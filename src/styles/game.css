@@ -125,8 +125,8 @@
     width: 40px;
     height: 40px;
     border-radius: 3px;
-    background: #bfbdb9
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='13' r='6' fill='%23fff'/%3E%3Cpath fill='%23fff' d='M13.5 21h13l-2.2 3 3 9h-14.6l3-9z'/%3E%3Crect x='9' y='33' width='22' height='5' rx='2' fill='%23fff'/%3E%3C/svg%3E")
+    /* Chess.com's default avatar. */
+    background: #e7e5e3 url('https://www.chess.com/bundles/web/images/user-image.007dad08.svg')
       center / cover no-repeat;
   }
 
