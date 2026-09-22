@@ -7,8 +7,9 @@ A Chrome extension that makes [Lichess](https://lichess.org) look and sound like
 - **Sounds**: Chess.com's move, opponent move, capture, castle, promotion, check, game start and end, 10-seconds-left and notification sounds. The right sound is picked for every move.
 - **Layout**:
   - A fixed left sidebar with flyout menus replaces the top header.
-  - Player bars with an avatar, title badge, rating, captured material and a Chess.com-style clock sit above and below the board.
+  - Player bars with an avatar, title badge, rating, Chess.com-style captured pieces and clock sit above and below the board, aligned with its edges.
   - One right-hand panel holds the move list, the game controls and the **chat**.
+  - Like Chess.com, game and analysis pages never scroll: everything fits the window. Lichess's below-the-board extras (crosstable, game info, share & export, computer analysis chart) are hidden.
 - **Theme**: Chess.com's dark palette, fonts and 3D green buttons across the whole site.
 - **Game Review**: on any finished game's analysis page, a Chess.com-style review powered by Stockfish 19 running in your browser:
   - A summary with the eval graph, both players' accuracy and counts of brilliant, great, best, excellent, good, book, inaccuracy, mistake, miss and blunder moves.
@@ -52,6 +53,7 @@ No Chess.com artwork or audio is bundled here. Pieces load from Chess.com's CDN 
 
 - Lichess obfuscates some move-list tag names (currently `i5d`, `aPp`, `qZM`, `Z7yx`, `bo3`) and occasionally renames them. If the move list loses its styling after a Lichess update, update those names in `src/styles/game.css`.
 - Below 1020px the Lichess mobile layout is kept, with the theme, board and pieces applied.
+- See [AGENTS.md](AGENTS.md) for the project goals, conventions and Lichess pitfalls.
 - Not affiliated with Chess.com or Lichess. Chess.com's name, pieces and sounds belong to Chess.com.
 
 ## License

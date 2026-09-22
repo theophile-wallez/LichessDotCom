@@ -59,12 +59,6 @@
     border-radius: 0 0 6px 6px;
   }
 
-  /* Below-the-fold items move past the extra review rows. */
-  html.cdc-review main.analyse .keyboard-move { grid-row: 6 !important; }
-  html.cdc-review main.analyse .analyse__underboard { grid-row: 7 !important; }
-  html.cdc-review main.analyse .analyse__side { grid-row: 6 / span 2 !important; }
-  html.cdc-review main.analyse .analyse__round-training { grid-row: 8 !important; }
-
   /* --------------------------------------------------------- panel --- */
 
   #cdc-review {
@@ -454,6 +448,8 @@
     position: relative;
     width: 26px;
     margin-right: 10px;
+    margin-top: var(--cdc-inset-t, 0px);
+    margin-bottom: var(--cdc-inset-b, 0px);
     overflow: hidden;
     border-radius: 3px;
     background: #403d39;

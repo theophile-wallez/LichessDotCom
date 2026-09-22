@@ -25,7 +25,7 @@
 
 @media (min-width: 1020px) {
   main.round {
-    --cdc-bar: 52px;
+    --cdc-bar: 56px;
     --cdc-coords-off: 0px;
     --cdc-gap: 24px;
     --cdc-panel-w: clamp(300px, 26vw, 460px);
@@ -59,7 +59,6 @@
     row-gap: 0 !important;
     justify-content: center !important;
     align-content: start !important;
-    padding-bottom: 24px;
   }
 
   body.coords-out main.round {
@@ -90,7 +89,7 @@
   main.round .material-top,
   main.round .expiration-top {
     grid-area: user-top !important;
-    --cdc-off: 0px;
+    --cdc-off: var(--cdc-inset-t, 0px);
   }
 
   main.round .ruser-bottom,
@@ -98,7 +97,7 @@
   main.round .material-bottom,
   main.round .expiration-bottom {
     grid-area: user-bot !important;
-    --cdc-off: var(--cdc-coords-off);
+    --cdc-off: calc(var(--cdc-coords-off) - var(--cdc-inset-b, 0px));
   }
 
   main.round .ruser {
@@ -108,12 +107,12 @@
     display: flex !important;
     align-items: center;
     gap: 5px;
-    height: 22px;
-    margin: calc(var(--cdc-off) + 6px) 0 0 !important;
+    height: 20px;
+    margin: calc(var(--cdc-off) + 8px) 0 0 var(--cdc-inset-l, 0px) !important;
     padding: 0 0 0 50px !important;
     overflow: visible !important;
     font-size: 14px !important;
-    line-height: 22px !important;
+    line-height: 20px !important;
     color: var(--cdc-text-strong) !important;
   }
 
@@ -166,26 +165,55 @@
   main.round .ruser rating::before { content: '('; }
   main.round .ruser rating::after  { content: ')'; }
 
+  /* Captured pieces, Chess.com style (built by content.js): the opponent's
+     pieces you took, grouped by type, then the material lead. Lichess's own
+     material-difference row is hidden. */
   main.round .material {
-    justify-self: start;
-    align-self: start;
-    height: 18px !important;
-    margin: calc(var(--cdc-off) + 29px) 0 0 52px !important;
-    line-height: 18px !important;
-    color: var(--cdc-text-dim);
-    font-size: 12px;
-    opacity: 0.85;
+    display: none !important;
   }
 
-  main.round .material score {
-    line-height: 18px !important;
-    font-weight: 600;
+  main.round .cdc-captured--top { grid-area: user-top; --cdc-off: var(--cdc-inset-t, 0px); }
+  main.round .cdc-captured--bottom {
+    grid-area: user-bot;
+    --cdc-off: calc(var(--cdc-coords-off) - var(--cdc-inset-b, 0px));
+  }
+
+  main.round .cdc-captured {
+    justify-self: start;
+    align-self: start;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 18px;
+    margin: calc(var(--cdc-off) + 30px) 0 0 calc(50px + var(--cdc-inset-l, 0px));
+    pointer-events: none;
+  }
+
+  .cdc-captured__group {
+    display: flex;
+  }
+
+  .cdc-captured__group img {
+    display: block;
+    width: 18px;
+    height: 18px;
+  }
+
+  .cdc-captured__group img + img {
+    margin-left: -11px;
+  }
+
+  .cdc-captured__score {
+    margin-left: 3px;
+    color: var(--cdc-text-dim);
+    font-size: 12px;
+    font-weight: 700;
   }
 
   main.round .expiration {
     justify-self: center;
     align-self: start;
-    margin-top: calc(var(--cdc-off) + 12px) !important;
+    margin-top: calc(var(--cdc-off) + 14px) !important;
     padding: 0 10px;
     border-radius: 4px !important;
   }
@@ -198,7 +226,8 @@
     display: flex !important;
     align-items: center;
     gap: 6px;
-    margin-top: calc(var(--cdc-off) + 4px) !important;
+    margin-top: calc(var(--cdc-off) + 6px) !important;
+    margin-right: var(--cdc-inset-r, 0px) !important;
   }
 
   main.round .rclock .bar {
@@ -544,40 +573,39 @@
     font-size: 11px;
   }
 
-  /* ------------------------------------------------ below the fold --- */
+  /* ---------------------------------------------------- no scrolling --- */
+
+  /* Like Chess.com, the page never scrolls: everything fits the viewport, and
+     what used to sit below the board (crosstable, game info, TV channels) is
+     dropped. The keyboard-move input goes on top of the chat. */
+  html:has(main.round),
+  html:has(main.round) body {
+    overflow: hidden !important;
+  }
+
+  html:has(main.round) body {
+    height: 100vh;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  main.round .round__underboard,
+  main.round .round__side > :not(.mchat) {
+    display: none !important;
+  }
 
   main.round .keyboard-move {
-    grid-column: 1 !important;
-    grid-row: 6 !important;
-    margin-top: 12px !important;
-  }
-
-  main.round .round__underboard {
-    grid-column: 1 !important;
-    grid-row: 7 !important;
-    margin-top: 16px;
-  }
-
-  /* Game info, TV channels, tournament box... stacked below the panel. */
-  main.round .round__side > :not(.mchat) {
-    grid-column: 2 !important;
-    grid-row: 6 !important;
-    margin-top: 16px !important;
-    border-radius: 6px;
+    grid-area: chat !important;
+    align-self: start;
+    z-index: 3;
+    margin: 0 !important;
+    padding: 6px 8px;
     background: var(--cdc-bg-panel);
-    box-shadow: none !important;
-  }
-
-  main.round .round__side > :not(.mchat) ~ :not(.mchat) {
-    grid-row: 7 !important;
-  }
-
-  main.round .round__side > :not(.mchat) ~ :not(.mchat) ~ :not(.mchat) {
-    grid-row: 8 !important;
   }
 
   /* No chat (e.g. games against the computer): show the game info there. */
   main.round:not(:has(.mchat)) .round__side > .game__meta {
+    display: block !important;
     grid-area: chat !important;
     margin-top: 0 !important;
     border-top: 1px solid var(--cdc-border);

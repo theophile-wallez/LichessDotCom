@@ -1,7 +1,7 @@
 /*
  * Analysis page (main.analyse), also used for finished games: board on the
  * left, one Chess.com-style panel on the right with engine + moves, the
- * navigation controls and the chat. Game info and the crosstable go below.
+ * navigation controls and the chat. The page itself never scrolls.
  * `--cdc-controls-h` is measured and set by content.js.
  */
 
@@ -34,7 +34,6 @@
     justify-content: center !important;
     align-content: start !important;
     margin-top: 12px;
-    padding-bottom: 24px;
   }
 
   main.analyse .analyse__board {
@@ -53,6 +52,7 @@
 
   main.analyse .analyse__tools {
     grid-area: tools !important;
+    align-self: stretch !important;
     height: auto !important;
     min-height: 0;
     border-radius: 6px 6px 0 0;
@@ -80,6 +80,9 @@
 
   main.analyse > .mchat {
     grid-area: chat !important;
+    align-self: stretch !important;
+    /* Lichess sets an inline height on the analysis chat; the grid row wins. */
+    height: auto !important;
     display: flex !important;
     flex-direction: column !important;
     min-height: 0 !important;
@@ -106,11 +109,14 @@
 
   main.analyse > .mchat .mchat__content {
     min-height: 0;
+    overflow: hidden;
     background: transparent !important;
   }
 
   main.analyse > .mchat .mchat__messages {
     max-height: none !important;
+    min-height: 0;
+    overflow-y: auto;
   }
 
   main.analyse > .mchat .mchat__say {
@@ -135,38 +141,32 @@
     border-radius: 0 0 6px 6px;
   }
 
-  /* ------------------------------------------------ below the fold --- */
+  /* ---------------------------------------------------- no scrolling --- */
 
-  main.analyse .chat__members {
+  /* Like Chess.com, the page never scrolls: the underboard (computer analysis
+     chart, share & export), game info and "learn from your mistakes" are
+     dropped. The keyboard-move input goes at the bottom of the tools. */
+  html:has(main.analyse),
+  html:has(main.analyse) body {
+    overflow: hidden !important;
+  }
+
+  html:has(main.analyse) body {
+    height: 100vh;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  main.analyse :is(.chat__members, .analyse__underboard, .analyse__side, .analyse__round-training) {
     display: none !important;
   }
 
   main.analyse .keyboard-move {
-    grid-column: 2 !important;
-    grid-row: 4 !important;
-    margin-top: 12px !important;
-  }
-
-  main.analyse .analyse__underboard {
-    grid-column: 2 !important;
-    grid-row: 5 !important;
-    margin-top: 16px;
-  }
-
-  main.analyse .analyse__side {
-    grid-column: 3 !important;
-    grid-row: 4 / span 2 !important;
-    margin: 16px 0 0 var(--cdc-gap) !important;
-  }
-
-  main.analyse .analyse__side .game__meta {
-    border-radius: 6px;
-    box-shadow: none !important;
-  }
-
-  main.analyse .analyse__round-training {
-    grid-column: 3 !important;
-    grid-row: 6 !important;
-    margin: 16px 0 0 var(--cdc-gap) !important;
+    grid-area: tools !important;
+    align-self: end;
+    z-index: 3;
+    margin: 0 0 0 var(--cdc-gap) !important;
+    padding: 6px 8px;
+    background: var(--cdc-bg-panel);
   }
 }

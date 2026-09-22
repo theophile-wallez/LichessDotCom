@@ -3,6 +3,7 @@
 //    the page-world script (page.js), which hooks Lichess's sound player.
 // 2. Keeps a CSS variable in sync with the height of the game controls, which
 //    the game layout grid needs (see styles/game.css).
+// 3. Renders Chess.com-style captured pieces in the game page's player bars.
 
 (() => {
   const MSG_SOUNDS = 'cdc:sounds';
@@ -37,5 +38,83 @@
       main.style.setProperty('--cdc-controls-h', height + 'px');
     }
   };
-  setInterval(syncControlsHeight, 250);
+  // Chess.com-style captured pieces under each player's name: the opponent's
+  // pieces that are no longer on the board, grouped by type, plus the lead.
+  const START = { pawn: 8, knight: 2, bishop: 2, rook: 2, queen: 1 };
+  const VALUE = { pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9 };
+  const LETTER = { pawn: 'p', knight: 'n', bishop: 'b', rook: 'r', queen: 'q' };
+  const PIECES = 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/';
+  const captured = { top: null, bottom: null };
+  let lastCaptured = '';
+
+  const capturedHtml = (color, missing, lead) =>
+    Object.keys(START)
+      .filter(role => missing[role] > 0)
+      .map(role => {
+        const img = `${PIECES}${color[0]}${LETTER[role]}.png`;
+        const piece = `<img src="${img}" alt="" draggable="false">`;
+        return `<div class="cdc-captured__group">${piece.repeat(missing[role])}</div>`;
+      })
+      .join('') + (lead > 0 ? `<span class="cdc-captured__score">+${lead}</span>` : '');
+
+  const syncCaptured = () => {
+    const main = document.querySelector('main.round');
+    const wrap = main?.querySelector('.round__app__board .cg-wrap');
+    const board = wrap?.querySelector('cg-board');
+    if (!board) return;
+    const onBoard = { white: {}, black: {} };
+    const material = { white: 0, black: 0 };
+    for (const p of board.querySelectorAll('piece:not(.ghost):not(.fading)')) {
+      const color = p.classList.contains('white') ? 'white' : 'black';
+      const role = Object.keys(START).find(r => p.classList.contains(r));
+      if (!role) continue;
+      onBoard[color][role] = (onBoard[color][role] || 0) + 1;
+      material[color] += VALUE[role];
+    }
+    const bottomColor = wrap.classList.contains('orientation-black') ? 'black' : 'white';
+    const topColor = bottomColor === 'white' ? 'black' : 'white';
+    // A player shows the pieces of the other color that are gone.
+    const missing = color =>
+      Object.fromEntries(Object.keys(START).map(r => [r, Math.max(0, START[r] - (onBoard[color][r] || 0))]));
+    const html = {
+      top: capturedHtml(bottomColor, missing(bottomColor), material[topColor] - material[bottomColor]),
+      bottom: capturedHtml(topColor, missing(topColor), material[bottomColor] - material[topColor]),
+    };
+    for (const side of ['top', 'bottom']) {
+      if (!captured[side] || captured[side].parentNode !== main) {
+        captured[side] = document.createElement('div');
+        captured[side].className = `cdc-captured cdc-captured--${side}`;
+        main.appendChild(captured[side]);
+        lastCaptured = '';
+      }
+    }
+    const key = html.top + '|' + html.bottom;
+    if (key === lastCaptured) return;
+    lastCaptured = key;
+    captured.top.innerHTML = html.top;
+    captured.bottom.innerHTML = html.bottom;
+  };
+
+  // Chessground shrinks the board to whole pixels per square and leaves the
+  // remainder as an inset inside its wrapper. Expose it so the player bars and
+  // the eval bar line up with the squares, not the wrapper.
+  let lastInset = '';
+  const syncBoardInset = () => {
+    const main = document.querySelector('main.round, main.analyse');
+    const container = main?.querySelector('.main-board cg-container');
+    const wrap = container?.closest('.cg-wrap');
+    if (!wrap) return;
+    const c = container.getBoundingClientRect(), w = wrap.getBoundingClientRect();
+    const inset = [c.top - w.top, w.right - c.right, w.bottom - c.bottom, c.left - w.left].map(v => Math.max(0, Math.round(v)));
+    const key = inset.join(',');
+    if (key === lastInset) return;
+    lastInset = key;
+    ['t', 'r', 'b', 'l'].forEach((side, i) => main.style.setProperty(`--cdc-inset-${side}`, inset[i] + 'px'));
+  };
+
+  setInterval(() => {
+    syncControlsHeight();
+    syncCaptured();
+    syncBoardInset();
+  }, 250);
 })();
