@@ -1,0 +1,550 @@
+/*
+ * Chess.com-style Game Review (see src/review.js). review.js sets one of these
+ * on <html> for game analysis pages:
+ *   .cdc-review-normal   Lichess analysis + a "Game Review" button on top
+ *   .cdc-review-summary  review summary fills the right panel
+ *   .cdc-review-moves    move-by-move review: coach, moves, graph, controls
+ * plus .cdc-evalbar-on and data-cdc-cls="<classification of current move>".
+ */
+
+@media (min-width: 1020px) {
+  html.cdc-review main.analyse {
+    --cdc-review-top: 48px;
+  }
+
+  html.cdc-review-normal main.analyse {
+    grid-template-rows:
+      var(--cdc-review-top)
+      max(0px, calc(var(--cdc-board) - var(--cdc-review-top) - var(--cdc-ctrl-h) - var(--cdc-chat-h)))
+      var(--cdc-ctrl-h)
+      var(--cdc-chat-h) !important;
+    grid-template-areas:
+      'gauge board rtop'
+      'gauge board tools'
+      'gauge board controls'
+      'gauge board chat' !important;
+  }
+
+  html.cdc-review-summary main.analyse {
+    grid-template-rows: var(--cdc-board) !important;
+    grid-template-areas: 'gauge board rtop' !important;
+  }
+
+  html.cdc-review-moves main.analyse {
+    --cdc-review-top: 236px;
+    --cdc-review-graph: 96px;
+    grid-template-rows:
+      var(--cdc-review-top)
+      max(0px, calc(var(--cdc-board) - var(--cdc-review-top) - var(--cdc-review-graph) - var(--cdc-ctrl-h)))
+      var(--cdc-review-graph)
+      var(--cdc-ctrl-h) !important;
+    grid-template-areas:
+      'gauge board rtop'
+      'gauge board tools'
+      'gauge board rgraph'
+      'gauge board controls' !important;
+  }
+
+  html.cdc-review-summary main.analyse > :is(.analyse__tools, .analyse__controls, .mchat),
+  html.cdc-review-moves main.analyse > .mchat,
+  html.cdc-review:not(.cdc-review-moves) #cdc-review-graph {
+    display: none !important;
+  }
+
+  html.cdc-review main.analyse .analyse__tools {
+    border-radius: 0 !important;
+  }
+
+  html.cdc-review-moves main.analyse .analyse__controls {
+    border-radius: 0 0 6px 6px;
+  }
+
+  /* Below-the-fold items move past the extra review rows. */
+  html.cdc-review main.analyse .keyboard-move { grid-row: 6 !important; }
+  html.cdc-review main.analyse .analyse__underboard { grid-row: 7 !important; }
+  html.cdc-review main.analyse .analyse__side { grid-row: 6 / span 2 !important; }
+  html.cdc-review main.analyse .analyse__round-training { grid-row: 8 !important; }
+
+  /* --------------------------------------------------------- panel --- */
+
+  #cdc-review {
+    grid-area: rtop;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin-left: var(--cdc-gap);
+    overflow: hidden;
+    border-radius: 6px 6px 0 0;
+    background: var(--cdc-bg-panel);
+    color: var(--cdc-text);
+    font-family: var(--cdc-font);
+  }
+
+  html.cdc-review-summary #cdc-review {
+    border-radius: 6px;
+  }
+
+  #cdc-review button {
+    font-family: var(--cdc-font) !important;
+    cursor: pointer;
+  }
+
+  .cdc-review__open {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 100%;
+    border: none;
+    border-bottom: 1px solid var(--cdc-border);
+    background: transparent;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .cdc-review__open:hover {
+    background: #ffffff0d;
+  }
+
+  .cdc-review__head {
+    flex: none;
+    display: grid;
+    grid-template-columns: 40px 1fr 40px;
+    align-items: center;
+    height: 48px;
+    padding: 0 4px;
+    background: var(--cdc-bg-panel-dark);
+  }
+
+  .cdc-review__back,
+  .cdc-review__close {
+    height: 36px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--cdc-text-dim);
+    font-size: 20px;
+  }
+
+  .cdc-review__back:hover,
+  .cdc-review__close:hover {
+    color: #fff;
+  }
+
+  .cdc-review__title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 800;
+  }
+
+  .cdc-review__star {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--cdc-green);
+    color: #fff;
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  .cdc-review__body {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 12px 16px;
+  }
+
+  .cdc-review__foot {
+    flex: none;
+    padding: 12px 16px 16px;
+  }
+
+  .cdc-review__msg,
+  .cdc-review__progress p {
+    margin: 24px 0 12px;
+    text-align: center;
+    color: var(--cdc-text);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .cdc-review__pct {
+    margin-top: 8px !important;
+    color: var(--cdc-text-dim) !important;
+  }
+
+  .cdc-progress {
+    height: 8px;
+    overflow: hidden;
+    border-radius: 4px;
+    background: var(--cdc-bg-raised);
+  }
+
+  .cdc-progress > div {
+    height: 100%;
+    background: var(--cdc-green);
+    transition: width 0.2s;
+  }
+
+  /* ----------------------------------------------------------- graph --- */
+
+  .cdc-summary-graph {
+    height: 88px;
+    margin-bottom: 14px;
+    cursor: pointer;
+  }
+
+  #cdc-review-graph {
+    grid-area: rgraph;
+    margin-left: var(--cdc-gap);
+    padding: 8px 12px;
+    box-sizing: border-box;
+    background: var(--cdc-bg-panel);
+    cursor: pointer;
+  }
+
+  .cdc-summary-graph svg,
+  #cdc-review-graph svg {
+    display: block;
+    border-radius: 3px;
+  }
+
+  /* ----------------------------------------------------------- table --- */
+
+  .cdc-review__table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .cdc-review__table td {
+    padding: 6px 0;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .cdc-review__table .cdc-t-label {
+    width: 34%;
+    text-align: left;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .cdc-t-names td {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    word-break: break-all;
+  }
+
+  .cdc-t-num {
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .cdc-t-icon {
+    width: 32px;
+  }
+
+  .cdc-t-sep td {
+    padding: 4px 0 !important;
+    border-bottom: 1px solid var(--cdc-border);
+  }
+
+  .cdc-avatar {
+    display: inline-block;
+    width: 56px;
+    height: 56px;
+    border-radius: 6px;
+    background: #e7e5e3 url('https://www.chess.com/bundles/web/images/user-image.007dad08.svg') center / cover;
+  }
+
+  .cdc-acc {
+    display: inline-block;
+    min-width: 52px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 17px;
+    font-weight: 800;
+  }
+
+  .cdc-acc--w { background: #fff; color: #312e2b; }
+  .cdc-acc--b { background: #403d39; color: #fff; }
+
+  .cdc-cls-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--c);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -1px;
+    flex: none;
+  }
+
+  /* ----------------------------------------------------------- coach --- */
+
+  .cdc-coach {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    height: 116px;
+    padding: 12px 12px 0;
+    box-sizing: border-box;
+  }
+
+  .cdc-coach__avatar {
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #312e2b url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-6 -6 62 62'%3E%3Cpath fill='%23fff' d='M38.956.5c-3.53.418-6.452.902-9.286 2.984C5.534 1.786-.692 18.533.68 29.364 3.493 50.214 31.918 55.785 41.329 41.7c-7.444 7.696-19.276 8.752-28.323 3.084S-.506 27.392 4.683 17.567C9.873 7.742 18.996 4.535 29.03 6.405c2.43-1.418 5.225-3.22 7.655-3.187l-1.694 4.86 12.752 21.37c-.439 5.654-5.459 6.112-5.459 6.112-.574-1.47-1.634-2.942-4.842-6.036-3.207-3.094-17.465-10.177-15.788-16.207-2.001 6.967 10.311 14.152 14.04 17.663 3.73 3.51 5.426 6.04 5.795 6.756 0 0 9.392-2.504 7.838-8.927L37.4 7.171z'/%3E%3C/svg%3E")
+      center / cover;
+  }
+
+  .cdc-bubble {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    max-height: 100px;
+    overflow: hidden;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #fff;
+    color: #312e2b;
+  }
+
+  .cdc-bubble::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 16px;
+    border: 7px solid transparent;
+    border-left: none;
+    border-right-color: #fff;
+  }
+
+  .cdc-bubble__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cdc-bubble__title {
+    flex: 1;
+    margin: 0;
+    color: #312e2b;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .cdc-bubble__eval {
+    flex: none;
+    padding: 2px 6px;
+    border: 1px solid #d0cfcc;
+    border-radius: 3px;
+    background: #f1f1f0;
+    color: #312e2b;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .cdc-bubble__sub {
+    margin: 6px 0 0;
+    color: #312e2b;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .cdc-review__nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 14px 12px 12px;
+  }
+
+  .cdc-btn {
+    height: 44px;
+    text-align: center;
+    border: none;
+    border-radius: 6px;
+    background: var(--cdc-bg-raised);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    box-shadow: 0 4px 0 0 #1f1e1c;
+  }
+
+  .cdc-btn:hover:not(:disabled) {
+    background: var(--cdc-bg-raised-hover);
+  }
+
+  .cdc-btn--green {
+    background: var(--cdc-green);
+    box-shadow: 0 4px 0 0 var(--cdc-green-shadow);
+  }
+
+  .cdc-btn--green:hover:not(:disabled) {
+    background: var(--cdc-green-hover);
+  }
+
+  .cdc-btn:disabled {
+    opacity: 0.5;
+    cursor: default !important;
+  }
+
+  .cdc-review__foot .cdc-btn {
+    width: 100%;
+    height: 56px;
+    font-size: 20px;
+  }
+
+  /* ------------------------------------------------------- move list --- */
+
+  html.cdc-review-moves main.analyse .tview2 > move[data-cdc-cls] glyph {
+    display: none;
+  }
+
+  html.cdc-review-moves main.analyse .tview2 > move:is(
+      [data-cdc-cls='brilliant'], [data-cdc-cls='great'], [data-cdc-cls='book'],
+      [data-cdc-cls='inaccuracy'], [data-cdc-cls='mistake'], [data-cdc-cls='miss'],
+      [data-cdc-cls='blunder'])::before {
+    content: attr(data-cdc-icon);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 17px;
+    height: 17px;
+    margin-right: 5px;
+    border-radius: 50%;
+    background: var(--c);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    vertical-align: 1px;
+    flex: none;
+  }
+
+  html.cdc-review-moves main.analyse .tview2 > move:is(
+      [data-cdc-cls='brilliant'], [data-cdc-cls='great'], [data-cdc-cls='inaccuracy'],
+      [data-cdc-cls='mistake'], [data-cdc-cls='miss'], [data-cdc-cls='blunder']) {
+    color: var(--c) !important;
+  }
+
+  /* -------------------------------------------------------- eval bar --- */
+
+  #cdc-evalbar {
+    grid-area: gauge;
+    display: none;
+    position: relative;
+    width: 26px;
+    margin-right: 10px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: #403d39;
+  }
+
+  html.cdc-evalbar-on #cdc-evalbar {
+    display: block;
+  }
+
+  html.cdc-evalbar-on main.analyse .eval-gauge {
+    display: none !important;
+  }
+
+  .cdc-evalbar__fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    transition: height 0.3s ease;
+  }
+
+  .cdc-evalbar--flip .cdc-evalbar__fill {
+    top: 0;
+    bottom: auto;
+  }
+
+  .cdc-evalbar__label {
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-family: var(--cdc-font);
+    font-size: 10px;
+    font-weight: 700;
+    z-index: 1;
+  }
+
+  .cdc-evalbar__label--white { bottom: 5px; color: #403d39; }
+  .cdc-evalbar__label--black { top: 5px; color: #fff; }
+  .cdc-evalbar--flip .cdc-evalbar__label--white { top: 5px; bottom: auto; }
+  .cdc-evalbar--flip .cdc-evalbar__label--black { bottom: 5px; top: auto; }
+}
+
+/* ------------------------------------------------------ board overlay --- */
+
+#cdc-board-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.cdc-badge {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.8%;
+  aspect-ratio: 1;
+  transform: translate(-72%, -28%);
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 2px 3px #00000059;
+  color: #fff;
+  font-family: var(--cdc-font);
+  font-size: calc(var(--cdc-board, 640px) * 0.022);
+  font-weight: 900;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.cdc-arrow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+}
+
+.cdc-arrow line { stroke: #5da8db; }
+.cdc-arrow polygon { fill: #5da8db; }
+
+/* Last-move squares take the classification color. */
+html.cdc-review-moves[data-cdc-cls='brilliant'] main.analyse cg-board square.last-move { background: rgba(38, 194, 163, 0.5) !important; }
+html.cdc-review-moves[data-cdc-cls='great'] main.analyse cg-board square.last-move { background: rgba(116, 155, 191, 0.5) !important; }
+html.cdc-review-moves[data-cdc-cls='best'] main.analyse cg-board square.last-move { background: rgba(129, 182, 76, 0.5) !important; }
+html.cdc-review-moves[data-cdc-cls='excellent'] main.analyse cg-board square.last-move { background: rgba(150, 188, 75, 0.5) !important; }
+html.cdc-review-moves[data-cdc-cls='good'] main.analyse cg-board square.last-move { background: rgba(150, 175, 139, 0.5) !important; }
+html.cdc-review-moves[data-cdc-cls='book'] main.analyse cg-board square.last-move { background: rgba(168, 136, 101, 0.5) !important; }
+html.cdc-review-moves[data-cdc-cls='inaccuracy'] main.analyse cg-board square.last-move { background: rgba(247, 192, 69, 0.5) !important; }
+html.cdc-review-moves[data-cdc-cls='mistake'] main.analyse cg-board square.last-move { background: rgba(255, 164, 89, 0.5) !important; }
+html.cdc-review-moves[data-cdc-cls='miss'] main.analyse cg-board square.last-move { background: rgba(255, 119, 105, 0.5) !important; }
+html.cdc-review-moves[data-cdc-cls='blunder'] main.analyse cg-board square.last-move { background: rgba(250, 65, 45, 0.5) !important; }

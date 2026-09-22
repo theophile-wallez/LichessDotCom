@@ -10,6 +10,9 @@ A Chrome extension that makes [Lichess](https://lichess.org) look and sound like
   - Player bars with an avatar, title badge, rating, captured material and a Chess.com-style clock sit above and below the board.
   - One right-hand panel holds the move list, the game controls and the **chat**.
 - **Theme**: Chess.com's dark palette, fonts and 3D green buttons across the whole site.
+- **Game Review**: on any finished game's analysis page, a Chess.com-style review powered by Stockfish 19 running in your browser:
+  - A summary with the eval graph, both players' accuracy and counts of brilliant, great, best, excellent, good, book, inaccuracy, mistake, miss and blunder moves.
+  - A move-by-move review with a coach bubble, classification badges in the move list and on the board, colored move squares, a best-move arrow and a Chess.com eval bar.
 
 The game page (`/<gameId>`, including TV) and the analysis page (`/analysis` and finished games) get the full Chess.com layout. Every other page gets the theme, sidebar, board and pieces.
 
@@ -31,13 +34,17 @@ Tip: Lichess's _coordinates_ setting (Preferences → Display) picks between Che
 | `src/styles/board.css` | Board, pieces, square highlights, move hints, arrows, coordinates. |
 | `src/styles/game.css` | Game page layout (`main.round`). |
 | `src/styles/analysis.css` | Analysis page layout (`main.analyse`). |
+| `src/styles/review.css` | Game Review panel, eval bar and board annotations. |
 | `src/background.js` | Downloads the Chess.com sounds once and caches them in `chrome.storage.local`. |
 | `src/content.js` | Passes the sounds to the page and measures the controls height for the layout grid. |
 | `src/page.js` | Runs in the page and wraps `site.sound` so each event plays the matching Chess.com sound. |
+| `src/review.js` | Runs in the page: analyzes the game with Stockfish, classifies moves and renders the Game Review. |
 
 The layouts use `display: contents` on Lichess's containers so the board, player bars, clocks, moves and chat can be arranged in one CSS grid. No DOM nodes are moved, which keeps Lichess's virtual DOM happy.
 
 For sounds, `page.js` wraps Lichess's `site.sound.move()` and `site.sound.play()`. When a move lands, it reads the board's last-move squares and pieces from the DOM (chessground's `cgKey`). From that it tells your moves from your opponent's and detects castling, promotion and check, just as Chess.com does.
+
+For the Game Review, `review.js` loads the same Stockfish 19 build (`sf_19_smallnet`) that Lichess's analysis board uses, through Lichess's own asset loader. It evaluates every mainline position (depth 16, two lines) and caches the results per game in `localStorage`, so a game is only analyzed once (about 20 seconds for 50 moves). Moves are classified from how much win probability they lose, following Chess.com's categories. "Brilliant" means a best move that sacrifices a piece; "great" means the only good move. Navigation goes through Lichess's analysis controller (`site.analysis`).
 
 No Chess.com artwork or audio is bundled here. Pieces load from Chess.com's CDN at runtime, and the sounds are fetched by the extension on first use.
 
