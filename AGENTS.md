@@ -131,3 +131,17 @@ Lichess turn animations off; emulate `no-preference` to check animations.
 Before committing, syntax-check every JS file (e.g. `new Function(src)` in the
 browser) and parse `manifest.json`. Finally, load the extension unpacked in
 `chrome://extensions`.
+
+## Shipping
+
+When you consider the work done, ship it. Don't wait to be asked, and don't
+open a PR:
+
+1. Commit, merge `origin/main` in, and push to `main` (`git push origin
+   HEAD:main`, a fast-forward).
+2. Pull `main` into the main checkout, which is where Chrome loads the unpacked
+   extension. Otherwise the user keeps testing the old code.
+3. Clean the worktree: remove any `node_modules` and other throwaway files
+   (test scripts, screenshots, browser profiles) you created.
+4. Finish with a short summary of what was done, and remind the user to reload
+   the extension in `chrome://extensions`.
