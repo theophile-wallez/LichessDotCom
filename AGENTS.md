@@ -45,10 +45,11 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 
 | Path | What it does |
 | --- | --- |
-| `manifest.json` | Content scripts: CSS + `content.js` (isolated world), `page.js` + `review.js` (page world). |
+| `manifest.json` | Content scripts: CSS + `content.js` (isolated world), `page.js` + `board.js` + `review.js` (page world). |
 | `src/background.js` | Service worker: downloads the Chess.com sounds, caches them as base64. |
 | `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces. |
 | `src/page.js` | Page world: wraps `site.sound` to play the right Chess.com sound per move. |
+| `src/board.js` | Page world: analysis arrows redrawn Chess.com-style, checkmate badge and label. |
 | `src/review.js` | Page world: Game Review (engine, classification, panel, board overlays, eval bar). |
 | `src/styles/theme.css` | Overrides Lichess's `--c-*` color variables, fonts, buttons. |
 | `src/styles/sidebar.css` | Lichess's top header → Chess.com's left sidebar. |
@@ -89,11 +90,13 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   only reach Lichess's domains plus `blob:` and `data:`. Cross-origin data
   must come from the background worker.
 - **Two worlds.** `content.js` can't see page JS objects (`site`, chessground's
-  `cgKey` expandos); `page.js` and `review.js` can. Communicate with
+  `cgKey` expandos); `page.js`, `board.js` and `review.js` can. Communicate with
   `window.postMessage`.
 - **Useful page APIs.** `site.sound` is Lichess's sound player, and
   `site.analysis` is the analysis controller (`mainline`, `node.ply`,
-  `jumpToMain`, `getOrientation`). Game data is in
+  `jumpToMain`, `getOrientation`; `jumpToMain` doesn't scroll the move list),
+  and `site.analysis.chessground.state.drawable` holds the arrows (`shapes`,
+  `autoShapes`, `current`). Game data is in
   `<script id="page-init-data">`, and the engine is at
   `npm/stockfish-web/sf_19_smallnet.js`.
 
@@ -113,6 +116,8 @@ Check at 1366×640, 1600×900 and 1920×1080: nothing overflows, the page doesn'
 scroll, and bars and the eval bar line up with the board. Chess.com's CDN
 rejects the `HeadlessChrome` user agent, so override it to a normal Chrome UA
 for every request, or images will look broken when they aren't.
+Headless Chrome also reports `prefers-reduced-motion: reduce`, which makes
+Lichess turn animations off; emulate `no-preference` to check animations.
 
 Before committing, syntax-check every JS file (e.g. `new Function(src)` in the
 browser) and parse `manifest.json`. Finally, load the extension unpacked in

@@ -39,6 +39,7 @@ Tip: Lichess's _coordinates_ setting (Preferences → Display) picks between Che
 | `src/background.js` | Downloads the Chess.com sounds once and caches them in `chrome.storage.local`. |
 | `src/content.js` | Passes the sounds to the page and measures the controls height for the layout grid. |
 | `src/page.js` | Runs in the page and wraps `site.sound` so each event plays the matching Chess.com sound. |
+| `src/board.js` | Runs in the page: redraws analysis arrows like Chess.com (L-shaped for knights) and shows checkmate on the king. |
 | `src/review.js` | Runs in the page: analyzes the game with Stockfish, classifies moves and renders the Game Review. |
 
 The layouts use `display: contents` on Lichess's containers so the board, player bars, clocks, moves and chat can be arranged in one CSS grid. No DOM nodes are moved, which keeps Lichess's virtual DOM happy.
