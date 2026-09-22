@@ -147,5 +147,6 @@ open a PR:
    extension. Otherwise the user keeps testing the old code.
 3. Clean the worktree: remove any `node_modules` and other throwaway files
    (test scripts, screenshots, browser profiles) you created.
-4. Finish with a short summary of what was done, and remind the user to reload
-   the extension in `chrome://extensions`.
+4. Finish with a short summary of what was done. There's no need to reload
+   the extension by hand: when loaded unpacked, it reloads itself (and the
+   tab) as soon as a Lichess tab gets focus after its files changed.

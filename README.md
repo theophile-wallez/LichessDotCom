@@ -25,6 +25,8 @@ The game page (`/<gameId>`, including TV) and the analysis page (`/analysis` and
 3. Click **Load unpacked** and select the repository folder.
 4. Open or reload lichess.org.
 
+When loaded unpacked, the extension reloads itself whenever its files change (for example after a `git pull`): focus a Lichess tab and it picks up the new code.
+
 Tip: Lichess's _coordinates_ setting (Preferences → Display) picks between Chess.com's inside coordinates (the default) and outside coordinates.
 
 ## How it works
