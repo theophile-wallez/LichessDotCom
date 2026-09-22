@@ -5,7 +5,7 @@
 
 @media (min-width: 1020px) {
   :root {
-    --cdc-sidebar-w: 145px;
+    --cdc-sidebar-w: 160px;
   }
 
   body {
@@ -81,11 +81,15 @@
   }
 
   #top .site-title::after {
-    content: 'Chess.com';
+    content: 'Lichess';
+    min-width: 0;
     font-size: 22px;
     font-weight: 800;
     letter-spacing: -0.5px;
     color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   #top .site-title:hover::after {
@@ -115,6 +119,9 @@
 
   #topnav section > a {
     display: flex !important;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
     align-items: center;
     gap: 10px;
     height: 44px !important;
@@ -135,6 +142,8 @@
 
   #topnav section > a .play {
     display: inline !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   #topnav section > a::before {
@@ -179,23 +188,24 @@
     color: #fff !important;
   }
 
-  /* Icons, matched on the section's main link. */
-  #topnav a[href='/'] {
+  /* Icons by position: Play, Puzzles, Learn, Watch, Community, Tools. Hrefs
+     are localized (e.g. /fr/training), so they can't be matched on. */
+  #topnav section:nth-of-type(1) > a {
     --cdc-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='1' y='1' width='22' height='22' rx='4' fill='%2381b64c'/%3E%3Ccircle cx='12' cy='7' r='3' fill='%23fff'/%3E%3Cpath fill='%23fff' d='M8.8 11h6.4l-1.3 1.6 1.4 4.9H8.7l1.4-4.9z'/%3E%3Crect x='6.5' y='17.6' width='11' height='2.6' rx='1' fill='%23fff'/%3E%3C/svg%3E");
   }
-  #topnav a[href='/training'] {
+  #topnav section:nth-of-type(2) > a {
     --cdc-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23f7922e' d='M10 2.5a2.5 2.5 0 0 1 5 0V5h4.5A1.5 1.5 0 0 1 21 6.5V11h-2a2.5 2.5 0 0 0 0 5h2v4.5a1.5 1.5 0 0 1-1.5 1.5H15v-2a2.5 2.5 0 0 0-5 0v2H4.5A1.5 1.5 0 0 1 3 20.5V16h2a2.5 2.5 0 0 0 0-5H3V6.5A1.5 1.5 0 0 1 4.5 5H10z'/%3E%3C/svg%3E");
   }
-  #topnav a[href='/learn'] {
+  #topnav section:nth-of-type(3) > a {
     --cdc-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%233ba5e0' d='M12 3 1 8.5 12 14l9-4.5V16h2V8.5z'/%3E%3Cpath fill='%232a86bd' d='M5 12v4c0 1.9 3.1 3.5 7 3.5s7-1.6 7-3.5v-4l-7 3.5z'/%3E%3C/svg%3E");
   }
-  #topnav a[href='/broadcast'] {
+  #topnav section:nth-of-type(4) > a {
     --cdc-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='6.5' cy='15' r='5' fill='%23c4c3c0'/%3E%3Ccircle cx='17.5' cy='15' r='5' fill='%23c4c3c0'/%3E%3Ccircle cx='6.5' cy='15' r='2.6' fill='%235a9fd6'/%3E%3Ccircle cx='17.5' cy='15' r='2.6' fill='%235a9fd6'/%3E%3Cpath fill='%23c4c3c0' d='M4 4h4l1 7H3zm12 0h4l1 7h-6zM9.5 10h5v4h-5z'/%3E%3C/svg%3E");
   }
-  #topnav a[href='/player'] {
+  #topnav section:nth-of-type(5) > a {
     --cdc-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='8' cy='7' r='3.5' fill='%23f7922e'/%3E%3Cpath fill='%23f7922e' d='M1 20c0-4 3-7 7-7s7 3 7 7z'/%3E%3Ccircle cx='17' cy='8' r='3' fill='%233ba5e0'/%3E%3Cpath fill='%233ba5e0' d='M13 19.5c.3-1.8-.2-3.6-1.3-5A6 6 0 0 1 23 17.5v2z'/%3E%3C/svg%3E");
   }
-  #topnav a[href='/analysis'] {
+  #topnav section:nth-of-type(6) > a {
     --cdc-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='4' cy='12' r='2.5' fill='%23989795'/%3E%3Ccircle cx='12' cy='12' r='2.5' fill='%23989795'/%3E%3Ccircle cx='20' cy='12' r='2.5' fill='%23989795'/%3E%3C/svg%3E");
   }
 
@@ -275,6 +285,9 @@
   #top #user_tag {
     max-width: none !important;
     width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     font-weight: 700;
     color: var(--cdc-text) !important;
   }
