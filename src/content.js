@@ -4,6 +4,7 @@
 // 2. Keeps a CSS variable in sync with the height of the game controls, which
 //    the game layout grid needs (see styles/game.css).
 // 3. Renders Chess.com-style captured pieces in the game page's player bars.
+// 4. When loaded unpacked, reloads the extension after a ship changed its files.
 
 (() => {
   const MSG_SOUNDS = 'cdc:sounds';
@@ -179,4 +180,29 @@
   }, 250);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncHero);
   else syncHero();
+
+  // Unpacked only: when the tab gets focus, ask the background worker whether
+  // the files on disk changed (a ship pulled main). If so it reloads the
+  // extension, and the tab reloads once the new version is in.
+  if (!('update_url' in chrome.runtime.getManifest())) {
+    const reloadWhenOrphaned = () => {
+      const wait = setInterval(() => {
+        if (chrome.runtime?.id) return;
+        clearInterval(wait);
+        setTimeout(() => location.reload(), 250);
+      }, 100);
+    };
+    const checkForUpdate = () => {
+      if (document.visibilityState !== 'visible') return;
+      // Orphaned by an extension reload started from another tab.
+      if (!chrome.runtime?.id) return location.reload();
+      chrome.runtime.sendMessage({ type: 'cdc:dev-check' }).then(
+        res => res?.reload && reloadWhenOrphaned(),
+        () => {},
+      );
+    };
+    document.addEventListener('visibilitychange', checkForUpdate);
+    window.addEventListener('focus', checkForUpdate);
+    checkForUpdate();
+  }
 })();
