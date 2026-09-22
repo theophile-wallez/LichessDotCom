@@ -121,7 +121,10 @@
 
     const d = cg.state.drawable;
     const white = cg.state.orientation === 'white';
-    const shapes = [...(d.shapes || []), ...(d.autoShapes || []), ...(window.cdcReviewArrows || [])];
+    // During the Game Review, only its best move: no local engine arrows.
+    const reviewing = html.classList.contains('cdc-review-moves') || html.classList.contains('cdc-review-summary');
+    const auto = reviewing ? [] : d.autoShapes || [];
+    const shapes = [...(d.shapes || []), ...auto, ...(window.cdcReviewArrows || [])];
     if (d.current) shapes.push(d.current); // the arrow being drawn
     const arrows = shapes
       .filter(s => s.orig && s.dest && s.orig !== s.dest && !s.customSvg && !s.piece)

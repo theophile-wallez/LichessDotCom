@@ -582,8 +582,9 @@
     color: #fff;
   }
 
-  html.cdc-review-moves main.analyse .tview2 > move[data-cdc-cls] glyph {
-    display: none;
+  /* No Lichess glyphs or per-move engine evals: the badges replace them. */
+  html.cdc-review-moves main.analyse .tview2 > move :is(glyph, eval) {
+    display: none !important;
   }
 
   html.cdc-review-moves main.analyse .tview2 > move[data-cdc-badge]::before {
