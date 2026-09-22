@@ -1,0 +1,52 @@
+# LichessDotCom
+
+A Chrome extension that makes [Lichess](https://lichess.org) look and sound like Chess.com.
+
+- **Board**: Chess.com's green board (`#ebecd0` / `#739552`), yellow last-move highlights, dot and ring move hints, and red premove squares.
+- **Pieces**: Chess.com "Neo" pieces.
+- **Sounds**: Chess.com's move, opponent move, capture, castle, promotion, check, game start and end, 10-seconds-left and notification sounds. The right sound is picked for every move.
+- **Layout**:
+  - A fixed left sidebar with flyout menus replaces the top header.
+  - Player bars with an avatar, title badge, rating, captured material and a Chess.com-style clock sit above and below the board.
+  - One right-hand panel holds the move list, the game controls and the **chat**.
+- **Theme**: Chess.com's dark palette, fonts and 3D green buttons across the whole site.
+
+The game page (`/<gameId>`, including TV) and the analysis page (`/analysis` and finished games) get the full Chess.com layout. Every other page gets the theme, sidebar, board and pieces.
+
+## Install
+
+1. Clone this repository.
+2. Open `chrome://extensions` and turn on **Developer mode**.
+3. Click **Load unpacked** and select the repository folder.
+4. Open or reload lichess.org.
+
+Tip: Lichess's _coordinates_ setting (Preferences → Display) picks between Chess.com's inside coordinates (the default) and outside coordinates.
+
+## How it works
+
+| File | Role |
+| --- | --- |
+| `src/styles/theme.css` | Overrides Lichess's `--c-*` color variables, fonts and buttons. |
+| `src/styles/sidebar.css` | Turns `#top` into a fixed left sidebar (≥ 1020px wide). |
+| `src/styles/board.css` | Board, pieces, square highlights, move hints, arrows, coordinates. |
+| `src/styles/game.css` | Game page layout (`main.round`). |
+| `src/styles/analysis.css` | Analysis page layout (`main.analyse`). |
+| `src/background.js` | Downloads the Chess.com sounds once and caches them in `chrome.storage.local`. |
+| `src/content.js` | Passes the sounds to the page and measures the controls height for the layout grid. |
+| `src/page.js` | Runs in the page and wraps `site.sound` so each event plays the matching Chess.com sound. |
+
+The layouts use `display: contents` on Lichess's containers so the board, player bars, clocks, moves and chat can be arranged in one CSS grid. No DOM nodes are moved, which keeps Lichess's virtual DOM happy.
+
+For sounds, `page.js` wraps Lichess's `site.sound.move()` and `site.sound.play()`. When a move lands, it reads the board's last-move squares and pieces from the DOM (chessground's `cgKey`). From that it tells your moves from your opponent's and detects castling, promotion and check, just as Chess.com does.
+
+No Chess.com artwork or audio is bundled here. Pieces load from Chess.com's CDN at runtime, and the sounds are fetched by the extension on first use.
+
+## Caveats
+
+- Lichess obfuscates some move-list tag names (currently `i5d`, `aPp`, `qZM`, `Z7yx`, `bo3`) and occasionally renames them. If the move list loses its styling after a Lichess update, update those names in `src/styles/game.css`.
+- Below 1020px the Lichess mobile layout is kept, with the theme, board and pieces applied.
+- Not affiliated with Chess.com or Lichess. Chess.com's name, pieces and sounds belong to Chess.com.
+
+## License
+
+[MIT](LICENSE)

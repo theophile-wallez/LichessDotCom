@@ -1,0 +1,299 @@
+/*
+ * Turns Lichess's top header into Chess.com's fixed left sidebar.
+ * Below 1020px Lichess switches to its hamburger menu, which we leave alone.
+ */
+
+@media (min-width: 1020px) {
+  :root {
+    --cdc-sidebar-w: 145px;
+  }
+
+  body {
+    ---site-header-height: 44px !important;
+    ---site-header-margin: 0px !important;
+  }
+
+  #top,
+  #top.hide,
+  #top.scrolled {
+    position: fixed !important;
+    inset: 0 auto 0 0 !important;
+    width: var(--cdc-sidebar-w) !important;
+    max-width: none !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: stretch !important;
+    background: var(--cdc-bg-panel-dark) !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    z-index: 106;
+  }
+
+  #top::before {
+    display: none !important;
+  }
+
+  #top .site-title-nav {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  #top .site-title-nav__donate {
+    display: none !important;
+  }
+
+  #main-wrap {
+    margin-left: var(--cdc-sidebar-w) !important;
+    margin-top: 0 !important;
+    padding-top: 16px;
+  }
+
+  /* ------------------------------------------------------------- logo --- */
+
+  #top .site-title {
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+    margin: 0 !important;
+    padding: 14px 12px 12px !important;
+    transform: none !important;
+    font-size: 0 !important;
+    color: #fff !important;
+  }
+
+  #top .site-title > * {
+    display: none !important;
+  }
+
+  #top .site-title::before {
+    content: '';
+    flex: none;
+    width: 28px;
+    height: 32px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 28'%3E%3Ccircle cx='12' cy='6' r='5' fill='%2381b64c'/%3E%3Cpath fill='%2381b64c' d='M6.5 12.5h11l-2 2.5 2.5 8h-12l2.5-8z'/%3E%3Crect x='3' y='23.5' width='18' height='4' rx='1.5' fill='%2381b64c'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+
+  #top .site-title::after {
+    content: 'Chess.com';
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #fff;
+  }
+
+  #top .site-title:hover::after {
+    color: #fff;
+  }
+
+  /* -------------------------------------------------------------- nav --- */
+
+  #topnav {
+    position: static !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    max-width: none !important;
+    padding: 0 !important;
+    transform: none !important;
+    overflow: visible !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  #topnav section {
+    position: relative;
+    height: auto !important;
+    margin: 0 !important;
+  }
+
+  #topnav section > a {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    height: 44px !important;
+    padding: 0 10px 0 12px !important;
+    line-height: 1 !important;
+    text-transform: none !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: var(--cdc-text) !important;
+    border: none !important;
+    background: transparent !important;
+    text-shadow: none !important;
+  }
+
+  #topnav section > a .home {
+    display: none !important;
+  }
+
+  #topnav section > a .play {
+    display: inline !important;
+  }
+
+  #topnav section > a::before {
+    content: '';
+    flex: none;
+    width: 28px;
+    height: 28px;
+    background: var(--cdc-nav-icon) center / contain no-repeat;
+  }
+
+  #topnav.hover section:hover > a,
+  #topnav section.active > a {
+    background: #00000033 !important;
+    color: #fff !important;
+  }
+
+  /* Flyout menus open to the right of the sidebar, like Chess.com. */
+  #topnav section > div {
+    position: absolute !important;
+    top: 0 !important;
+    left: 100% !important;
+    right: auto !important;
+    min-width: 220px;
+    padding: 6px 0 !important;
+    border: none !important;
+    border-radius: 0 6px 6px 0 !important;
+    background: var(--cdc-bg-panel-dark) !important;
+    box-shadow: 4px 4px 12px #0006 !important;
+    z-index: 110;
+  }
+
+  #topnav section > div a {
+    padding: 10px 16px !important;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--cdc-text) !important;
+    border-radius: 0 !important;
+  }
+
+  #topnav section > div a:hover {
+    background: #ffffff14 !important;
+    color: #fff !important;
+  }
+
+  /* Icons, matched on the section's main link. */
+  #topnav a[href='/'] {
+    --cdc-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='1' y='1' width='22' height='22' rx='4' fill='%2381b64c'/%3E%3Ccircle cx='12' cy='7' r='3' fill='%23fff'/%3E%3Cpath fill='%23fff' d='M8.8 11h6.4l-1.3 1.6 1.4 4.9H8.7l1.4-4.9z'/%3E%3Crect x='6.5' y='17.6' width='11' height='2.6' rx='1' fill='%23fff'/%3E%3C/svg%3E");
+  }
+  #topnav a[href='/training'] {
+    --cdc-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23f7922e' d='M10 2.5a2.5 2.5 0 0 1 5 0V5h4.5A1.5 1.5 0 0 1 21 6.5V11h-2a2.5 2.5 0 0 0 0 5h2v4.5a1.5 1.5 0 0 1-1.5 1.5H15v-2a2.5 2.5 0 0 0-5 0v2H4.5A1.5 1.5 0 0 1 3 20.5V16h2a2.5 2.5 0 0 0 0-5H3V6.5A1.5 1.5 0 0 1 4.5 5H10z'/%3E%3C/svg%3E");
+  }
+  #topnav a[href='/learn'] {
+    --cdc-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%233ba5e0' d='M12 3 1 8.5 12 14l9-4.5V16h2V8.5z'/%3E%3Cpath fill='%232a86bd' d='M5 12v4c0 1.9 3.1 3.5 7 3.5s7-1.6 7-3.5v-4l-7 3.5z'/%3E%3C/svg%3E");
+  }
+  #topnav a[href='/broadcast'] {
+    --cdc-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='6.5' cy='15' r='5' fill='%23c4c3c0'/%3E%3Ccircle cx='17.5' cy='15' r='5' fill='%23c4c3c0'/%3E%3Ccircle cx='6.5' cy='15' r='2.6' fill='%235a9fd6'/%3E%3Ccircle cx='17.5' cy='15' r='2.6' fill='%235a9fd6'/%3E%3Cpath fill='%23c4c3c0' d='M4 4h4l1 7H3zm12 0h4l1 7h-6zM9.5 10h5v4h-5z'/%3E%3C/svg%3E");
+  }
+  #topnav a[href='/player'] {
+    --cdc-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='8' cy='7' r='3.5' fill='%23f7922e'/%3E%3Cpath fill='%23f7922e' d='M1 20c0-4 3-7 7-7s7 3 7 7z'/%3E%3Ccircle cx='17' cy='8' r='3' fill='%233ba5e0'/%3E%3Cpath fill='%233ba5e0' d='M13 19.5c.3-1.8-.2-3.6-1.3-5A6 6 0 0 1 23 17.5v2z'/%3E%3C/svg%3E");
+  }
+  #topnav a[href='/analysis'] {
+    --cdc-nav-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='4' cy='12' r='2.5' fill='%23989795'/%3E%3Ccircle cx='12' cy='12' r='2.5' fill='%23989795'/%3E%3Ccircle cx='20' cy='12' r='2.5' fill='%23989795'/%3E%3C/svg%3E");
+  }
+
+  /* ------------------------------------------------ bottom buttons --- */
+
+  #top .site-buttons {
+    display: flex !important;
+    flex-flow: row wrap !important;
+    align-items: center !important;
+    gap: 4px;
+    padding: 8px 8px 12px !important;
+  }
+
+  #top .site-buttons > * {
+    order: 2;
+  }
+
+  #top .site-buttons .link,
+  #top .site-buttons .toggle {
+    height: 36px !important;
+    line-height: 36px !important;
+    padding: 0 8px !important;
+    color: var(--cdc-text-dim) !important;
+  }
+
+  #top .site-buttons .link:hover,
+  #top .site-buttons .toggle:hover {
+    color: #fff !important;
+  }
+
+  #top #clinput {
+    order: 0;
+    flex: 1 0 100%;
+    height: 36px !important;
+    align-items: center;
+    border-radius: 5px;
+  }
+
+  #top #clinput input {
+    width: 100% !important;
+    padding: 0 4px !important;
+    line-height: 36px !important;
+    color: var(--cdc-text) !important;
+  }
+
+  #top #clinput input::placeholder {
+    color: var(--cdc-text-dim);
+  }
+
+  #top #clinput:hover,
+  #top #clinput:focus-within {
+    background: #00000033;
+  }
+
+  #top .signin-or-signup {
+    order: 1;
+    flex: 1 0 100%;
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin: 4px 0 8px;
+  }
+
+  #top .signin-or-signup .button {
+    display: block;
+    padding: 8px 0 !important;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  #top .dasher:has(#user_tag) {
+    order: 1;
+    flex: 1 0 100%;
+  }
+
+  #top #user_tag {
+    max-width: none !important;
+    width: 100%;
+    font-weight: 700;
+    color: var(--cdc-text) !important;
+  }
+
+  /* Dropdowns (preferences, notifications, challenges) open beside the sidebar. */
+  #top .site-buttons .dropdown {
+    position: fixed !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: 12px !important;
+    left: calc(var(--cdc-sidebar-w) + 6px) !important;
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+    border-radius: 6px;
+    background: var(--cdc-bg-panel) !important;
+    box-shadow: 0 6px 24px #0009 !important;
+  }
+
+  #top .site-buttons .shown .toggle {
+    background: transparent !important;
+  }
+}

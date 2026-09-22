@@ -1,0 +1,587 @@
+/*
+ * Game page (main.round) re-laid out like Chess.com:
+ *
+ *   +---------------------------+  +-------------+
+ *   | avatar  name (rating)  clk|  |   moves     |
+ *   +---------------------------+  |             |
+ *   |                           |  +-------------+
+ *   |          board            |  |  controls   |
+ *   |                           |  +-------------+
+ *   +---------------------------+  |    chat     |
+ *   | avatar  name (rating)  clk|  |             |
+ *   +---------------------------+  +-------------+
+ *
+ * `.round__app` and `.round__side` become `display: contents`, so the board,
+ * player bars, clocks, move list and chat all join one grid. No DOM nodes are
+ * moved, which would break Lichess's virtual DOM.
+ * `--cdc-controls-h` is measured and set by content.js.
+ *
+ * Lichess obfuscates the move list tag names and renames them now and then.
+ * These are the current ones (with the older names alongside):
+ *   i5d / rm6   move list wrapper      aPp / l4x   move rows
+ *   qZM / i5z   move number            Z7yx / kwdb move
+ *   bo3         navigation buttons     .a1t / .active  current move
+ */
+
+@media (min-width: 1020px) {
+  main.round {
+    --cdc-bar: 52px;
+    --cdc-coords-off: 0px;
+    --cdc-gap: 24px;
+    --cdc-panel-w: clamp(300px, 26vw, 460px);
+    --cdc-board: max(
+      320px,
+      min(
+        calc(100vh - 32px - 2 * var(--cdc-bar) - var(--cdc-coords-off)),
+        calc(100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-panel-w) - var(--cdc-gap) - 48px)
+      )
+    );
+    --cdc-bar-bot: calc(var(--cdc-bar) + var(--cdc-coords-off));
+    --cdc-chat-h: min(clamp(180px, 32vh, 340px), calc(var(--cdc-board) * 0.45));
+    --cdc-ctrl-h: var(--cdc-controls-h, 48px);
+
+    display: grid !important;
+    grid-template-columns: var(--cdc-board) var(--cdc-panel-w) !important;
+    grid-template-rows:
+      var(--cdc-bar)
+      max(0px, calc(var(--cdc-board) + var(--cdc-bar-bot) - var(--cdc-ctrl-h) - var(--cdc-chat-h)))
+      var(--cdc-ctrl-h)
+      max(0px, calc(var(--cdc-chat-h) - var(--cdc-bar-bot)))
+      var(--cdc-bar-bot) !important;
+    grid-auto-rows: auto !important;
+    grid-template-areas:
+      'user-top moves'
+      'board    moves'
+      'board    controls'
+      'board    chat'
+      'user-bot chat' !important;
+    column-gap: var(--cdc-gap) !important;
+    row-gap: 0 !important;
+    justify-content: center !important;
+    align-content: start !important;
+    padding-bottom: 24px;
+  }
+
+  body.coords-out main.round {
+    --cdc-coords-off: 18px;
+  }
+
+  main.round .round__app,
+  main.round .round__side {
+    display: contents !important;
+  }
+
+  main.round .round__app__table,
+  main.round #voice-bar,
+  main.round .col1-rmoves-preload,
+  main.round .round__underchat {
+    display: none !important;
+  }
+
+  main.round .round__app__board {
+    grid-area: board !important;
+    margin: 0 !important;
+  }
+
+  /* ------------------------------------------------------- player bars --- */
+
+  main.round .ruser-top,
+  main.round .rclock-top,
+  main.round .material-top,
+  main.round .expiration-top {
+    grid-area: user-top !important;
+    --cdc-off: 0px;
+  }
+
+  main.round .ruser-bottom,
+  main.round .rclock-bottom,
+  main.round .material-bottom,
+  main.round .expiration-bottom {
+    grid-area: user-bot !important;
+    --cdc-off: var(--cdc-coords-off);
+  }
+
+  main.round .ruser {
+    position: relative;
+    justify-self: start;
+    align-self: start;
+    display: flex !important;
+    align-items: center;
+    gap: 5px;
+    height: 22px;
+    margin: calc(var(--cdc-off) + 6px) 0 0 !important;
+    padding: 0 0 0 50px !important;
+    overflow: visible !important;
+    font-size: 14px !important;
+    line-height: 22px !important;
+    color: var(--cdc-text-strong) !important;
+  }
+
+  main.round .ruser::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
+    background: #bfbdb9
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='13' r='6' fill='%23fff'/%3E%3Cpath fill='%23fff' d='M13.5 21h13l-2.2 3 3 9h-14.6l3-9z'/%3E%3Crect x='9' y='33' width='22' height='5' rx='2' fill='%23fff'/%3E%3C/svg%3E")
+      center / cover no-repeat;
+  }
+
+  main.round .ruser .line {
+    display: none !important;
+  }
+
+  main.round .ruser a,
+  main.round .ruser name {
+    flex: none !important;
+    font-weight: 700;
+    color: var(--cdc-text-strong) !important;
+    letter-spacing: 0 !important;
+  }
+
+  main.round .ruser .utitle,
+  main.round .ruser a .utitle {
+    display: inline-block;
+    margin-right: 5px;
+    padding: 0 3px;
+    border-radius: 3px;
+    background: #7c2929;
+    color: #fff !important;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 16px;
+    vertical-align: 1px;
+  }
+
+  main.round .ruser rating {
+    margin: 0 !important;
+    color: var(--cdc-text-dim) !important;
+    letter-spacing: 0 !important;
+    font-weight: 400;
+  }
+
+  main.round .ruser rating::before { content: '('; }
+  main.round .ruser rating::after  { content: ')'; }
+
+  main.round .material {
+    justify-self: start;
+    align-self: start;
+    height: 18px !important;
+    margin: calc(var(--cdc-off) + 29px) 0 0 52px !important;
+    line-height: 18px !important;
+    color: var(--cdc-text-dim);
+    font-size: 12px;
+    opacity: 0.85;
+  }
+
+  main.round .material score {
+    line-height: 18px !important;
+    font-weight: 600;
+  }
+
+  main.round .expiration {
+    justify-self: center;
+    align-self: start;
+    margin-top: calc(var(--cdc-off) + 12px) !important;
+    padding: 0 10px;
+    border-radius: 4px !important;
+  }
+
+  /* ------------------------------------------------------------ clocks --- */
+
+  main.round .rclock {
+    justify-self: end;
+    align-self: start;
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+    margin-top: calc(var(--cdc-off) + 4px) !important;
+  }
+
+  main.round .rclock .bar {
+    display: none !important;
+  }
+
+  main.round .rclock .time {
+    box-sizing: border-box;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end;
+    gap: 0;
+    height: 44px;
+    min-width: 138px;
+    padding: 0 12px !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    z-index: auto !important;
+    font-family: var(--cdc-font) !important;
+    font-size: 26px !important;
+    font-weight: 600 !important;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0 !important;
+    line-height: 1 !important;
+    backdrop-filter: none !important;
+  }
+
+  main.round .rclock .time sep {
+    opacity: 1 !important;
+    font-size: 1em !important;
+  }
+
+  main.round .rclock-white .time {
+    background: #989795 !important;
+    color: #312e2b99 !important;
+  }
+
+  main.round .rclock-white.running .time {
+    background: #fff !important;
+    color: #312e2b !important;
+  }
+
+  main.round .rclock-black .time {
+    background: #2b2926 !important;
+    color: #82807d !important;
+  }
+
+  main.round .rclock-black.running .time {
+    background: #1c1b19 !important;
+    color: #fff !important;
+  }
+
+  main.round .rclock.emerg.running .time,
+  main.round .rclock.outoftime .time {
+    background: #c33a2f !important;
+    color: #fff !important;
+  }
+
+  /* Stopwatch icon on the running clock. */
+  main.round .rclock.running .time::before {
+    content: '';
+    width: 18px;
+    height: 18px;
+    margin-right: auto;
+    padding-right: 10px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='13' r='9' fill='none' stroke='%23312e2b' stroke-width='2.5'/%3E%3Cpath d='M12 13V8' stroke='%23312e2b' stroke-width='2.5' stroke-linecap='round'/%3E%3Crect x='9' y='1' width='6' height='2.5' rx='1' fill='%23312e2b'/%3E%3C/svg%3E")
+      left center / 18px no-repeat;
+  }
+
+  main.round .rclock-black.running .time::before {
+    filter: invert(1);
+  }
+
+  /* ----------------------------------------------------------- move list --- */
+
+  main.round :is(i5d, rm6) {
+    grid-area: moves !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0;
+    margin: 0 !important;
+    overflow: hidden;
+    border-radius: 6px 6px 0 0;
+    background: var(--cdc-bg-panel) !important;
+    box-shadow: none !important;
+  }
+
+  main.round :is(i5d, rm6)::before {
+    display: none !important;
+  }
+
+  main.round :is(i5d, rm6) :is(aPp, l4x) {
+    flex: 1 1 0 !important;
+    min-height: 0;
+    display: grid !important;
+    grid-template-columns: 48px minmax(0, 104px) minmax(0, 104px) 1fr;
+    grid-auto-rows: minmax(30px, auto);
+    align-content: start !important;
+    align-items: center !important;
+    overflow-y: auto !important;
+    padding: 0 0 4px;
+    font-size: 14px !important;
+    line-height: 1 !important;
+    white-space: normal;
+    /* Row stripes; `local` makes them scroll with the moves. */
+    background: repeating-linear-gradient(to bottom, transparent 0 30px, #2b2a27 30px 60px)
+      local !important;
+    box-shadow: none !important;
+  }
+
+  main.round :is(i5d, rm6) :is(aPp, l4x) > * {
+    grid-column: 1 / -1;
+  }
+
+  main.round :is(i5d, rm6) :is(qZM, i5z) {
+    grid-column: 1 !important;
+    align-self: stretch;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: 0 0 0 14px !important;
+    background: none !important;
+    color: var(--cdc-text-dim) !important;
+    font-family: var(--cdc-font) !important;
+    font-weight: 600 !important;
+  }
+
+  main.round :is(i5d, rm6) :is(Z7yx, kwdb) {
+    grid-column: auto !important;
+    justify-self: start;
+    display: flex !important;
+    align-items: center;
+    flex: none !important;
+    height: 24px;
+    margin-left: 2px;
+    padding: 0 6px !important;
+    border-radius: 3px;
+    border-bottom: 2px solid transparent;
+    color: var(--cdc-text) !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    background: none !important;
+  }
+
+  main.round :is(i5d, rm6) :is(Z7yx, kwdb):hover {
+    background: #ffffff14 !important;
+    color: #fff !important;
+  }
+
+  main.round :is(i5d, rm6) :is(Z7yx, kwdb):is(.a1t, .active) {
+    background: #ffffff26 !important;
+    border-bottom-color: #ffffff3d;
+    color: #fff !important;
+  }
+
+  main.round :is(i5d, rm6) .result-wrap {
+    padding: 8px 0 12px;
+  }
+
+  main.round :is(i5d, rm6) .result {
+    border: none !important;
+    color: #fff;
+    font-size: 16px !important;
+  }
+
+  main.round :is(i5d, rm6) .status {
+    color: var(--cdc-text-dim);
+  }
+
+  /* Navigation buttons sit at the bottom of the panel on Chess.com. */
+  main.round :is(i5d, rm6) bo3 {
+    order: 99 !important;
+    display: flex !important;
+    flex: none !important;
+    gap: 6px;
+    padding: 8px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  main.round :is(i5d, rm6) bo3 .fbt,
+  main.round :is(i5d, rm6) bo3 .noop {
+    flex: 1 1 0 !important;
+    height: 40px !important;
+    line-height: 40px !important;
+    border-radius: 5px;
+    background: var(--cdc-bg-raised) !important;
+    color: var(--cdc-text) !important;
+    font-size: 18px;
+    box-shadow: 0 3px 0 0 #1f1e1c;
+  }
+
+  main.round :is(i5d, rm6) bo3 .fbt:hover:not(.disabled) {
+    background: var(--cdc-bg-raised-hover) !important;
+    color: #fff !important;
+  }
+
+  /* ------------------------------------------------------------ controls --- */
+
+  main.round .rcontrols {
+    grid-area: controls !important;
+    align-self: start;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 4px 8px 8px;
+    background: var(--cdc-bg-panel);
+  }
+
+  main.round .rcontrols .ricons {
+    display: flex !important;
+    justify-content: center;
+    gap: 6px;
+    margin: 0 !important;
+  }
+
+  main.round .rcontrols .ricons .fbt,
+  main.round .rcontrols .ricons button {
+    padding: 8px 16px !important;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--cdc-text-dim) !important;
+    font-size: 16px;
+  }
+
+  main.round .rcontrols .ricons .fbt:hover:not(.disabled),
+  main.round .rcontrols .ricons button:hover:not(.disabled) {
+    background: var(--cdc-bg-raised) !important;
+    color: #fff !important;
+  }
+
+  main.round .rcontrols .follow-up {
+    gap: 8px !important;
+    padding: 4px 0 6px !important;
+    border: none !important;
+  }
+
+  main.round .rcontrols .follow-up .fbt {
+    margin: 0 !important;
+    padding: 12px 0 !important;
+    border-radius: 6px !important;
+    background: var(--cdc-bg-raised) !important;
+    color: var(--cdc-text) !important;
+    font-weight: 700;
+    text-shadow: none !important;
+    box-shadow: 0 4px 0 0 #1f1e1c !important;
+  }
+
+  main.round .rcontrols .follow-up .fbt:hover:not(.disabled) {
+    background: var(--cdc-bg-raised-hover) !important;
+    color: #fff !important;
+  }
+
+  main.round .rcontrols .follow-up .fbt.strong,
+  main.round .rcontrols .rematch.fbt {
+    padding: 16px 0 !important;
+    background: var(--cdc-green) !important;
+    color: #fff !important;
+    font-size: 18px !important;
+    font-weight: 800;
+    box-shadow: 0 4px 0 0 var(--cdc-green-shadow) !important;
+  }
+
+  main.round .rcontrols .follow-up .fbt.strong:hover:not(.disabled),
+  main.round .rcontrols .rematch.fbt:hover:not(.disabled) {
+    background: var(--cdc-green-hover) !important;
+  }
+
+  /* ---------------------------------------------------------------- chat --- */
+
+  main.round .mchat {
+    grid-area: chat !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    overflow: hidden;
+    border-top: 1px solid var(--cdc-border);
+    border-radius: 0 0 6px 6px !important;
+    background: var(--cdc-bg-panel) !important;
+    box-shadow: none !important;
+  }
+
+  main.round .mchat__tabs {
+    background: var(--cdc-bg-panel);
+  }
+
+  main.round .mchat__tab {
+    border-radius: 0 !important;
+    padding: 8px 10px !important;
+    background: transparent !important;
+    color: var(--cdc-text-dim) !important;
+    font-family: var(--cdc-font) !important;
+    font-size: 13px;
+    font-weight: 600 !important;
+  }
+
+  main.round .mchat__tab-active {
+    color: #fff !important;
+    box-shadow: inset 0 -2px 0 #fff;
+  }
+
+  main.round .mchat__content {
+    min-height: 0;
+    background: transparent !important;
+  }
+
+  main.round .mchat__messages {
+    max-height: none !important;
+    padding: 4px 0;
+    font-size: 13px !important;
+  }
+
+  main.round .mchat__messages li {
+    padding: 3px 12px !important;
+    color: var(--cdc-text);
+  }
+
+  main.round .mchat__messages .user-link,
+  main.round .mchat__messages .color {
+    color: #fff !important;
+    letter-spacing: 0 !important;
+  }
+
+  main.round .mchat__messages .system {
+    color: var(--cdc-text-dim);
+  }
+
+  main.round .mchat__say {
+    box-sizing: border-box;
+    width: calc(100% - 16px);
+    margin: 6px 8px 8px;
+    padding: 9px 12px !important;
+    border: none !important;
+    border-radius: 5px !important;
+    outline: none !important;
+    background: var(--cdc-bg-raised) !important;
+    color: #fff !important;
+    font-size: 14px;
+  }
+
+  main.round .mchat__presets span {
+    border-color: var(--cdc-border) !important;
+    font-size: 11px;
+  }
+
+  /* ------------------------------------------------ below the fold --- */
+
+  main.round .keyboard-move {
+    grid-column: 1 !important;
+    grid-row: 6 !important;
+    margin-top: 12px !important;
+  }
+
+  main.round .round__underboard {
+    grid-column: 1 !important;
+    grid-row: 7 !important;
+    margin-top: 16px;
+  }
+
+  /* Game info, TV channels, tournament box... stacked below the panel. */
+  main.round .round__side > :not(.mchat) {
+    grid-column: 2 !important;
+    grid-row: 6 !important;
+    margin-top: 16px !important;
+    border-radius: 6px;
+    background: var(--cdc-bg-panel);
+    box-shadow: none !important;
+  }
+
+  main.round .round__side > :not(.mchat) ~ :not(.mchat) {
+    grid-row: 7 !important;
+  }
+
+  main.round .round__side > :not(.mchat) ~ :not(.mchat) ~ :not(.mchat) {
+    grid-row: 8 !important;
+  }
+
+  /* No chat (e.g. games against the computer): show the game info there. */
+  main.round:not(:has(.mchat)) .round__side > .game__meta {
+    grid-area: chat !important;
+    margin-top: 0 !important;
+    border-top: 1px solid var(--cdc-border);
+    border-radius: 0 0 6px 6px;
+    overflow-y: auto;
+  }
+}

@@ -1,0 +1,172 @@
+/*
+ * Analysis page (main.analyse), also used for finished games: board on the
+ * left, one Chess.com-style panel on the right with engine + moves, the
+ * navigation controls and the chat. Game info and the crosstable go below.
+ * `--cdc-controls-h` is measured and set by content.js.
+ */
+
+@media (min-width: 1020px) {
+  main.analyse {
+    --cdc-gap: 24px;
+    --cdc-panel-w: clamp(300px, 26vw, 460px);
+    --cdc-board: max(
+      320px,
+      min(
+        calc(100vh - 56px),
+        calc(100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-panel-w) - var(--cdc-gap) - 72px)
+      )
+    );
+    --cdc-chat-h: min(clamp(180px, 30vh, 320px), calc(var(--cdc-board) * 0.4));
+    --cdc-ctrl-h: var(--cdc-controls-h, 48px);
+
+    display: grid !important;
+    grid-template-columns: auto var(--cdc-board) calc(var(--cdc-panel-w) + var(--cdc-gap)) !important;
+    grid-template-rows:
+      max(0px, calc(var(--cdc-board) - var(--cdc-ctrl-h) - var(--cdc-chat-h)))
+      var(--cdc-ctrl-h)
+      var(--cdc-chat-h) !important;
+    grid-auto-rows: auto !important;
+    grid-template-areas:
+      'gauge board tools'
+      'gauge board controls'
+      'gauge board chat' !important;
+    gap: 0 !important;
+    justify-content: center !important;
+    align-content: start !important;
+    margin-top: 12px;
+    padding-bottom: 24px;
+  }
+
+  main.analyse .analyse__board {
+    grid-area: board !important;
+    margin: 0 !important;
+  }
+
+  main.analyse .eval-gauge {
+    grid-area: gauge !important;
+    margin: 0 8px 0 0 !important;
+  }
+
+  main.analyse > :is(.analyse__tools, .analyse__controls, .mchat) {
+    margin-left: var(--cdc-gap) !important;
+  }
+
+  main.analyse .analyse__tools {
+    grid-area: tools !important;
+    height: auto !important;
+    min-height: 0;
+    border-radius: 6px 6px 0 0;
+    background: var(--cdc-bg-panel) !important;
+    box-shadow: none !important;
+  }
+
+  main.analyse .analyse__controls {
+    grid-area: controls !important;
+    align-self: start;
+    background: var(--cdc-bg-panel) !important;
+    box-shadow: none !important;
+  }
+
+  main.analyse .analyse__controls .fbt,
+  main.analyse .analyse__controls .jumps .fbt {
+    border-radius: 5px;
+    color: var(--cdc-text) !important;
+  }
+
+  main.analyse .analyse__controls .fbt:hover:not(.disabled) {
+    background: var(--cdc-bg-raised) !important;
+    color: #fff !important;
+  }
+
+  main.analyse > .mchat {
+    grid-area: chat !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    margin-top: 0 !important;
+    overflow: hidden;
+    border-top: 1px solid var(--cdc-border);
+    border-radius: 0 0 6px 6px !important;
+    background: var(--cdc-bg-panel) !important;
+    box-shadow: none !important;
+  }
+
+  main.analyse > .mchat .mchat__tab {
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: var(--cdc-text-dim) !important;
+    font-family: var(--cdc-font) !important;
+    font-weight: 600 !important;
+  }
+
+  main.analyse > .mchat .mchat__tab-active {
+    color: #fff !important;
+    box-shadow: inset 0 -2px 0 #fff;
+  }
+
+  main.analyse > .mchat .mchat__content {
+    min-height: 0;
+    background: transparent !important;
+  }
+
+  main.analyse > .mchat .mchat__messages {
+    max-height: none !important;
+  }
+
+  main.analyse > .mchat .mchat__say {
+    box-sizing: border-box;
+    width: calc(100% - 16px);
+    margin: 6px 8px 8px;
+    padding: 9px 12px !important;
+    border: none !important;
+    border-radius: 5px !important;
+    background: var(--cdc-bg-raised) !important;
+    color: #fff !important;
+  }
+
+  /* No chat (e.g. the free analysis board): tools take the whole panel. */
+  main.analyse:not(:has(> .mchat)) {
+    grid-template-rows:
+      max(0px, calc(var(--cdc-board) - var(--cdc-ctrl-h)))
+      var(--cdc-ctrl-h) !important;
+  }
+
+  main.analyse:not(:has(> .mchat)) .analyse__controls {
+    border-radius: 0 0 6px 6px;
+  }
+
+  /* ------------------------------------------------ below the fold --- */
+
+  main.analyse .chat__members {
+    display: none !important;
+  }
+
+  main.analyse .keyboard-move {
+    grid-column: 2 !important;
+    grid-row: 4 !important;
+    margin-top: 12px !important;
+  }
+
+  main.analyse .analyse__underboard {
+    grid-column: 2 !important;
+    grid-row: 5 !important;
+    margin-top: 16px;
+  }
+
+  main.analyse .analyse__side {
+    grid-column: 3 !important;
+    grid-row: 4 / span 2 !important;
+    margin: 16px 0 0 var(--cdc-gap) !important;
+  }
+
+  main.analyse .analyse__side .game__meta {
+    border-radius: 6px;
+    box-shadow: none !important;
+  }
+
+  main.analyse .analyse__round-training {
+    grid-column: 3 !important;
+    grid-row: 6 !important;
+    margin: 16px 0 0 var(--cdc-gap) !important;
+  }
+}

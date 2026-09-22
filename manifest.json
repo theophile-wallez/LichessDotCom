@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "LichessDotCom",
+  "version": "0.1.0",
+  "description": "Make Lichess look and sound like Chess.com: green board, neo pieces, Chess.com sounds, sidebar and game layout.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": ["storage"],
+  "host_permissions": ["https://images.chesscomfiles.com/*"],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://lichess.org/*"],
+      "css": [
+        "src/styles/theme.css",
+        "src/styles/sidebar.css",
+        "src/styles/board.css",
+        "src/styles/game.css",
+        "src/styles/analysis.css"
+      ],
+      "js": ["src/content.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://lichess.org/*"],
+      "js": ["src/page.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ]
+}
