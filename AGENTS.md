@@ -47,7 +47,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | --- | --- |
 | `manifest.json` | Content scripts: CSS + `content.js` (isolated world), `page.js` + `review.js` (page world). |
 | `src/background.js` | Service worker: downloads the Chess.com sounds, caches them as base64. |
-| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces. |
+| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, the home hero and the font remapping. |
 | `src/page.js` | Page world: wraps `site.sound` to play the right Chess.com sound per move. |
 | `src/review.js` | Page world: Game Review (engine, classification, panel, board overlays, eval bar). |
 | `src/styles/theme.css` | Overrides Lichess's `--c-*` color variables, fonts, buttons. |
@@ -57,6 +57,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/analysis.css` | Analysis page (`main.analyse`) grid. |
 | `src/styles/review.css` | Game Review panel, eval bar, board annotations. |
 | `src/styles/pages.css` | Modern look for every other page (headings, side menus, tabs, tables, forms, lobby). |
+| `src/styles/home.css` | Home page (`main.lobby`) as a 12-column card dashboard; the hero is added by `content.js`. |
 
 There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
 
