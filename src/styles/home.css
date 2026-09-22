@@ -184,8 +184,8 @@
 
   /* ---------------------------------------------------------- cards --- */
 
-  main.lobby :is(.lobby__tv, .lobby__puzzle, .lobby__blog, .lobby__feed, .lobby__side,
-      .lobby__tournaments-simuls, .lobby__app, .lobby__timeline) {
+  main.lobby :is(.lobby__tv, .lobby__puzzle, .lobby__blog, .lobby__feed, .lobby__streams,
+      .about-side, .lobby__tournaments-simuls, .lobby__app, .lobby__timeline) {
     box-sizing: border-box;
     padding: 16px !important;
     border: none !important;
@@ -195,7 +195,7 @@
   }
 
   /* Card titles Lichess doesn't provide. */
-  main.lobby :is(.lobby__tv, .lobby__blog, .lobby__feed)::before {
+  main.lobby :is(.lobby__tv, .lobby__blog, .lobby__feed, .lobby__streams)::before {
     display: block;
     margin: 0 0 12px 2px;
     color: #fff;
@@ -206,9 +206,11 @@
   main.lobby .lobby__tv::before   { content: 'Featured game'; }
   main.lobby .lobby__blog::before { content: 'From the blog'; }
   main.lobby .lobby__feed::before { content: "What's new"; }
+  main.lobby .lobby__streams::before { content: 'Live streams'; }
   html[lang^='fr'] main.lobby .lobby__tv::before   { content: 'Partie en vedette'; }
   html[lang^='fr'] main.lobby .lobby__blog::before { content: 'Articles du blog'; }
   html[lang^='fr'] main.lobby .lobby__feed::before { content: 'Nouveautés'; }
+  html[lang^='fr'] main.lobby .lobby__streams::before { content: 'Streams en direct'; }
 
   /* Lichess repeats the support links inside these blocks on some widths. */
   main.lobby :is(.lobby__tv, .lobby__puzzle) > .lobby__support-link {
@@ -222,12 +224,6 @@
 
   main.lobby .lpool .perf {
     font-size: 0.62em;
-  }
-
-  /* The updates feed is long; keep it card-sized next to the side column. */
-  main.lobby .lobby__feed {
-    max-height: 460px;
-    overflow-y: auto;
   }
 
   main.lobby .lobby__app__content {
@@ -250,7 +246,349 @@
     overflow: hidden;
   }
 
-  /* Support links become two side-by-side tiles. */
+  /* --------------------------------------------------------- updates --- */
+
+  /* The feed is long: it takes the side column's height (contain: size keeps
+     its content from growing the row) and scrolls, with the title pinned on
+     top and a fade at the bottom hinting at more. */
+  main.lobby .lobby__feed {
+    contain: size;
+    min-height: 340px;
+    padding: 0 20px !important;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #ffffff26 transparent;
+  }
+
+  main.lobby .lobby__feed::before {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    margin: 0 !important;
+    padding: 18px 2px 10px;
+    background: var(--cdc-bg-panel);
+  }
+
+  main.lobby .lobby__feed::after {
+    content: '';
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    display: block;
+    height: 40px;
+    margin-top: -40px;
+    background: linear-gradient(#26252200, var(--cdc-bg-panel));
+    pointer-events: none;
+  }
+
+  /* Lichess's gold rail and ringed markers → a faint rail and icon tiles. */
+  main.lobby .daily-feed__updates {
+    position: relative;
+    margin: 0 0 12px !important;
+    border: none !important;
+  }
+
+  main.lobby .daily-feed__updates::before {
+    content: '';
+    position: absolute;
+    top: 24px;
+    bottom: 24px;
+    left: 17px;
+    width: 2px;
+    border-radius: 1px;
+    background: #ffffff12;
+  }
+
+  main.lobby .daily-feed__update {
+    position: relative;
+    display: grid !important;
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 14px;
+    margin: 0 !important;
+    padding: 10px 0 !important;
+  }
+
+  main.lobby .daily-feed__update__marker {
+    position: relative;
+    box-sizing: border-box;
+    width: 36px !important;
+    height: 36px !important;
+    margin: 0 !important;
+    padding: 7px !important;
+    border: none !important;
+    border-radius: 10px !important;
+    background: var(--cdc-bg-raised) !important;
+    box-shadow: 0 0 0 4px var(--cdc-bg-panel);
+  }
+
+  main.lobby .daily-feed__update__day {
+    display: inline-flex !important;
+    align-items: center;
+    min-height: 36px;
+    color: var(--cdc-text-dim) !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: color 0.15s;
+  }
+
+  main.lobby .daily-feed__update__day:hover {
+    color: #fff !important;
+  }
+
+  main.lobby .daily-feed__update p {
+    margin: -7px 0 0;
+    color: #d4d3d1;
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+
+  /* The last entry is the "All updates" link. */
+  main.lobby .daily-feed__update a.daily-feed__update__day[href$='/feed'] {
+    color: var(--cdc-green-hover) !important;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 14px !important;
+  }
+
+  /* ------------------------------------------------------------ side --- */
+
+  /* A stack of cards (streams, spotlights, about) instead of one card
+     stretched to the feed's height with a hole in the middle. */
+  main.lobby .lobby__side {
+    gap: 20px !important;
+    padding: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  main.lobby .lobby__streams {
+    display: flex !important;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  main.lobby .lobby__streams::before {
+    margin-bottom: 6px !important;
+  }
+
+  main.lobby .lobby__streams .stream {
+    position: relative;
+    margin: 0 !important;
+    padding: 9px 12px 9px 56px;
+    border-radius: 10px;
+    background: #ffffff08;
+    color: var(--cdc-text-dim) !important;
+    font-size: 13px;
+    line-height: 1.4 !important;
+    text-shadow: none !important;
+    transition: background 0.15s;
+  }
+
+  main.lobby .lobby__streams .stream:hover {
+    background: #ffffff12;
+  }
+
+  main.lobby .lobby__streams .stream strong {
+    display: block;
+    overflow: hidden;
+    color: #fff !important;
+    font-family: inherit !important;
+    font-size: 14px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+  }
+
+  /* Lichess's mic icon, in a red "live" tile. */
+  main.lobby .lobby__streams .stream strong::before {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    margin: 0 !important;
+    border-radius: 50%;
+    background: #e0282826;
+    color: #ff6b6b;
+    font-size: 18px !important;
+    transform: translateY(-50%);
+  }
+
+  main.lobby .lobby__streams .stream strong::after {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin: 0 0 1px 8px;
+    border-radius: 50%;
+    background: #ff4d4d;
+    box-shadow: 0 0 0 3px #ff4d4d2e;
+  }
+
+  main.lobby .lobby__streams .more {
+    margin: auto 0 0 !important;
+    padding: 9px;
+    border-radius: 10px;
+    background: #ffffff0a;
+    color: #fff !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    text-align: center;
+    transition: background 0.15s;
+  }
+
+  main.lobby .lobby__streams .more:hover {
+    background: #ffffff17;
+  }
+
+  main.lobby .lobby__spotlights {
+    display: flex !important;
+    flex-direction: column;
+    gap: 10px;
+    overflow: visible !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  main.lobby .lobby__spotlights:empty {
+    display: none !important;
+  }
+
+  main.lobby .tour-spotlight {
+    padding: 12px !important;
+    border-radius: 14px !important;
+    background: var(--cdc-bg-panel) !important;
+    box-shadow: inset 0 1px 0 #ffffff0d, 0 10px 28px #00000033 !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+  }
+
+  main.lobby .tour-spotlight:hover {
+    background: #2c2b28 !important;
+  }
+
+  main.lobby .tour-spotlight .name {
+    color: #fff;
+    font-weight: 700;
+  }
+
+  main.lobby .tour-spotlight :is(.headline, .more) {
+    color: var(--cdc-text-dim);
+  }
+
+  main.lobby .about-side {
+    flex: none;
+    margin: 0 !important;
+    color: var(--cdc-text-dim) !important;
+    font-size: 13px;
+    line-height: 1.55;
+    text-shadow: none !important;
+  }
+
+  /* ----------------------------------------------------- tournaments --- */
+
+  main.lobby .lobby__tournaments-simuls {
+    padding: 0 !important;
+    overflow: hidden;
+  }
+
+  main.lobby .lobby__tournaments-simuls .lobby__box {
+    border-radius: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Lichess's grey metal bar → a card header: icon tile, title, pill. */
+  main.lobby .lobby__tournaments-simuls .lobby__box__top {
+    padding: 14px 16px !important;
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    transition: background 0.15s;
+  }
+
+  main.lobby .lobby__tournaments-simuls .lobby__box__top:hover {
+    background: #ffffff05 !important;
+  }
+
+  main.lobby .lobby__box__top .title {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    padding: 0 !important;
+    color: #fff !important;
+    font-family: inherit !important;
+    font-size: 17px !important;
+    font-weight: 800 !important;
+  }
+
+  main.lobby .lobby__box__top .title::before {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    margin: 0 !important;
+    border-radius: 12px;
+    background: #81b64c26;
+    color: var(--cdc-green-hover);
+    font-size: 22px;
+  }
+
+  main.lobby .lobby__box__top .more {
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: #ffffff0d;
+    color: #fff !important;
+    font-size: 13px;
+    font-weight: 700;
+    transition: background 0.15s;
+  }
+
+  main.lobby .lobby__box__top:hover .more {
+    background: #ffffff1a;
+  }
+
+  main.lobby .lobby__tournaments-simuls .lobby__box__content {
+    padding: 0 8px 8px;
+    background: none !important;
+  }
+
+  /* Logged out, Lichess leaves the table empty: keep just the header. */
+  main.lobby .lobby__tournaments-simuls .lobby__box__content:has(table:empty) {
+    display: none;
+  }
+
+  main.lobby .lobby__tournaments-simuls tr {
+    background: none !important;
+    transition: background 0.15s;
+  }
+
+  main.lobby .lobby__tournaments-simuls tr:hover {
+    background: #ffffff08 !important;
+  }
+
+  main.lobby .lobby__tournaments-simuls td {
+    padding: 10px !important;
+    border-bottom: 1px solid #ffffff0d !important;
+  }
+
+  main.lobby .lobby__tournaments-simuls tr:last-child td {
+    border-bottom: none !important;
+  }
+
+  main.lobby .lobby__tournaments-simuls td.name a {
+    color: #fff !important;
+  }
+
+  /* --------------------------------------------------------- support --- */
+
+  /* Support links become two side-by-side tiles: icon tile, text, chevron. */
   main.lobby .lobby__support {
     display: grid !important;
     grid-template-columns: 1fr 1fr;
@@ -259,7 +597,8 @@
   }
 
   main.lobby .lobby__support-link {
-    padding: 18px 20px !important;
+    gap: 16px;
+    padding: 18px 22px 18px 18px !important;
     border-radius: 16px !important;
     background: var(--cdc-bg-panel) !important;
     box-shadow: inset 0 1px 0 #ffffff0d, 0 10px 28px #00000033 !important;
@@ -271,18 +610,66 @@
     background: #2c2b28 !important;
   }
 
+  main.lobby .lobby__support-link icon {
+    display: grid !important;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    margin: 0 !important;
+    border-radius: 14px;
+    background: #e3aa2424;
+  }
+
+  main.lobby .lobby__support-link icon::before {
+    margin: 0 !important;
+    font-size: 32px !important;
+  }
+
+  main.lobby .lobby__support-link[href$='/swag'] icon {
+    background: #81b64c26;
+  }
+
+  main.lobby .lobby__support-link[href$='/swag'] icon::before {
+    color: var(--cdc-green-hover) !important;
+  }
+
   main.lobby .lobby__support-link strong {
     color: #fff;
+    font-size: 17px;
     font-weight: 800;
   }
 
-  /* Footer links. */
+  main.lobby .lobby__support-link__text span {
+    margin-top: 2px;
+    color: var(--cdc-text-dim) !important;
+    font-size: 14px !important;
+  }
+
+  main.lobby .lobby__support-link::after {
+    content: '';
+    flex: none;
+    width: 9px;
+    height: 9px;
+    border: solid var(--cdc-text-dim);
+    border-width: 2.5px 2.5px 0 0;
+    transform: rotate(45deg);
+    transition: transform 0.15s, border-color 0.15s;
+  }
+
+  main.lobby .lobby__support-link:hover::after {
+    border-color: #fff;
+    transform: translateX(3px) rotate(45deg);
+  }
+
+  /* ---------------------------------------------------------- footer --- */
+
   main.lobby .lobby__about {
     display: flex !important;
     flex-wrap: wrap;
     justify-content: center;
     gap: 6px 22px;
-    padding: 8px 0 0;
+    padding: 24px 0 0;
+    border-top: 1px solid #ffffff12;
     background: none !important;
     box-shadow: none !important;
   }
