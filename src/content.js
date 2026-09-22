@@ -138,9 +138,45 @@
     ['t', 'r', 'b', 'l'].forEach((side, i) => main.style.setProperty(`--cdc-inset-${side}`, inset[i] + 'px'));
   };
 
+  // Home page hero card (see styles/home.css).
+  const HERO_TEXT = (document.documentElement.lang || '').startsWith('fr')
+    ? {
+        eyebrow: 'Gratuit · Sans publicité · Open source',
+        title: 'Jouer aux échecs en ligne',
+        titleUser: 'Prêt pour une partie, {name} ?',
+        sub: 'Affrontez des milliers de joueurs du monde entier, résolvez des problèmes et progressez, entièrement gratuitement.',
+      }
+    : {
+        eyebrow: 'Free · No ads · Open source',
+        title: 'Play chess online',
+        titleUser: 'Ready to play, {name}?',
+        sub: 'Take on thousands of players worldwide, solve puzzles and improve, completely free.',
+      };
+  const syncHero = () => {
+    const main = document.querySelector('main.lobby');
+    if (!main || main.querySelector(':scope > .cdc-hero')) return;
+    const user = document.body.dataset.user;
+    const hero = document.createElement('section');
+    hero.className = 'cdc-hero';
+    const eyebrow = document.createElement('p');
+    eyebrow.className = 'cdc-hero__eyebrow';
+    eyebrow.textContent = HERO_TEXT.eyebrow;
+    const title = document.createElement('h1');
+    title.className = 'cdc-hero__title';
+    title.textContent = user ? HERO_TEXT.titleUser.replace('{name}', user) : HERO_TEXT.title;
+    const sub = document.createElement('p');
+    sub.className = 'cdc-hero__sub';
+    sub.textContent = HERO_TEXT.sub;
+    hero.append(eyebrow, title, sub);
+    main.prepend(hero);
+  };
+
   setInterval(() => {
     syncControlsHeight();
     syncCaptured();
     syncBoardInset();
+    syncHero();
   }, 250);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncHero);
+  else syncHero();
 })();

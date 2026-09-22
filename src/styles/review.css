@@ -4,6 +4,7 @@
  *   .cdc-review-normal   Lichess analysis + a "Game Review" button on top
  *   .cdc-review-summary  review summary fills the right panel
  *   .cdc-review-moves    move-by-move review: coach, moves, graph, controls
+ *                        (entered as soon as the user moves off the summary)
  * plus .cdc-evalbar-on and data-cdc-cls="<classification of current move>".
  */
 
@@ -30,33 +31,33 @@
     grid-template-areas: 'gauge board rtop' !important;
   }
 
+  /* Like Chess.com: coach and buttons, moves, graph, then our own big
+     controls (with play) instead of Lichess's. No engine lines. */
   html.cdc-review-moves main.analyse {
-    --cdc-review-top: 236px;
-    --cdc-review-graph: 96px;
+    --cdc-review-top: 230px;
+    --cdc-review-graph: 92px;
+    --cdc-review-ctrl: 72px;
     grid-template-rows:
       var(--cdc-review-top)
-      max(0px, calc(var(--cdc-board) - var(--cdc-review-top) - var(--cdc-review-graph) - var(--cdc-ctrl-h)))
+      max(0px, calc(var(--cdc-board) - var(--cdc-review-top) - var(--cdc-review-graph) - var(--cdc-review-ctrl)))
       var(--cdc-review-graph)
-      var(--cdc-ctrl-h) !important;
+      var(--cdc-review-ctrl) !important;
     grid-template-areas:
       'gauge board rtop'
       'gauge board tools'
       'gauge board rgraph'
-      'gauge board controls' !important;
+      'gauge board rctrl' !important;
   }
 
   html.cdc-review-summary main.analyse > :is(.analyse__tools, .analyse__controls, .mchat),
-  html.cdc-review-moves main.analyse > .mchat,
-  html.cdc-review:not(.cdc-review-moves) #cdc-review-graph {
+  html.cdc-review-moves main.analyse > :is(.analyse__controls, .mchat),
+  html.cdc-review-moves main.analyse .analyse__tools > :is(.ceval, .pv_box),
+  html.cdc-review:not(.cdc-review-moves) :is(#cdc-review-graph, #cdc-review-controls) {
     display: none !important;
   }
 
   html.cdc-review main.analyse .analyse__tools {
     border-radius: 0 !important;
-  }
-
-  html.cdc-review-moves main.analyse .analyse__controls {
-    border-radius: 0 0 6px 6px;
   }
 
   /* --------------------------------------------------------- panel --- */
@@ -161,43 +162,46 @@
     padding: 12px 16px 16px;
   }
 
-  .cdc-review__msg,
-  .cdc-review__progress p {
-    margin: 24px 0 12px;
-    text-align: center;
-    color: var(--cdc-text);
-    font-size: 15px;
-    font-weight: 600;
-  }
-
-  .cdc-review__pct {
-    margin-top: 8px !important;
-    color: var(--cdc-text-dim) !important;
-  }
-
-  .cdc-progress {
-    height: 8px;
-    overflow: hidden;
-    border-radius: 4px;
-    background: var(--cdc-bg-raised);
-  }
-
-  .cdc-progress > div {
-    height: 100%;
-    background: var(--cdc-green);
-    transition: width 0.2s;
-  }
-
   /* ----------------------------------------------------------- graph --- */
 
   .cdc-summary-graph {
+    position: relative;
     height: 88px;
     margin-bottom: 14px;
     cursor: pointer;
   }
 
+  .cdc-review__table--loading,
+  .cdc-summary-graph:has(.cdc-summary-pct) {
+    cursor: default;
+  }
+
+  .cdc-summary-pct {
+    position: absolute;
+    top: 8px;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    text-align: center;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    mix-blend-mode: difference;
+  }
+
+  /* Placeholder icons while the game is analyzed. */
+  .cdc-cls-icon--empty {
+    background: #141311;
+    animation: cdc-pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes cdc-pulse {
+    50% { opacity: 0.6; }
+  }
+
   #cdc-review-graph {
     grid-area: rgraph;
+    position: relative;
     margin-left: var(--cdc-gap);
     padding: 8px 12px;
     box-sizing: border-box;
@@ -209,6 +213,31 @@
   #cdc-review-graph svg {
     display: block;
     border-radius: 3px;
+  }
+
+  /* The graph draws itself from left to right the first time it shows. */
+  .cdc-graph-reveal {
+    animation: cdc-reveal 1.4s ease-out;
+  }
+
+  @keyframes cdc-reveal {
+    from { clip-path: inset(0 100% 0 0); }
+    to { clip-path: inset(0 0 0 0); }
+  }
+
+  /* Eval under the mouse. */
+  .cdc-graph-tip {
+    position: absolute;
+    top: 6px;
+    display: none;
+    padding: 3px 6px;
+    border-radius: 3px;
+    background: #e8e6e3;
+    box-shadow: 0 1px 3px #0000004d;
+    color: #312e2b;
+    font-size: 13px;
+    font-weight: 800;
+    pointer-events: none;
   }
 
   /* ----------------------------------------------------------- table --- */
@@ -289,21 +318,48 @@
     flex: none;
   }
 
+  .cdc-cls-icon--svg {
+    background: none;
+  }
+
+  .cdc-cls-icon--svg svg {
+    width: 100%;
+    height: 100%;
+  }
+
   /* ----------------------------------------------------------- coach --- */
 
   .cdc-coach {
     display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    height: 116px;
-    padding: 12px 12px 0;
+    align-items: center;
+    gap: 14px;
+    height: 120px;
+    padding: 12px 16px 0;
     box-sizing: border-box;
+  }
+
+  .cdc-coach--summary {
+    flex: none;
+    height: auto;
+    min-height: 112px;
+    padding-bottom: 4px;
+  }
+
+  .cdc-coach--summary .cdc-bubble {
+    height: auto;
+  }
+
+  .cdc-bubble__say {
+    margin: 0;
+    color: #312e2b;
+    font-size: 14px;
+    line-height: 1.4;
   }
 
   .cdc-coach__avatar {
     flex: none;
-    width: 48px;
-    height: 48px;
+    width: 76px;
+    height: 76px;
     border-radius: 50%;
     background: #312e2b url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-6 -6 62 62'%3E%3Cpath fill='%23fff' d='M38.956.5c-3.53.418-6.452.902-9.286 2.984C5.534 1.786-.692 18.533.68 29.364 3.493 50.214 31.918 55.785 41.329 41.7c-7.444 7.696-19.276 8.752-28.323 3.084S-.506 27.392 4.683 17.567C9.873 7.742 18.996 4.535 29.03 6.405c2.43-1.418 5.225-3.22 7.655-3.187l-1.694 4.86 12.752 21.37c-.439 5.654-5.459 6.112-5.459 6.112-.574-1.47-1.634-2.942-4.842-6.036-3.207-3.094-17.465-10.177-15.788-16.207-2.001 6.967 10.311 14.152 14.04 17.663 3.73 3.51 5.426 6.04 5.795 6.756 0 0 9.392-2.504 7.838-8.927L37.4 7.171z'/%3E%3C/svg%3E")
       center / cover;
@@ -313,9 +369,9 @@
     position: relative;
     flex: 1;
     min-width: 0;
-    max-height: 100px;
-    overflow: hidden;
-    padding: 10px 12px;
+    height: 96px;
+    box-sizing: border-box;
+    padding: 12px 14px;
     border-radius: 10px;
     background: #fff;
     color: #312e2b;
@@ -325,7 +381,7 @@
     content: '';
     position: absolute;
     left: -7px;
-    top: 16px;
+    top: 38px;
     border: 7px solid transparent;
     border-left: none;
     border-right-color: #fff;
@@ -364,14 +420,37 @@
     line-height: 1.35;
   }
 
+  .cdc-bubble__sub {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
   .cdc-review__nav {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
-    padding: 14px 12px 12px;
+    padding: 14px 16px 12px;
+  }
+
+  .cdc-review__nav .cdc-btn {
+    min-width: 0;
+    gap: 6px;
+    overflow: hidden;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .cdc-review__nav .cdc-btn:not(.cdc-btn--green) .cdc-i {
+    color: var(--cdc-text-dim);
   }
 
   .cdc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     height: 44px;
     text-align: center;
     border: none;
@@ -401,43 +480,146 @@
     cursor: default !important;
   }
 
+  .cdc-btn .cdc-i {
+    width: 20px;
+    height: 20px;
+    flex: none;
+  }
+
+  .cdc-btn--on .cdc-i {
+    color: #f7c045 !important;
+  }
+
   .cdc-review__foot .cdc-btn {
     width: 100%;
     height: 56px;
     font-size: 20px;
   }
 
-  /* ------------------------------------------------------- move list --- */
+  /* -------------------------------------------------------- controls --- */
 
-  html.cdc-review-moves main.analyse .tview2 > move[data-cdc-cls] glyph {
-    display: none;
+  #cdc-review-controls {
+    grid-area: rctrl;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-left: var(--cdc-gap);
+    padding: 10px 8px 18px;
+    box-sizing: border-box;
+    border-top: 1px solid var(--cdc-border);
+    border-radius: 0 0 6px 6px;
+    background: var(--cdc-bg-panel-dark);
   }
 
-  html.cdc-review-moves main.analyse .tview2 > move:is(
-      [data-cdc-cls='brilliant'], [data-cdc-cls='great'], [data-cdc-cls='book'],
-      [data-cdc-cls='inaccuracy'], [data-cdc-cls='mistake'], [data-cdc-cls='miss'],
-      [data-cdc-cls='blunder'])::before {
+  #cdc-review-controls .cdc-btn {
+    height: 100%;
+    color: var(--cdc-text);
+    cursor: pointer;
+  }
+
+  #cdc-review-controls .cdc-i {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* ------------------------------------------------------- move list --- */
+
+  /* Chess.com's compact list: 30px striped rows, badges in the gutter left of
+     the move, a small box around the current move. Comments and variations
+     are hidden, as on Chess.com (close the review to see them). */
+  html.cdc-review-moves main.analyse .tview2-column {
+    background: repeating-linear-gradient(transparent 0 30px, #2a2926 30px 60px);
+  }
+
+  html.cdc-review-moves main.analyse .tview2-column > :is(interrupt, move.empty, interrupt + index) {
+    display: none !important;
+  }
+
+  html.cdc-review-moves main.analyse .tview2-column > index {
+    flex: 0 0 40px !important;
+    justify-content: flex-start !important;
+    height: 30px;
+    padding-left: 10px;
+    box-sizing: border-box;
+    background: transparent !important;
+    color: var(--cdc-text-dim) !important;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 30px !important;
+  }
+
+  html.cdc-review-moves main.analyse .tview2-column > index::after {
+    content: '.';
+  }
+
+  html.cdc-review-moves main.analyse .tview2-column > move {
+    position: relative;
+    flex: 0 0 26% !important;
+    align-items: center;
+    height: 30px;
+    padding: 0 0 0 26px !important;
+    box-sizing: border-box;
+    background: transparent !important;
+    color: var(--cdc-text) !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    line-height: 30px !important;
+  }
+
+  html.cdc-review-moves main.analyse .tview2-column > move san {
+    padding: 0 4px;
+    border-radius: 3px;
+    line-height: 22px;
+  }
+
+  html.cdc-review-moves main.analyse .tview2-column > move:hover san {
+    background: #ffffff14;
+  }
+
+  html.cdc-review-moves main.analyse .tview2-column > move.active san {
+    background: #ffffff26;
+    box-shadow: inset 0 -2px 0 #ffffff33;
+    color: #fff;
+  }
+
+  /* No Lichess glyphs or per-move engine evals: the badges replace them. */
+  html.cdc-review-moves main.analyse .tview2 > move :is(glyph, eval) {
+    display: none !important;
+  }
+
+  html.cdc-review-moves main.analyse .tview2 > move[data-cdc-badge]::before {
     content: attr(data-cdc-icon);
-    display: inline-flex;
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    display: flex;
     align-items: center;
     justify-content: center;
-    width: 17px;
-    height: 17px;
-    margin-right: 5px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: var(--c);
     color: #fff;
     font-size: 9px;
     font-weight: 900;
+    line-height: 1;
     letter-spacing: -1px;
-    vertical-align: 1px;
-    flex: none;
   }
 
-  html.cdc-review-moves main.analyse .tview2 > move:is(
-      [data-cdc-cls='brilliant'], [data-cdc-cls='great'], [data-cdc-cls='inaccuracy'],
-      [data-cdc-cls='mistake'], [data-cdc-cls='miss'], [data-cdc-cls='blunder']) {
+  html.cdc-review-moves main.analyse .tview2 > move[data-cdc-badge][data-cdc-img]::before {
+    content: '';
+    border-radius: 0;
+    background: var(--i) center / contain no-repeat;
+  }
+
+  /* A badged move takes its color (the last book move too). */
+  html.cdc-review-moves main.analyse .tview2 > move[data-cdc-badge] {
     color: var(--c) !important;
+  }
+
+  /* Narrow white column, black gets the rest. */
+  html.cdc-review-moves main.analyse .tview2-column > move + move {
+    flex: 0 0 calc(74% - 40px) !important;
   }
 
   /* -------------------------------------------------------- eval bar --- */
@@ -522,16 +704,16 @@
   line-height: 1;
 }
 
-.cdc-arrow {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.8;
+.cdc-badge--svg {
+  background: none;
+  box-shadow: none;
 }
 
-.cdc-arrow line { stroke: #5da8db; }
-.cdc-arrow polygon { fill: #5da8db; }
+.cdc-badge--svg svg {
+  width: 100%;
+  height: 100%;
+}
+
 
 /* Last-move squares take the classification color. */
 html.cdc-review-moves[data-cdc-cls='brilliant'] main.analyse cg-board square.last-move { background: rgba(38, 194, 163, 0.5) !important; }

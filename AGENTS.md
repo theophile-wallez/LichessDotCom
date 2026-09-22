@@ -45,10 +45,11 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 
 | Path | What it does |
 | --- | --- |
-| `manifest.json` | Content scripts: CSS + `content.js` (isolated world), `page.js` + `review.js` (page world). |
+| `manifest.json` | Content scripts: CSS + `content.js` (isolated world), `page.js` + `board.js` + `review.js` (page world). |
 | `src/background.js` | Service worker: downloads the Chess.com sounds, caches them as base64. |
-| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces. |
+| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, the home hero and the font remapping. |
 | `src/page.js` | Page world: wraps `site.sound` to play the right Chess.com sound per move. |
+| `src/board.js` | Page world: analysis arrows redrawn Chess.com-style, checkmate badge and label. |
 | `src/review.js` | Page world: Game Review (engine, classification, panel, board overlays, eval bar). |
 | `src/styles/theme.css` | Overrides Lichess's `--c-*` color variables, fonts, buttons. |
 | `src/styles/sidebar.css` | Lichess's top header → Chess.com's left sidebar. |
@@ -57,6 +58,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/analysis.css` | Analysis page (`main.analyse`) grid. |
 | `src/styles/review.css` | Game Review panel, eval bar, board annotations. |
 | `src/styles/pages.css` | Modern look for every other page (headings, side menus, tabs, tables, forms, dialogs, lobby, editor, tournaments). |
+| `src/styles/home.css` | Home page (`main.lobby`) as a 12-column card dashboard; the hero is added by `content.js`. |
 
 There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
 
@@ -97,7 +99,7 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   (`https://assets-ds.chess.com/color-icons/<name>.svg`). The names come from
   the nav data embedded in chess.com pages (`"icon":{"name":…}`).
 - **Two worlds.** `content.js` can't see page JS objects (`site`, chessground's
-  `cgKey` expandos); `page.js` and `review.js` can. Communicate with
+  `cgKey` expandos); `page.js`, `board.js` and `review.js` can. Communicate with
   `window.postMessage`.
 - **3D buttons in groups.** Every `.button` gets Chess.com's 4px bottom
   edge. Where Lichess glues a button to an input (`.copy-me`, search forms)
@@ -105,7 +107,9 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   neighbour: flatten it or add a gap.
 - **Useful page APIs.** `site.sound` is Lichess's sound player, and
   `site.analysis` is the analysis controller (`mainline`, `node.ply`,
-  `jumpToMain`, `getOrientation`). Game data is in
+  `jumpToMain`, `getOrientation`; `jumpToMain` doesn't scroll the move list),
+  and `site.analysis.chessground.state.drawable` holds the arrows (`shapes`,
+  `autoShapes`, `current`). Game data is in
   `<script id="page-init-data">`, and the engine is at
   `npm/stockfish-web/sf_19_smallnet.js`.
 
@@ -125,7 +129,23 @@ Check at 1366×640, 1600×900 and 1920×1080: nothing overflows, the page doesn'
 scroll, and bars and the eval bar line up with the board. Chess.com's CDN
 rejects the `HeadlessChrome` user agent, so override it to a normal Chrome UA
 for every request, or images will look broken when they aren't.
+Headless Chrome also reports `prefers-reduced-motion: reduce`, which makes
+Lichess turn animations off; emulate `no-preference` to check animations.
 
 Before committing, syntax-check every JS file (e.g. `new Function(src)` in the
 browser) and parse `manifest.json`. Finally, load the extension unpacked in
 `chrome://extensions`.
+
+## Shipping
+
+When you consider the work done, ship it. Don't wait to be asked, and don't
+open a PR:
+
+1. Commit, merge `origin/main` in, and push to `main` (`git push origin
+   HEAD:main`, a fast-forward).
+2. Pull `main` into the main checkout, which is where Chrome loads the unpacked
+   extension. Otherwise the user keeps testing the old code.
+3. Clean the worktree: remove any `node_modules` and other throwaway files
+   (test scripts, screenshots, browser profiles) you created.
+4. Finish with a short summary of what was done, and remind the user to reload
+   the extension in `chrome://extensions`.

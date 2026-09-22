@@ -23,14 +23,15 @@
         "src/styles/game.css",
         "src/styles/analysis.css",
         "src/styles/review.css",
-        "src/styles/pages.css"
+        "src/styles/pages.css",
+        "src/styles/home.css"
       ],
       "js": ["src/content.js"],
       "run_at": "document_start"
     },
     {
       "matches": ["https://lichess.org/*"],
-      "js": ["src/page.js", "src/review.js"],
+      "js": ["src/page.js", "src/board.js", "src/review.js"],
       "run_at": "document_start",
       "world": "MAIN"
     }

@@ -5,8 +5,9 @@
 // - Classifies each move like Chess.com (book, brilliant, great, best,
 //   excellent, good, inaccuracy, mistake, miss, blunder) from win-probability
 //   loss, and computes per-player accuracy.
-// - Renders a summary panel (graph, accuracy, counts), a move-by-move review
-//   (coach bubble, next/previous), board annotations (badge, colored squares,
+// - Renders a summary panel (graph, accuracy, counts), shown until the user
+//   moves; then a move-by-move review (coach bubble, explain / best / next,
+//   move list badges, graph, controls), board annotations (badge, colored squares,
 //   best-move arrow) and a Chess.com eval bar.
 //
 // Navigation and state go through `site.analysis` (Lichess's AnalyseCtrl).
@@ -22,19 +23,37 @@
   const fr = (document.documentElement.lang || '').startsWith('fr');
   const T = fr
     ? {
-        review: 'Bilan', start: 'Démarrer le bilan', next: 'Suivant', prev: 'Précédent',
+        review: 'Bilan', start: 'Démarrer le bilan', next: 'Suivant', explain: 'Expliquer', best: 'Meilleur',
         analysing: 'Analyse de la partie…', players: 'Joueurs', accuracy: 'Précision',
         anonymous: 'Anonyme', open: 'Bilan de la partie', close: 'Fermer le bilan',
         intro: 'Passons en revue cette partie !', bestWas: 'Le meilleur coup était {m}.',
         engineError: "Le moteur n'a pas pu démarrer.",
       }
     : {
-        review: 'Game Review', start: 'Start Review', next: 'Next', prev: 'Previous',
+        review: 'Game Review', start: 'Start Review', next: 'Next', explain: 'Explain', best: 'Best',
         analysing: 'Analyzing game…', players: 'Players', accuracy: 'Accuracy',
         anonymous: 'Anonymous', open: 'Game Review', close: 'Close review',
         intro: "Let's review this game!", bestWas: '{m} was best.',
         engineError: 'The engine failed to start.',
       };
+
+  // What the coach says while the game is analyzed, like Chess.com.
+  const QUOTES = fr
+    ? [
+        '« Moins il y a de pièces sur l’échiquier, plus un pion passé gagne en puissance. » – José Raúl Capablanca',
+        '« Les fautes sont là, sur l’échiquier, attendant d’être commises. » – Savielly Tartakower',
+        '« Personne n’a jamais gagné une partie en abandonnant. » – Savielly Tartakower',
+        '« La menace est plus forte que son exécution. » – Aron Nimzowitsch',
+        '« Entre l’ouverture et la finale, les dieux ont placé le milieu de partie. » – Siegbert Tarrasch',
+      ]
+    : [
+        '"The passed pawn increases in strength as the number of pieces on the board diminishes." – José Raúl Capablanca',
+        '"The mistakes are there, waiting to be made." – Savielly Tartakower',
+        '"No one ever won a game by resigning." – Savielly Tartakower',
+        '"The threat is stronger than the execution." – Aron Nimzowitsch',
+        '"Between the opening and the end game, the gods have placed the middle game." – Siegbert Tarrasch',
+      ];
+  const QUOTE = QUOTES[Math.floor(Math.random() * QUOTES.length)];
 
   // key, color, icon, label, sentence ({m} = move)
   const CLASSES = [
@@ -43,7 +62,7 @@
     ['best', '#81b64c', '★', fr ? 'Meilleur' : 'Best', fr ? '{m} est le meilleur coup' : '{m} is best'],
     ['excellent', '#96bc4b', '✓', fr ? 'Très bon' : 'Excellent', fr ? '{m} est très bon' : '{m} is excellent'],
     ['good', '#96af8b', '✓', fr ? 'Bon' : 'Good', fr ? '{m} est bon' : '{m} is good'],
-    ['book', '#a88865', '≡', fr ? 'Théorique' : 'Book', fr ? '{m} est un coup théorique' : '{m} is a book move'],
+    ['book', '#d5a47d', '≡', fr ? 'Théorique' : 'Book', fr ? '{m} est un coup théorique' : '{m} is a book move'],
     ['inaccuracy', '#f7c045', '?!', fr ? 'Imprécision' : 'Inaccuracy', fr ? '{m} est une imprécision' : '{m} is an inaccuracy'],
     ['mistake', '#ffa459', '?', fr ? 'Erreur' : 'Mistake', fr ? '{m} est une erreur' : '{m} is a mistake'],
     ['miss', '#ff7769', '✕', fr ? 'Manqué' : 'Miss', fr ? '{m} est un coup manqué' : '{m} is a miss'],
@@ -51,6 +70,58 @@
   ].map(([key, color, icon, label, sentence]) => ({ key, color, icon, label, sentence }));
   const CLS = Object.fromEntries(CLASSES.map(c => [c.key, c]));
   const GRAPH_DOTS = new Set(['brilliant', 'great', 'inaccuracy', 'mistake', 'miss', 'blunder']);
+  // Move list badges; book only on the last book move, like Chess.com.
+  const LIST_BADGES = new Set([...GRAPH_DOTS, 'book']);
+  // Moves that need no correction: no best-move arrow or button.
+  const GOOD = new Set(['brilliant', 'great', 'best', 'book']);
+
+  // Chess.com's own icons: a shadowed circle, and white glyphs whose shadow is
+  // the same glyphs half a unit lower. Classes without one keep a text icon.
+  const ICONS = {
+    book: [
+      'M8.45,5.4c-1-.75-2.51-1.09-4.83-1.09H3V13h.58a8.09,8.09,0,0,1,4.83,1.17Z',
+      'M9.54,14.19A8.14,8.14,0,0,1,14.38,13H15V4.31h-.58c-2.31,0-3.81.34-4.84,1.09Z',
+    ],
+    great: [
+      'M10.32,14.1a.27.27,0,0,1,0,.13.44.44,0,0,1-.08.11l-.11.08-.13,0H8l-.13,0-.11-.08a.41.41,0,0,1-.08-.24V12.2a.27.27,0,0,1,0-.13.36.36,0,0,1,.07-.1.39.39,0,0,1,.1-.08l.13,0h2a.31.31,0,0,1,.24.1.39.39,0,0,1,.08.1.51.51,0,0,1,0,.13Zm-.12-3.93a.17.17,0,0,1,0,.12.41.41,0,0,1-.07.11.4.4,0,0,1-.23.08H8.1a.31.31,0,0,1-.34-.31L7.61,3.4a.36.36,0,0,1,.09-.24.23.23,0,0,1,.11-.08.27.27,0,0,1,.13,0h2.11a.32.32,0,0,1,.25.1.36.36,0,0,1,.09.24Z',
+    ],
+    best: [
+      'M9,2.93A.5.5,0,0,0,8.73,3a.46.46,0,0,0-.17.22L7.24,6.67l-3.68.19A.52.52,0,0,0,3.3,7a.53.53,0,0,0-.16.23.45.45,0,0,0,0,.28.44.44,0,0,0,.15.23L6.15,10l-1,3.56a.45.45,0,0,0,0,.28.46.46,0,0,0,.17.22.41.41,0,0,0,.26.09.43.43,0,0,0,.27-.08l3.09-2,3.09,2a.46.46,0,0,0,.53,0,.46.46,0,0,0,.17-.22.53.53,0,0,0,0-.28l-1-3.56L14.71,7.7a.44.44,0,0,0,.15-.23.45.45,0,0,0,0-.28A.53.53,0,0,0,14.7,7a.52.52,0,0,0-.26-.1l-3.68-.2L9.44,3.23A.46.46,0,0,0,9.27,3,.5.5,0,0,0,9,2.93Z',
+    ],
+    mistake: [
+      'M9.92,14.52a.27.27,0,0,1,0,.12.41.41,0,0,1-.07.11.32.32,0,0,1-.23.09H7.7a.25.25,0,0,1-.12,0,.27.27,0,0,1-.1-.08.31.31,0,0,1-.09-.22V12.69a.32.32,0,0,1,.09-.23l.1-.07.12,0H9.59a.32.32,0,0,1,.23.09.61.61,0,0,1,.07.1.28.28,0,0,1,0,.13Zm2.2-7.17a3.1,3.1,0,0,1-.36.73,5.58,5.58,0,0,1-.49.6,6,6,0,0,1-.52.49,8,8,0,0,0-.65.63,1,1,0,0,0-.27.7v.22a.24.24,0,0,1,0,.12.17.17,0,0,1-.06.1.3.3,0,0,1-.1.07l-.12,0H7.79l-.12,0a.3.3,0,0,1-.1-.07.26.26,0,0,1-.07-.1.37.37,0,0,1,0-.12v-.35a2.42,2.42,0,0,1,.13-.84,2.55,2.55,0,0,1,.33-.66,3.38,3.38,0,0,1,.45-.55c.16-.15.33-.29.49-.42a7.73,7.73,0,0,0,.64-.64,1,1,0,0,0,.26-.67.77.77,0,0,0-.07-.34A.75.75,0,0,0,9.48,6a1.16,1.16,0,0,0-.72-.24,1.61,1.61,0,0,0-.49.07A3,3,0,0,0,7.86,6a1.41,1.41,0,0,0-.29.18l-.11.09a.5.5,0,0,1-.24.06A.31.31,0,0,1,7,6.19L6,5a.29.29,0,0,1,0-.4,1.36,1.36,0,0,1,.21-.2A3.07,3.07,0,0,1,6.81,4a5.38,5.38,0,0,1,.89-.37,3.75,3.75,0,0,1,1.2-.17,4.07,4.07,0,0,1,1.2.19,4,4,0,0,1,1.09.56,2.76,2.76,0,0,1,.78.92,2.82,2.82,0,0,1,.28,1.28A3,3,0,0,1,12.12,7.35Z',
+    ],
+    blunder: [
+      'M14.74,5A2.58,2.58,0,0,0,14,4a3.76,3.76,0,0,0-1.09-.56,4.07,4.07,0,0,0-1.2-.19,3.92,3.92,0,0,0-1.18.17,5.87,5.87,0,0,0-.9.37,3,3,0,0,0-.32.2,3.46,3.46,0,0,1,.42.63,3.29,3.29,0,0,1,.36,1.47.31.31,0,0,0,.19-.06L10.37,6a2.9,2.9,0,0,1,.29-.19,3.89,3.89,0,0,1,.41-.17,1.55,1.55,0,0,1,.48-.07,1.1,1.1,0,0,1,.72.24.72.72,0,0,1,.23.26.8.8,0,0,1,.07.34,1,1,0,0,1-.25.67,7.71,7.71,0,0,1-.65.63,6.2,6.2,0,0,0-.48.43,2.93,2.93,0,0,0-.45.54,2.55,2.55,0,0,0-.33.66,2.62,2.62,0,0,0-.13.83v.35a.24.24,0,0,0,0,.12.35.35,0,0,0,.17.17l.12,0h1.71l.12,0a.23.23,0,0,0,.1-.07.21.21,0,0,0,.06-.1.27.27,0,0,0,0-.12V10.3a1,1,0,0,1,.26-.7q.27-.28.66-.63a5.79,5.79,0,0,0,.51-.48,4.51,4.51,0,0,0,.48-.6,2.56,2.56,0,0,0,.36-.72,2.81,2.81,0,0,0,.14-1A2.66,2.66,0,0,0,14.74,5Z',
+      'M12.38,12.15H10.5l-.12,0a.34.34,0,0,0-.18.29v1.82a.36.36,0,0,0,.08.23.23.23,0,0,0,.1.07l.12,0h1.88a.24.24,0,0,0,.12,0,.26.26,0,0,0,.11-.07.36.36,0,0,0,.07-.1.28.28,0,0,0,0-.13V12.46a.27.27,0,0,0,0-.12.61.61,0,0,0-.07-.1A.32.32,0,0,0,12.38,12.15Z',
+      'M6.79,12.15H4.91l-.12,0a.34.34,0,0,0-.18.29v1.82a.36.36,0,0,0,.08.23.23.23,0,0,0,.1.07l.12,0H6.79a.24.24,0,0,0,.12,0A.26.26,0,0,0,7,14.51a.36.36,0,0,0,.07-.1.28.28,0,0,0,0-.13V12.46a.27.27,0,0,0,0-.12.61.61,0,0,0-.07-.1A.32.32,0,0,0,6.79,12.15Z',
+      'M8.39,4A3.76,3.76,0,0,0,7.3,3.48a4.07,4.07,0,0,0-1.2-.19,3.92,3.92,0,0,0-1.18.17,5.87,5.87,0,0,0-.9.37,3.37,3.37,0,0,0-.55.38l-.21.19a.32.32,0,0,0,0,.41l1,1.2a.26.26,0,0,0,.2.12.48.48,0,0,0,.24-.06L4.78,6a2.9,2.9,0,0,1,.29-.19l.4-.17A1.66,1.66,0,0,1,6,5.56a1.1,1.1,0,0,1,.72.24.72.72,0,0,1,.23.26A.77.77,0,0,1,7,6.4a1,1,0,0,1-.26.67,7.6,7.6,0,0,1-.64.63,6.28,6.28,0,0,0-.49.43,2.93,2.93,0,0,0-.45.54,2.72,2.72,0,0,0-.33.66,2.62,2.62,0,0,0-.13.83v.35a.43.43,0,0,0,0,.12.39.39,0,0,0,.08.1.18.18,0,0,0,.1.07.21.21,0,0,0,.12,0H6.72l.12,0a.23.23,0,0,0,.1-.07.36.36,0,0,0,.07-.1.5.5,0,0,0,0-.12V10.3a1,1,0,0,1,.27-.7A8,8,0,0,1,8,9c.18-.15.35-.31.52-.48A7,7,0,0,0,9,7.89a3.23,3.23,0,0,0,.36-.72,3.07,3.07,0,0,0,.13-1A2.66,2.66,0,0,0,9.15,5,2.58,2.58,0,0,0,8.39,4Z',
+    ],
+  };
+  for (const [key, paths] of Object.entries(ICONS)) {
+    const glyphs = paths.map(d => `<path d="${d}"/>`).join('');
+    const c = CLS[key];
+    c.svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 19">
+      <path opacity="0.3" d="M9,.5a9,9,0,1,0,9,9A9,9,0,0,0,9,.5Z"/>
+      <path fill="${c.color}" d="M9,0a9,9,0,1,0,9,9A9,9,0,0,0,9,0Z"/>
+      <g opacity="${key === 'book' ? 0.3 : 0.2}" transform="translate(0 .5)">${glyphs}</g>
+      <g fill="#fff">${glyphs}</g></svg>`;
+    c.img = `url("data:image/svg+xml,${encodeURIComponent(c.svg)}")`;
+  }
+  CLS.book.text = '#312e2b';
+
+  const SVG = {
+    first: '<path d="M5 4h3v16H5zM20 4v16L9 12z"/>',
+    prev: '<path d="M15.6 3.5 7.1 12l8.5 8.5 2.3-2.3-6.2-6.2 6.2-6.2z"/>',
+    play: '<path d="M7 3.5v17L20.5 12z"/>',
+    pause: '<path d="M6 4h4.5v16H6zM13.5 4H18v16h-4.5z"/>',
+    next: '<path d="M8.4 3.5 16.9 12l-8.5 8.5-2.3-2.3 6.2-6.2-6.2-6.2z"/>',
+    last: '<path d="M16 4h3v16h-3zM4 4v16l11-8z"/>',
+    star: '<path d="M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19zm0 2a7.5 7.5 0 1 1 0 15 7.5 7.5 0 0 1 0-15zm0 2.2-1.6 3.6-3.9.4 2.9 2.6-.8 3.9 3.4-2 3.4 2-.8-3.9 2.9-2.6-3.9-.4z"/>',
+    bulb: '<path d="M12 2a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2zM9 19.5h6V21a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1z"/>',
+    arrow: '<path d="M3 10.5h13.1l-5.3-5.3L13 3l9 9-9 9-2.2-2.2 5.3-5.3H3z"/>',
+  };
+  const svgIcon = name => `<svg class="cdc-i" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd">${SVG[name]}</svg>`;
 
   const esc = s =>
     String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -301,13 +372,36 @@
   // ------------------------------------------------------------- UI ---
 
   const html = document.documentElement;
-  const state = { mode: 'summary', review: null, progress: 0, error: null, lastKey: '' };
+  const state = {
+    mode: 'summary', review: null, progress: 0, error: null, lastKey: '',
+    explain: false, playing: null, revealed: new Set(),
+    bestOf: null, // mainline ply whose best move is shown on the board
+  };
 
   function setMode(mode) {
     state.mode = mode;
+    // The summary is shown until the user moves; then the move-by-move review.
+    state.summaryPly = site.analysis?.node.ply;
+    if (mode !== 'moves') stopPlaying();
     html.classList.remove('cdc-review-normal', 'cdc-review-summary', 'cdc-review-moves');
     html.classList.add('cdc-review-' + mode);
     render(true);
+  }
+
+  function stopPlaying() {
+    clearInterval(state.playing);
+    state.playing = null;
+  }
+
+  function togglePlay(ctrl) {
+    if (state.playing) return stopPlaying();
+    const step = () => {
+      const last = ctrl.mainline.length - 1;
+      if (!ctrl.onMainline || ctrl.node.ply >= last) return stopPlaying(), render(true);
+      jump(ctrl, ctrl.node.ply + 1);
+    };
+    state.playing = setInterval(step, 1200);
+    step();
   }
 
   const el = (tag, attrs = {}, htmlText = '') => {
@@ -320,6 +414,7 @@
   const dom = {
     panel: el('div', { id: 'cdc-review' }),
     graphBox: el('div', { id: 'cdc-review-graph' }),
+    controls: el('div', { id: 'cdc-review-controls' }),
     bar: el('div', { id: 'cdc-evalbar' }, '<div class="cdc-evalbar__fill"></div><span class="cdc-evalbar__label"></span>'),
     overlay: el('div', { id: 'cdc-board-overlay' }),
   };
@@ -328,7 +423,7 @@
     const main = document.querySelector('main.analyse');
     const board = main?.querySelector('.analyse__board');
     if (!main || !board) return false;
-    for (const node of [dom.panel, dom.graphBox, dom.bar]) if (node.parentNode !== main) main.appendChild(node);
+    for (const node of [dom.panel, dom.graphBox, dom.controls, dom.bar]) if (node.parentNode !== main) main.appendChild(node);
     if (dom.overlay.parentNode !== board) board.appendChild(dom.overlay);
     return true;
   }
@@ -341,12 +436,15 @@
     return { w: byColor.white, b: byColor.black };
   }
 
+  // `review.total` (positions in the game) lets a partial analysis fill the
+  // graph from the left while it runs.
   function graphSvg(review, ply, width, height) {
-    const n = review.positions.length - 1 || 1;
+    const n = (review.total || review.positions.length) - 1 || 1;
     const x = i => (i / n) * width;
     const y = wp => height - (Math.max(0, Math.min(100, wp)) / 100) * height;
     const pts = review.positions.map((p, i) => `${x(i).toFixed(1)},${y(p.wp).toFixed(1)}`);
-    const area = `M0,${height} L${pts.join(' L')} L${width},${height} Z`;
+    const end = x(review.positions.length - 1).toFixed(1);
+    const area = pts.length ? `M0,${height} L${pts.join(' L')} L${end},${height} Z` : '';
     const dots = review.moves
       .filter(m => GRAPH_DOTS.has(m.cls))
       .map(m => `<circle cx="${x(m.ply).toFixed(1)}" cy="${y(review.positions[m.ply].wp).toFixed(1)}" r="3.5" fill="${CLS[m.cls].color}" stroke="#fff" stroke-width="1"/>`)
@@ -365,14 +463,52 @@
     const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
     const width = Math.max(100, Math.floor(container.clientWidth - padX));
     const height = Math.max(40, Math.floor(container.clientHeight - padY));
-    container.innerHTML = graphSvg(review, ply, width, height);
-    container.onclick = e => {
+    container.innerHTML = graphSvg(review, ply, width, height) + '<span class="cdc-graph-tip"></span>';
+    // The first time each graph shows, it draws itself from left to right.
+    const kind = container === dom.graphBox ? 'moves' : 'summary';
+    if (!state.revealed.has(kind)) {
+      state.revealed.add(kind);
+      container.firstElementChild.classList.add('cdc-graph-reveal');
+    }
+    const n = review.positions.length - 1;
+    const plyAt = e => {
       const r = container.getBoundingClientRect();
-      const n = review.positions.length - 1;
-      const target = Math.round(((e.clientX - r.left) / r.width) * n);
-      jump(ctrl, Math.max(0, Math.min(n, target)));
+      return Math.max(0, Math.min(n, Math.round(((e.clientX - r.left - padX / 2) / width) * n)));
+    };
+    const tip = container.lastElementChild;
+    container.onmousemove = e => {
+      const i = plyAt(e);
+      tip.textContent = formatEval(review.positions[i]) || '0.00';
+      tip.style.display = 'block';
+      const x = padX / 2 + (i / (n || 1)) * width;
+      tip.style.left = Math.max(padX / 2, Math.min(container.clientWidth - padX / 2 - tip.offsetWidth, x - tip.offsetWidth / 2)) + 'px';
+    };
+    container.onmouseleave = () => (tip.style.display = 'none');
+    container.onclick = e => {
+      stopPlaying();
+      jump(ctrl, plyAt(e));
       if (state.mode === 'summary') setMode('moves');
     };
+  }
+
+  // The engine's best move instead of the game's, played on the board as a
+  // (hidden) variation, like Chess.com's "Best" button.
+  function bestShown(ctrl) {
+    const m = state.bestOf && state.review?.moves[state.bestOf - 1];
+    const chess960 = ctrl.data.game.variant?.key === 'chess960';
+    if (!m || ctrl.onMainline || ctrl.node.ply !== state.bestOf) return null;
+    return normUci(ctrl.node.uci, chess960) === m.best ? m : null;
+  }
+
+  function showBest(ctrl) {
+    if (bestShown(ctrl)) return jump(ctrl, state.bestOf);
+    const ply = ctrl.node.ply;
+    const m = state.review?.moves[ply - 1];
+    if (!m?.best || typeof ctrl.playUci !== 'function') return;
+    jump(ctrl, ply - 1);
+    state.bestOf = ply;
+    ctrl.playUci(m.best);
+    ctrl.redraw?.();
   }
 
   function jump(ctrl, ply) {
@@ -380,7 +516,10 @@
     ctrl.redraw?.();
   }
 
-  const icon = cls => `<span class="cdc-cls-icon" style="--c:${CLS[cls].color}">${CLS[cls].icon}</span>`;
+  const icon = cls =>
+    CLS[cls].svg
+      ? `<span class="cdc-cls-icon cdc-cls-icon--svg">${CLS[cls].svg}</span>`
+      : `<span class="cdc-cls-icon" style="--c:${CLS[cls].color}">${CLS[cls].icon}</span>`;
 
   function header(title, back) {
     return `<div class="cdc-review__head">
@@ -390,25 +529,27 @@
     </div>`;
   }
 
+  // Like Chess.com, the summary keeps its layout while the game is analyzed:
+  // a quote from the coach, the graph filling in, and empty placeholders.
   function renderSummary(ctrl) {
     const p = players(ctrl);
     const r = state.review;
-    let body;
-    if (state.error) body = `<p class="cdc-review__msg">${esc(state.error)}</p>`;
-    else if (!r)
-      body = `<div class="cdc-review__progress"><p>${esc(T.analysing)}</p>
-        <div class="cdc-progress"><div style="width:${Math.round(state.progress * 100)}%"></div></div>
-        <p class="cdc-review__pct">${Math.round(state.progress * 100)}%</p></div>`;
-    else {
-      const acc = c => (r.accuracy[c] === null ? '—' : r.accuracy[c].toFixed(1));
-      const rows = CLASSES.map(
-        c => `<tr><td class="cdc-t-label">${esc(c.label)}</td>
-          <td class="cdc-t-num" style="color:${c.color}">${r.counts.w[c.key] || 0}</td>
-          <td class="cdc-t-icon">${icon(c.key)}</td>
-          <td class="cdc-t-num" style="color:${c.color}">${r.counts.b[c.key] || 0}</td></tr>`,
-      ).join('');
-      body = `<div class="cdc-review__graph cdc-summary-graph"></div>
-        <table class="cdc-review__table">
+    const loading = !r && !state.error;
+    const pct = Math.round(state.progress * 100);
+    const say = state.error ? esc(state.error) : loading ? esc(QUOTE) : esc(T.intro);
+    const acc = c => (r?.accuracy[c] == null ? '&nbsp;' : r.accuracy[c].toFixed(1));
+    const rows = CLASSES.map(
+      c => `<tr><td class="cdc-t-label">${esc(c.label)}</td>
+        <td class="cdc-t-num" style="color:${c.color}">${r?.counts.w[c.key] || 0}</td>
+        <td class="cdc-t-icon">${r ? icon(c.key) : '<span class="cdc-cls-icon cdc-cls-icon--empty"></span>'}</td>
+        <td class="cdc-t-num" style="color:${c.color}">${r?.counts.b[c.key] || 0}</td></tr>`,
+    ).join('');
+    dom.panel.innerHTML = `${header(T.review, 'normal')}
+      <div class="cdc-coach cdc-coach--summary"><div class="cdc-coach__avatar"></div>
+        <div class="cdc-bubble"><p class="cdc-bubble__say">${say}</p></div></div>
+      <div class="cdc-review__body">
+        <div class="cdc-review__graph cdc-summary-graph">${loading ? `<span class="cdc-summary-pct">${pct}%</span>` : ''}</div>
+        <table class="cdc-review__table${loading ? ' cdc-review__table--loading' : ''}">
           <tr class="cdc-t-names"><td></td><td>${esc(playerName(p.w))}</td><td></td><td>${esc(playerName(p.b))}</td></tr>
           <tr><td class="cdc-t-label">${esc(T.players)}</td><td><span class="cdc-avatar"></span></td><td></td><td><span class="cdc-avatar"></span></td></tr>
           <tr><td class="cdc-t-label">${esc(T.accuracy)}</td>
@@ -416,25 +557,33 @@
             <td><span class="cdc-acc cdc-acc--b">${acc('b')}</span></td></tr>
           <tr class="cdc-t-sep"><td colspan="4"></td></tr>
           ${rows}
-        </table>`;
-    }
-    dom.panel.innerHTML = `${header(T.review, 'normal')}
-      <div class="cdc-review__body">${body}</div>
+        </table>
+      </div>
       <div class="cdc-review__foot"><button class="cdc-btn cdc-btn--green" data-cdc="moves" ${r ? '' : 'disabled'}>${esc(T.start)}</button></div>`;
     const g = dom.panel.querySelector('.cdc-summary-graph');
-    if (g && r) mountGraph(g, r, ctrl.node.ply, ctrl);
+    if (r) mountGraph(g, r, ctrl.node.ply, ctrl);
+    else if (loading) {
+      const partial = { positions: state.partial || [], moves: [], total: ctrl.mainline.length };
+      const box = g.getBoundingClientRect();
+      g.insertAdjacentHTML('beforeend', graphSvg(partial, 0, Math.max(100, Math.floor(box.width)), Math.max(40, Math.floor(box.height))));
+    }
   }
 
   function renderMoves(ctrl) {
     const r = state.review;
     const ply = ctrl.node.ply;
     const move = ctrl.onMainline && ply > 0 ? r?.moves[ply - 1] : null;
+    const shown = bestShown(ctrl);
     let bubble;
     if (!r) bubble = `<p class="cdc-bubble__title">${esc(T.analysing)} ${Math.round(state.progress * 100)}%</p>`;
+    else if (shown)
+      bubble = `<div class="cdc-bubble__row">${icon('best')}
+          <p class="cdc-bubble__title" style="color:${CLS.best.color}">${esc(CLS.best.sentence.replace('{m}', ctrl.node.san))}</p>
+          <span class="cdc-bubble__eval">${esc(formatEval(r.positions[shown.ply - 1]))}</span></div>`;
     else if (!move) bubble = `<p class="cdc-bubble__title">${esc(T.intro)}</p>`;
     else {
       const c = CLS[move.cls];
-      const good = ['brilliant', 'great', 'best', 'book'].includes(move.cls);
+      const good = GOOD.has(move.cls);
       const sub =
         move.cls === 'book'
           ? esc(state.openingName || '')
@@ -442,18 +591,32 @@
             ? esc(T.bestWas.replace('{m}', move.bestSan))
             : '';
       bubble = `<div class="cdc-bubble__row">${icon(move.cls)}
-          <p class="cdc-bubble__title" style="color:${c.color}">${esc(c.sentence.replace('{m}', move.san))}</p>
+          <p class="cdc-bubble__title" style="color:${c.text || c.color}">${esc(c.sentence.replace('{m}', move.san))}</p>
           <span class="cdc-bubble__eval">${esc(formatEval(move.eval))}</span></div>
-        ${sub ? `<p class="cdc-bubble__sub">${sub}</p>` : ''}`;
+        ${sub && state.explain ? `<p class="cdc-bubble__sub">${sub}</p>` : ''}`;
     }
+    const atEnd = ctrl.onMainline && ply >= ctrl.mainline.length - 1;
+    const canBest = shown || (move && move.best && !GOOD.has(move.cls));
     dom.panel.innerHTML = `${header(T.review, 'summary')}
       <div class="cdc-coach"><div class="cdc-coach__avatar"></div><div class="cdc-bubble">${bubble}</div></div>
       <div class="cdc-review__nav">
-        <button class="cdc-btn" data-cdc="prev">${esc(T.prev)}</button>
-        <button class="cdc-btn cdc-btn--green" data-cdc="next">${esc(T.next)} →</button>
+        <button class="cdc-btn${state.explain ? ' cdc-btn--on' : ''}" data-cdc="explain">${svgIcon('bulb')}${esc(T.explain)}</button>
+        <button class="cdc-btn${shown ? ' cdc-btn--on' : ''}" data-cdc="best" ${canBest ? '' : 'disabled'}>${svgIcon('star')}${esc(T.best)}</button>
+        <button class="cdc-btn cdc-btn--green" data-cdc="next" ${atEnd ? 'disabled' : ''}>${svgIcon('arrow')}${esc(T.next)}</button>
       </div>`;
+    dom.controls.innerHTML = ['first', 'prev', state.playing ? 'pause' : 'play', 'next', 'last']
+      .map(a => `<button class="cdc-btn" data-cdc="${a === 'pause' ? 'play' : a}">${svgIcon(a)}</button>`)
+      .join('');
     if (r) mountGraph(dom.graphBox, r, ply, ctrl);
     else dom.graphBox.innerHTML = '';
+    // jumpToMain doesn't scroll Lichess's move list; keep the move in view.
+    requestAnimationFrame(() => {
+      const box = document.querySelector('main.analyse .analyse__moves');
+      const active = box?.querySelector('move.active');
+      if (!active) return;
+      const top = active.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop;
+      box.scrollTop = top - box.clientHeight / 2 + active.offsetHeight / 2;
+    });
   }
 
   function renderNormal() {
@@ -468,8 +631,10 @@
     const orientation = ctrl.getOrientation();
     const reviewing = state.mode !== 'normal';
 
-    // Eval bar.
-    const pos = r && onMain ? r.positions[ply] : null;
+    const shown = bestShown(ctrl);
+
+    // Eval bar. The best move keeps the eval of the position before it.
+    const pos = shown ? r.positions[shown.ply - 1] : r && onMain ? r.positions[ply] : null;
     html.classList.toggle('cdc-evalbar-on', !!pos);
     if (pos) {
       const whiteShare = pos.wp;
@@ -481,7 +646,7 @@
     }
 
     // Board overlay.
-    const move = r && onMain && ply > 0 && reviewing ? r.moves[ply - 1] : null;
+    const move = shown ? { ...shown, cls: 'best' } : r && onMain && ply > 0 && reviewing ? r.moves[ply - 1] : null;
     html.dataset.cdcCls = move ? move.cls : '';
     let overlay = '';
     if (move) {
@@ -489,25 +654,17 @@
         const [f, rk] = fr2(key);
         return orientation === 'white' ? [f, 7 - rk] : [7 - f, rk];
       };
-      const node = ctrl.mainline[ply];
+      const node = ctrl.node;
       let dest = node.uci.slice(2, 4);
       if (node.san.startsWith('O-O')) dest = (node.san.startsWith('O-O-O') ? 'c' : 'g') + node.uci[1];
       const [dx, dy] = toXY(dest);
-      let arrow = '';
-      if (!['best', 'brilliant', 'great', 'book'].includes(move.cls) && move.best) {
-        const [ax, ay] = toXY(move.best.slice(0, 2));
-        const [bx, by] = toXY(move.best.slice(2, 4));
-        const x1 = ax + 0.5, y1 = ay + 0.5, x2 = bx + 0.5, y2 = by + 0.5;
-        const len = Math.hypot(x2 - x1, y2 - y1) || 1;
-        const ux = (x2 - x1) / len, uy = (y2 - y1) / len;
-        const hx = x2 - ux * 0.42, hy = y2 - uy * 0.42;
-        arrow = `<svg class="cdc-arrow" viewBox="0 0 8 8">
-          <line x1="${x1 + ux * 0.2}" y1="${y1 + uy * 0.2}" x2="${hx}" y2="${hy}" stroke-width="0.2" stroke-linecap="butt"/>
-          <polygon points="${x2},${y2} ${hx - uy * 0.25},${hy + ux * 0.25} ${hx + uy * 0.25},${hy - ux * 0.25}"/></svg>`;
-      }
-      overlay = `${arrow}<div class="cdc-badge" style="left:${(dx + 1) * 12.5}%;top:${dy * 12.5}%;--c:${CLS[move.cls].color}">${CLS[move.cls].icon}</div>`;
+      const c = CLS[move.cls];
+      overlay = `<div class="cdc-badge${c.svg ? ' cdc-badge--svg' : ''}" style="left:${(dx + 1) * 12.5}%;top:${dy * 12.5}%;--c:${c.color}">${c.svg || c.icon}</div>`;
     }
     if (dom.overlay.innerHTML !== overlay) dom.overlay.innerHTML = overlay;
+    // The best move, drawn by board.js with the other arrows.
+    const showBest = move && move.best && !GOOD.has(move.cls);
+    window.cdcReviewArrows = showBest ? [{ orig: move.best.slice(0, 2), dest: move.best.slice(2, 4), brush: 'best' }] : [];
 
     // Move list badges.
     if (r) {
@@ -515,11 +672,18 @@
       const mainMoves = tree ? [...tree.querySelectorAll(':scope > move:not(.empty)')] : [];
       mainMoves.forEach((m, i) => {
         const mv = r.moves[i];
-        if (mv && m.dataset.cdcCls !== mv.cls) {
-          m.dataset.cdcCls = mv.cls;
-          m.style.setProperty('--c', CLS[mv.cls].color);
-          m.dataset.cdcIcon = CLS[mv.cls].icon;
+        if (!mv || m.dataset.cdcCls === mv.cls) return;
+        const c = CLS[mv.cls];
+        m.dataset.cdcCls = mv.cls;
+        m.style.setProperty('--c', c.color);
+        m.dataset.cdcIcon = c.icon;
+        if (c.img) {
+          m.style.setProperty('--i', c.img);
+          m.dataset.cdcImg = '';
         }
+        const badge = LIST_BADGES.has(mv.cls) && !(mv.cls === 'book' && r.moves[i + 1]?.cls === 'book');
+        if (badge) m.dataset.cdcBadge = '';
+        else delete m.dataset.cdcBadge;
       });
     }
   }
@@ -527,7 +691,8 @@
   function render(force) {
     const ctrl = site.analysis;
     if (!ctrl || !ensureAttached(ctrl)) return;
-    const key = [state.mode, ctrl.node.ply, ctrl.onMainline, ctrl.getOrientation(), !!state.review, Math.round(state.progress * 100), state.error].join('|');
+    if (state.mode === 'summary' && ctrl.node.ply !== state.summaryPly) return setMode('moves');
+    const key = [state.mode, ctrl.node.ply, ctrl.onMainline, ctrl.getOrientation(), !!state.review, Math.round(state.progress * 100), state.error, state.explain, !!state.playing].join('|');
     if (force || key !== state.lastKey) {
       state.lastKey = key;
       if (state.mode === 'summary') renderSummary(ctrl);
@@ -537,19 +702,31 @@
     renderBoard(ctrl);
   }
 
-  dom.panel.addEventListener('click', e => {
+  const onClick = e => {
     const btn = e.target.closest('[data-cdc]');
     if (!btn || btn.disabled) return;
     const ctrl = site.analysis;
     const act = btn.dataset.cdc;
-    if (act === 'prev') jump(ctrl, Math.max(0, ctrl.node.ply - 1));
-    else if (act === 'next') jump(ctrl, Math.min(ctrl.mainline.length - 1, ctrl.onMainline ? ctrl.node.ply + 1 : 0));
+    const last = ctrl.mainline.length - 1;
+    if (act !== 'play') stopPlaying();
+    if (act === 'play') togglePlay(ctrl);
+    else if (act === 'explain') state.explain = !state.explain;
+    else if (act === 'first') jump(ctrl, 0);
+    else if (act === 'last') jump(ctrl, last);
+    // Off the mainline (e.g. showing the best move): back to the game's move,
+    // or on to the next one.
+    else if (act === 'prev') jump(ctrl, ctrl.onMainline ? Math.max(0, ctrl.node.ply - 1) : Math.min(last, ctrl.node.ply));
+    else if (act === 'next') jump(ctrl, Math.min(last, ctrl.node.ply + 1));
+    else if (act === 'best') showBest(ctrl);
     else {
-      if (act === 'moves' && !ctrl.onMainline) jump(ctrl, 0);
+      // Starting the review goes to the first move.
+      if (act === 'moves' && (!ctrl.onMainline || ctrl.node.ply === 0)) jump(ctrl, 1);
       setMode(act);
     }
     render(true);
-  });
+  };
+  dom.panel.addEventListener('click', onClick);
+  dom.controls.addEventListener('click', onClick);
 
   let lastWidth = 0;
   window.addEventListener('resize', () => {
@@ -595,10 +772,12 @@
       positions = [];
       for (let i = 0; i < nodes.length; i++) {
         positions.push(toRecord(nodes[i].fen, await engine.analyse(nodes[i].fen)));
+        state.partial = positions;
         state.progress = (i + 1) / nodes.length;
         render();
       }
       engine.destroy();
+      state.revealed.add('summary'); // it already filled in while loading
       try {
         localStorage.setItem(cacheKey, JSON.stringify(positions));
       } catch {}
