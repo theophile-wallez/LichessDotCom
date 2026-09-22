@@ -139,10 +139,39 @@ textarea:focus {
   outline: none !important;
 }
 
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--cdc-green);
+}
+
 /* The sidebar search box keeps its borderless look. */
 #top #clinput input {
   border: none !important;
   background: transparent !important;
+}
+
+/* An input with a button glued to it (copy FEN / URL, study, opening and
+ * FIDE searches) reads as one control: square the inner corners and drop
+ * the 3D edge, which would otherwise hang below the input. */
+input:not([type='hidden']):has(+ .button) {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+input:not([type='hidden']) + .button {
+  margin: 0 !important;
+  border-radius: 0 6px 6px 0 !important;
+  box-shadow: none !important;
+}
+
+input:not([type='hidden']) + .button.button-metal {
+  border: 1px solid #4b4847 !important;
+  border-left: none !important;
+  color: var(--cdc-text-dim) !important;
+}
+
+input:not([type='hidden']) + .button.button-metal:hover {
+  color: #fff !important;
 }
 
 /* ---------------------------------------------------------------- lobby --- */
@@ -180,19 +209,234 @@ textarea:focus {
   font-weight: 600;
 }
 
-/* "Create a game" becomes Chess.com's big green Play button. */
-.lobby__start__button--hook.button {
+/* "Create a game" becomes Chess.com's big green Play button. The selectors
+ * repeat .button-metal to outrank the generic metal-button hover in
+ * theme.css, and the icon stays white (Lichess tints it green on hover). */
+.lobby__start__button--hook.button.button-metal {
   background: var(--cdc-green) !important;
   color: #fff !important;
   box-shadow: 0 4px 0 0 var(--cdc-green-shadow) !important;
 }
 
-.lobby__start__button--hook.button:hover {
+.lobby__start__button--hook.button.button-metal:not(.disabled):hover {
+  background: var(--cdc-green-hover) !important;
+  color: #fff !important;
+}
+
+.lobby__start__button.button::before {
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+.lobby__start__button--hook.button.button-metal::before {
+  color: #fff !important;
+}
+
+/* ------------------------------------------------------------- dialogs --- */
+
+/* Chess.com-style modals: blurred backdrop, rounded card, the close button
+ * inside the corner, and a short fade-in. */
+dialog::backdrop,
+.snab-modal-mask {
+  background: #00000073 !important;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+dialog {
+  border: 1px solid #ffffff14 !important;
+  border-radius: 12px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: 0 24px 64px #0009 !important;
+  animation: cdc-dialog-in 0.18s ease-out;
+}
+
+@keyframes cdc-dialog-in {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
+dialog:not(.touch-scroll) button.close-button {
+  top: 12px !important;
+  right: 12px !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--cdc-text-dim) !important;
+  transform: none !important;
+}
+
+html[dir='rtl'] dialog:not(.touch-scroll) button.close-button {
+  right: auto !important;
+  left: 12px !important;
+}
+
+dialog:not(.touch-scroll) button.close-button:hover {
+  background: #ffffff14 !important;
+  color: #fff !important;
+}
+
+/* The dialog frame is the emphasis now; alerts don't need a second border. */
+dialog .dialog-content.alert,
+dialog .dialog-content.debug {
+  border: none !important;
+}
+
+dialog .dialog-content > h2 {
+  color: #fff !important;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+}
+
+/* Keyboard help: plain section headings instead of gold bars. */
+dialog .help th p {
+  margin: 1.2em 0 0.4em !important;
+  padding: 12px 0 0 !important;
+  border-top: 1px solid var(--cdc-border);
+  background: transparent !important;
+  color: #fff !important;
+  font-size: 16px;
+  font-weight: 800 !important;
+}
+
+/* Game setup (create a game, challenge a friend, play the computer). */
+.game-setup h2 {
+  margin: 24px 56px 20px !important;
+}
+
+.game-setup .setup-content {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 24px 8px !important;
+}
+
+.mselect__label {
+  border: 1px solid #4b4847 !important;
+  border-radius: 8px !important;
+  background: var(--cdc-bg-raised) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+.mselect__label:hover {
+  background: var(--cdc-bg-raised-hover) !important;
+}
+
+.mselect__list {
+  border-radius: 8px !important;
+  box-shadow: 0 12px 32px #0009 !important;
+}
+
+.game-setup .config-group .label {
+  color: var(--cdc-text-dim) !important;
+  font-weight: 700 !important;
+}
+
+.game-setup .time-control-tabs .time-panel .presets .preset-btn {
+  border-radius: 6px !important;
+  background: var(--cdc-bg-raised) !important;
+  color: var(--cdc-text) !important;
+  font-weight: 700;
+}
+
+.game-setup .time-control-tabs .time-panel .presets .preset-btn:hover {
+  background: var(--cdc-bg-raised-hover) !important;
+  color: #fff !important;
+}
+
+.game-setup .time-control-tabs .time-panel .presets .preset-btn.active,
+.game-setup .time-control-tabs .time-panel .slider-container .label-row .val-box {
+  background: var(--cdc-green) !important;
+  color: #fff !important;
+}
+
+/* White / random / black: separate cards, the chosen one outlined in green. */
+.game-setup .color-cards {
+  gap: 8px;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.game-setup .color-cards label.card-radio {
+  border: 2px solid transparent !important;
+  border-radius: 8px !important;
+}
+
+.game-setup .color-cards input:checked + label.card-radio {
+  border-color: var(--cdc-green) !important;
+  background: #81b64c26 !important;
+  text-shadow: none !important;
+}
+
+.game-setup .color-cards .card-radio .text {
+  font-weight: 700 !important;
+}
+
+/* The footer button is the dialog's primary action. */
+.game-setup .footer {
+  padding: 16px 24px 24px !important;
+}
+
+.game-setup .footer .lobby__start__button.button {
+  justify-content: center;
+  width: 100%;
+  height: 52px !important;
+  border: none !important;
+  background: var(--cdc-green) !important;
+  box-shadow: 0 4px 0 0 var(--cdc-green-shadow) !important;
+  color: #fff !important;
+  font-size: 20px !important;
+}
+
+.game-setup .footer .lobby__start__button.button:not(.disabled):hover {
   background: var(--cdc-green-hover) !important;
 }
 
-.lobby__start__button--hook.button::before {
+dialog .game-setup .footer .lobby__start__button.button::before {
   color: #fff !important;
+}
+
+/* ------------------------------------------------------ radio groups --- */
+
+/* Lichess's metal segmented controls (setup dialog, coordinates trainer,
+ * preferences) become flat Chess.com toggles. */
+group.radio {
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+group.radio label,
+group.radio .label {
+  border-color: var(--cdc-bg-panel) !important;
+  background: var(--cdc-bg-raised) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+group.radio label:not(.disabled):hover {
+  background: var(--cdc-bg-raised-hover) !important;
+}
+
+group.radio input:checked + label,
+group.radio input:checked + label:not(.disabled):hover {
+  background: var(--cdc-green) !important;
+  box-shadow: none !important;
+  color: #fff !important;
+  font-weight: 700;
+}
+
+/* Range sliders (time controls). */
+input.range::-webkit-slider-runnable-track {
+  background: var(--cdc-bg-raised-hover) !important;
+}
+
+input.range::-webkit-slider-thumb {
+  border: none !important;
+  background: var(--cdc-green) !important;
 }
 
 /* ---------------------------------------------------------- leaderboards --- */
@@ -224,5 +468,181 @@ textarea:focus {
 .puz-side__start__text span,
 .storm-play-again {
   letter-spacing: normal !important;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------- board editor --- */
+
+/* The action buttons are stacked flush, so each 3D edge overlapped the
+ * next button. Space them out. */
+.board-editor__tools .actions {
+  gap: 10px;
+}
+
+.board-editor__tools .actions form .button {
+  width: 100%;
+}
+
+.board-editor__tools .castling label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------------------------------------------------------- tournaments --- */
+
+.tour__links a {
+  display: block;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--cdc-text-dim) !important;
+  font-weight: 600;
+}
+
+.tour__links a:hover {
+  background: #ffffff0d;
+  color: #fff !important;
+}
+
+.tour__links br {
+  display: none;
+}
+
+.tour-home__side h2 {
+  margin: 24px 0 8px !important;
+  padding: 0 12px !important;
+  border: none !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+}
+
+.tour-home__side h2 a {
+  color: #fff !important;
+}
+
+.tour-home__side .leaderboard,
+.tour-home__side .scheduled {
+  padding: 6px;
+  border-radius: 8px;
+  background: var(--cdc-bg-panel);
+}
+
+.tour-home__side .leaderboard li {
+  padding: 7px 8px !important;
+  border-radius: 6px;
+}
+
+.tour-home__side .leaderboard li:hover {
+  background: #ffffff0d;
+}
+
+.tour-home__side .scheduled a {
+  border-radius: 6px !important;
+}
+
+.tour-home__side .scheduled a:hover {
+  background: #ffffff0d !important;
+}
+
+.tour-chart__inner {
+  border-top: none !important;
+  scrollbar-width: thin;
+}
+
+.tour-chart .timeheader {
+  border-inline-start-color: #ffffff0f !important;
+  color: var(--cdc-text-dim);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tour-chart .timeheader.hour {
+  border-inline-start-color: #ffffff24 !important;
+  color: #fff;
+  font-weight: 800;
+}
+
+/* Tournament tiles: dark cards tinted by their kind, with a colored edge and
+ * icon, instead of Lichess's saturated blocks and grain texture. */
+.tsht {
+  --cdc-tsht: #6f6d6a;
+  border-inline-start: 3px solid var(--cdc-tsht) !important;
+  border-radius: 8px !important;
+  background: color-mix(in srgb, var(--cdc-tsht) 26%, var(--cdc-bg-panel)) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  letter-spacing: normal !important;
+  text-shadow: none !important;
+  transition: background-color 0.15s;
+}
+
+.tsht:hover {
+  background: color-mix(in srgb, var(--cdc-tsht) 38%, var(--cdc-bg-panel)) !important;
+  filter: none !important;
+}
+
+.tsht-finished {
+  opacity: 0.45 !important;
+}
+
+.tsht icon {
+  color: color-mix(in srgb, var(--cdc-tsht) 70%, #fff);
+}
+
+.tsht .name {
+  font-weight: 700;
+}
+
+.tsht .infos {
+  color: #ffffffa6;
+  font-size: 12px;
+}
+
+.tsht-hourly {
+  --cdc-tsht: #81b64c;
+}
+
+.tsht-daily,
+.tsht-eastern {
+  --cdc-tsht: #3692e7;
+}
+
+.tsht-weekly {
+  --cdc-tsht: #e58f2a;
+}
+
+.tsht-monthly {
+  --cdc-tsht: #e0513a;
+}
+
+.tsht-yearly,
+.tsht-weekend,
+.tsht-unique {
+  --cdc-tsht: #e3aa24;
+}
+
+.tsht-marathon {
+  --cdc-tsht: #9b7fd8;
+}
+
+.tsht-max-rating {
+  --cdc-tsht: #7b68ee;
+}
+
+.tsht-variant {
+  --cdc-tsht: #b07b4f;
+}
+
+.tsht-user-created {
+  --cdc-tsht: #5d9948;
+}
+
+/* Tournament lists: no spaced-out names. */
+.arena-list .slist .header {
+  letter-spacing: normal !important;
+}
+
+.arena-list .slist .name {
+  color: #fff;
   font-weight: 700;
 }
