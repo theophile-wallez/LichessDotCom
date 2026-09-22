@@ -22,7 +22,7 @@
   --cdc-green: #81b64c;
   --cdc-green-hover: #a3d160;
   --cdc-green-shadow: #45753c;
-  --cdc-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+  --cdc-font: 'CDC Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
     sans-serif;
 
   --c-bg: var(--cdc-bg-panel) !important;
@@ -68,7 +68,8 @@
   --c-link-hover: var(--cdc-green-hover) !important;
   --c-good: var(--cdc-green) !important;
   --c-bad: #e02828 !important;
-  --c-accent: #e58f2a !important;
+  --c-accent: var(--cdc-green) !important;
+  --c-future: #4b4847 !important;
   --c-brag: #e3aa24 !important;
   --c-metal-top: var(--cdc-bg-raised) !important;
   --c-metal-bottom: var(--cdc-bg-raised) !important;

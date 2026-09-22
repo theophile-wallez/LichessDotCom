@@ -1,0 +1,228 @@
+/*
+ * Modern, Chess.com-style look for every other Lichess page: bold headings,
+ * pill side menus, clean tabs and tables, card tiles. Shared components
+ * first, then page-specific fixes. (Thin text is fixed globally by the font
+ * remapping in content.js.)
+ */
+
+/* ------------------------------------------------------------ headings --- */
+
+h1,
+.box__top h1,
+.page-menu__content h1 {
+  color: #fff;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.box__top h1 {
+  font-size: 1.9rem !important;
+}
+
+h2,
+h3 {
+  font-weight: 700 !important;
+}
+
+/* Lichess's spaced-out uppercase section titles become Chess.com headings. */
+.learn-stages .categ > h2,
+.practice-app section > h2,
+.coach-widget .coach-name,
+.hooks__list tr.variants td {
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+
+.learn-stages .categ > h2,
+.practice-app section > h2 {
+  color: #fff !important;
+  font-size: 1.5em !important;
+  font-weight: 800 !important;
+  text-align: left !important;
+}
+
+/* --------------------------------------------------- side page menus --- */
+
+.subnav a {
+  margin-bottom: 2px;
+  padding: 10px 14px !important;
+  border-radius: 6px !important;
+  color: var(--cdc-text-dim) !important;
+  font-family: var(--cdc-font) !important;
+  font-size: 15px;
+  font-weight: 600;
+  text-shadow: none !important;
+}
+
+.subnav a:hover {
+  background: #ffffff0d !important;
+  color: #fff !important;
+}
+
+.subnav a.active {
+  background: #ffffff1a !important;
+  color: #fff !important;
+  font-weight: 700;
+}
+
+.subnav a.active::after {
+  display: none !important;
+}
+
+/* ----------------------------------------------------------------- tabs --- */
+
+.tabs-horiz {
+  text-shadow: none !important;
+}
+
+.tabs-horiz span,
+.tabs-horiz button {
+  color: var(--cdc-text-dim);
+  font-family: var(--cdc-font) !important;
+  font-weight: 700;
+  letter-spacing: 0 !important;
+}
+
+.tabs-horiz span:hover,
+.tabs-horiz button:hover {
+  color: #fff;
+}
+
+.tabs-horiz span.active,
+.tabs-horiz button.active {
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+/* --------------------------------------------------------------- tables --- */
+
+.slist thead {
+  background: var(--cdc-bg-panel-dark) !important;
+  box-shadow: none !important;
+  font-family: var(--cdc-font) !important;
+  font-weight: 600 !important;
+}
+
+.slist thead th {
+  border-bottom-color: var(--cdc-border) !important;
+  color: var(--cdc-text-dim);
+  font-size: 13px;
+}
+
+.slist tbody tr:nth-child(2n) {
+  background: #2a2926 !important;
+}
+
+.slist tbody tr:hover {
+  background: #ffffff0a !important;
+}
+
+.slist td {
+  border-color: var(--cdc-border) !important;
+}
+
+/* ---------------------------------------------------------------- forms --- */
+
+input:not([type='checkbox'], [type='radio'], [type='range'], [type='file'], [type='color']),
+select,
+textarea {
+  border: 1px solid #4b4847 !important;
+  border-radius: 6px !important;
+  background-color: var(--cdc-bg-raised) !important;
+  color: #fff !important;
+}
+
+input:not([type='checkbox'], [type='radio'], [type='range'], [type='file'], [type='color']):focus,
+select:focus,
+textarea:focus {
+  border-color: var(--cdc-green) !important;
+  outline: none !important;
+}
+
+/* The sidebar search box keeps its borderless look. */
+#top #clinput input {
+  border: none !important;
+  background: transparent !important;
+}
+
+/* ---------------------------------------------------------------- lobby --- */
+
+/* Drop the faint Lichess logo watermark behind the time-control tiles. */
+.lobby__app__content {
+  background-image: none !important;
+}
+
+.lpools {
+  font-family: var(--cdc-font) !important;
+}
+
+.lpool {
+  border: none !important;
+  border-radius: 8px !important;
+  background: var(--cdc-bg-raised) !important;
+  box-shadow: 0 4px 0 0 #1f1e1c !important;
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
+.lpool:hover {
+  background: var(--cdc-bg-raised-hover) !important;
+}
+
+.lpool .clock {
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0 !important;
+}
+
+.lpool .perf {
+  color: var(--cdc-text-dim);
+  font-weight: 600;
+}
+
+/* "Create a game" becomes Chess.com's big green Play button. */
+.lobby__start__button--hook.button {
+  background: var(--cdc-green) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 0 0 var(--cdc-green-shadow) !important;
+}
+
+.lobby__start__button--hook.button:hover {
+  background: var(--cdc-green-hover) !important;
+}
+
+.lobby__start__button--hook.button::before {
+  color: #fff !important;
+}
+
+/* ---------------------------------------------------------- leaderboards --- */
+
+.community__leaders .leaderboards h2 {
+  background: var(--cdc-bg-panel-dark) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+}
+
+.community__leaders .leaderboards .user-top {
+  border-color: var(--cdc-border) !important;
+}
+
+/* ------------------------------------------------------------- sign in --- */
+
+.auth .auth-tabs a {
+  color: var(--cdc-text-dim) !important;
+  font-weight: 700 !important;
+}
+
+.auth .auth-tabs a.active {
+  color: #fff !important;
+  border-bottom-color: #fff !important;
+}
+
+/* ------------------------------------------------------- puzzle modes --- */
+
+.puz-side__start__text span,
+.storm-play-again {
+  letter-spacing: normal !important;
+  font-weight: 700;
+}

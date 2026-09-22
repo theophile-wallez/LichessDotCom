@@ -56,6 +56,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/game.css` | Game page (`main.round`) grid, player bars, clocks, moves, chat. |
 | `src/styles/analysis.css` | Analysis page (`main.analyse`) grid. |
 | `src/styles/review.css` | Game Review panel, eval bar, board annotations. |
+| `src/styles/pages.css` | Modern look for every other page (headings, side menus, tabs, tables, forms, lobby). |
 
 There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
 
@@ -88,6 +89,8 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
 - **CSP.** Images may load from anywhere (`img-src *`). Audio and `fetch` may
   only reach Lichess's domains plus `blob:` and `data:`. Cross-origin data
   must come from the background worker.
+- **Thin fonts.** Lichess sets weight 300 on Roboto / Noto Sans everywhere. `content.js` appends `@font-face` rules re-pointing those families (and `CDC Sans`) at the system UI font; they must come *after* Lichess's faces, which is why they're not in the manifest CSS.
+- **Icons.** Sidebar icons are Chess.com's own (`https://assets-ds.chess.com/color-icons/<name>.svg`). The names come from the nav data on chess.com (`"icon":{"name":…}`).
 - **Two worlds.** `content.js` can't see page JS objects (`site`, chessground's
   `cgKey` expandos); `page.js` and `review.js` can. Communicate with
   `window.postMessage`.
