@@ -4,6 +4,8 @@
 // files (as blob: URLs, which Lichess's CSP allows) under our own names and wrap
 // `move()` / `play()` so each event picks the matching Chess.com sound:
 // move-self / move-opponent / capture / castle / promote / move-check, etc.
+// Chess.com sounds Lichess has no event for (premove, illegal, game-start) are
+// played from our own detection below.
 
 (() => {
   const MSG_SOUNDS = 'cdc:sounds';
@@ -28,6 +30,12 @@
 
   const available = new Set();
   let lastMoveSoundAt = 0;
+  // Pieces as last seen before a move, to know what a promoted piece was.
+  let lastPieces = null;
+  // The server move Lichess last passed on with its SAN (see sound.move).
+  let recentMove = null;
+  // Plays one of our sounds once installed.
+  let playCdcSound = null;
 
   // ---------------------------------------------------------------- board ---
 
@@ -92,13 +100,18 @@
 
   // Works out the Chess.com sound for the move that was just played on the board.
   function soundFromBoard(lichessName) {
+    const fallback = lichessName === 'capture' ? 'capture' : 'move-self';
     const state = readBoard(mainBoard());
-    if (!state || state.lastMove.length < 2) {
-      return lichessName === 'capture' ? 'capture' : 'move-self';
-    }
+    if (!state) return fallback;
     const { pieces, lastMove } = state;
-    const [a, b] = lastMove;
+    const before = lastPieces;
+    lastPieces = pieces;
+    if (!lastMove.length) return fallback;
+
+    // Drops only highlight one square.
+    const [a, b = a] = lastMove;
     const dest = pieces.has(b) ? b : pieces.has(a) ? a : null;
+    const orig = dest === a ? b : a;
     const mover = dest ? pieces.get(dest) : null;
 
     const [ax, ay] = toXY(a);
@@ -113,7 +126,12 @@
       if (enemyKing && isAttacked(pieces, enemyKing[0], mover.color)) return 'move-check';
     }
     if (castle) return 'castle';
-    if (mover?.role === 'pawn' && (dest.endsWith('8') || dest.endsWith('1'))) return 'promote';
+    // Auto-queen swaps the pawn before we get to look, so also check what stood
+    // on the origin square before the move.
+    const was = before?.get(orig);
+    const wasPawn =
+      mover?.role === 'pawn' || (was?.role === 'pawn' && was.color === mover?.color);
+    if (wasPawn && orig !== dest && /[18]$/.test(dest)) return 'promote';
     if (lichessName === 'capture') return 'capture';
     return !mover || mover.color === orientation() ? 'move-self' : 'move-opponent';
   }
@@ -155,11 +173,10 @@
     sound.play = (name, volume = 1) => {
       if (typeof name === 'string' && !name.startsWith(PREFIX)) {
         // Chess.com plays a single "move-check" for checking moves, which move()
-        // already handled. Drop Lichess's separate check / mate sound.
-        if (name === 'check' || name === 'checkmate') {
-          if (Date.now() - lastMoveSoundAt < 1500) return Promise.resolve();
-          return playMove('move-check', volume);
-        }
+        // handles. Lichess plays its own check / mate sound either just before
+        // the move callback (opponent moves) or on the server echo of our own
+        // move, so drop it.
+        if (name === 'check' || name === 'checkmate') return Promise.resolve();
         const mapped = PLAY_MAP[name];
         if (mapped && available.has(mapped)) return playCdc(mapped, volume);
       }
@@ -167,19 +184,142 @@
     };
 
     sound.move = o => {
+      // The round page gets each server move with its SAN and passes it here
+      // (filter 'music') just before chessground's deferred move callback plays
+      // the board sound. Keep it: SAN says exactly what the move was.
+      if (o?.filter === 'music' && o.san) {
+        recentMove = { san: o.san, ply: o.ply, at: Date.now() };
+      }
       if (o?.filter === 'music' || sound.theme === 'music') return origMove(o);
       const volume = o?.volume ?? 1;
       if (o?.san) return playMove(soundFromSan(o.san, o.ply), volume);
-      if (o?.name === 'move' || o?.name === 'capture') {
+      // Board moves on the round page, and drops (no argument).
+      if (!o?.name || o.name === 'move' || o.name === 'capture') {
+        const recent = recentMove;
+        recentMove = null;
+        // Our own moves only reach the server (and come back) after this, so a
+        // fresh SAN is the move being played now.
+        if (recent && Date.now() - recent.at < 300) {
+          return playMove(soundFromSan(recent.san, recent.ply), volume);
+        }
         // The board redraws on the next frame; inspect it after that.
         lastMoveSoundAt = Date.now();
-        requestAnimationFrame(() => playMove(soundFromBoard(o.name), volume));
+        requestAnimationFrame(() => playMove(soundFromBoard(o?.name), volume));
         return Promise.resolve();
       }
-      if (o?.name) return origMove(o);
-      return playMove('move-self', volume);
+      return origMove(o);
     };
+
+    playCdcSound = playCdc;
+    if (freshGameId) {
+      const key = 'cdc-started:' + freshGameId;
+      if (!sessionStorage.getItem(key)) {
+        sessionStorage.setItem(key, '1');
+        playCdc('game-start');
+      }
+    }
   }
+
+  // ------------------------------------------------------------- attempts ---
+  // Chess.com plays "premove" when a premove is queued and "illegal" when a
+  // dropped piece is refused; chessground does neither. So watch the pointer:
+  // after a click or drop that tries to move a piece elsewhere, either a move
+  // sound played, a premove appeared, or the move was refused. A refused click
+  // stays silent: it is how you deselect a piece.
+
+  function squareAt(board, x, y) {
+    const r = board.getBoundingClientRect();
+    const fx = Math.floor(((x - r.left) / r.width) * 8);
+    const fy = Math.floor(((y - r.top) / r.height) * 8);
+    if (fx < 0 || fx > 7 || fy < 0 || fy > 7) return null;
+    return orientation() === 'white' ? toKey(fx, 7 - fy) : toKey(7 - fx, fy);
+  }
+
+  const premoveKeys = board =>
+    [...board.querySelectorAll('square.current-premove')].map(sq => sq.cgKey).join();
+
+  function watchAttempt(board, premovesBefore, isDrop) {
+    const at = Date.now();
+    // Chessground defers its move callback and redraws on the next frame.
+    setTimeout(() => {
+      if (!playCdcSound || lastMoveSoundAt >= at) return;
+      const premoves = premoveKeys(board);
+      if (premoves && premoves !== premovesBefore) playCdcSound('premove');
+      else if (isDrop) playCdcSound('illegal');
+    }, 80);
+  }
+
+  let down = null;
+
+  window.addEventListener(
+    'pointerdown',
+    e => {
+      down = null;
+      const board = mainBoard()?.querySelector('cg-board');
+      if (e.button !== 0 || !board?.contains(e.target)) return;
+      const state = readBoard(mainBoard());
+      const key = squareAt(board, e.clientX, e.clientY);
+      if (!state || !key) return;
+      lastPieces = state.pieces;
+      const premoves = premoveKeys(board);
+      down = { board, key, premoves };
+
+      // Click-to-move: a piece is selected and this click isn't just selecting
+      // another piece of the same side.
+      const selected = board.querySelector('square.selected')?.cgKey;
+      const piece = selected && state.pieces.get(selected);
+      if (piece && key !== selected && state.pieces.get(key)?.color !== piece.color) {
+        watchAttempt(board, premoves, false);
+      }
+    },
+    true,
+  );
+
+  // Runs before chessground's own handler, so the drag is still in progress.
+  window.addEventListener(
+    'pointerup',
+    e => {
+      const d = down;
+      down = null;
+      if (!d || e.button !== 0 || !d.board.querySelector('piece.dragging')) return;
+      const key = squareAt(d.board, e.clientX, e.clientY);
+      // Dropped back on its square or off the board: just a cancelled drag.
+      if (key && key !== d.key) watchAttempt(d.board, d.premoves, true);
+    },
+    true,
+  );
+
+  // ----------------------------------------------------------- game start ---
+  // Lichess has no game start sound. Its round data is inlined in the page as
+  // JSON and removed once read, so grab it while the page parses, and play
+  // "game-start" once per game when a player opens a game that just began.
+
+  let freshGameId = null;
+
+  const initObserver = new MutationObserver(() => {
+    const el = document.getElementById('page-init-data');
+    if (!el) return;
+    let data;
+    try {
+      data = JSON.parse(el.textContent)?.data;
+    } catch {
+      return; // Not fully parsed yet.
+    }
+    initObserver.disconnect();
+    const game = data?.game;
+    const status = game?.status?.name;
+    if (
+      game?.id &&
+      data.player &&
+      !data.player.spectator &&
+      (status === 'created' || status === 'started') &&
+      (game.turns ?? 0) <= 1
+    ) {
+      freshGameId = game.id;
+    }
+  });
+  initObserver.observe(document, { childList: true, subtree: true });
+  document.addEventListener('DOMContentLoaded', () => initObserver.disconnect());
 
   function toBlobUrls(sounds) {
     const blobs = {};
