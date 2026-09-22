@@ -22,7 +22,8 @@
         "src/styles/board.css",
         "src/styles/game.css",
         "src/styles/analysis.css",
-        "src/styles/review.css"
+        "src/styles/review.css",
+        "src/styles/pages.css"
       ],
       "js": ["src/content.js"],
       "run_at": "document_start"

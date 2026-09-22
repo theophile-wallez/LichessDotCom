@@ -9,6 +9,32 @@
   const MSG_SOUNDS = 'cdc:sounds';
   const MSG_PAGE_READY = 'cdc:page-ready';
 
+  // Lichess sets light (300) weights on Roboto / Noto Sans all over the site;
+  // Chess.com's text is solid. Re-point those families (and our own 'CDC Sans')
+  // at the system UI font so light weights render as regular. These faces must
+  // come after Lichess's own @font-face rules to win, hence appended at the end
+  // of <head> rather than shipped in the manifest CSS.
+  const FONT_FACES = ['Roboto', 'Noto Sans', 'CDC Sans']
+    .map(family =>
+      [
+        ['100 450', "local('Segoe UI'), local('SegoeUI'), local('Helvetica Neue'), local('Roboto')"],
+        ['451 650', "local('Segoe UI Semibold'), local('SegoeUI-Semibold'), local('HelveticaNeue-Medium'), local('Roboto Medium')"],
+        ['651 850', "local('Segoe UI Bold'), local('SegoeUI-Bold'), local('HelveticaNeue-Bold'), local('Roboto Bold')"],
+        ['851 1000', "local('Segoe UI Black'), local('SegoeUI-Black'), local('HelveticaNeue-Bold'), local('Roboto Black')"],
+      ]
+        .map(([weight, src]) => `@font-face{font-family:'${family}';font-weight:${weight};src:${src}}`)
+        .join(''),
+    )
+    .join('');
+  const addFonts = () => {
+    const style = document.createElement('style');
+    style.id = 'cdc-fonts';
+    style.textContent = FONT_FACES;
+    document.head.appendChild(style);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addFonts);
+  else addFonts();
+
   let sounds = null;
 
   const postSounds = () => {
