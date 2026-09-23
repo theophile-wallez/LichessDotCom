@@ -1,8 +1,9 @@
 /*
  * Puzzles (main.puzzle) with Chess.com's playful look: rounded cards in the
- * side column, a status banner instead of grey text (dark while it's your turn,
- * green when right, red when wrong), and chunky rounded buttons for the hint,
- * the solution and the move controls, those last ones moved inside the panel.
+ * side column, a status card instead of grey text (always dark, with a green
+ * or red badge and title when right or wrong), and chunky rounded buttons for
+ * the hint, the solution and the move controls, those last ones moved inside
+ * the panel.
  * On desktop the page gets its own grid, sized to the viewport so it never
  * scrolls: the side card, the eval bar, the board, the panel.
  */
@@ -410,24 +411,42 @@ main.puzzle .puzzle__feedback.play strong {
   color: #fff;
 }
 
-/* Right and wrong moves: green and red, with the mark in a round badge. */
+/* Right and wrong moves: the card stays dark, like Chess.com's. Only the mark
+ * (in a round green or red badge) and the title take the color: a whole
+ * green or red card next to the board shouts. */
+main.puzzle .puzzle__feedback:is(.good, .fail) {
+  background: var(--cdc-bg-raised) !important;
+  color: var(--cdc-text) !important;
+}
+
 main.puzzle .puzzle__feedback.good {
-  background: var(--cdc-btn-green) !important;
-  color: #fff !important;
+  --cdc-feedback: var(--cdc-green-hover);
+  --cdc-feedback-badge: var(--cdc-btn-green);
 }
 
 main.puzzle .puzzle__feedback.fail {
-  background: var(--cdc-btn-red) !important;
-  color: #fff !important;
+  --cdc-feedback: #ff7769;
+  --cdc-feedback-badge: var(--cdc-btn-red);
+}
+
+main.puzzle .puzzle__feedback:is(.good, .fail) strong {
+  color: var(--cdc-feedback) !important;
+}
+
+main.puzzle .puzzle__feedback:is(.good, .fail) em {
+  color: var(--cdc-text-dim);
+  opacity: 1;
 }
 
 main.puzzle .puzzle__feedback:is(.good, .fail) .icon {
   border-radius: 50%;
-  background: #ffffff33;
+  background: var(--cdc-feedback-badge);
+  box-shadow: inset 0 1px 0 #ffffff40, 0 0 0 5px color-mix(in srgb, var(--cdc-feedback) 18%, transparent);
   color: #fff !important;
-  font-size: 32px !important;
+  font-size: 30px !important;
   font-weight: 800;
   line-height: 56px !important;
+  text-shadow: 0 1px 1px #00000040;
 }
 
 /* Hint and solution: two full-width buttons with a real gap. Side by side
