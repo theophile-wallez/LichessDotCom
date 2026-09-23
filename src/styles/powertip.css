@@ -22,6 +22,16 @@
  * builds with powertip.ts get their own ids (#miniGame, #miniBoard).
  */
 
+/* Chess.com's glyphs for the four actions (board-simple-watch,
+ * message-envelope-fill, board-badge-plus, user-badge-plus), masked over the
+ * Lichess font icons they replace. */
+:root {
+  --cdc-upt-watch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m2 20h2.63c.54.69 1.13 1.37 1.76 2h-3.73c-2 0-2.67-.67-2.67-2.67v-14.67c0-2 .67-2.67 2.67-2.67h14.67c2 0 2.67.67 2.67 2.67v6.69c-.64-.35-1.31-.65-2-.87v-6.48h-8v7.33c-.38.21-.75.43-1.11.67h-6.89zm13 1.17c1.73 0 3.13-1.4 3.13-3.13 0-1.7-1.4-3.1-3.13-3.1s-3.13 1.4-3.13 3.1c0 1.73 1.4 3.13 3.13 3.13zm0 2.83c-3.9 0-7-2.63-9.33-5.97 2.33-3.3 5.43-6.03 9.33-6.03 3.87 0 7 2.73 9 6.03-2 3.33-5.13 5.97-9 5.97zm0 0'/%3E%3C/svg%3E");
+  --cdc-upt-message: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m19.33 21h-14.67c-2.41 0-3.67-1.25-3.67-3.67v-8.9l8.77 5.73c1.67 1.1 2.8 1.1 4.47 0l8.77-5.71v8.88c0 2.41-1.25 3.67-3.67 3.67zm-18.29-15.04c.22-1.97 1.45-2.99 3.63-2.99h14.67c2.18 0 3.41 1.02 3.63 2.99l-9.76 6.41c-.87.57-1.53.57-2.4 0zm0 0'/%3E%3C/svg%3E");
+  --cdc-upt-challenge: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m6 8h-4v4h4zm0 0h4v-4h-4zm-4 12h4v-4h-4zm4-4h2.1c-.07.35-.1.68-.1 1 0 1.86.55 3.57 1.5 5h-6.83c-2 0-2.67-.67-2.67-2.67v-14.67c0-2 .67-2.67 2.67-2.67h14.67c2 0 2.67.67 2.67 2.67v3.84c-.64-.22-1.31-.38-2-.45v-4.05h-4v4 .68-.68h-4v4h-4zm11 8c-3.83 0-7-3.17-7-7 0-3.87 3.17-7 7-7 3.87 0 7 3.13 7 7 0 3.83-3.13 7-7 7zm-1.03-2.97c0 .63.33.97.93.97h.1c.63 0 .97-.33.97-.93v-3.07h3.1c.6 0 .93-.33.93-.97v-.1c0-.6-.33-.93-.97-.93h-3.07v-3.03c0-.63-.33-.97-.93-.97h-.1c-.63 0-.97.33-.97.93v3.07h-3.03c-.6 0-.93.33-.93.97v.1c0 .6.33.93.97.93h3zm0 0'/%3E%3C/svg%3E");
+  --cdc-upt-follow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m0 20.03c0-2 .63-2.9 2.47-3.63l1.5-.6c2.87-1.13 3.23-1.37 3.23-2.13 0-2.3-1.83-2.3-1.83-6.27 0-3.17 1.47-5.57 4.57-5.57 3.23 0 4.7 2.4 4.7 5.57 0 .33-.01.64-.04.92-3.82 1.04-6.6 4.51-6.6 8.68 0 1.86.55 3.57 1.5 5h-9.5zm17 3.94c-3.8 0-6.97-3.17-6.97-6.97 0-3.83 3.17-6.97 6.97-6.97 3.83 0 6.97 3.13 6.97 6.97 0 3.8-3.13 6.97-6.97 6.97zm-1.03-2.94c0 .63.33.97.93.97h.1c.63 0 .97-.33.97-.93v-3.07h3.1c.6 0 .93-.33.93-.97v-.1c0-.6-.33-.93-.97-.93h-3.07v-3.03c0-.63-.33-.97-.93-.97h-.1c-.63 0-.97.33-.97.93v3.07h-3.03c-.6 0-.93.33-.93.97v.1c0 .6.33.93.97.93h3zm0 0'/%3E%3C/svg%3E");
+}
+
 #powerTip {
   --cdc-upt-avatar: 56px;
   --cdc-upt-pad: 16px;
@@ -117,17 +127,12 @@
   color: var(--cdc-green-hover) !important;
 }
 
+/* The title reads as it does over the board: gold and bold, no badge — the
+ * same gold as Lichess's own --c-brag, which theme.css sets to this value. */
 #powerTip .upt__info__top .user-link .utitle {
-  display: inline-block;
-  margin-inline-end: 3px;
-  padding: 0 4px;
-  border-radius: 3px;
-  background: #7c2929;
-  color: #fff !important;
-  font-size: 11px;
+  margin-inline-end: 4px;
+  color: var(--cdc-brag, #e3aa24) !important;
   font-weight: 800;
-  line-height: 16px;
-  vertical-align: 2px;
 }
 
 #powerTip .upt__info__top .user-link .uflair {
@@ -192,7 +197,8 @@
 /* --------------------------------------------------------------- ratings --- */
 
 /* Lichess's eight best perfs, as Chess.com's game-mode chips: its colored
- * icon (see theme.css) and the rating, four to a row. */
+ * icon (see theme.css) and the rating, four to a row. The numbers are the quiet
+ * grey the ratings have next to the players over the board, not white. */
 #powerTip .upt__info__ratings {
   grid-column: 1 / -1;
   display: grid !important;
@@ -211,9 +217,9 @@
   padding: 7px 2px !important;
   border-radius: 6px;
   background: #ffffff0a;
-  color: var(--cdc-text-strong) !important;
+  color: var(--cdc-text-dim) !important;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 400;
   font-variant-numeric: tabular-nums;
   text-align: center !important;
 }
@@ -227,7 +233,7 @@
 /* Unrated (no games yet, or too few to be rated): a quiet chip. */
 #powerTip .upt__info__ratings > span[data-cdc-rating='none'] {
   background: #ffffff05;
-  color: var(--cdc-text-dim) !important;
+  color: var(--cdc-font-dimmer, #6f6d6a) !important;
 }
 
 #powerTip .upt__info__ratings > span[data-cdc-rating='none']::before {
@@ -365,7 +371,56 @@
   opacity: 1;
 }
 
+/* Watch (AnalogTv), message (BubbleSpeech), challenge (Swords) and follow
+ * (ThumbsUp) become Chess.com's icons. "Following" and "Blocked" keep the
+ * Lichess glyph: a plus would read as "not following them yet". */
+#powerTip .upt__actions .btn-rack__btn[data-icon='\e010']::before {
+  --cdc-upt-icon: var(--cdc-upt-watch);
+}
+
+#powerTip .upt__actions .btn-rack__btn[data-icon='\e041']::before {
+  --cdc-upt-icon: var(--cdc-upt-message);
+}
+
+#powerTip .upt__actions .btn-rack__btn[data-icon='\e033']::before {
+  --cdc-upt-icon: var(--cdc-upt-challenge);
+}
+
+#powerTip .upt__actions .relation-button[data-icon='\e046']:not([href*='/unfollow'])::before {
+  --cdc-upt-icon: var(--cdc-upt-follow);
+}
+
+/* Only the four above: a button whose ::before had no --cdc-upt-icon would draw
+ * an 18px block of currentColor instead of an icon. */
+#powerTip
+  .upt__actions
+  .btn-rack__btn:is([data-icon='\e010'], [data-icon='\e041'], [data-icon='\e033'])::before,
+#powerTip .upt__actions .relation-button[data-icon='\e046']:not([href*='/unfollow'])::before {
+  content: '' !important;
+  display: block;
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  -webkit-mask: var(--cdc-upt-icon) center / contain no-repeat;
+  mask: var(--cdc-upt-icon) center / contain no-repeat;
+}
+
 /* Follow / Following / Blocked carries the label, so it takes the rest. */
 #powerTip .upt__actions .relation-button {
   flex: 1 1 auto !important;
+}
+
+/* Following someone is the card's call to action, so it gets Chess.com's green
+ * button. Once followed (or blocked), it goes back to a quiet grey — those are
+ * the un-localized /rel/ routes, not translated paths. */
+#powerTip .upt__actions .relation-button:not([href*='/unfollow'], [href*='/unblock']) {
+  background: var(--cdc-btn-green) !important;
+  box-shadow: var(--cdc-btn-green-shadow) !important;
+  color: #fff !important;
+  text-shadow: 0 1px 1px #00000033 !important;
+}
+
+#powerTip .upt__actions .relation-button:not([href*='/unfollow'], [href*='/unblock']):hover {
+  background: var(--cdc-btn-green-hover) !important;
+  color: #fff !important;
 }
