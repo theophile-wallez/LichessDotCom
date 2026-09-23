@@ -1,0 +1,332 @@
+/*
+ * Coach directory (main.coach-list) as a Chess.com-style grid of coach cards:
+ *
+ *   +---- title, filters ------------------------------+---- side ----+
+ *   +---------+ +---------+ +---------+ +---------+     | Are you a    |
+ *   | picture | | picture | | picture | | picture |     | coach? ...   |
+ *   | [FM] name, headline, info rows, last seen   |     | (sticky)     |
+ *   +---------+ +---------+ +---------+ +---------+     +--------------+
+ *
+ * Lichess alternates wide rows left / right; here every coach is the same
+ * card. The title badge is split out of the name by content.js.
+ */
+
+/* ---------------------------------------------------------- layout --- */
+
+@media (min-width: 1020px) {
+  main.coach-full-page {
+    grid-template-columns: minmax(0, 1fr) 280px !important;
+    grid-template-areas: 'main side' !important;
+    gap: 24px !important;
+    align-items: start;
+    margin: 8px 0 40px;
+  }
+
+  main.coach-full-page .coach-side {
+    position: sticky;
+    top: 24px;
+    /* Level with the first row of cards, below the title bar. */
+    margin: 72px 0 0 !important;
+  }
+}
+
+/* Lichess's mobile layout runs the list edge to edge; cards need a margin. */
+@media (max-width: 1019.98px) {
+  main.coach-full-page {
+    padding: 0 12px 24px;
+  }
+
+  main.coach-full-page .coach-side {
+    margin: 24px 0 0 !important;
+  }
+}
+
+.coach-list__main.box {
+  min-height: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.coach-list__main .box__top {
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  padding: 16px 0 20px !important;
+}
+
+.coach-list__main .box__top h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 !important;
+}
+
+/* Chess.com's coaches icon, as in the sidebar menu. */
+.coach-list__main .box__top h1::before {
+  content: '';
+  flex: none;
+  width: 36px;
+  height: 36px;
+  background: url('https://assets-ds.chess.com/color-icons/coaches.svg') center / contain no-repeat;
+}
+
+.coach-list__main .box__top__actions {
+  gap: 8px;
+}
+
+.coach-list .mselect {
+  font-size: 15px !important;
+}
+
+.coach-list .mselect__label {
+  padding: 8px 12px 8px 14px !important;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------ side --- */
+
+.coach-list__side {
+  box-sizing: border-box;
+  padding: 20px;
+  border-radius: 10px;
+  background: var(--cdc-bg-panel);
+  color: var(--cdc-text) !important;
+  text-align: left !important;
+}
+
+.coach-list__side p {
+  margin: 0 !important;
+  font-size: 15px !important;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.coach-list__side p br {
+  display: none;
+}
+
+/* The application link becomes the card's call to action. */
+.coach-list__side p a {
+  display: block;
+  margin-top: 16px;
+  padding: 10px 14px 9px;
+  border-radius: 6px;
+  background: var(--cdc-bg-raised);
+  box-shadow: 0 4px 0 0 #1f1e1c;
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.coach-list__side p a:hover {
+  background: var(--cdc-bg-raised-hover);
+}
+
+/* ------------------------------------------------------------ list --- */
+
+.coach-list__main .list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.coach-list__main .list > .pager,
+.coach-list__main .list > .infinite-scroll__loading {
+  grid-column: 1 / -1;
+}
+
+/* ------------------------------------------------------------ card --- */
+
+.coach-list__main .coach-widget,
+.coach-list__main .coach-widget:nth-child(2n) {
+  flex-direction: column;
+  justify-content: flex-start !important;
+  height: auto !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border: none !important;
+  border-radius: 10px;
+  background: var(--cdc-bg-panel) !important;
+  transition: background-color 0.15s, transform 0.15s, box-shadow 0.15s !important;
+}
+
+.coach-list__main .coach-widget:hover {
+  background: #2e2d2a !important;
+  box-shadow: 0 10px 24px #00000059;
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coach-list__main .coach-widget:hover {
+    transform: none;
+  }
+}
+
+/* Lichess hides pictures on narrow screens; a card always has one. */
+.coach-list__main .coach-widget .picture,
+.coach-list__main .coach-widget:nth-child(2n) .picture {
+  display: block !important;
+  order: 0 !important;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: center 30%;
+  background: var(--cdc-bg-raised);
+}
+
+.coach-list__main .coach-widget .overview {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 14px 16px 14px;
+}
+
+.coach-list__main .coach-widget .coach-name {
+  overflow: hidden;
+  margin: 0 0 4px !important;
+  color: #fff;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coach-list__main .coach-widget .headline {
+  display: -webkit-box;
+  overflow: hidden;
+  min-height: 2.8em;
+  margin: 0 0 14px !important;
+  color: var(--cdc-text-dim);
+  font-size: 14px !important;
+  font-style: normal !important;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Info rows: a dim label column and a single-line value. */
+.coach-list__main .coach-widget table {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  line-height: 1.4 !important;
+}
+
+.coach-list__main .coach-widget tbody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.coach-list__main .coach-widget tr {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  column-gap: 8px;
+  align-items: baseline;
+}
+
+.coach-list__main .coach-widget th {
+  padding: 0 !important;
+  overflow: hidden;
+  color: var(--cdc-text-dim) !important;
+  font-size: 12px !important;
+  font-weight: 600;
+  text-align: start !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coach-list__main .coach-widget td {
+  overflow: hidden;
+  color: var(--cdc-text);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coach-list__main .coach-widget td .location::after {
+  content: ' ·';
+  color: var(--cdc-text-dim);
+}
+
+.coach-list__main .coach-widget td .flag img {
+  width: 16px;
+  height: 16px;
+  margin-inline: 4px 2px !important;
+  vertical-align: -3px !important;
+}
+
+/* The FIDE rating is bare text next to the link, so the ratings become flex
+ * items beside it and wrap onto a second line rather than being cut off.
+ * (The link isn't clickable anyway: the card's overlay link covers it.) */
+.coach-list__main .coach-widget .rating td {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 0 8px;
+  max-height: 2.8em;
+  white-space: nowrap;
+}
+
+.coach-list__main .coach-widget .rating td a {
+  display: contents !important;
+}
+
+.coach-list__main .coach-widget .rating td a span {
+  display: inline !important;
+  margin: 0 !important;
+  color: #fff;
+  font-weight: 700;
+}
+
+.coach-list__main .coach-widget .rating td a span::before {
+  margin-inline-end: 3px;
+  color: var(--cdc-text-dim);
+  font-weight: 400;
+}
+
+.coach-list__main .coach-widget .rate td {
+  display: -webkit-box;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* "Active …" is pinned to the bottom so every card in a row lines up. */
+.coach-list__main .coach-widget tr.seen {
+  display: block;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid #ffffff12;
+}
+
+.coach-list__main .coach-widget tr.seen th {
+  display: none;
+}
+
+.coach-list__main .coach-widget tr.seen td {
+  color: var(--cdc-text-dim);
+  font-size: 12px;
+}
+
+/* ----------------------------------------------------- title badge --- */
+
+.cdc-coach-title {
+  display: inline-block;
+  margin-inline-end: 6px;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: #7c2929;
+  color: #fff;
+  font-size: 0.62em;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.6;
+  vertical-align: 0.2em;
+}

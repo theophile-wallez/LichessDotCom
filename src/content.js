@@ -172,11 +172,33 @@
     main.prepend(hero);
   };
 
+  // Coach cards (see styles/coach.css): Lichess writes the title as plain text
+  // in the name ("FM Hans Renette"). Chess.com shows it as a badge. The
+  // picture's alt starts with the title, which catches names without one.
+  // Pages are server-rendered (and appended by infinite scroll), not snabbdom,
+  // so editing the name's text is safe.
+  const TITLES = new Set(['GM', 'IM', 'FM', 'CM', 'NM', 'WGM', 'WIM', 'WFM', 'WCM', 'WNM', 'LM', 'BOT']);
+  const syncCoachTitles = () => {
+    for (const name of document.querySelectorAll('.coach-widget .coach-name:not([data-cdc-title])')) {
+      const title = name.closest('.coach-widget').querySelector('img.picture')?.alt.split(' ')[0];
+      name.dataset.cdcTitle = TITLES.has(title) ? title : '';
+      if (!name.dataset.cdcTitle) continue;
+      const text = name.firstChild;
+      if (text?.nodeType === Node.TEXT_NODE && text.data.startsWith(title + ' '))
+        text.data = text.data.slice(title.length + 1);
+      const badge = document.createElement('span');
+      badge.className = 'cdc-coach-title';
+      badge.textContent = title;
+      name.prepend(badge);
+    }
+  };
+
   setInterval(() => {
     syncControlsHeight();
     syncCaptured();
     syncBoardInset();
     syncHero();
+    syncCoachTitles();
   }, 250);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncHero);
   else syncHero();

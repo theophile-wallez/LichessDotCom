@@ -11,6 +11,7 @@ A Chrome extension that makes [Lichess](https://lichess.org) look and sound like
   - One right-hand panel holds the move list, the game controls and the **chat**.
   - Like Chess.com, game and analysis pages never scroll: everything fits the window. Lichess's below-the-board extras (crosstable, game info, share & export, computer analysis chart) are hidden.
 - **Home page**: a modern dashboard with a hero card (big title, Play / Friend / Computer buttons, live counters), the featured game and daily puzzle as cards, chunky time-control tiles, and blog, news, streams and tournaments below.
+- **Coaches**: the coach directory is a grid of Chess.com-style cards: photo, title badge, headline, location, languages, ratings, rate and last seen.
 - **Theme**: Chess.com's dark palette, fonts and 3D green buttons across the whole site. Every page is modernized: solid bold text instead of Lichess's thin fonts, pill side menus, clean tabs and tables, card tiles, and Chess.com's colorful icons in the sidebar menus.
 - **Game Review**: on any finished game's analysis page, a Chess.com-style review powered by Stockfish 19 running in your browser:
   - A summary with the eval graph, both players' accuracy and counts of brilliant, great, best, excellent, good, book, inaccuracy, mistake, miss and blunder moves.
@@ -41,6 +42,7 @@ Tip: Lichess's _coordinates_ setting (Preferences → Display) picks between Che
 | `src/styles/review.css` | Game Review panel, eval bar and board annotations. |
 | `src/styles/pages.css` | Modern look for every other page: headings, side menus, tabs, tables, forms, lobby tiles. |
 | `src/styles/home.css` | Home page redesigned as a card dashboard with a hero, featured game and daily puzzle. |
+| `src/styles/coach.css` | Coach directory as a grid of coach cards with title badges. |
 | `src/background.js` | Downloads the Chess.com sounds once and caches them in `chrome.storage.local`. |
 | `src/content.js` | Passes the sounds to the page and measures the controls height for the layout grid. |
 | `src/page.js` | Runs in the page and wraps `site.sound` so each event plays the matching Chess.com sound. |

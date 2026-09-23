@@ -24,7 +24,8 @@
         "src/styles/analysis.css",
         "src/styles/review.css",
         "src/styles/pages.css",
-        "src/styles/home.css"
+        "src/styles/home.css",
+        "src/styles/coach.css"
       ],
       "js": ["src/content.js"],
       "run_at": "document_start"
