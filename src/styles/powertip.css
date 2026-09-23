@@ -127,12 +127,9 @@
   color: var(--cdc-green-hover) !important;
 }
 
-/* The title reads as it does over the board: gold and bold, no badge — the
- * same gold as Lichess's own --c-brag, which theme.css sets to this value. */
+/* The title is theme.css's badge, as over the board. */
 #powerTip .upt__info__top .user-link .utitle {
   margin-inline-end: 4px;
-  color: var(--cdc-brag, #e3aa24) !important;
-  font-weight: 800;
 }
 
 #powerTip .upt__info__top .user-link .uflair {

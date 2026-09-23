@@ -46,6 +46,8 @@
   --cdc-card-border-hover: #ffffff2e;
   --cdc-card-hover: #2c2b28;
   --cdc-card-shadow-hover: 0 4px 12px #00000040;
+  /* Chess.com's title badge (GM, IM…). */
+  --cdc-title-bg: #7c2929;
   --cdc-font: 'CDC Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
     sans-serif;
 
@@ -200,6 +202,29 @@ select {
 ::-webkit-scrollbar-thumb {
   background: #4b4847;
   border-radius: 4px;
+}
+
+/* ---------------------------------------------------------------- titles --- */
+
+/* Lichess prints a player's title as gold text (span.utitle, BOT in its own
+ * color), everywhere a name is: player bars, mini boards, hover cards, blog
+ * cards, chat, standings. Chess.com shows it as a white-on-red badge. Sizes
+ * are in em so the badge follows whatever text it sits in; Lichess already
+ * puts a space between the title and the name. */
+.utitle,
+.utitle[data-bot] {
+  display: inline-block;
+  margin-inline-end: 0.15em;
+  padding: 0 0.3em;
+  border-radius: 0.25em;
+  background: var(--cdc-title-bg);
+  color: #fff !important;
+  font-size: 0.72em;
+  font-weight: 800 !important;
+  letter-spacing: 0;
+  line-height: 1.45;
+  text-shadow: none;
+  vertical-align: 0.14em;
 }
 
 /* ------------------------------------------------------------ game modes --- */

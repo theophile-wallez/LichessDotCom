@@ -150,7 +150,7 @@ main.box.page-small:has(> table.slist-invert > tbody > tr > td:first-child > .us
     margin-inline-end: 2px;
     padding: 0 4px;
     border-radius: 3px;
-    background: #7c2929;
+    background: var(--cdc-title-bg);
     color: #fff !important;
     font-size: 11px;
     font-weight: 800;
