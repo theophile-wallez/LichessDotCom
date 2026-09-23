@@ -68,6 +68,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/puzzle.css` | Puzzles (`main.puzzle`): side cards, a status banner, chunky hint / solution buttons, and the move buttons pinned inside the panel. |
 | `src/styles/blog.css` | Blog posts (`.ublog-post`) as Chess.com-style articles, and the blog lists. |
 | `src/styles/practice.css` | Practice (`.practice-app`, `.practice-side`) as playful lesson cards: a color per section, white icons on gradient tiles, progress pills. |
+| `src/styles/practice-run.css` | Inside a lesson (`main.analyse` + `.practice__side`): one lesson panel with the chapter list as numbered steps, the gamebook coach in a white bubble with the octopus, and a drill's goal card and status. |
 | `src/styles/puzzles.css` | Puzzle themes (`.puzzle-themes`) and puzzles by opening (`.puzzle-openings`) in the Practice look: a color per section, theme cards, a card per opening family, opening chips. |
 | `src/styles/dashboard.css` | Puzzle dashboard (`.puzzle-dashboard`): stat tiles, per-theme rows, and the panel around `dashboard.js`'s radar. |
 | `src/styles/broadcast.css` | Broadcasts (`.relay-index` lists, calendar, FIDE pages, info pages) as event cards with a LIVE pill. |
@@ -115,6 +116,14 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   `\e00a` classical, `\e019` correspondence). `theme.css` masks them with
   Chess.com's game-time icons in `--cdc-mode-color`; set that variable on the
   `::before` to recolor one in context.
+- **Practice lessons are analysis pages.** `/practice/…` renders `main.analyse`
+  with `.practice__side` (the chapter list) plus either `.gamebook` (an
+  interactive lesson: comment, feedback, mascot) or `.practice-box` (a drill
+  against the engine). `.practice-box` alone doesn't identify one — "practice
+  with computer" adds the same box to any analysis board — so scope on
+  `.practice__side`. A drill's goal sits in `.analyse__underboard`, which
+  `analysis.css` hides. Rows of the panel need a definite height to be shares
+  of the board: `1fr` in a container sized by its content just grows.
 - **Two worlds.** `content.js` can't see page JS objects (`site`, chessground's
   `cgKey` expandos); `page.js`, `board.js` and `review.js` can. Communicate with
   `window.postMessage`.
