@@ -262,6 +262,31 @@
     ['t', 'r', 'b', 'l'].forEach((side, i) => main.style.setProperty(`--cdc-inset-${side}`, inset[i] + 'px'));
   };
 
+  // The puzzle's eval bar, analysis-style (styles/puzzle.css): its score, read
+  // from the engine line, written like Chess.com's ("1.2", "M3") at the
+  // leading side's end. And the session chips, one sideways-scrolling row:
+  // keep the latest in view.
+  let lastChips = 0;
+  const syncPuzzle = () => {
+    const main = document.querySelector('main.puzzle');
+    if (!main) return;
+    const gauge = main.querySelector('.eval-gauge');
+    if (gauge) {
+      const score = (main.querySelector('.ceval pearl')?.textContent || '').trim();
+      const m = /^(#)?([+\-−])?(\d+(?:\.\d+)?)$/.exec(score);
+      const label = m ? (m[1] ? 'M' : '') + m[3] : '';
+      const lead = m && (m[2] === '-' || m[2] === '−') ? 'black' : 'white';
+      if ((gauge.dataset.cdcEval || '') !== label) gauge.dataset.cdcEval = label;
+      if (gauge.dataset.cdcLead !== lead) gauge.dataset.cdcLead = lead;
+    }
+    const session = main.querySelector('.puzzle__session');
+    const chips = session?.childElementCount || 0;
+    if (chips !== lastChips) {
+      lastChips = chips;
+      if (session) session.scrollLeft = session.scrollWidth;
+    }
+  };
+
   // Home page hero card (see styles/home.css).
   const HERO_TEXT = (document.documentElement.lang || '').startsWith('fr')
     ? {
@@ -347,6 +372,7 @@
     syncNewGame();
     syncFlags();
     syncBoardInset();
+    syncPuzzle();
     syncHero();
     syncCoachTitles();
     syncPowertip();
