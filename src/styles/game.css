@@ -165,9 +165,8 @@
   main.round .ruser rating::before { content: '('; }
   main.round .ruser rating::after  { content: ')'; }
 
-  /* Country flag, after the rating as on Chess.com (set by content.js), and
-     before the rating change a finished game adds. */
-  main.round .ruser :is(good, bad) { order: 2; }
+  /* The player's country flag, right after the name (set by content.js). */
+  main.round .ruser :is(rating, good, bad) { order: 2; }
   main.round .ruser[data-cdc-flag]:not([data-cdc-flag=''])::after {
     order: 1;
     content: attr(data-cdc-flag);
