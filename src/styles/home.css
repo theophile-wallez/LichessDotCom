@@ -340,7 +340,7 @@
   }
 
   main.lobby .lobby__app {
-    height: 470px !important;
+    height: 490px !important;
     max-height: none !important;
   }
 
@@ -352,18 +352,19 @@
   /* --------------------------------------------------- quick pairing --- */
 
   /* Chess.com's time-control picker: a heading per speed (icon + name) over
-     a row of flat buttons labelled "1 min", "3 + 2". Every speed is one row
-     of a 12-column grid, split evenly between its pools; the heading lives
-     in the row gap above, drawn by the row's first button. The pools are
+     flat buttons labelled "1 min", "3 + 2". All buttons are the same size,
+     three to a row, wrapping (blitz's four take two rows). Each speed's
+     first button starts a new row and pushes it down with a top margin;
+     the heading is drawn in that margin by the button. The pools are
      Lichess's fixed set, so they're matched by data-id; an unknown one
-     still shows up as a plain third-width button. */
+     still shows up as a plain button. */
   main.lobby .lpools {
-    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     grid-template-rows: none !important;
-    grid-auto-rows: 46px;
+    grid-auto-rows: auto;
     align-content: start;
-    gap: 40px 10px !important;
-    padding: 46px 2px 0 !important;
+    gap: 8px 10px !important;
+    padding: 0 2px !important;
     font-size: 16px !important;
   }
 
@@ -371,17 +372,15 @@
     position: relative;
     flex-flow: row !important;
     gap: 10px;
-    grid-column: span 4;
+    align-self: end;
+    height: 42px;
     border-radius: 6px !important;
     font-weight: 600;
   }
 
-  main.lobby .lpool:is([data-id='1+0'], [data-id='2+1'], [data-id='30+0'], [data-id='30+20']) {
-    grid-column: span 6;
-  }
-
-  main.lobby .lpool:is([data-id='3+0'], [data-id='3+2'], [data-id='5+0'], [data-id='5+3']) {
-    grid-column: span 3;
+  main.lobby .lpool:is([data-id='1+0'], [data-id='3+0'], [data-id='10+0'], [data-id='30+0']) {
+    grid-column-start: 1;
+    margin-top: 34px;
   }
 
   main.lobby .lpool[data-id='1+0']   { --cdc-pool-label: '1 min'; }
@@ -472,7 +471,7 @@
   main.lobby .lpool:is([data-id='1+0'], [data-id='3+0'], [data-id='10+0'], [data-id='30+0'])::before,
   main.lobby .lpool:is([data-id='1+0'], [data-id='3+0'], [data-id='10+0'], [data-id='30+0'])::after {
     position: absolute;
-    bottom: calc(100% + 10px);
+    bottom: calc(100% + 8px);
     left: 2px;
     pointer-events: none;
   }
@@ -502,7 +501,7 @@
     grid-column: 1 / -1;
     justify-self: center;
     height: 36px;
-    margin-top: -30px;
+    margin-top: 2px;
     padding: 0 14px;
     background: none !important;
     box-shadow: none !important;
