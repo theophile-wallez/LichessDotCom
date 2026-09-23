@@ -1,0 +1,253 @@
+/*
+ * Study lists (.study-index: all studies, search, staff picks, a player's
+ * studies) as a grid of Chess.com-style cards:
+ *
+ *   +------------------------------------------------+
+ *   | [flair]  Study name                            |
+ *   |          (heart) 431 • author • 3 days ago     |
+ *   |------------------------------------------------|
+ *   |  (o) Chapter one               (tower) member  |
+ *   |  (o) Chapter two               (eye) member    |
+ *   +------------------------------------------------+
+ *
+ * The compact format (list view) becomes dense rows in the same grid.
+ */
+
+/* --------------------------------------------------------- toolbar --- */
+
+.study-index.box {
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.study-index .box__top {
+  flex-wrap: wrap;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 16px 0 20px !important;
+}
+
+.study-index .box__top > * {
+  margin: 0 !important;
+}
+
+/* One 44px row: search, sort, list view, new study. */
+.study-index .box__top .search input,
+.study-index .box__top .search .button,
+.study-index .box__top .mselect,
+.study-index .box__top form[action*='list-format'] .button,
+.study-index .box__top .new-study .button {
+  box-sizing: border-box;
+  height: 44px !important;
+}
+
+.study-index .box__top .search input {
+  padding-inline-start: 14px !important;
+  font-size: 15px !important;
+}
+
+.study-index .box__top .search .button {
+  padding: 0 16px !important;
+}
+
+.study-index .box__top .mselect {
+  flex: 0 1 auto !important;
+  font-size: 15px !important;
+}
+
+.study-index .box__top .mselect__label {
+  min-width: 170px;
+  padding: 0 12px 0 14px !important;
+}
+
+.study-index .box__top form[action*='list-format'] .button,
+.study-index .box__top .new-study .button {
+  width: 44px;
+  padding: 0 !important;
+}
+
+.study-index .box__top form[action*='list-format'] .button::before,
+.study-index .box__top .new-study .button::before {
+  font-size: 20px !important;
+}
+
+/* List view on: the toggle reads as pressed, not as a green action. */
+.study-index .box__top form[action*='list-format'] .button.active {
+  background: var(--cdc-btn-grey-hover) !important;
+  box-shadow: inset 0 0 0 1px var(--cdc-card-border-hover), var(--cdc-btn-grey-shadow) !important;
+}
+
+/* ------------------------------------------------------------ grid --- */
+
+.study-index .studies {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+  gap: 12px;
+}
+
+.study-index .studies::after {
+  display: none !important;
+}
+
+.study-index .studies > .pager {
+  grid-column: 1 / -1;
+}
+
+/* ------------------------------------------------------------ card --- */
+
+.study-index .studies .study {
+  display: flex;
+  flex-direction: column;
+  padding: 16px !important;
+  border: 1px solid var(--cdc-card-border) !important;
+  border-radius: 10px;
+  background: var(--cdc-bg-panel);
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s !important;
+}
+
+.study-index .studies .study:hover {
+  border-color: var(--cdc-card-border-hover) !important;
+  background: var(--cdc-card-hover) !important;
+  box-shadow: var(--cdc-card-shadow-hover);
+}
+
+.study-index .studies .study .top {
+  gap: 12px !important;
+}
+
+/* The flair (or Lichess's study icon) on a tile, like team avatars. */
+.study-index .studies .study__icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  background: #81b64c26;
+  color: var(--cdc-green) !important;
+  font-size: 24px !important;
+}
+
+.study-index .studies .study__icon img {
+  width: 28px;
+  height: 28px;
+  margin: 0 !important;
+}
+
+.study-index .studies .study .top .study-name {
+  color: #fff !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  line-height: 1.35;
+}
+
+.study-index .studies .study .top span {
+  margin-top: 2px;
+  color: var(--cdc-text-dim) !important;
+  font-size: 12px !important;
+  font-weight: 600;
+}
+
+.study-index .studies .study .top .private {
+  color: var(--cdc-brag, #e3aa24);
+}
+
+.study-index .studies .study .body {
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #ffffff0f;
+  font-size: 13px !important;
+}
+
+.study-index .studies .study .chapters,
+.study-index .studies .study .members {
+  margin: 0 !important;
+}
+
+.study-index .studies .study .chapters {
+  flex: 1 1 60% !important;
+  max-width: none !important;
+}
+
+.study-index .studies .study .members {
+  flex: 0 1 40% !important;
+  max-width: 40% !important;
+}
+
+.study-index .studies .study li {
+  padding: 2px 0;
+  color: #c8c7c4 !important;
+  line-height: 1.4;
+}
+
+.study-index .studies .study .members li {
+  color: var(--cdc-text-dim) !important;
+}
+
+.study-index .studies .study li::before {
+  margin-inline-end: 6px !important;
+  color: var(--cdc-font-dimmer) !important;
+  font-size: 11px !important;
+}
+
+/* --------------------------------------------------- list view rows --- */
+
+.study-index .studies.compact {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+  gap: 8px;
+}
+
+.study-index .studies .study.compact {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px !important;
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.study-index .studies .study.compact > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.study-index .studies .study.compact > .study__icon {
+  width: 34px;
+  height: 34px;
+  margin: 0 !important;
+  border-radius: 8px;
+  font-size: 18px !important;
+}
+
+.study-index .studies .study.compact > .study__icon img {
+  width: 22px;
+  height: 22px;
+}
+
+/* ----------------------------------------------------- empty state --- */
+
+.study-index .nostudies {
+  padding: 48px 16px;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px;
+  background: var(--cdc-bg-panel);
+  color: var(--cdc-text-dim);
+  font-size: 18px !important;
+  font-weight: 600;
+}
+
+.study-index .nostudies icon {
+  font-size: 96px !important;
+}
+
+/* Lichess's mobile layout runs the list edge to edge; cards need a margin. */
+@media (max-width: 799.98px) {
+  .study-index.box {
+    padding: 0 12px 24px !important;
+  }
+}

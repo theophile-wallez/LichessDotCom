@@ -62,6 +62,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/home.css` | Home page (`main.lobby`) as a 12-column card dashboard; the hero is added by `content.js`. |
 | `src/styles/coach.css` | Coach directory (`main.coach-list`) as a grid of coach cards; the title badges are split out of the names by `content.js`. |
 | `src/styles/teams.css` | Team lists (`main.team-list`) as a grid of club cards with avatar tiles. |
+| `src/styles/study.css` | Study lists (`.study-index`) as a grid of study cards, plus the compact list view and the toolbar. |
 
 There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
 
