@@ -144,22 +144,16 @@
   height: auto !important;
   padding: 0 !important;
   overflow: hidden;
-  border: none !important;
+  border: 1px solid var(--cdc-card-border) !important;
   border-radius: 10px;
   background: var(--cdc-bg-panel) !important;
-  transition: background-color 0.15s, transform 0.15s, box-shadow 0.15s !important;
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s !important;
 }
 
 .coach-list__main .coach-widget:hover {
-  background: #2e2d2a !important;
-  box-shadow: 0 10px 24px #00000059;
-  transform: translateY(-2px);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .coach-list__main .coach-widget:hover {
-    transform: none;
-  }
+  border-color: var(--cdc-card-border-hover) !important;
+  background: var(--cdc-card-hover) !important;
+  box-shadow: var(--cdc-card-shadow-hover);
 }
 
 /* Lichess hides pictures on narrow screens; a card always has one. */

@@ -9,7 +9,7 @@ LichessDotCom is a Chrome extension (Manifest V3) that gives lichess.org a
 analysis, open data, no ads. The user gets the polished Chess.com UI they're
 used to:
 
-- Chess.com's look: dark palette, green board, Neo pieces, bold 3D buttons,
+- Chess.com's look: dark palette, green board, Neo pieces, bold gradient buttons,
   a fixed left sidebar and roomy player bars with avatars and clocks.
 - Chess.com's layout: board on the left, one right-hand panel with moves,
   controls and chat, and a page that **never scrolls**. Everything fits the

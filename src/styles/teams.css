@@ -82,9 +82,10 @@ main.team-list .slist tbody tr:nth-child(2n) {
   align-items: end;
   column-gap: 12px;
   padding: 16px 16px 14px 76px;
+  border: 1px solid var(--cdc-card-border);
   border-radius: 10px;
   background: var(--cdc-bg-panel) !important;
-  transition: background-color 0.15s, transform 0.15s, box-shadow 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
 html[dir='rtl'] main.team-list .slist tbody tr {
@@ -92,15 +93,9 @@ html[dir='rtl'] main.team-list .slist tbody tr {
 }
 
 main.team-list .slist tbody tr:hover {
-  background: #2e2d2a !important;
-  box-shadow: 0 10px 24px #00000059;
-  transform: translateY(-2px);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  main.team-list .slist tbody tr:hover {
-    transform: none;
-  }
+  border-color: var(--cdc-card-border-hover);
+  background: var(--cdc-card-hover) !important;
+  box-shadow: var(--cdc-card-shadow-hover);
 }
 
 /* Lichess has no team pictures: vary the avatar tints down the list. */
@@ -251,9 +246,9 @@ main.team-list .slist tbody tr:has(td[colspan]) {
   display: block;
   grid-column: 1 / -1;
   padding: 16px !important;
+  border: none;
   background: transparent !important;
   box-shadow: none !important;
-  transform: none !important;
 }
 
 main.team-list .slist tbody tr:has(td[colspan]) td {
