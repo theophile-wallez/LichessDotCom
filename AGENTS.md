@@ -52,7 +52,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/board.js` | Page world: analysis arrows redrawn Chess.com-style, checkmate badge and label. |
 | `src/review.js` | Page world: Game Review (engine, classification, panel, board overlays, eval bar). |
 | `src/styles/theme.css` | Overrides Lichess's `--c-*` color variables, fonts, buttons. |
-| `src/styles/sidebar.css` | Lichess's top header → Chess.com's left sidebar. |
+| `src/styles/sidebar.css` | Lichess's top header → Chess.com's left sidebar, and the user menu (dasher) as a Chess.com menu. |
 | `src/styles/board.css` | Board, pieces, highlights, move hints, arrows, coordinates. |
 | `src/styles/game.css` | Game page (`main.round`) grid, player bars, clocks, moves, chat. |
 | `src/styles/analysis.css` | Analysis page (`main.analyse`) grid. |

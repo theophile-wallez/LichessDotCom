@@ -320,14 +320,35 @@
     flex: 1 0 100%;
   }
 
+  /* The name on the left, Lichess's avatar icon pinned to the right. */
   #top #user_tag {
+    position: relative;
+    box-sizing: border-box;
     max-width: none !important;
     width: 100%;
+    padding-inline-end: 44px !important;
+    border-radius: 5px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     font-weight: 700;
     color: var(--cdc-text) !important;
+  }
+
+  #top #user_tag::after {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    margin: 0 !important;
+    font-size: 28px !important;
+    line-height: 1;
+    transform: translateY(-50%);
+  }
+
+  #top #user_tag:hover,
+  #top .dasher.shown #user_tag {
+    background: #00000033 !important;
+    color: #fff !important;
   }
 
   /* Dropdowns (preferences, notifications, challenges) open beside the sidebar. */
@@ -358,4 +379,371 @@
   #top .site-buttons .shown .toggle {
     background: transparent !important;
   }
+}
+
+/* ------------------------------------------------ user menu (dasher) --- */
+
+/* Lichess's dasher (account links, then language, sound, theme, board and
+ * pieces) as a Chess.com menu: rounded rows with a dim icon column, a grey
+ * hover instead of a green fill, dim chevrons, and a green check on the
+ * current choice in the sub-panels. Lichess paints hovers and the current
+ * choice with --c-dasher, so that becomes the menu's hover grey. */
+#top #dasher_app {
+  --c-dasher: var(--cdc-menu-hover) !important;
+  --c-dasher-light: var(--cdc-menu-hover) !important;
+  --cdc-sound-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 9h3.5L12 5v14l-4.5-4H4z'/%3E%3Cpath d='M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  --cdc-theme-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M12 4a8 8 0 0 1 0 16z'/%3E%3C/svg%3E");
+  --cdc-board-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='4' y='4' width='16' height='16' rx='2' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M4 4h8v8H4zM12 12h8v8h-8z'/%3E%3C/svg%3E");
+  --cdc-piece-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='6.5' r='3.5'/%3E%3Cpath d='M9 11h6l1.5 7h-9zM6 19h12v2H6z'/%3E%3C/svg%3E");
+  box-sizing: border-box;
+  width: 264px !important;
+  padding: 6px !important;
+  border: 1px solid var(--cdc-menu-border) !important;
+  border-radius: 10px !important;
+  background: var(--cdc-menu-bg) !important;
+  box-shadow: var(--cdc-menu-shadow) !important;
+  font-family: var(--cdc-font);
+  text-shadow: none !important;
+}
+
+#dasher_app .links,
+#dasher_app .subs {
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+#dasher_app .subs:not(:first-child) {
+  margin: 6px -6px 0;
+  padding: 6px 6px 0 !important;
+  border-top: 1px solid #ffffff14 !important;
+}
+
+/* Rows: account links, sub-menu buttons, zen mode. */
+#dasher_app :is(.links a, .links button, .subs .sub, .zen button) {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px !important;
+  padding: 0 12px !important;
+  border-radius: 6px;
+  background: none !important;
+  color: var(--cdc-text) !important;
+  font-size: 15px;
+  font-weight: 600;
+  opacity: 1 !important;
+  transition: background-color 0.1s;
+}
+
+#dasher_app :is(.links a, .links button, .subs .sub, .zen button):hover {
+  background: var(--cdc-menu-hover) !important;
+  color: #fff !important;
+}
+
+/* The icon column: Lichess glyphs, the online dot, our masks. */
+#dasher_app :is(.links a, .links button, .subs .sub, .zen button)::before,
+#dasher_app .links .line {
+  flex: none;
+  width: 20px;
+  margin: 0 !important;
+  background: none !important;
+  color: var(--cdc-text-dim) !important;
+  font-size: 18px !important;
+  text-align: center;
+  opacity: 1 !important;
+  float: none !important;
+}
+
+#dasher_app :is(.links a, .links button, .subs .sub, .zen button):hover::before {
+  color: #fff !important;
+}
+
+/* Profile's online dot stays green, in the 20px icon column. */
+#top #dasher_app .links .user-link .line {
+  display: flex !important;
+  justify-content: center;
+  width: 20px !important;
+  color: var(--cdc-green) !important;
+}
+
+#dasher_app .subs .sub:not(.language)::before {
+  content: '';
+  height: 20px;
+  background: var(--cdc-text-dim) !important;
+  -webkit-mask: var(--cdc-sub-icon) center / 20px no-repeat;
+  mask: var(--cdc-sub-icon) center / 20px no-repeat;
+}
+
+#dasher_app .subs .sub:not(.language):hover::before {
+  background: #fff !important;
+}
+
+/* Sub-menus are matched by position: their labels are localized. */
+#dasher_app .subs .sub:nth-child(2) { --cdc-sub-icon: var(--cdc-sound-icon); }
+#dasher_app .subs .sub:nth-child(3) { --cdc-sub-icon: var(--cdc-theme-icon); }
+#dasher_app .subs .sub:nth-child(4) { --cdc-sub-icon: var(--cdc-board-icon); }
+#dasher_app .subs .sub:nth-child(5) { --cdc-sub-icon: var(--cdc-piece-icon); }
+
+#dasher_app .subs .sub::after {
+  color: var(--cdc-text-dim) !important;
+  font-size: 12px;
+  opacity: 1 !important;
+}
+
+#dasher_app .subs .sub:hover::after {
+  color: #fff !important;
+}
+
+#dasher_app .logout button:hover {
+  background: var(--cdc-menu-hover) !important;
+}
+
+/* Ping and server lag: one small dim line with the signal bars. */
+#dasher_app .status {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  margin: 6px -6px 0;
+  padding: 10px 18px 6px !important;
+  border-top: 1px solid #ffffff14 !important;
+  color: var(--cdc-text-dim) !important;
+  font-size: 12px;
+}
+
+#dasher_app .status:hover {
+  color: #fff !important;
+}
+
+#dasher_app .status :is(.ping, .server) {
+  display: inline !important;
+  font-family: var(--cdc-font) !important;
+}
+
+#dasher_app .status em {
+  font-style: normal;
+}
+
+#dasher_app .status strong {
+  padding: 0 3px !important;
+  color: var(--cdc-text);
+  font-weight: 700;
+}
+
+#dasher_app .status signal {
+  position: static !important;
+  order: 1;
+  margin-inline-start: auto;
+  font-size: 16px !important;
+}
+
+/* Sub-panels: a back row as the title, then the choices. */
+#dasher_app .head {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  width: calc(100% + 12px) !important; /* a button doesn't stretch */
+  height: 44px;
+  margin: -6px -6px 6px;
+  padding: 0 16px !important;
+  border-bottom: 1px solid #ffffff14 !important;
+  color: #fff !important;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+#dasher_app .head::before {
+  margin: 0 !important;
+  color: var(--cdc-text-dim) !important;
+  font-size: 14px;
+  opacity: 1 !important;
+}
+
+#dasher_app .head:hover::before {
+  color: #fff !important;
+}
+
+#dasher_app :is(.selector button, .langs form button) {
+  display: flex !important;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  padding: 6px 12px !important;
+  border: none !important;
+  border-radius: 6px;
+  color: var(--cdc-text) !important;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.1s;
+}
+
+/* The current choice is white with a green check, not filled: a fill would
+ * look the same as the hover. */
+#top #dasher_app :is(.selector button.active, .langs .current, .langs .accepted) {
+  border: none !important;
+  background: none !important;
+  color: #fff !important;
+}
+
+#top #dasher_app :is(.selector button, .langs form button):hover {
+  background: var(--cdc-menu-hover) !important;
+  color: #fff !important;
+}
+
+#top #dasher_app .selector button::before,
+#top #dasher_app .selector button.active::before {
+  color: var(--cdc-green) !important;
+}
+
+#dasher_app .langs .current::after {
+  content: '';
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-inline-start: auto;
+  background: var(--cdc-green);
+  -webkit-mask: var(--cdc-check) center / contain no-repeat;
+  mask: var(--cdc-check) center / contain no-repeat;
+}
+
+#dasher_app .langs .help {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 10px 12px !important;
+  border-radius: 6px !important;
+  color: var(--cdc-text-dim) !important;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#top #dasher_app .langs .help:hover {
+  background: var(--cdc-menu-hover) !important;
+  color: #fff !important;
+}
+
+#dasher_app .langs .help::before {
+  color: inherit !important;
+}
+
+/* Board and piece pickers: rounded tiles, the current one ringed green. */
+#dasher_app .board .list button,
+#dasher_app .piece .no-square {
+  border-radius: 6px;
+}
+
+#dasher_app .board .list button:hover,
+#dasher_app .piece .no-square:hover {
+  background: var(--cdc-menu-hover) !important;
+}
+
+#dasher_app .board .list button.active,
+#dasher_app .piece .no-square.active {
+  background: #81b64c33 !important;
+  box-shadow: inset 0 0 0 2px var(--cdc-green);
+}
+
+#dasher_app .board .list span {
+  border-radius: 3px;
+}
+
+/* Lichess's piece grid sits on a light marble backdrop. */
+#top #dasher_app .piece .list {
+  margin-bottom: 6px;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* "+" / "-" (more boards and pieces): a quiet row, not a green bar. */
+#top #dasher_app .button.more {
+  height: 32px;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 6px !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--cdc-text-dim) !important;
+  font-size: 18px;
+  text-shadow: none !important;
+}
+
+#top #dasher_app .button.more:hover {
+  background: var(--cdc-menu-hover) !important;
+  color: #fff !important;
+}
+
+/* Sliders: a thin green-filled track and a round white thumb. */
+/* The vertical volume slider is a native one: drawn like the others. */
+#top #dasher_app .sound input[type='range']:not(.rate) {
+  appearance: none;
+  margin: 12px 4px 12px 10px !important;
+  background: none;
+}
+
+#top #dasher_app .sound input[type='range']:not(.rate)::-webkit-slider-runnable-track {
+  width: 4px;
+  border-radius: 2px;
+  background: #ffffff26;
+}
+
+#top #dasher_app .sound input[type='range']:not(.rate)::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-left: -6px; /* physical: in a vertical slider "inline" is vertical */
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px #0009;
+}
+
+#top #dasher_app input.range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: #ffffff26 !important;
+}
+
+#top #dasher_app input.range::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border: none !important;
+  border-radius: 50%;
+  background: #fff !important;
+  box-shadow: 0 1px 4px #0009;
+}
+
+/* Switches: Chess.com's pill, grey off and green on, with a white knob. */
+#dasher_app .cmn-toggle label {
+  box-sizing: border-box;
+  width: 40px;
+  height: 22px;
+  padding: 0;
+  border: none !important;
+  border-radius: 999px !important;
+  background: #5d5b58 !important;
+}
+
+#dasher_app .cmn-toggle label::before {
+  display: none !important;
+}
+
+#dasher_app .cmn-toggle label::after {
+  bottom: 2px !important;
+  left: 2px !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  box-shadow: 0 1px 3px #0006 !important;
+}
+
+#dasher_app .cmn-toggle input:checked + label {
+  background: var(--cdc-green) !important;
+}
+
+#dasher_app .cmn-toggle input:checked + label::after {
+  margin-inline-start: 18px !important;
 }
