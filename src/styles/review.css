@@ -163,16 +163,29 @@
 
   .cdc-review__back,
   .cdc-review__close {
+    display: grid;
+    place-items: center;
+    width: 36px;
     height: 36px;
+    padding: 0;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     background: transparent;
     color: var(--cdc-text-dim);
-    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+  }
+
+  .cdc-review__back svg,
+  .cdc-review__close svg {
+    width: 22px;
+    height: 22px;
+    pointer-events: none;
   }
 
   .cdc-review__back:hover,
   .cdc-review__close:hover {
+    background: #ffffff12;
     color: #fff;
   }
 

@@ -25,14 +25,14 @@
     ? {
         review: 'Bilan', start: 'Démarrer le bilan', next: 'Suivant', explain: 'Expliquer', best: 'Meilleur',
         analysing: 'Analyse de la partie…', players: 'Joueurs', accuracy: 'Précision',
-        anonymous: 'Anonyme', close: 'Fermer le bilan',
+        anonymous: 'Anonyme', close: 'Fermer le bilan', back: 'Retour',
         intro: 'Passons en revue cette partie !', bestWas: 'Le meilleur coup était {m}.',
         engineError: "Le moteur n'a pas pu démarrer.",
       }
     : {
         review: 'Game Review', start: 'Start Review', next: 'Next', explain: 'Explain', best: 'Best',
         analysing: 'Analyzing game…', players: 'Players', accuracy: 'Accuracy',
-        anonymous: 'Anonymous', close: 'Close review',
+        anonymous: 'Anonymous', close: 'Close review', back: 'Back',
         intro: "Let's review this game!", bestWas: '{m} was best.',
         engineError: 'The engine failed to start.',
       };
@@ -527,11 +527,18 @@
       ? `<span class="cdc-cls-icon cdc-cls-icon--svg">${CLS[cls].svg}</span>`
       : `<span class="cdc-cls-icon" style="--c:${CLS[cls].color}">${CLS[cls].icon}</span>`;
 
+  // Back and close as drawn icons of one size: the font's "←" is a sliver
+  // next to its "✕".
+  const headIcon = d =>
+    `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const BACK_ICON = headIcon('M19 12H5M11 5l-7 7 7 7');
+  const CLOSE_ICON = headIcon('M6 6l12 12M18 6 6 18');
+
   function header(title, back) {
     return `<div class="cdc-review__head">
-      ${back ? `<button class="cdc-review__back" data-cdc="${back}" title="${esc(T.close)}">←</button>` : '<span></span>'}
+      ${back ? `<button class="cdc-review__back" data-cdc="${back}" title="${esc(T.back)}" aria-label="${esc(T.back)}">${BACK_ICON}</button>` : '<span></span>'}
       <div class="cdc-review__title"><span class="cdc-review__star">★</span>${esc(title)}</div>
-      <button class="cdc-review__close" data-cdc="normal" title="${esc(T.close)}">✕</button>
+      <button class="cdc-review__close" data-cdc="normal" title="${esc(T.close)}" aria-label="${esc(T.close)}">${CLOSE_ICON}</button>
     </div>`;
   }
 
