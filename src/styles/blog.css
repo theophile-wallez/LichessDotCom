@@ -256,13 +256,14 @@
 
 /* Blog lists (.ublog-index) and "You may also like" under a post share one
  * card: image on top with the date and author as small chips over it, then
- * the title and intro. */
-.ublog-post-cards {
+ * the title and intro. Scoped to those two: the home page styles its own
+ * blog cards (home.css). */
+:is(.ublog-index, .ublog-post) .ublog-post-cards {
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
   gap: 16px !important;
 }
 
-.ublog-post-card {
+:is(.ublog-index, .ublog-post) .ublog-post-card {
   overflow: hidden;
   border: 1px solid var(--cdc-card-border) !important;
   border-radius: 10px !important;
@@ -271,26 +272,26 @@
   transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s !important;
 }
 
-.ublog-post-card--link:hover {
+:is(.ublog-index, .ublog-post) .ublog-post-card--link:hover {
   border-color: var(--cdc-card-border-hover) !important;
   background: var(--cdc-card-hover) !important;
   box-shadow: var(--cdc-card-shadow-hover) !important;
 }
 
 /* Lichess's own posts: a gold edge instead of a thick gold frame. */
-.ublog-post-card--by-lichess {
+:is(.ublog-index, .ublog-post) .ublog-post-card--by-lichess {
   border-color: #e3aa2466 !important;
 }
 
-.ublog-post-card--by-lichess:hover {
+:is(.ublog-index, .ublog-post) .ublog-post-card--by-lichess:hover {
   border-color: #e3aa24b3 !important;
 }
 
-.ublog-post-card__image {
+:is(.ublog-index, .ublog-post) .ublog-post-card__image {
   border-radius: 0 !important;
 }
 
-.ublog-post-card .ublog-post-card__over-image {
+:is(.ublog-index, .ublog-post) .ublog-post-card .ublog-post-card__over-image {
   top: 8px;
   margin: 0 8px;
   padding: 3px 8px !important;
@@ -302,27 +303,27 @@
   text-shadow: none !important;
 }
 
-.ublog-post-card .ublog-post-card__over-image.pos-bottom {
+:is(.ublog-index, .ublog-post) .ublog-post-card .ublog-post-card__over-image.pos-bottom {
   top: auto;
   bottom: 8px;
 }
 
-.ublog-post-card .ublog-post-card__over-image::before {
+:is(.ublog-index, .ublog-post) .ublog-post-card .ublog-post-card__over-image::before {
   display: none;
 }
 
-.ublog-post-card__content {
+:is(.ublog-index, .ublog-post) .ublog-post-card__content {
   padding: 14px 16px 16px !important;
 }
 
-.ublog-post-card__title {
+:is(.ublog-index, .ublog-post) .ublog-post-card__title {
   color: #fff !important;
   font-size: 16px !important;
   font-weight: 800 !important;
   line-height: 1.3;
 }
 
-.ublog-post-card__intro {
+:is(.ublog-index, .ublog-post) .ublog-post-card__intro {
   margin-top: 6px !important;
   color: var(--cdc-text-dim) !important;
   font-size: 13px;
@@ -485,18 +486,18 @@
   gap: 12px !important;
 }
 
-.ublog-post-card--mini {
+.ublog-index .ublog-post-card--mini {
   display: flex !important;
   flex-direction: column;
   border: none !important;
   background: transparent !important;
 }
 
-.ublog-post-card--mini .ublog-post-card__image {
+.ublog-index .ublog-post-card--mini .ublog-post-card__image {
   border-radius: 8px !important;
 }
 
-.ublog-post-card--mini .ublog-post-card__title {
+.ublog-index .ublog-post-card--mini .ublog-post-card__title {
   position: static !important;
   display: -webkit-box !important;
   overflow: hidden;
