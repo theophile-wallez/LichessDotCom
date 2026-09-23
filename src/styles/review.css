@@ -377,11 +377,15 @@
     color: #312e2b;
   }
 
+  /* The tail points at the avatar, which is centered on the bubble: center
+   * it too, as the bubble's height varies (short summary line, taller
+   * move comments). */
   .cdc-bubble::before {
     content: '';
     position: absolute;
     left: -7px;
-    top: 38px;
+    top: 50%;
+    margin-top: -7px;
     border: 7px solid transparent;
     border-left: none;
     border-right-color: #fff;
