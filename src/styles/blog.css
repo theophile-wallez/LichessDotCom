@@ -1,7 +1,8 @@
 /*
  * Blog: a post (.ublog-post) reads like a Chess.com article: rounded hero
  * image, a big left-aligned title, one compact meta line, then comfortable
- * article typography.
+ * article typography. The blog lists (.ublog-index: community, by month, by
+ * topic, a user's blog) are grids of the same post cards.
  */
 
 /* ------------------------------------------------------------ post --- */
@@ -244,9 +245,278 @@
   margin-top: 48px !important;
 }
 
-.ublog-post .ublog-post__footer h2 {
+.ublog-post .ublog-post__footer h2:not(.ublog-post-card__title) {
   margin-bottom: 20px !important;
   color: #fff;
   font-size: 22px !important;
   font-weight: 800 !important;
+}
+
+/* ------------------------------------------------------ post cards --- */
+
+/* Blog lists (.ublog-index) and "You may also like" under a post share one
+ * card: image on top with the date and author as small chips over it, then
+ * the title and intro. */
+.ublog-post-cards {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+  gap: 16px !important;
+}
+
+.ublog-post-card {
+  overflow: hidden;
+  border: 1px solid var(--cdc-card-border) !important;
+  border-radius: 10px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: none !important;
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s !important;
+}
+
+.ublog-post-card--link:hover {
+  border-color: var(--cdc-card-border-hover) !important;
+  background: var(--cdc-card-hover) !important;
+  box-shadow: var(--cdc-card-shadow-hover) !important;
+}
+
+/* Lichess's own posts: a gold edge instead of a thick gold frame. */
+.ublog-post-card--by-lichess {
+  border-color: #e3aa2466 !important;
+}
+
+.ublog-post-card--by-lichess:hover {
+  border-color: #e3aa24b3 !important;
+}
+
+.ublog-post-card__image {
+  border-radius: 0 !important;
+}
+
+.ublog-post-card .ublog-post-card__over-image {
+  top: 8px;
+  margin: 0 8px;
+  padding: 3px 8px !important;
+  border-radius: 6px !important;
+  background: #000000a6 !important;
+  color: #fff !important;
+  font-size: 12px;
+  font-weight: 700;
+  text-shadow: none !important;
+}
+
+.ublog-post-card .ublog-post-card__over-image.pos-bottom {
+  top: auto;
+  bottom: 8px;
+}
+
+.ublog-post-card .ublog-post-card__over-image::before {
+  display: none;
+}
+
+.ublog-post-card__content {
+  padding: 14px 16px 16px !important;
+}
+
+.ublog-post-card__title {
+  color: #fff !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  line-height: 1.3;
+}
+
+.ublog-post-card__intro {
+  margin-top: 6px !important;
+  color: var(--cdc-text-dim) !important;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* ---------------------------------------------------------- header --- */
+
+.ublog-index.box {
+  gap: 16px !important;
+  padding: 16px 0 40px !important;
+  background: transparent !important;
+}
+
+.ublog-index .box__top {
+  flex-wrap: wrap;
+  gap: 12px 20px !important;
+  min-height: 0 !important;
+}
+
+.ublog-index .box__top h1 {
+  gap: 0 !important;
+  color: #fff;
+}
+
+/* Chess.com's blog icon, as in the sidebar menu. A user's blog already
+ * starts with the author's own icon. */
+.ublog-index .box__top h1:not(:has(.user-link))::before {
+  content: '';
+  flex: none;
+  width: 36px;
+  height: 36px;
+  margin-inline-end: 12px;
+  background: url('https://assets-ds.chess.com/color-icons/page-blog.svg') center / contain no-repeat;
+}
+
+.ublog-index .box__top h1 .user-link {
+  color: #fff !important;
+}
+
+.ublog-index .box__top__actions {
+  gap: 12px !important;
+}
+
+.ublog-index .box__top .atom {
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+  border-radius: 8px;
+  color: var(--cdc-text-dim) !important;
+  font-size: 20px !important;
+}
+
+.ublog-index .box__top .atom:hover {
+  background: #ffffff0f;
+  color: #e58f2a !important;
+}
+
+/* "Show best / all", "Sort likes / date": Chess.com segmented toggles. */
+.ublog-index .filter-and-sort {
+  gap: 16px !important;
+  color: var(--cdc-text-dim);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ublog-index .btn-rack {
+  gap: 2px;
+  padding: 3px;
+  border-radius: 8px !important;
+  background: var(--cdc-bg-raised) !important;
+  box-shadow: none !important;
+}
+
+.ublog-index .btn-rack__btn {
+  padding: 6px 12px !important;
+  border: none !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--cdc-text) !important;
+  font-size: 14px;
+  font-weight: 700;
+  text-shadow: none !important;
+}
+
+.ublog-index .btn-rack__btn:hover {
+  background: #ffffff12 !important;
+  color: #fff !important;
+}
+
+.ublog-index .btn-rack__btn.active {
+  background: var(--cdc-btn-green) !important;
+  box-shadow: var(--cdc-btn-green-shadow) !important;
+  color: #fff !important;
+}
+
+/* By month: previous / next month as quiet icon buttons around the pickers. */
+.ublog-index .calendar-mselect > a {
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+  border-radius: 8px;
+  color: var(--cdc-text) !important;
+  font-size: 18px !important;
+}
+
+.ublog-index .calendar-mselect > a:hover {
+  background: #ffffff0f;
+  color: #fff !important;
+}
+
+.ublog-index .calendar-mselect .mselect__label {
+  padding: 8px 12px 8px 14px !important;
+  font-size: 16px;
+}
+
+/* ---------------------------------------------------------- topics --- */
+
+/* /blog/topic: one card per topic, its latest posts as small image tiles
+ * with the title under the image rather than over it. */
+.ublog-topics {
+  gap: 16px !important;
+}
+
+.ublog-topics__topic {
+  padding: 16px !important;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px;
+  background: var(--cdc-bg-panel);
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.ublog-topics__topic:hover {
+  border-color: var(--cdc-card-border-hover);
+  background: var(--cdc-card-hover);
+  box-shadow: var(--cdc-card-shadow-hover);
+}
+
+.ublog-topics__topic h2 {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 12px !important;
+  color: #fff !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+}
+
+.ublog-topics__topic__nb {
+  color: var(--cdc-green) !important;
+  font-size: 13px !important;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ublog-topics__topic__posts {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+.ublog-post-card--mini {
+  display: flex !important;
+  flex-direction: column;
+  border: none !important;
+  background: transparent !important;
+}
+
+.ublog-post-card--mini .ublog-post-card__image {
+  border-radius: 8px !important;
+}
+
+.ublog-post-card--mini .ublog-post-card__title {
+  position: static !important;
+  display: -webkit-box !important;
+  overflow: hidden;
+  margin: 8px 0 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--cdc-text) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+@media (max-width: 799.98px) {
+  .ublog-index.box {
+    padding: 12px 12px 32px !important;
+  }
+
+  .ublog-topics__topic__posts {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
 }
