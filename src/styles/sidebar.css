@@ -110,9 +110,15 @@
     overflow: visible !important;
     background: transparent !important;
     box-shadow: none !important;
-    /* Lichess hides the nav once the page scrolls (#top.scrolled). */
+  }
+
+  /* Lichess hides the nav and dropdowns once the page scrolls down (#top.hide),
+     pointer-events included: the sidebar is fixed, so keep them usable. */
+  #top #topnav,
+  #top .dropdown {
     visibility: visible !important;
     opacity: 1 !important;
+    pointer-events: auto !important;
   }
 
   #topnav section {

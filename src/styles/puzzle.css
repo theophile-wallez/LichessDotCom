@@ -262,6 +262,35 @@ main.puzzle .puzzle__feedback .view_solution .button:hover {
   background: var(--cdc-btn-grey-hover) !important;
 }
 
+/* Chess.com's own icons beside the labels: a glowing bulb for the hint, a
+ * question mark for the solution. Drawn as masks, so they follow the label's
+ * colour, dimmed hint included. The streak's lone "skip" button is not one of
+ * the two, hence :not(.skip). */
+main.puzzle .puzzle__feedback .view_solution:not(.skip) .button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+main.puzzle .puzzle__feedback .view_solution:not(.skip) .button::before {
+  content: '';
+  flex: none;
+  width: 20px;
+  height: 20px;
+  background: currentColor;
+  -webkit-mask: var(--cdc-hint-icon) center / contain no-repeat;
+  mask: var(--cdc-hint-icon) center / contain no-repeat;
+}
+
+main.puzzle .puzzle__feedback .view_solution:not(.skip) .button:first-child {
+  --cdc-hint-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m12 3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-10 8.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm20 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-3.33-6.67c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-13.34 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm8.44 15.17h-3.53c-1.03 0-1.43-.4-1.43-1.43v.33c0-3.73-2.97-3.57-2.97-8.1 0-3.13 2.7-5.8 6.17-5.8s6.17 2.67 6.17 5.8c0 4.53-2.97 4.37-2.97 8.1v-.33c0 1.03-.4 1.43-1.43 1.43zm-3.9 2h4.33c-.27 1.03-1.33 1.43-2.17 1.43-.83 0-1.9-.4-2.17-1.43z'/%3E%3C/svg%3E");
+}
+
+main.puzzle .puzzle__feedback .view_solution:not(.skip) .button:nth-child(2) {
+  --cdc-hint-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m12 1.5c5.8 0 10.5 4.7 10.5 10.5s-4.7 10.5-10.5 10.5-10.5-4.7-10.5-10.5 4.7-10.5 10.5-10.5zm-.07 12.13c4.5 0 5.57-2.53 5.57-4.23 0-3-2.5-4.57-5.17-4.57-2.3 0-4.03 1.27-4.93 2.1-.47.53-.5.93-.07 1.47l.63.77c.47.57.83.57 1.3.07.67-.6 1.83-1.4 3.17-1.4 1 0 2.07.37 2.07 1.6 0 1.07-.87 1.2-2.57 1.2h-.4c-.73 0-1 .27-1 .97v1.03c0 .73.27 1 .97 1zm.07 5.2c1.13 0 1.83-.7 1.83-1.83s-.7-1.83-1.83-1.83-1.83.7-1.83 1.83.7 1.83 1.83 1.83z'/%3E%3C/svg%3E");
+}
+
 /* The hint, once shown: pressed in, not a green call to action. */
 main.puzzle .puzzle__feedback .view_solution .button:not(.button-empty) {
   background: #282725 !important;
