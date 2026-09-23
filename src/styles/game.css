@@ -165,6 +165,16 @@
   main.round .ruser rating::before { content: '('; }
   main.round .ruser rating::after  { content: ')'; }
 
+  /* The player's country flag, right after the name (set by content.js). */
+  main.round .ruser :is(rating, good, bad) { order: 2; }
+  main.round .ruser[data-cdc-flag]:not([data-cdc-flag=''])::after {
+    order: 1;
+    content: attr(data-cdc-flag);
+    font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+    font-size: 16px;
+    line-height: 20px;
+  }
+
   /* Captured pieces, Chess.com style (built by content.js): the opponent's
      pieces you took, grouped by type, then the material lead. Lichess's own
      material-difference row is hidden. */

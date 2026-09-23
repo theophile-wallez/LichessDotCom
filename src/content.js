@@ -203,6 +203,48 @@
     follow.prepend(a);
   };
 
+  // Country flags in the player bars, like Chess.com. The round data has no
+  // country, so it comes from the players' profiles (`/api/users` takes a
+  // batch of names), as an emoji. The bar is snabbdom's: the flag is an
+  // attribute shown by CSS, put back whenever the bar is re-rendered.
+  const flags = new Map();
+  const SPECIAL_FLAGS = {
+    'GB-ENG': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    'GB-SCT': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+    'GB-WLS': '🏴󠁧󠁢󠁷󠁬󠁳󠁿',
+    _rainbow: '🏳️‍🌈',
+    _transgender: '🏳️‍⚧️',
+    _pirate: '🏴‍☠️',
+    '_united-nations': '🇺🇳',
+    _earth: '🌍',
+  };
+  // Two letters are regional indicators; anything else without an emoji
+  // (Lichess's own flag, regions) shows nothing.
+  const flagEmoji = code =>
+    SPECIAL_FLAGS[code] ||
+    (/^[A-Z]{2}$/.test(code || '') ? String.fromCodePoint(...[...code].map(c => 0x1f1a5 + c.charCodeAt(0))) : '');
+  const loadFlags = async names => {
+    names.forEach(n => flags.set(n, null));
+    try {
+      const res = await fetch('/api/users', { method: 'POST', body: names.join(',') });
+      const users = await res.json();
+      names.forEach(n => flags.set(n, ''));
+      for (const u of users) flags.set(u.id, flagEmoji(u.profile?.flag));
+    } catch {
+      names.forEach(n => flags.set(n, ''));
+    }
+  };
+  const syncFlags = () => {
+    const bars = [...document.querySelectorAll('main.round .ruser')];
+    const nameOf = bar => bar.querySelector('a.user-link')?.pathname.split('/').pop().toLowerCase();
+    const missing = bars.map(nameOf).filter(n => n && !flags.has(n));
+    if (missing.length) loadFlags(missing);
+    for (const bar of bars) {
+      const flag = flags.get(nameOf(bar)) || '';
+      if ((bar.dataset.cdcFlag || '') !== flag) bar.dataset.cdcFlag = flag;
+    }
+  };
+
   // Chessground shrinks the board to whole pixels per square and leaves the
   // remainder as an inset inside its wrapper. Expose it so the player bars and
   // the eval bar line up with the squares, not the wrapper.
@@ -303,6 +345,7 @@
     syncCaptured();
     syncMoveTimes();
     syncNewGame();
+    syncFlags();
     syncBoardInset();
     syncHero();
     syncCoachTitles();
