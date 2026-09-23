@@ -341,6 +341,17 @@
     box-shadow: 0 6px 24px #0009 !important;
   }
 
+  /* Search suggestions too: below the search box they'd open off screen. */
+  #top #clinput .complete-list {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 12px;
+    left: calc(var(--cdc-sidebar-w) + 6px);
+    width: 280px !important;
+    max-height: calc(100vh - 24px);
+    overflow-y: auto !important;
+  }
+
   #top .site-buttons .shown .toggle {
     background: transparent !important;
   }

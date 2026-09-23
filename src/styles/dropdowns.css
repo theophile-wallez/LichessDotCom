@@ -1,0 +1,390 @@
+/*
+ * Every Lichess dropdown as one Chess.com-style menu: a flat trigger with a
+ * chevron that flips when open, and a floating rounded menu below it with
+ * white items, a soft hover and a green check on the current choice.
+ *
+ *   - .mselect: Lichess's CSS-only dropdown (coach, blog, study and puzzle
+ *     filters, rating stats, broadcasts, the game setup variant picker).
+ *   - native <select>: restyled through Chrome's customizable select
+ *     (appearance: base-select), so the popup is ours too, not the OS list.
+ *   - autocomplete lists (search box, forum mentions, searchable selects).
+ */
+
+:root {
+  --cdc-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 6 8 10.5 12.5 6' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --cdc-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5 6.5 12 13 4.5' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* ---------------------------------------------------------- mselect --- */
+
+.mselect__label {
+  border: 1px solid #4b4847 !important;
+  border-radius: 8px !important;
+  background: var(--cdc-bg-raised) !important;
+  box-shadow: none !important;
+  color: #fff;
+  font-weight: 600;
+  text-shadow: none !important;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.mselect__label:hover,
+.mselect__toggle:checked ~ .mselect__label {
+  background: var(--cdc-bg-raised-hover) !important;
+}
+
+.mselect__toggle:checked ~ .mselect__label {
+  border-color: #6b6966 !important;
+}
+
+/* Lichess's green triangle icon becomes a dim chevron. */
+.mselect__label::after {
+  content: '' !important;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin-inline: 2px 0 !important;
+  background: var(--cdc-text-dim);
+  opacity: 1 !important;
+  -webkit-mask: var(--cdc-chevron) center / contain no-repeat;
+  mask: var(--cdc-chevron) center / contain no-repeat;
+  transition: transform 0.15s ease, background-color 0.15s;
+}
+
+.mselect__label:hover::after,
+.mselect__toggle:checked ~ .mselect__label::after {
+  background: #fff;
+}
+
+.mselect__toggle:checked ~ .mselect__label::after {
+  transform: rotate(180deg);
+}
+
+.mselect__list {
+  box-sizing: border-box;
+  padding: 4px;
+  border: 1px solid var(--cdc-menu-border);
+  border-radius: 8px !important;
+  background: var(--cdc-menu-bg) !important;
+  box-shadow: var(--cdc-menu-shadow) !important;
+  scrollbar-width: thin;
+}
+
+/* Desktop: the menu drops below its button and fades in, instead of
+ * unrolling over it. (Below 800px Lichess centers it on screen; kept.) */
+@media (min-width: 800px) {
+  /* The click-away mask stays, but a menu doesn't dim the page. */
+  .mselect .fullscreen-mask {
+    background: transparent !important;
+  }
+
+  .mselect__list {
+    top: calc(100% + 6px) !important;
+    max-height: min(60vh, 440px) !important;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px) scale(0.98) !important;
+    transform-origin: top center !important;
+    transition: opacity 0.14s ease-out, transform 0.14s ease-out, visibility 0s linear 0.14s !important;
+  }
+
+  .mselect__toggle:checked ~ .mselect__list {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    transition: opacity 0.14s ease-out, transform 0.14s ease-out, visibility 0s !important;
+  }
+
+  /* The variant picker only renders its menu once open. */
+  @starting-style {
+    .mselect__toggle:checked ~ .mselect__list {
+      opacity: 0 !important;
+      transform: translateY(-4px) scale(0.98) !important;
+    }
+  }
+
+  /* The menu itself fades; items don't need Lichess's delayed fade. */
+  .mselect__item,
+  .mselect__toggle:checked ~ .mselect__list .mselect__item {
+    opacity: 1 !important;
+    visibility: inherit !important;
+    transition: background-color 0.1s, color 0.1s !important;
+  }
+}
+
+.mselect__item {
+  border: none !important;
+  border-radius: 5px;
+  color: var(--cdc-text) !important;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+a.mselect__item,
+span.mselect__item,
+div.mselect__item {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px !important;
+}
+
+.mselect__item:hover,
+.mselect__item:focus-visible {
+  background: var(--cdc-menu-hover) !important;
+  color: #fff !important;
+  outline: none !important;
+}
+
+.mselect__item.current {
+  background: transparent;
+  color: #fff !important;
+  font-weight: 700;
+}
+
+.mselect__item::before {
+  margin: 0 !important;
+  color: var(--cdc-text-dim);
+}
+
+/* The current choice gets Chess.com's check at the end of the row. */
+a.mselect__item.current::after,
+span.mselect__item.current::after,
+div.mselect__item.current::after {
+  content: '';
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin-inline-start: auto;
+  padding-inline-start: 12px;
+  background: var(--cdc-green);
+  -webkit-mask: var(--cdc-check) right center / 14px no-repeat;
+  mask: var(--cdc-check) right center / 14px no-repeat;
+}
+
+/* The setup dialog is short and scrolls, which clipped the variant menu to a
+ * few rows. While it's open, let it float past the dialog's edge. */
+dialog .scrollable:has(.game-setup .mselect__toggle:checked) {
+  overflow: visible !important;
+}
+
+@media (min-width: 800px) {
+  .game-setup .mselect__list {
+    max-height: min(50vh, 440px) !important;
+  }
+}
+
+/* Game setup variant picker: the menu is a table (icon, name, description),
+ * so rows are rounded through their first and last cells. */
+.game-setup .mselect__list table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.game-setup .mselect__item td {
+  padding: 9px 10px !important;
+  transition: background-color 0.1s;
+}
+
+.game-setup .mselect__item td:first-child {
+  padding-inline-start: 12px !important;
+  border-start-start-radius: 5px;
+  border-end-start-radius: 5px;
+}
+
+.game-setup .mselect__item td:last-child {
+  border-start-end-radius: 5px;
+  border-end-end-radius: 5px;
+}
+
+.game-setup .mselect__item:hover *,
+.game-setup .mselect__item:focus-visible * {
+  color: inherit !important;
+}
+
+.game-setup .mselect__item:hover,
+.game-setup .mselect__item:focus-visible {
+  background: transparent !important;
+}
+
+.game-setup .mselect__item:hover td,
+.game-setup .mselect__item:focus-visible td {
+  background: var(--cdc-menu-hover) !important;
+}
+
+.game-setup .mselect__item.current td {
+  background: #81b64c1f !important;
+}
+
+.game-setup .mselect__item .icon span {
+  color: var(--cdc-text-dim);
+}
+
+.game-setup .mselect__item.current .icon span {
+  color: var(--cdc-green);
+}
+
+.game-setup .mselect__item .desc {
+  color: var(--cdc-text-dim) !important;
+  font-weight: 400;
+}
+
+.game-setup .mselect__label .icon {
+  color: var(--cdc-green);
+}
+
+/* ---------------------------------------------------- native select --- */
+
+@supports (appearance: base-select) {
+  select:not([multiple], [size]),
+  select:not([multiple], [size])::picker(select) {
+    appearance: base-select;
+  }
+
+  select:not([multiple], [size]) {
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+  }
+
+  select:not([multiple], [size]):not(:disabled):hover {
+    background-color: var(--cdc-bg-raised-hover) !important;
+  }
+
+  select:not([multiple], [size])::picker-icon {
+    content: '';
+    width: 14px;
+    height: 14px;
+    margin-inline-start: auto;
+    background: var(--cdc-text-dim);
+    -webkit-mask: var(--cdc-chevron) center / contain no-repeat;
+    mask: var(--cdc-chevron) center / contain no-repeat;
+    transition: rotate 0.15s ease, background-color 0.15s;
+  }
+
+  select:not([multiple], [size]):hover::picker-icon,
+  select:not([multiple], [size]):open::picker-icon {
+    background: #fff;
+  }
+
+  select:not([multiple], [size]):open::picker-icon {
+    rotate: 180deg;
+  }
+
+  select:not([multiple], [size])::picker(select) {
+    box-sizing: border-box;
+    margin-block: 6px;
+    padding: 4px;
+    border: 1px solid var(--cdc-menu-border);
+    border-radius: 8px;
+    background: var(--cdc-menu-bg);
+    box-shadow: var(--cdc-menu-shadow);
+    color: var(--cdc-text);
+    scrollbar-width: thin;
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.14s ease-out, transform 0.14s ease-out, overlay 0.14s allow-discrete,
+      display 0.14s allow-discrete;
+  }
+
+  @starting-style {
+    select:not([multiple], [size])::picker(select):popover-open {
+      opacity: 0;
+      transform: translateY(-4px) scale(0.98);
+    }
+  }
+
+  select:not([multiple], [size]) option {
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--cdc-text);
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  select:not([multiple], [size]) option:hover,
+  select:not([multiple], [size]) option:focus-visible {
+    background: var(--cdc-menu-hover);
+    color: #fff;
+    outline: none;
+  }
+
+  select:not([multiple], [size]) option:checked {
+    color: #fff;
+    font-weight: 700;
+  }
+
+  select:not([multiple], [size]) option:disabled {
+    color: var(--cdc-font-dimmer);
+  }
+
+  select:not([multiple], [size]) option::checkmark {
+    order: 1;
+    content: '';
+    width: 14px;
+    height: 14px;
+    margin-inline-start: auto;
+    padding-inline-start: 12px;
+    background: var(--cdc-green);
+    -webkit-mask: var(--cdc-check) right center / 14px no-repeat;
+    mask: var(--cdc-check) right center / 14px no-repeat;
+  }
+
+  select:not([multiple], [size]) optgroup {
+    padding-top: 4px;
+    color: var(--cdc-text-dim);
+    font-size: 12px;
+    font-weight: 700;
+  }
+}
+
+/* ---------------------------------------------------- autocomplete --- */
+
+.complete-list,
+.textcomplete-dropdown,
+.select-search__menu {
+  padding: 4px !important;
+  border: 1px solid var(--cdc-menu-border) !important;
+  border-radius: 8px !important;
+  background: var(--cdc-menu-bg) !important;
+  box-shadow: var(--cdc-menu-shadow) !important;
+}
+
+.complete-result,
+.textcomplete-dropdown li,
+.select-search__item {
+  padding: 8px 10px !important;
+  border: none !important;
+  border-radius: 5px;
+  color: var(--cdc-text) !important;
+  font-weight: 600;
+}
+
+.complete-result:hover,
+.complete-result:focus,
+.complete-result.complete-selected,
+.textcomplete-dropdown li:hover,
+.textcomplete-dropdown .active,
+.select-search__item:hover,
+.select-search__item.focus {
+  background: var(--cdc-menu-hover) !important;
+  color: #fff !important;
+}
+
+.textcomplete-dropdown a {
+  color: inherit !important;
+}
+
+.select-search__list {
+  border: none !important;
+  background: transparent !important;
+}
+
+.select-search__item.selected {
+  color: var(--cdc-green) !important;
+}

@@ -24,6 +24,7 @@
         "src/styles/analysis.css",
         "src/styles/review.css",
         "src/styles/pages.css",
+        "src/styles/dropdowns.css",
         "src/styles/home.css",
         "src/styles/coach.css"
       ],

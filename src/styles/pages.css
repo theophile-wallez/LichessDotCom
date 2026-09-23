@@ -314,23 +314,6 @@ dialog .help th p {
   padding: 0 24px 8px !important;
 }
 
-.mselect__label {
-  border: 1px solid #4b4847 !important;
-  border-radius: 8px !important;
-  background: var(--cdc-bg-raised) !important;
-  box-shadow: none !important;
-  text-shadow: none !important;
-}
-
-.mselect__label:hover {
-  background: var(--cdc-bg-raised-hover) !important;
-}
-
-.mselect__list {
-  border-radius: 8px !important;
-  box-shadow: 0 12px 32px #0009 !important;
-}
-
 .game-setup .config-group .label {
   color: var(--cdc-text-dim) !important;
   font-weight: 700 !important;
