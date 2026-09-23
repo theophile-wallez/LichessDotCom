@@ -50,6 +50,7 @@ Tip: Lichess's _coordinates_ setting (Preferences → Display) picks between Che
 | `src/styles/coach.css` | Coach directory as a grid of coach cards with title badges. |
 | `src/styles/teams.css` | Team lists as a grid of club cards. |
 | `src/styles/study.css` | Study lists as a grid of study cards. |
+| `src/styles/friends.css` | Player lists (following, blocks) as friend cards. |
 | `src/styles/blog.css` | Blog posts as Chess.com-style articles, and the blog lists as grids of post cards. |
 | `src/styles/practice.css` | Practice page as playful, colorful lesson cards. |
 | `src/background.js` | Downloads the Chess.com sounds once and caches them in `chrome.storage.local`. |

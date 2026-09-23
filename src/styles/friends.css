@@ -1,0 +1,217 @@
+/*
+ * Player lists (a player's following, your blocks, favourite opponents) as
+ * Chess.com's friends list: one rounded card per player.
+ *
+ *   +--------------------------------------------------------------+
+ *   | [avatar]  GM Name                                            |
+ *   |       •   (blitz) 1508 · 36,931 games · Active 32 minutes ago|
+ *   +--------------------------------------------------------------+
+ *
+ * Lichess renders a table in main.page-small whose first cell is a user
+ * link, then best rating (absent when ratings are hidden), games and last
+ * seen. The rows become cards; the online dot moves onto the avatar.
+ */
+
+main.box.page-small:has(> table.slist-invert > tbody > tr > td:first-child > .user-link) {
+  /* ------------------------------------------------------- header --- */
+
+  & > .box__top {
+    padding-block: 24px 16px !important;
+  }
+
+  & > .box__top h1 {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 !important;
+    font-size: 26px !important;
+  }
+
+  /* The back arrow becomes a round grey button. */
+  & > .box__top h1 > a[data-icon] {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--cdc-btn-grey);
+    box-shadow: var(--cdc-btn-grey-shadow);
+    color: #fff !important;
+    font-size: 15px;
+    transition: background 0.15s;
+  }
+
+  & > .box__top h1 > a[data-icon]:hover {
+    background: var(--cdc-btn-grey-hover);
+  }
+
+  & > .box__top h1 > a[data-icon]::before {
+    margin: 0 !important;
+    opacity: 1;
+  }
+
+  /* --------------------------------------------------------- list --- */
+
+  & > table.slist {
+    display: block;
+    border: none !important;
+  }
+
+  & > table.slist > tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 var(---box-padding) var(---box-padding);
+  }
+
+  /* --------------------------------------------------------- card --- */
+
+  & > table.slist > tbody > tr,
+  & > table.slist > tbody > tr:nth-child(n) {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, auto) minmax(0, 1fr);
+    align-content: center;
+    row-gap: 3px;
+    box-sizing: border-box;
+    min-height: 72px;
+    padding: 12px 16px 12px 76px;
+    border: 1px solid #ffffff14;
+    border-radius: 10px;
+    background: #ffffff06 !important;
+    transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+  }
+
+  & > table.slist > tbody > tr:hover {
+    border-color: var(--cdc-card-border-hover);
+    background: var(--cdc-card-hover) !important;
+    box-shadow: var(--cdc-card-shadow-hover);
+  }
+
+  /* Lichess has no profile pictures: Chess.com's default avatar. */
+  & > table.slist > tbody > tr::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 16px;
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    background: #e7e5e3 url('https://www.chess.com/bundles/web/images/user-image.007dad08.svg')
+      center / cover no-repeat;
+    transform: translateY(-50%);
+  }
+
+  & > table.slist > tbody > tr > td {
+    display: block;
+    width: auto !important; /* Lichess sizes the table's columns */
+    min-width: 0;
+    padding: 0 !important;
+    border: none !important;
+    color: var(--cdc-text-dim) !important;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The name on its own line; the rest is one dim line below it. */
+  & > table.slist > tbody > tr > td:first-child {
+    grid-column: 1 / -1;
+    font-size: 16px;
+  }
+
+  & > table.slist > tbody > tr > td:empty {
+    display: none;
+  }
+
+  & > table.slist > tbody > tr > td:not(:first-child, :empty) ~ td:not(:empty)::before {
+    content: '·';
+    margin: 0 8px;
+  }
+
+  & td time {
+    font-size: inherit !important;
+  }
+
+  & .user-link {
+    color: #fff !important;
+    font-weight: 700;
+  }
+
+  & .user-link:hover {
+    color: var(--cdc-green-hover) !important;
+  }
+
+  & .user-link .utitle {
+    display: inline-block;
+    margin-inline-end: 2px;
+    padding: 0 4px;
+    border-radius: 3px;
+    background: #7c2929;
+    color: #fff !important;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 16px;
+    vertical-align: 2px;
+  }
+
+  & .user-link .uflair {
+    width: 18px;
+    height: 18px;
+    margin-inline-start: 6px;
+    vertical-align: -3px;
+  }
+
+  /* Online: a green dot on the avatar's corner. Offline: nothing. */
+  & .user-link .line {
+    display: none;
+  }
+
+  & .user-link.online .line {
+    position: absolute;
+    top: calc(50% + 12px);
+    left: 50px;
+    display: block;
+    box-sizing: border-box;
+    width: 14px;
+    height: 14px;
+    margin: 0 !important;
+    border: 2px solid var(--cdc-bg-panel);
+    border-radius: 50%;
+    background: var(--cdc-green);
+    font-size: 0;
+  }
+
+  & .user-link.online .line::before {
+    display: none;
+  }
+
+  /* Best rating: brighter than the rest of the line, after its perf icon. */
+  & td > span.text[data-icon] {
+    color: var(--cdc-text);
+    font-weight: 700;
+  }
+
+  & td > span.text[data-icon]::before {
+    margin-inline-end: 4px;
+    color: var(--cdc-text-dim);
+    font-size: 15px;
+    opacity: 1;
+  }
+
+  /* Infinite scroll's "Next" row. */
+  & > table.slist > tbody > tr.pager {
+    display: block;
+    min-height: 0;
+    padding: 12px;
+    border: none;
+    text-align: center;
+  }
+
+  & > table.slist > tbody > tr.pager::before {
+    display: none;
+  }
+}
