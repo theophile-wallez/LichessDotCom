@@ -128,6 +128,12 @@
     box-shadow: none !important;
   }
 
+  /* Lichess opens the game setup dialog (not as a modal) inside the table, so
+     the table's z-index traps it: the feed's pinned title drew over it. */
+  main.lobby .lobby__table:has(.snab-modal-mask) {
+    z-index: 110;
+  }
+
   main.lobby .lobby__start {
     display: flex !important;
     flex-direction: row !important;
