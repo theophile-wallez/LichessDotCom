@@ -26,7 +26,8 @@
         "src/styles/pages.css",
         "src/styles/dropdowns.css",
         "src/styles/home.css",
-        "src/styles/coach.css"
+        "src/styles/coach.css",
+        "src/styles/teams.css"
       ],
       "js": ["src/content.js"],
       "run_at": "document_start"

@@ -1,0 +1,269 @@
+/*
+ * Team lists (main.team-list: all teams, search, my teams, teams I lead) as a
+ * grid of Chess.com-style club cards:
+ *
+ *   +------------------------------------------+
+ *   | [avatar]  Team name  [LEADER]            |
+ *   |           Intro, two lines at most…      |
+ *   |           (people) 735,799 members [Quit]|
+ *   +------------------------------------------+
+ *
+ * Lichess renders a table (one row per team). The rows become cards; the
+ * avatar is the team's flair when it has one, else the group icon on a tile.
+ */
+
+/* ---------------------------------------------------------- header --- */
+
+main.team-list .page-menu__content.box {
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+main.team-list .box__top {
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  padding: 16px 0 20px !important;
+}
+
+main.team-list .box__top h1,
+main.team-list h1.box__top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 !important;
+}
+
+/* Chess.com's clubs icon, as in the sidebar menu. */
+main.team-list .box__top h1::before,
+main.team-list h1.box__top::before {
+  content: '';
+  flex: none;
+  width: 36px;
+  height: 36px;
+  background: url('https://assets-ds.chess.com/color-icons/clubs.svg') center / contain no-repeat;
+}
+
+main.team-list .box__top .search input {
+  width: 260px;
+  padding-inline-start: 38px !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='7' cy='7' r='4.75' fill='none' stroke='%23989795' stroke-width='1.8'/%3E%3Cpath d='m10.5 10.5 3.5 3.5' stroke='%23989795' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+  background-position: 12px center !important;
+  background-repeat: no-repeat !important;
+  background-size: 16px !important;
+}
+
+html[dir='rtl'] main.team-list .box__top .search input {
+  background-position: calc(100% - 12px) center !important;
+}
+
+/* ------------------------------------------------------------ grid --- */
+
+main.team-list table.slist {
+  display: block;
+  border: none !important;
+}
+
+main.team-list .slist tbody {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+
+/* ------------------------------------------------------------ card --- */
+
+main.team-list .slist tbody tr,
+main.team-list .slist tbody tr:nth-child(2n) {
+  --cdc-team: #81b64c;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 1fr auto;
+  grid-template-areas: 'subject subject' 'info actions';
+  align-items: end;
+  column-gap: 12px;
+  padding: 16px 16px 14px 76px;
+  border-radius: 10px;
+  background: var(--cdc-bg-panel) !important;
+  transition: background-color 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+
+html[dir='rtl'] main.team-list .slist tbody tr {
+  padding: 16px 76px 14px 16px;
+}
+
+main.team-list .slist tbody tr:hover {
+  background: #2e2d2a !important;
+  box-shadow: 0 10px 24px #00000059;
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main.team-list .slist tbody tr:hover {
+    transform: none;
+  }
+}
+
+/* Lichess has no team pictures: vary the avatar tints down the list. */
+main.team-list .slist tbody tr:nth-child(6n + 2) { --cdc-team: #3692e7; }
+main.team-list .slist tbody tr:nth-child(6n + 3) { --cdc-team: #e58f2a; }
+main.team-list .slist tbody tr:nth-child(6n + 4) { --cdc-team: #9b7fd8; }
+main.team-list .slist tbody tr:nth-child(6n + 5) { --cdc-team: #e0513a; }
+main.team-list .slist tbody tr:nth-child(6n + 6) { --cdc-team: #26b6a6; }
+
+main.team-list .slist td,
+main.team-list .slist th {
+  display: block !important;
+  width: auto !important;
+  min-width: 0;
+  padding: 0 !important;
+  border: none !important;
+  white-space: normal !important;
+}
+
+main.team-list .slist td.subject {
+  grid-area: subject;
+  align-self: start;
+  min-height: 44px;
+}
+
+/* The name link covers the whole card. */
+main.team-list .slist .team-name {
+  display: block !important;
+  overflow: hidden;
+  color: #fff !important;
+  font-size: 16px !important;
+  font-weight: 800;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+main.team-list .slist .team-name::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+}
+
+/* Teams you're in keep Lichess's gold name. */
+main.team-list .slist .team-name.mine {
+  color: var(--cdc-brag, #e3aa24) !important;
+}
+
+/* Avatar: the group icon on a tile tinted by --cdc-team. */
+main.team-list .slist .team-name::before {
+  position: absolute;
+  top: 16px;
+  inset-inline-start: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  margin: 0 !important;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--cdc-team) 22%, var(--cdc-bg-panel));
+  color: var(--cdc-team);
+  font-size: 24px !important;
+  opacity: 1 !important;
+}
+
+/* A team flair (emoji) takes the avatar's place. */
+main.team-list .slist .team-name:has(.uflair)::before {
+  color: transparent;
+}
+
+main.team-list .slist .team-name .uflair {
+  position: absolute;
+  top: 25px;
+  inset-inline-start: 25px;
+  width: 28px;
+  height: 28px;
+  margin: 0 !important;
+}
+
+main.team-list .slist .team-name em {
+  margin-inline-start: 8px !important;
+  padding: 1px 6px !important;
+  border-radius: 4px !important;
+  background: #81b64c33 !important;
+  color: var(--cdc-green-hover) !important;
+  font-size: 11px !important;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  vertical-align: 2px;
+}
+
+main.team-list .slist .team-name + span {
+  display: -webkit-box !important;
+  overflow: hidden;
+  min-height: 2.8em;
+  margin-top: 4px !important;
+  color: var(--cdc-text-dim);
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+main.team-list .slist td.info {
+  grid-area: info;
+  margin-top: 12px;
+}
+
+main.team-list .slist td.info p {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 !important;
+  color: var(--cdc-text-dim);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: start !important;
+}
+
+/* Lichess's group icon (U+E044) before the count. */
+main.team-list .slist td.info p::before {
+  content: '\e044';
+  font-family: lichess;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+main.team-list .slist td.actions {
+  grid-area: actions;
+  position: relative;
+  z-index: 2;
+  margin-top: 12px;
+}
+
+main.team-list .slist td.actions .button {
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+}
+
+/* The empty-list message and the pager span the grid, without a card. */
+main.team-list .slist tbody tr.pager,
+main.team-list .slist tbody tr:has(td[colspan]) {
+  display: block;
+  grid-column: 1 / -1;
+  padding: 16px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+main.team-list .slist tbody tr:has(td[colspan]) td {
+  color: var(--cdc-text-dim);
+  text-align: center;
+}
+
+/* Lichess's mobile layout runs the list edge to edge; cards need a margin. */
+@media (max-width: 799.98px) {
+  main.team-list .page-menu__content.box {
+    padding: 0 12px 24px !important;
+  }
+}
