@@ -49,6 +49,7 @@ Tip: Lichess's _coordinates_ setting (Preferences → Display) picks between Che
 | `src/styles/pages.css` | Modern look for every other page: headings, side menus, tabs, tables, forms, lobby tiles. |
 | `src/styles/dropdowns.css` | One Chess.com-style menu for every dropdown: filters, native selects, the variant picker, search suggestions. |
 | `src/styles/powertip.css` | The profile hover card (`#powerTip`) as a Chess.com player card. |
+| `src/styles/profile.css` | Player profile as a Chess.com member page: hero card with the avatar and awards, a strip of rating cards, the activity timeline and the game rows. |
 | `src/styles/home.css` | Home page redesigned as a card dashboard with a hero, featured game and daily puzzle. |
 | `src/styles/coach.css` | Coach directory as a grid of coach cards with title badges. |
 | `src/styles/teams.css` | Team lists as a grid of club cards. |

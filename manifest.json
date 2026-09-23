@@ -26,6 +26,7 @@
         "src/styles/pages.css",
         "src/styles/dropdowns.css",
         "src/styles/powertip.css",
+        "src/styles/profile.css",
         "src/styles/home.css",
         "src/styles/coach.css",
         "src/styles/teams.css",

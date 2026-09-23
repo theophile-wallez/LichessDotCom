@@ -65,6 +65,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/pages.css` | Modern look for every other page (headings, side menus, tabs, tables, forms, dialogs, lobby, editor, tournaments). |
 | `src/styles/dropdowns.css` | Every dropdown as one menu style: Lichess's `.mselect`, native `<select>` (via `appearance: base-select`) and autocomplete lists. |
 | `src/styles/powertip.css` | The profile hover card (`#powerTip`, filled with `/@/<user>/mini`) as a Chess.com player card. |
+| `src/styles/profile.css` | Player profile (`main.page-menu` + `.user-show`) as a Chess.com member page: a hero card (avatar, name, awards, counters, actions), the side ratings as a full-width strip of rating cards, the about card and rating chart, pill tabs, the activity timeline and the game rows. |
 | `src/styles/home.css` | Home page (`main.lobby`) as a 12-column card dashboard, with quick pairing as Chess.com's time-control picker (same-size buttons, three to a row); the hero is added by `content.js`. |
 | `src/styles/coach.css` | Coach directory (`main.coach-list`) as a grid of coach cards; the title badges are split out of the names by `content.js`. |
 | `src/styles/teams.css` | Team lists (`main.team-list`) as a grid of club cards with avatar tiles. |
@@ -173,6 +174,17 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   read it. Grab it while the page parses (a `MutationObserver` from
   `document_start`); keeping the node is enough, its text stays readable after
   Lichess takes it out of the document.
+- **Profiles.** A profile's two richest blocks, the **rating chart** and the
+  **activity feed**, are only served to a *signed-in* visitor: logged out, both
+  containers are rendered empty. To see them, inject plausible markup into
+  `.angle-content .activity` and `#us_profile` on the live page (the shapes are
+  in `modules/activity/.../ActivityUi.scala` and `PerfStatUi.ratingHistoryContainer`).
+  Two more traps: the awards are `position: absolute` on `main.page-menu`, to
+  escape `.user-show { overflow: hidden }` — once the box no longer clips they
+  can flow, but each kind carries margins tuned for that absolute strip. And
+  `bits.dropdownOverflow` decides how many action buttons fit by adding them
+  until `.user-actions`'s `offsetWidth` grows, so **don't change that element's
+  flex sizing** — only what's inside it.
 
 ## Testing
 
