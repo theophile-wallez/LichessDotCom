@@ -209,6 +209,119 @@ input:not([type='hidden']) + .button.button-metal:hover {
   font-weight: 600;
 }
 
+/* The Lobby tab: Chess.com's list of open seeks. No cell tint or row
+ * borders: rows are rounded strips that light up on hover, columns are
+ * left-aligned under their headers, and the header stays pinned while the
+ * list scrolls. */
+.lreal_time {
+  padding: 0 8px 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff26 transparent;
+}
+
+.hooks__list {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: var(--cdc-font);
+}
+
+.hooks__list th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 48px;
+  padding: 0 12px !important;
+  background: var(--cdc-bg-panel);
+  color: var(--cdc-text-dim);
+  font-family: var(--cdc-font) !important;
+  font-size: 13px;
+  font-weight: 700 !important;
+  text-align: left;
+}
+
+.hooks__list th:not(.sort) .is {
+  display: none; /* hidden sort arrow: it still pushed the label right */
+}
+
+.hooks__list th.sortable:hover {
+  color: #fff;
+}
+
+.hooks__list td {
+  height: 40px;
+  padding: 0 12px !important;
+  border: none !important;
+  background: none !important;
+  color: var(--cdc-text);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.hooks__list td:first-child {
+  padding-inline-start: 14px !important;
+  border-radius: 6px 0 0 6px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.hooks__list td:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+.hooks__list td:last-child ::before {
+  color: var(--cdc-text-dim);
+  font-size: 1.35em !important;
+  opacity: 1 !important;
+  vertical-align: -3px;
+}
+
+.hooks__list tr.join:not(.disabled):hover td {
+  background: #ffffff12 !important;
+  color: #fff !important;
+}
+
+.hooks__list tr.join:not(.disabled):hover td:last-child ::before {
+  color: #fff;
+}
+
+/* Seeks you can't join (rating range, rated while anonymous). */
+.hooks__list tr.disabled {
+  opacity: 0.35 !important;
+}
+
+/* Your own seek. */
+.hooks__list tr.cancel td {
+  background: #81b64c26 !important;
+}
+
+.hooks__list tr.variants td {
+  height: auto;
+  padding: 16px 12px 6px !important;
+  color: var(--cdc-text-dim);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: default;
+}
+
+/* Graph and filter toggles, in the header row's corners. */
+.lobby__app .toggle {
+  top: 7px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin: 0 6px;
+  padding: 0 !important;
+  border-radius: 6px;
+  color: var(--cdc-text-dim);
+  font-size: 18px !important;
+}
+
+.lobby__app .toggle:hover {
+  background: #ffffff12;
+  color: #fff !important;
+}
+
 /* "Create a game" becomes Chess.com's big green Play button. The selectors
  * repeat .button-metal to outrank the generic metal-button hover in
  * theme.css, and the icon stays white (Lichess tints it green on hover). */

@@ -164,6 +164,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    overflow: visible !important; /* Lichess clips it, cutting the dot's ring */
     color: var(--cdc-text-dim) !important;
     font-size: 14px;
   }
@@ -215,6 +216,127 @@
   /* Lichess repeats the support links inside these blocks on some widths. */
   main.lobby :is(.lobby__tv, .lobby__puzzle) > .lobby__support-link {
     display: none !important;
+  }
+
+  /* ---------------------------------------------------------- blog --- */
+
+  /* Lichess sizes the cards from the carousel's clientWidth, which counts
+     padding: with side padding the last card overflows and gets clipped.
+     A transparent border insets them the same without being counted. */
+  main.lobby .lobby__blog {
+    padding: 16px 0 !important;
+    border: solid transparent !important;
+    border-width: 0 16px !important;
+  }
+
+  /* Chess.com news cards: a rounded image, the title under it, then
+     author · date, instead of labels pasted over the picture. The image
+     wrapper becomes display: contents so its labels join the card's grid. */
+  main.lobby .lobby__blog .ublog-post-card {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-content: start;
+    column-gap: 6px;
+    border: none !important;
+    border-radius: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    transition: transform 0.15s;
+  }
+
+  main.lobby .lobby__blog .ublog-post-card:hover {
+    transform: translateY(-2px);
+  }
+
+  main.lobby .lobby__blog .ublog-post-card__top {
+    display: contents !important;
+  }
+
+  main.lobby .lobby__blog .ublog-post-card__image {
+    grid-area: 1 / 1 / 2 / -1;
+    border-radius: 10px !important;
+    box-shadow: 0 0 0 1px var(--cdc-card-border);
+    transition: filter 0.15s;
+  }
+
+  main.lobby .lobby__blog .ublog-post-card:hover .ublog-post-card__image {
+    filter: brightness(1.1);
+  }
+
+  main.lobby .lobby__blog .ublog-post-card__content {
+    grid-area: 2 / 1 / 3 / -1;
+    padding: 10px 2px 4px !important;
+  }
+
+  main.lobby .lobby__blog .ublog-post-card__title {
+    min-height: 2.6em;
+    margin: 0;
+    -webkit-line-clamp: 2 !important;
+    color: #fff !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    line-height: 1.3;
+  }
+
+  main.lobby .lobby__blog .ublog-post-card__over-image {
+    position: static !important;
+    grid-row: 3;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    background: none !important;
+    color: var(--cdc-text-dim) !important;
+    font-size: 13px;
+    font-weight: 400 !important;
+    line-height: 1.4;
+    text-shadow: none !important;
+    white-space: nowrap;
+  }
+
+  main.lobby .lobby__blog .ublog-post-card .user-link {
+    grid-column: 1;
+    padding-inline-start: 2px !important;
+    color: #d4d3d1 !important;
+    font-weight: 600 !important;
+  }
+
+  main.lobby .lobby__blog .ublog-post-card time {
+    grid-column: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  main.lobby .lobby__blog .ublog-post-card time::before {
+    content: '·';
+    position: static;
+    margin-inline-end: 6px;
+    backdrop-filter: none;
+  }
+
+  main.lobby .lobby__blog .ublog-post-card .user-link::before {
+    display: none;
+  }
+
+  /* Round arrow buttons on the images' edges, not full-height chevrons. */
+  main.lobby .lobby__blog .carousel__controls {
+    box-sizing: border-box;
+    padding: 0 6px;
+  }
+
+  main.lobby .lobby__blog .carousel__controls button {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--cdc-btn-grey);
+    box-shadow: var(--cdc-btn-grey-shadow), 0 4px 12px #00000080;
+    color: #fff;
+    font-size: 18px;
+  }
+
+  main.lobby .lobby__blog .carousel__controls button:hover {
+    background: var(--cdc-btn-grey-hover);
+    color: #fff;
   }
 
   main.lobby .lobby__app {

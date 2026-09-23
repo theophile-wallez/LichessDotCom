@@ -110,6 +110,9 @@
     overflow: visible !important;
     background: transparent !important;
     box-shadow: none !important;
+    /* Lichess hides the nav once the page scrolls (#top.scrolled). */
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   #topnav section {
