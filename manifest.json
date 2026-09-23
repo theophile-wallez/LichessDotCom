@@ -29,7 +29,8 @@
         "src/styles/coach.css",
         "src/styles/teams.css",
         "src/styles/study.css",
-        "src/styles/blog.css"
+        "src/styles/blog.css",
+        "src/styles/practice.css"
       ],
       "js": ["src/content.js"],
       "run_at": "document_start"
