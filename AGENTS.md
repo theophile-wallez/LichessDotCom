@@ -68,7 +68,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/puzzle.css` | Puzzles (`main.puzzle`): side cards, a coloured status banner, chunky hint / solution and move buttons. |
 | `src/styles/blog.css` | Blog posts (`.ublog-post`) as Chess.com-style articles, and the blog lists. |
 | `src/styles/practice.css` | Practice (`.practice-app`, `.practice-side`) as playful lesson cards: a color per section, white icons on gradient tiles, progress pills. |
-| `src/styles/puzzles.css` | Puzzle themes (`.puzzle-themes`) in the Practice look: a color per section, theme cards, opening chips. |
+| `src/styles/puzzles.css` | Puzzle themes (`.puzzle-themes`) and puzzles by opening (`.puzzle-openings`) in the Practice look: a color per section, theme cards, a card per opening family, opening chips. |
 | `src/styles/dashboard.css` | Puzzle dashboard (`.puzzle-dashboard`): stat tiles, per-theme rows, and the panel around `dashboard.js`'s radar. |
 | `src/styles/broadcast.css` | Broadcasts (`.relay-index` lists, calendar, FIDE pages, info pages) as event cards with a LIVE pill. |
 
