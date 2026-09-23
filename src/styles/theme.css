@@ -208,7 +208,8 @@ select {
  * the same six everywhere (lobby, profiles, game info, tournaments, player
  * lists, notifications). Swap them for Chess.com's game-time icons, in its
  * colors. Chess.com has no ultrabullet or classical: they get bullet's and
- * rapid's icon. Crazyhouse and Chess960 get Chess.com's variant icons. */
+ * rapid's icon. Variants Chess.com also has get its icons: Crazyhouse,
+ * Chess960, King of the Hill, Three-check, and Standard in the variant picker. */
 :root {
   --cdc-mode-bullet: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m7.17 15.3 1.43 1.47-8.27 6.9zm-6.87 2.3 4.5-6 .9 2zm10.47-7.5c3.47-3.6 5.93-5.2 8.7-6.4-2.4 0-5.3.37-9.8 4.6.03.5.7 1.47 1.1 1.8zm11.06-7.93s.23 1.1.23 2.77c0 2.67-.67 6.83-4.17 10.33l-2.17 2.17c-.67.67-1.33.6-2.13.27l-7.47 6.3 9.8-12.17-5.23 4.03c-.43-.4-.93-.83-1.33-1.23-1.73-1.7-4.13-5-2.77-6.37l2.2-2.13c3.53-3.5 7.63-4.2 10.3-4.2 1.63 0 2.73.23 2.73.23zm0 0'/%3E%3C/svg%3E");
   --cdc-mode-blitz: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m5.77 15c-1.03 0-1.37-.4-1.2-1.4l1.53-10.2c.17-1 .63-1.4 1.67-1.4h5.8c1.03 0 1.33.4 1.07 1.37l-3.23 11.63zm13.06-6c1.03 0 1.2.33.57 1.13l-9.67 12.73c-1.23 1.63-1.6 1.47-1.27-.57l2.2-13.3zm0 0'/%3E%3C/svg%3E");
@@ -216,6 +217,9 @@ select {
   --cdc-mode-daily: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m.93 11.63c3.3-1.33 3.77-2.83 1.77-5.77l-.93-1.33 1.63.5c3.4 1 4.6.1 4.63-3.43l.03-1.6 1 1.27c2.17 2.8 3.7 2.8 5.87 0l1-1.27.03 1.6c.03 3.53 1.23 4.43 4.63 3.43l1.63-.5-.93 1.33c-2 2.93-1.53 4.43 1.77 5.77l.93.37-.93.37c-3.3 1.33-3.77 2.83-1.77 5.77l.93 1.33-1.63-.5c-3.4-1-4.6-.1-4.63 3.43l-.03 1.6-1-1.27c-2.17-2.8-3.7-2.8-5.87 0l-1 1.27-.03-1.6c-.03-3.53-1.23-4.43-4.63-3.43l-1.63.5.93-1.33c2-2.93 1.53-4.43-1.77-5.77l-.93-.37zm5.07.37c0 3.19 2.86 6 6 6 3.18 0 6-2.82 6-6 0-3.14-2.81-6-6-6-3.15 0-6 2.85-6 6zm2 0c0-2.32 1.68-4 4-4 2.35 0 4 1.68 4 4 0 2.35-1.65 4-4 4-2.32 0-4-1.65-4-4zm0 0'/%3E%3C/svg%3E");
   --cdc-mode-crazyhouse: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m11.73 18.67c3.07 0 5.47-2.3 5.23-5l-9.97 1.3c0 2.23 2.3 3.7 4.73 3.7zm-2.83-5.77c1 0 1.87-.83 1.87-1.83 0-1.03-.87-1.9-1.87-1.9-1.03 0-1.9.87-1.9 1.9 0 1 .87 1.83 1.9 1.83zm4.43-1.23h3.53c.07-.2.1-.43.1-.63 0-1.13-.87-1.87-1.87-1.87-1.1 0-1.87.87-1.87 1.87 0 .2.03.43.1.63zm7.24 10.33h-17.13c-1.03 0-1.43-.4-1.43-1.43v-10.13c0-1.03.3-1.7 1.07-2.37l7.87-6.8c.77-.67 1.37-.67 2.13 0l7.87 6.8c.77.67 1.07 1.33 1.07 2.37v10.13c0 1.03-.4 1.43-1.43 1.43zm0 0'/%3E%3C/svg%3E");
   --cdc-mode-960: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m15.5 2h-2v1.62c4.2.67 7.5 4.11 7.95 8.38h-3c-.39-3.41-2.79-5.5-6.44-5.5-3.66 0-6.06 2.09-6.44 5.5h-3c.45-4.27 3.75-7.71 7.95-8.38v-1.62h-2c0-1.7.43-2 3.5-2s3.5.3 3.5 2zm-4.94 10 .94-4h1l.95 4zm11.01 12h-3.13c-1.03 0-1.43-.4-1.43-1.43v-7.13c0-1.03.4-1.43 1.43-1.43h3.13c1.03 0 1.43.4 1.43 1.43v7.13c0 1.03-.4 1.43-1.43 1.43zm-16 0h-4.57v-2h4v-2h-2.57c-1.03 0-1.43-.4-1.43-1.43v-3.13c0-1.03.4-1.43 1.43-1.43h3.13c1.03 0 1.43.4 1.43 1.43v7.13c0 1.03-.4 1.43-1.43 1.43zm-2.57-6h2v-2h-2zm8 4h2v-2h-2zm2.57 2h-3.13c-1.03 0-1.43-.4-1.43-1.43v-7.13c0-1.03.4-1.43 1.43-1.43h4.57v2h-4v2h2.57c1.03 0 1.43.4 1.43 1.43v3.13c0 1.03-.4 1.43-1.43 1.43zm5.43-2h2v-6h-2zm0 0'/%3E%3C/svg%3E");
+  --cdc-mode-standard: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m19.33 22h-14.67c-2 0-2.67-.67-2.67-2.67v-14.67c0-2 .67-2.67 2.67-2.67h14.67c2 0 2.67.67 2.67 2.67v14.67c0 2-.67 2.67-2.67 2.67zm-15.33-2h4v-4h-4zm8 0h4v-4h-4zm-4-4h4v-4h-4zm-4-4h4v-4h-4zm12 4h4v-4h-4zm-4-4h4v-4h-4zm-4-4h4v-4h-4zm8 0h4v-4h-4zm0 0'/%3E%3C/svg%3E");
+  --cdc-mode-hill: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m21.17 22h-18.33c-2.07 0-2.73-2.57-1.07-4.17l7.73-7.73c.73-.73 1-1.4 1-2.43v-1.17h-2.53c-.6 0-.93-.33-.93-.93v-1.13c0-.6.33-.93.93-.93h2.53v-2.57c0-.6.33-.93.93-.93h1.13c.6 0 .93.33.93.93v2.57h2.53c.6 0 .93.33.93.93v1.13c0 .6-.33.93-.93.93h-2.53v1.2c0 1.03.3 1.7 1 2.43l7.73 7.7c1.67 1.6 1 4.17-1.07 4.17zm0 0'/%3E%3C/svg%3E");
+  --cdc-mode-3check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m5.53 20.53c-1.5 0-2.83-.2-4.23-.77-.93-.43-1.3-1-1.3-2.03v-1.6c0-1.03.37-1.27 1.3-.83 1.53.67 2.7.9 3.8.9 1.23 0 2.1-.43 2.1-1.4 0-.8-.53-1.23-1.93-1.23h-.7c-1.03 0-1.43-.4-1.43-1.43v-.23c0-1.03.33-1.63 1.23-2.2l2.69-1.67h-5.63c-1.03 0-1.43-.4-1.43-1.43v-1.27c0-1.03.4-1.43 1.43-1.43h9.23c1.03 0 1.43.4 1.43 1.43v3.01c-.75.32-1.32.85-1.69 1.55l-1.12.66c.27.11.52.23.75.38-.07.33-.11.69-.11 1.06 0 1.86.87 3.19 2.35 3.73-.18 2.59-2.04 4.81-6.75 4.81zm12.54-2.53h-.13c-1.6 0-1.93-.33-1.93-1.93v-2.07h-2.07c-1.6 0-1.93-.33-1.93-1.93v-.13c0-1.6.33-1.93 1.93-1.93h2.07v-2.07c0-1.6.33-1.93 1.93-1.93h.13c1.6 0 1.93.33 1.93 1.93v2.07h2.07c1.6 0 1.93.33 1.93 1.93v.13c0 1.6-.33 1.93-1.93 1.93h-2.07v2.07c0 1.6-.33 1.93-1.93 1.93zm0 0'/%3E%3C/svg%3E");
 }
 
 /* UltraBullet, Bullet */
@@ -256,18 +260,22 @@ select {
   --cdc-mode-color: #fa742c;
 }
 
-/* King of the Hill and Three-check keep Lichess's glyph, in Chess.com's color. */
 [data-icon='\e007']::before {
+  --cdc-mode-icon: var(--cdc-mode-hill);
   --cdc-mode-color: #ca9350;
 }
 
-[data-icon='\e00d']::before {
+/* Lichess also marks the current session with this glyph (account security). */
+[data-icon='\e00d']:not(.is-green)::before {
+  --cdc-mode-icon: var(--cdc-mode-3check);
   --cdc-mode-color: #26c2a3;
 }
 
-:is([data-icon='\e007'], [data-icon='\e00d'])::before {
-  color: var(--cdc-mode-color) !important;
-  opacity: 1 !important;
+/* Standard's crown is also Elite Arena's and top-rated TV's: only the variant
+ * picker gets Chess.com's board. */
+.mselect [data-icon='\e021']::before {
+  --cdc-mode-icon: var(--cdc-mode-standard);
+  --cdc-mode-color: #81b64c;
 }
 
 /* A 1em box keeps the glyph's size and spot: Lichess sizes and aligns the
@@ -280,7 +288,10 @@ select {
     [data-icon='\e00a'],
     [data-icon='\e019'],
     [data-icon='\e066'],
-    [data-icon='\e006']
+    [data-icon='\e006'],
+    [data-icon='\e007'],
+    [data-icon='\e00d']:not(.is-green),
+    .mselect [data-icon='\e021']
   )::before {
   content: '' !important;
   display: inline-block;
