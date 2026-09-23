@@ -122,6 +122,59 @@
     captured.bottom.innerHTML = html.bottom;
   };
 
+  // Move times, like Chess.com once a game is over: the time spent on each
+  // move, with a bar scaled to the longest think (see styles/game.css).
+  // Lichess's round data has no clock history, so it comes from the export.
+  // The move list is snabbdom's: only attributes are added, and they're put
+  // back whenever it re-renders.
+  const times = { id: null, spent: null, tries: 0, loading: false };
+  const formatSpent = cs => {
+    const s = cs / 100;
+    return s < 60 ? s.toFixed(1) + 's' : `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+  };
+  const loadTimes = async id => {
+    times.loading = true;
+    try {
+      const res = await fetch(`/game/export/${id}?moves=false&clocks=true&evals=false&opening=false`, {
+        headers: { Accept: 'application/json' },
+      });
+      const game = await res.json();
+      const clocks = game.clocks || [];
+      const initial = (game.clock?.initial || 0) * 100, inc = (game.clock?.increment || 0) * 100;
+      // Lichess's clock only starts after each side's first move.
+      times.spent = clocks.map((c, i) => Math.max(0, i < 2 ? initial - c : clocks[i - 2] + inc - c));
+    } catch {
+      times.spent = [];
+    }
+    times.loading = false;
+  };
+  const syncMoveTimes = () => {
+    const result = document.querySelector('main.round .result-wrap');
+    const list = result?.parentElement;
+    if (!list) return;
+    const id = location.pathname.slice(1, 9);
+    if (times.id !== id) Object.assign(times, { id, spent: null, tries: 0 });
+    // The list starts with a move number; the moves are the other tag.
+    const indexTag = list.firstElementChild?.tagName;
+    const moves = [...list.children].filter(m => m.tagName !== indexTag && m !== result && !m.classList.contains('empty'));
+    // Right after the game ends, the export can lag the last move: retry.
+    if (!times.loading && (!times.spent || (times.spent.length < moves.length && times.spent.length && times.tries < 5))) {
+      times.tries++;
+      loadTimes(id);
+    }
+    const spent = times.spent;
+    if (!spent?.length) return;
+    const max = Math.max(...spent) || 1;
+    moves.forEach((m, i) => {
+      if (spent[i] == null) return;
+      const label = formatSpent(spent[i]);
+      if (m.dataset.cdcTime === label) return;
+      m.dataset.cdcTime = label;
+      m.style.setProperty('--cdc-time', (spent[i] / max).toFixed(3));
+    });
+    list.dataset.cdcTimes = '';
+  };
+
   // Chessground shrinks the board to whole pixels per square and leaves the
   // remainder as an inset inside its wrapper. Expose it so the player bars and
   // the eval bar line up with the squares, not the wrapper.
@@ -220,6 +273,7 @@
   setInterval(() => {
     syncControlsHeight();
     syncCaptured();
+    syncMoveTimes();
     syncBoardInset();
     syncHero();
     syncCoachTitles();

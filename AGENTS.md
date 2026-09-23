@@ -47,7 +47,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | --- | --- |
 | `manifest.json` | Content scripts: CSS + `content.js` + `dashboard.js` (isolated world), `page.js` + `board.js` + `review.js` (page world). |
 | `src/background.js` | Service worker: downloads the Chess.com sounds, caches them as base64. |
-| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, the home hero, coach title badges, the hover card's rating chips and the font remapping. |
+| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, fetches a finished game's move times, the home hero, coach title badges, the hover card's rating chips and the font remapping. |
 | `src/dashboard.js` | Isolated world: the puzzle dashboard's theme radar, redrawn as SVG from the page's init JSON (Lichess draws it into a canvas). |
 | `src/page.js` | Page world: wraps `site.sound` to play the right Chess.com sound per move, plus premove / illegal / game-start, which Lichess has no sound for. |
 | `src/board.js` | Page world: analysis arrows redrawn Chess.com-style, checkmate badge and label. |
@@ -55,7 +55,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/theme.css` | Overrides Lichess's `--c-*` color variables, fonts, buttons. |
 | `src/styles/sidebar.css` | Lichess's top header → Chess.com's left sidebar, and the user menu (dasher) as a Chess.com menu. |
 | `src/styles/board.css` | Board, pieces, highlights, move hints, arrows, coordinates. |
-| `src/styles/game.css` | Game page (`main.round`) grid, player bars, clocks, moves, chat. |
+| `src/styles/game.css` | Game page (`main.round`) grid, player bars, clocks, moves, chat, and the game-over panel (Game Review button, move times). |
 | `src/styles/analysis.css` | Analysis page (`main.analyse`) grid. |
 | `src/styles/review.css` | Game Review panel, eval bar, board annotations. |
 | `src/styles/pages.css` | Modern look for every other page (headings, side menus, tabs, tables, forms, dialogs, lobby, editor, tournaments). |
@@ -125,6 +125,12 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   `.practice__side`. A drill's goal sits in `.analyse__underboard`, which
   `analysis.css` hides. Rows of the panel need a definite height to be shares
   of the board: `1fr` in a container sized by its content just grows.
+- **Game over.** The round page's end-of-game buttons are `.rcontrols >
+  .follow-up` (rematch, new opponent, tournament link, then the analysis
+  link, always last), a column flexbox in Lichess's CSS. The round data has
+  no clock history, so move times come from `/game/export/<id>?clocks=true`.
+  In a scrolling grid, a track like `minmax(30px, auto)` never grows past its
+  fixed minimum once the content overflows: put the minimum on the items.
 - **Two worlds.** `content.js` can't see page JS objects (`site`, chessground's
   `cgKey` expandos); `page.js`, `board.js` and `review.js` can. Communicate with
   `window.postMessage`.
