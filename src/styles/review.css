@@ -13,17 +13,32 @@
     --cdc-review-top: 48px;
   }
 
+  /* Review closed: Lichess's analysis on top, then, like Chess.com's
+     analysis tab, the counts and the Game Review button over the controls. */
   html.cdc-review-normal main.analyse {
+    --cdc-review-top: 92px;
+    --cdc-chat-h: min(clamp(150px, 24vh, 260px), calc(var(--cdc-board) * 0.32));
     grid-template-rows:
-      var(--cdc-review-top)
       max(0px, calc(var(--cdc-board) - var(--cdc-review-top) - var(--cdc-ctrl-h) - var(--cdc-chat-h)))
+      var(--cdc-review-top)
       var(--cdc-ctrl-h)
       var(--cdc-chat-h) !important;
     grid-template-areas:
-      'gauge board rtop'
       'gauge board tools'
+      'gauge board rtop'
       'gauge board controls'
       'gauge board chat' !important;
+  }
+
+  html.cdc-review-normal main.analyse:not(:has(> .mchat)) {
+    grid-template-rows:
+      max(0px, calc(var(--cdc-board) - var(--cdc-review-top) - var(--cdc-ctrl-h)))
+      var(--cdc-review-top)
+      var(--cdc-ctrl-h) !important;
+    grid-template-areas:
+      'gauge board tools'
+      'gauge board rtop'
+      'gauge board controls' !important;
   }
 
   html.cdc-review-summary main.analyse {
@@ -56,7 +71,7 @@
     display: none !important;
   }
 
-  html.cdc-review main.analyse .analyse__tools {
+  html.cdc-review:not(.cdc-review-normal) main.analyse .analyse__tools {
     border-radius: 0 !important;
   }
 
@@ -84,22 +99,56 @@
     cursor: pointer;
   }
 
-  .cdc-review__open {
+  html.cdc-review-normal #cdc-review {
+    justify-content: flex-end;
+    padding: 0 8px 4px;
+    border-top: 1px solid var(--cdc-border);
+    border-radius: 0;
+  }
+
+  .cdc-review__counts {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    height: 100%;
-    border: none;
-    border-bottom: 1px solid var(--cdc-border);
-    background: transparent;
-    color: #fff;
-    font-size: 16px;
-    font-weight: 800;
+    gap: 14px;
+    height: 32px;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
   }
 
-  .cdc-review__open:hover {
-    background: #ffffff0d;
+  .cdc-review__count {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .cdc-review__counts .cdc-cls-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .cdc-review__progress {
+    color: var(--cdc-text-dim);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .cdc-btn.cdc-review__open {
+    flex: none;
+    gap: 12px;
+    height: 52px;
+    font-size: 22px;
+  }
+
+  .cdc-review__open .cdc-review__star {
+    width: 30px;
+    height: 30px;
+    background: #fff;
+    color: #5d9948;
+    font-size: 19px;
+    text-shadow: none;
   }
 
   .cdc-review__head {
@@ -536,7 +585,9 @@
     background: repeating-linear-gradient(transparent 0 30px, #2a2926 30px 60px);
   }
 
-  html.cdc-review-moves main.analyse .tview2-column > :is(interrupt, move.empty, interrupt + index) {
+  /* Keep the "..." of a game starting with Black's move (second child),
+     or the columns shift by one. */
+  html.cdc-review-moves main.analyse .tview2-column > :is(interrupt, move.empty:not(:nth-child(2)), interrupt + index) {
     display: none !important;
   }
 

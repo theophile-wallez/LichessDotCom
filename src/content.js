@@ -141,6 +141,7 @@
       const game = await res.json();
       const clocks = game.clocks || [];
       const initial = (game.clock?.initial || 0) * 100, inc = (game.clock?.increment || 0) * 100;
+      times.clock = game.clock || null;
       // Lichess's clock only starts after each side's first move.
       times.spent = clocks.map((c, i) => Math.max(0, i < 2 ? initial - c : clocks[i - 2] + inc - c));
     } catch {
@@ -153,7 +154,7 @@
     const list = result?.parentElement;
     if (!list) return;
     const id = location.pathname.slice(1, 9);
-    if (times.id !== id) Object.assign(times, { id, spent: null, tries: 0 });
+    if (times.id !== id) Object.assign(times, { id, spent: null, clock: null, tries: 0 });
     // The list starts with a move number; the moves are the other tag.
     const indexTag = list.firstElementChild?.tagName;
     const moves = [...list.children].filter(m => m.tagName !== indexTag && m !== result && !m.classList.contains('empty'));
@@ -173,6 +174,33 @@
       m.style.setProperty('--cdc-time', (spent[i] / max).toFixed(3));
     });
     list.dataset.cdcTimes = '';
+  };
+
+  // Chess.com's "New 10 min" next to Rematch. Lichess only offers "New
+  // opponent" for lobby and pool games; otherwise add a button doing what it
+  // does, a lobby seek like this game (`/?hook_like=<id>`). Either one gets
+  // the time control as its label. The clock comes with the move times.
+  const newGameLabel = clock => {
+    const min = +(clock.initial / 60).toFixed(2);
+    const tc = clock.increment ? `${min} | ${clock.increment}` : clock.initial < 60 ? `${clock.initial} s` : `${min} min`;
+    return (document.documentElement.lang || '').startsWith('fr') ? `Nouvelle en ${tc}` : `New ${tc}`;
+  };
+  const syncNewGame = () => {
+    const follow = document.querySelector('main.round .rcontrols .follow-up');
+    if (!follow || !times.clock) return;
+    const label = newGameLabel(times.clock);
+    const lichess = follow.querySelector('.new-opponent');
+    if (lichess) {
+      if (lichess.dataset.cdcLabel !== label) lichess.dataset.cdcLabel = label;
+      return;
+    }
+    // Players only: a spectator's follow-up has no rematch button.
+    if (!follow.querySelector('.rematch') || follow.querySelector('.cdc-new-game')) return;
+    const a = document.createElement('a');
+    a.className = 'fbt cdc-new-game';
+    a.href = `/?hook_like=${times.id}`;
+    a.textContent = label;
+    follow.prepend(a);
   };
 
   // Chessground shrinks the board to whole pixels per square and leaves the
@@ -274,6 +302,7 @@
     syncControlsHeight();
     syncCaptured();
     syncMoveTimes();
+    syncNewGame();
     syncBoardInset();
     syncHero();
     syncCoachTitles();

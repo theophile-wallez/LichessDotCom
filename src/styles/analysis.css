@@ -130,6 +130,416 @@
     color: #fff !important;
   }
 
+  /* ------------------------------------------------------------ engine --- */
+
+  /* Chess.com's engine header: one compact row with the toggle, the eval,
+     the engine name and its icons, then each engine line on one row. */
+  main.analyse .analyse__tools > .ceval {
+    position: relative;
+    flex: none;
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    height: 52px !important;
+    padding: 0 8px 0 12px !important;
+    border-bottom: 1px solid var(--cdc-border);
+    background: var(--cdc-bg-panel-dark) !important;
+  }
+
+  main.analyse .ceval pearl {
+    flex: none;
+    min-width: 52px;
+    padding: 0 !important;
+    color: #fff !important;
+    font-family: var(--cdc-font) !important;
+    font-size: 20px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    text-align: left;
+  }
+
+  main.analyse .ceval .engine {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--cdc-text-dim) !important;
+    font-family: var(--cdc-font) !important;
+    font-size: 12px !important;
+    line-height: 17px !important;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  main.analyse .ceval .engine .technology {
+    margin-left: 4px;
+    font-weight: 700;
+  }
+
+  main.analyse .ceval .engine .info {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  main.analyse .ceval .engine .cloud {
+    margin-left: 6px;
+    padding: 0 5px;
+    border-radius: 3px;
+    background: #ffffff1a !important;
+    color: var(--cdc-text) !important;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  main.analyse .ceval .engine .deeper {
+    display: none;
+  }
+
+  main.analyse .ceval > button {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    padding: 0 !important;
+    border-radius: 5px;
+    background: none !important;
+    color: var(--cdc-text-dim) !important;
+    font-size: 18px;
+  }
+
+  main.analyse .ceval > button:hover {
+    background: #ffffff14 !important;
+    color: #fff !important;
+  }
+
+  /* The depth progress, a thin line along the bottom of the header. */
+  main.analyse .ceval .bar {
+    position: absolute !important;
+    inset: auto 0 -1px !important;
+    height: 2px !important;
+  }
+
+  main.analyse .pv_box {
+    flex: none;
+    border-bottom: 1px solid var(--cdc-border);
+    background: var(--cdc-bg-panel-dark);
+  }
+
+  main.analyse .pv_box .pv {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 30px;
+    padding: 0 12px !important;
+    overflow: hidden;
+    border: none !important;
+    color: var(--cdc-text-dim);
+    font-family: var(--cdc-font) !important;
+    font-size: 13px !important;
+    line-height: 30px !important;
+    white-space: nowrap;
+    mask-image: linear-gradient(to right, #000 85%, transparent);
+  }
+
+  main.analyse .pv_box .pv + .pv {
+    border-top: 1px solid #ffffff0a !important;
+  }
+
+  main.analyse .pv_box .pv strong {
+    flex: none;
+    min-width: 40px;
+    margin-right: 4px;
+    padding: 0 5px;
+    border-radius: 3px;
+    background: #ffffff1f;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 20px;
+    text-align: center;
+  }
+
+  main.analyse .pv_box .pv-san {
+    color: var(--cdc-text);
+    font-weight: 700;
+  }
+
+  main.analyse .pv_box .pv-wrap-toggle {
+    display: none !important;
+  }
+
+  /* --------------------------------------------------------- move list --- */
+
+  /* Chess.com's list: 30px rows striped by pairs, "8." numbers, a small box
+     around the current move, and the move's eval small and dim on the right.
+     Rows are striped per move number, so comments in between don't shift
+     the stripes. */
+  main.analyse .analyse__moves {
+    background: var(--cdc-bg-panel) !important;
+  }
+
+  main.analyse .tview2-column {
+    padding-bottom: 8px;
+    background: none !important;
+    font-family: var(--cdc-font) !important;
+  }
+
+  main.analyse .tview2-column > index {
+    flex: 0 0 44px !important;
+    justify-content: flex-start !important;
+    box-sizing: border-box;
+    height: 30px;
+    padding-left: 12px !important;
+    border: none !important;
+    background: transparent !important;
+    color: var(--cdc-text-dim) !important;
+    font-size: 13px !important;
+    font-weight: 700;
+    line-height: 30px !important;
+  }
+
+  main.analyse .tview2-column > index::after {
+    content: '.';
+  }
+
+  main.analyse .tview2-column > move {
+    flex: 0 0 calc((100% - 44px) / 2) !important;
+    display: flex !important;
+    align-items: center;
+    gap: 4px;
+    box-sizing: border-box;
+    height: 30px;
+    padding: 0 10px 0 0 !important;
+    border: none !important;
+    background: transparent !important;
+    color: var(--cdc-text) !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    line-height: 30px !important;
+  }
+
+  /* The review's list (review.css) has its own stripes. */
+  html:not(.cdc-review-moves) main.analyse .tview2-column > index:nth-of-type(even),
+  html:not(.cdc-review-moves) main.analyse .tview2-column > index:nth-of-type(even) + move,
+  html:not(.cdc-review-moves) main.analyse .tview2-column > index:nth-of-type(even) + move + move {
+    background: #2a2926 !important;
+  }
+
+  main.analyse .tview2-column > move san {
+    padding: 0 5px;
+    border-radius: 3px;
+    border-bottom: 2px solid transparent;
+    line-height: 22px;
+  }
+
+  main.analyse .tview2-column > move:hover san {
+    background: #ffffff14;
+    color: #fff;
+  }
+
+  main.analyse .tview2-column > move.active san {
+    background: #ffffff26;
+    border-bottom-color: #ffffff3d;
+    color: #fff;
+  }
+
+  main.analyse .tview2-column > move.empty {
+    padding-left: 5px !important;
+    color: var(--cdc-text-dim) !important;
+    font-weight: 400 !important;
+  }
+
+  main.analyse .tview2-column > move eval {
+    flex: none;
+    margin-left: auto;
+    padding: 0 !important;
+    color: var(--cdc-text-dim) !important;
+    font-size: 11px !important;
+    font-weight: 400;
+    opacity: 0.8;
+  }
+
+  /* Annotated moves take Chess.com's classification colors, and the glyph
+     becomes its round badge in front of the move. */
+  main.analyse .tview2 move.brilliant { --cdc-glyph: #26c2a3; }
+  main.analyse .tview2 move.good { --cdc-glyph: #749bbf; }
+  main.analyse .tview2 move.interesting { --cdc-glyph: #96af8b; }
+  main.analyse .tview2 move.inaccuracy { --cdc-glyph: #f7c045; }
+  main.analyse .tview2 move.mistake { --cdc-glyph: #ffa459; }
+  main.analyse .tview2 move.blunder { --cdc-glyph: #fa412d; }
+
+  main.analyse .tview2 move:is(.brilliant, .good, .interesting, .inaccuracy, .mistake, .blunder) {
+    color: var(--cdc-glyph) !important;
+  }
+
+  main.analyse .tview2-column > move glyph {
+    order: -1;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin: 0 -1px 0 0 !important;
+    border-radius: 50%;
+    background: var(--cdc-glyph, #8b8987);
+    box-shadow: 0 1px 0 #0000004d;
+    color: #fff !important;
+    font-family: var(--cdc-font) !important;
+    font-size: 10px !important;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    line-height: 1 !important;
+  }
+
+  /* Comments and variations: a card under the move, with the classification
+     color as its accent, instead of Lichess's boxed tree. */
+  main.analyse .tview2-column > interrupt {
+    flex: 0 0 calc(100% - 16px) !important;
+    max-width: none !important;
+    box-sizing: border-box;
+    margin: 4px 8px 6px !important;
+    padding: 8px 10px !important;
+    border: none !important;
+    border-left: 3px solid var(--cdc-note, #5d5b58) !important;
+    border-radius: 5px !important;
+    background: var(--cdc-bg-panel-dark) !important;
+    box-shadow: none !important;
+    font-family: var(--cdc-font) !important;
+  }
+
+  main.analyse .tview2-column > interrupt:has(> comment.inaccuracy) { --cdc-note: #f7c045; }
+  main.analyse .tview2-column > interrupt:has(> comment.mistake) { --cdc-note: #ffa459; }
+  main.analyse .tview2-column > interrupt:has(> comment.blunder) { --cdc-note: #fa412d; }
+
+  main.analyse .tview2 interrupt comment {
+    display: block;
+    padding: 0 !important;
+    border: none !important;
+    color: var(--cdc-text) !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+  }
+
+  main.analyse .tview2 interrupt comment:is(.inaccuracy, .mistake, .blunder) {
+    color: var(--cdc-note) !important;
+    font-weight: 700;
+  }
+
+  main.analyse .tview2 interrupt lines {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  main.analyse .tview2 interrupt comment + lines,
+  main.analyse .tview2 interrupt lines + comment {
+    margin-top: 4px !important;
+  }
+
+  main.analyse .tview2 interrupt line {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 1px;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  main.analyse .tview2 interrupt line + line {
+    margin-top: 2px !important;
+    padding-top: 2px !important;
+    border-top: 1px solid #ffffff0a !important;
+  }
+
+  main.analyse .tview2 interrupt branch {
+    display: none !important;
+  }
+
+  main.analyse .tview2 interrupt line move {
+    margin: 0 !important;
+    padding: 0 3px !important;
+    line-height: 20px !important;
+    border-radius: 3px;
+    background: none !important;
+    color: var(--cdc-text-dim) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+  }
+
+  main.analyse .tview2 interrupt line move index {
+    margin-right: 2px;
+    padding: 0 !important;
+    color: #ffffff59 !important;
+    font-weight: 400;
+  }
+
+  main.analyse .tview2 interrupt line move:hover {
+    background: #ffffff14 !important;
+    color: #fff !important;
+  }
+
+  main.analyse .tview2 interrupt line move.active {
+    background: #ffffff26 !important;
+    color: #fff !important;
+  }
+
+  /* ---------------------------------------------------------- controls --- */
+
+  /* Chess.com's navigation: four big grey buttons, with the explorer and
+     practice toggles on the left and the menu on the right. */
+  main.analyse .analyse__controls {
+    display: flex !important;
+    align-items: center;
+    gap: 4px;
+    box-sizing: border-box;
+    padding: 8px !important;
+    border-top: 1px solid var(--cdc-border);
+  }
+
+  main.analyse .analyse__controls .jumps {
+    order: 1;
+    flex: 1;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin: 0 4px;
+  }
+
+  main.analyse .analyse__controls > .fbt {
+    flex: none;
+    width: 34px;
+    height: 44px;
+    padding: 0 !important;
+    color: var(--cdc-text-dim) !important;
+    font-size: 17px;
+  }
+
+  main.analyse .analyse__controls > .fbt.active {
+    color: var(--cdc-green) !important;
+  }
+
+  main.analyse .analyse__controls > .fbt[data-act='menu'] {
+    order: 2;
+  }
+
+  main.analyse .analyse__controls .jumps .fbt {
+    height: 44px;
+    padding: 0 !important;
+    border-radius: 5px;
+    background: var(--cdc-btn-grey) !important;
+    box-shadow: var(--cdc-btn-grey-shadow);
+    font-size: 20px;
+  }
+
+  main.analyse .analyse__controls .jumps .fbt:hover:not(.disabled, :disabled) {
+    background: var(--cdc-btn-grey-hover) !important;
+  }
+
+  main.analyse .analyse__controls .jumps .fbt:disabled {
+    opacity: 0.45;
+  }
+
   /* No chat (e.g. the free analysis board): tools take the whole panel. */
   main.analyse:not(:has(> .mchat)) {
     grid-template-rows:

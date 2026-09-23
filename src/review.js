@@ -25,14 +25,14 @@
     ? {
         review: 'Bilan', start: 'Démarrer le bilan', next: 'Suivant', explain: 'Expliquer', best: 'Meilleur',
         analysing: 'Analyse de la partie…', players: 'Joueurs', accuracy: 'Précision',
-        anonymous: 'Anonyme', open: 'Bilan de la partie', close: 'Fermer le bilan',
+        anonymous: 'Anonyme', close: 'Fermer le bilan',
         intro: 'Passons en revue cette partie !', bestWas: 'Le meilleur coup était {m}.',
         engineError: "Le moteur n'a pas pu démarrer.",
       }
     : {
         review: 'Game Review', start: 'Start Review', next: 'Next', explain: 'Explain', best: 'Best',
         analysing: 'Analyzing game…', players: 'Players', accuracy: 'Accuracy',
-        anonymous: 'Anonymous', open: 'Game Review', close: 'Close review',
+        anonymous: 'Anonymous', close: 'Close review',
         intro: "Let's review this game!", bestWas: '{m} was best.',
         engineError: 'The engine failed to start.',
       };
@@ -69,6 +69,12 @@
     ['blunder', '#fa412d', '??', fr ? 'Gaffe' : 'Blunder', fr ? '{m} est une gaffe' : '{m} is a blunder'],
   ].map(([key, color, icon, label, sentence]) => ({ key, color, icon, label, sentence }));
   const CLS = Object.fromEntries(CLASSES.map(c => [c.key, c]));
+  // The counts shown over the Game Review button, like Chess.com.
+  const COUNTED = ['brilliant', 'great', 'best'];
+  const countLabel = (key, n) =>
+    fr
+      ? `${n} ${{ brilliant: n > 1 ? 'coups brillants' : 'coup brillant', great: n > 1 ? 'excellents coups' : 'excellent coup', best: n > 1 ? 'meilleurs coups' : 'meilleur coup' }[key]}`
+      : `${n} ${CLS[key].label}`;
   const GRAPH_DOTS = new Set(['brilliant', 'great', 'inaccuracy', 'mistake', 'miss', 'blunder']);
   // Move list badges; book only on the last book move, like Chess.com.
   const LIST_BADGES = new Set([...GRAPH_DOTS, 'book']);
@@ -619,8 +625,20 @@
     });
   }
 
-  function renderNormal() {
-    dom.panel.innerHTML = `<button class="cdc-review__open" data-cdc="summary"><span class="cdc-review__star">★</span>${esc(T.open)}</button>`;
+  // Review closed: like Chess.com's analysis tab, the player's best moves
+  // over a big Game Review button.
+  function renderNormal(ctrl) {
+    const r = state.review;
+    const color = ctrl.getOrientation()[0];
+    const line = state.error
+      ? `<span class="cdc-review__progress">${esc(state.error)}</span>`
+      : !r
+        ? `<span class="cdc-review__progress">${esc(T.analysing)} ${Math.round(state.progress * 100)}%</span>`
+        : COUNTED.filter(k => r.counts[color][k])
+            .map(k => `<span class="cdc-review__count" style="color:${CLS[k].color}">${icon(k)}${esc(countLabel(k, r.counts[color][k]))}</span>`)
+            .join('');
+    dom.panel.innerHTML = `<div class="cdc-review__counts">${line}</div>
+      <button class="cdc-btn cdc-btn--green cdc-review__open" data-cdc="summary"><span class="cdc-review__star">★</span>${esc(T.review)}</button>`;
   }
 
   // Eval bar, board badge / arrow / square colors, move list badges.
@@ -697,7 +715,7 @@
       state.lastKey = key;
       if (state.mode === 'summary') renderSummary(ctrl);
       else if (state.mode === 'moves') renderMoves(ctrl);
-      else renderNormal();
+      else renderNormal(ctrl);
     }
     renderBoard(ctrl);
   }
