@@ -70,6 +70,17 @@
   scrollbar-width: thin;
 }
 
+/* Lichess boxes clip their content (for their rounded corners), which cut
+ * off a menu wider than the room left in the box. Unclip while one is open. */
+:where(.box, .page-menu__content):has(.mselect__toggle:checked) {
+  overflow: visible !important;
+}
+
+.mselect__item:hover,
+.mselect__item.current:hover {
+  background: var(--cdc-menu-hover) !important;
+}
+
 /* Desktop: the menu drops below its button and fades in, instead of
  * unrolling over it. (Below 800px Lichess centers it on screen; kept.) */
 @media (min-width: 800px) {
@@ -137,7 +148,7 @@ div.mselect__item {
 }
 
 .mselect__item.current {
-  background: transparent;
+  background: transparent !important;
   color: #fff !important;
   font-weight: 700;
 }
