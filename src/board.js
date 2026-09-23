@@ -1,45 +1,62 @@
-// Page-world script: Chess.com-style arrows and checkmate on analysis boards.
+// Page-world script: Chess.com-style shapes on any board, and checkmate.
 //
-// - Arrows: chessground's arrows (drawn with the right mouse button, engine
-//   lines, and the Game Review's best move) are hidden and redrawn with
-//   Chess.com's shape and colors: a thick 80% opaque arrow starting at the edge
-//   of the origin square, L-shaped for knight moves.
+// - Right-clicked squares: Chess.com fills the square, Lichess rings it with a
+//   circle. The fill goes under the pieces, like Chess.com's.
+// - Arrows: Chess.com's shape and colors, a thick 80% opaque arrow starting at
+//   the edge of the origin square, L-shaped for knight moves. Only once the
+//   button is released: Lichess draws the arrow as you drag, Chess.com doesn't.
 // - Checkmate: a red badge with a mated king on the king's square, then after a
 //   moment the square turns red under a "Checkmate" label.
 //
-// Shapes come from `site.analysis.chessground.state.drawable`. The review adds
-// its own arrows through `window.cdcReviewArrows` ([{ orig, dest, brush }]).
+// Chessground's own shapes are hidden (see styles/board.css) and read back from
+// its svg, rather than from a controller: their coordinates are already in board
+// units with the orientation applied, and it's the only source a game page has
+// (unlike the analysis page, it exposes no controller, so no `state.drawable`).
+// The Game Review adds its own arrows by square through `window.cdcReviewArrows`
+// ([{ orig, dest, brush }]), and checkmate needs `site.analysis`.
 
 (() => {
   const fr = (document.documentElement.lang || '').startsWith('fr');
   const MATE_LABEL = fr ? 'Échec et mat' : 'Checkmate';
   const MATE_DELAY = 2500;
 
-  // Lichess brush -> Chess.com color. Lichess's default (green) is Chess.com's
-  // default orange, and its fourth color (yellow) Chess.com's green.
-  const COLORS = {
-    green: '255,170,0',
-    red: '248,85,63',
-    blue: '72,193,249',
-    yellow: '159,207,63',
-    best: '159,207,63',
-    paleGreen: '255,170,0',
-    paleRed: '248,85,63',
-    paleBlue: '72,193,249',
-    paleGrey: '200,200,200',
-    purple: '170,110,210',
-    pink: '238,32,128',
-    white: '255,255,255',
+  // Lichess brush -> Chess.com color, keyed by the stroke chessground paints
+  // with, since brush names don't survive into the svg. Lichess's default
+  // (green) is Chess.com's default orange, and its fourth color (yellow)
+  // Chess.com's green.
+  const ARROW_COLORS = {
+    '#15781B': '255,170,0', // green, the default brush
+    '#882020': '248,85,63', // red
+    '#003088': '72,193,249', // blue
+    '#e68f00': '159,207,63', // yellow
+    '#4a4a4a': '200,200,200', // grey
+    '#68217a': '170,110,210', // purple
+    '#ee2080': '238,32,128', // pink
+    '#ffffff': '255,255,255', // white
   };
-  const opacity = brush => (/^pale/.test(brush) ? 0.5 : 0.8);
+  // Squares start from Chess.com's red instead, the color it highlights with:
+  // the default brush takes the red, and Lichess's red brush the freed orange.
+  const MARK_COLORS = { ...ARROW_COLORS, '#15781B': '235,97,80', '#882020': '255,170,0' };
+  const REVIEW_COLOR = '159,207,63'; // the review's best move, Chess.com's green
+  // Chessground fades the pale brushes it draws the engine's own arrows with to
+  // 0.4, and the shape being dragged to 0.9; only the former should look faint.
+  const alpha = el => (+(el.getAttribute('opacity') ?? 1) < 0.7 ? 0.5 : 0.8);
+  // Chessground hashes each shape into its group as width, height, then whether
+  // it's hilited, which is how it draws the one being dragged.
+  const dragged = el => (el.parentNode.getAttribute('cgHash') || '').split(',')[2] === 'true';
 
   // In squares: shaft width, head width and length, gap before the origin.
   const SHAFT = 0.22, HEAD_W = 0.52, HEAD_L = 0.34, START = 0.35;
 
   const FILES = 'abcdefgh';
+  // Board coordinates, in squares from the top left corner as shown.
   const center = (key, white) => {
     const f = FILES.indexOf(key[0]), r = +key[1] - 1;
     return white ? [f + 0.5, 7.5 - r] : [7.5 - f, r + 0.5];
+  };
+  const keyAt = ([x, y], white) => {
+    const f = Math.floor(x), r = Math.floor(y);
+    return white ? FILES[f] + (8 - r) : FILES[7 - f] + (r + 1);
   };
 
   // Polygon for an arrow along points [from, (corner,) tip], so overlapping
@@ -68,15 +85,13 @@
     return [...left, ...right.reverse()].map(p => p[0].toFixed(3) + ',' + p[1].toFixed(3)).join(' ');
   }
 
-  function arrow(orig, dest, brush, white) {
-    const a = center(orig, white), b = center(dest, white);
+  function arrow([a, b, color, opacity]) {
     const dx = b[0] - a[0], dy = b[1] - a[1];
     // Knight moves: along the long leg first, then the short one.
     const knight = (Math.abs(dx) === 1 && Math.abs(dy) === 2) || (Math.abs(dx) === 2 && Math.abs(dy) === 1);
     const corner = Math.abs(dx) > Math.abs(dy) ? [b[0], a[1]] : [a[0], b[1]];
     const pts = knight ? [a, corner, b] : [a, b];
-    const color = COLORS[brush] || COLORS.green;
-    return `<polygon points="${arrowPoints(pts)}" fill="rgba(${color},${opacity(brush)})"/>`;
+    return `<polygon points="${arrowPoints(pts)}" fill="rgba(${color},${opacity})"/>`;
   }
 
   const MATE_ICON = `<svg viewBox="0 0 24 24"><g fill="#000">
@@ -104,39 +119,64 @@
 
   const layer = document.createElement('div');
   layer.id = 'cdc-shapes';
+  const marks = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  marks.setAttribute('class', 'cdc-marks');
+  marks.setAttribute('viewBox', '0 0 8 8');
   const html = document.documentElement;
   const started = Date.now();
   let last = '', mateNode = null, mateAt = 0, seen = false;
 
   function frame() {
-    const ctrl = window.site?.analysis;
-    const cg = ctrl?.chessground;
-    const container = document.querySelector('main.analyse .main-board cg-container');
-    // Not an analysis board: stop looking after a while.
+    const container = document.querySelector('main .main-board cg-container');
+    const svg = container?.querySelector('svg.cg-shapes');
+    // No board: stop looking after a while.
     if (seen || Date.now() - started < 30000) requestAnimationFrame(frame);
-    if (!cg?.state || !container) return;
+    if (!svg) return;
     seen = true;
+    // The fills belong under the pieces, the arrows over them (see board.css).
+    if (marks.parentNode !== container) container.appendChild(marks);
     if (layer.parentNode !== container) container.appendChild(layer);
-    html.classList.add('cdc-arrows');
+    html.classList.add('cdc-shapes');
 
-    const d = cg.state.drawable;
-    const white = cg.state.orientation === 'white';
-    // During the Game Review, only its best move: no local engine arrows.
+    const white = !container.closest('.cg-wrap')?.classList.contains('orientation-black');
+    const ctrl = window.site?.analysis;
+    // During the Game Review, only its best move: no engine arrows. They sit in
+    // the same svg as the hand-drawn ones, so they're matched by their squares.
     const reviewing = html.classList.contains('cdc-review-moves') || html.classList.contains('cdc-review-summary');
-    const auto = reviewing ? [] : d.autoShapes || [];
-    const shapes = [...(d.shapes || []), ...auto, ...(window.cdcReviewArrows || [])];
-    if (d.current) shapes.push(d.current); // the arrow being drawn
-    const arrows = shapes
-      .filter(s => s.orig && s.dest && s.orig !== s.dest && !s.customSvg && !s.piece)
-      .map(s => [s.orig, s.dest, s.brush || 'green']);
+    const auto = new Set(
+      reviewing ? (ctrl?.chessground.state.drawable.autoShapes || []).map(s => s.orig + (s.dest || '')) : [],
+    );
 
-    const king = matedKing(ctrl.node);
+    // Chessground's shapes are in square units from the viewBox's own corner,
+    // and an arrow's ends are pulled in from the centers: round back to them.
+    const [ox, oy] = (svg.getAttribute('viewBox') || '-4 -4 8 8').split(/\s+/).map(Number);
+    const square = (el, x, y) =>
+      [Math.floor(+el.getAttribute(x) - ox) + 0.5, Math.floor(+el.getAttribute(y) - oy) + 0.5];
+
+    const fills = [];
+    for (const c of svg.querySelectorAll('circle')) {
+      const [x, y] = square(c, 'cx', 'cy');
+      if (auto.has(keyAt([x, y], white))) continue;
+      const color = MARK_COLORS[c.getAttribute('stroke')] || MARK_COLORS['#15781B'];
+      fills.push(`<rect x="${x - 0.5}" y="${y - 0.5}" width="1" height="1" fill="rgba(${color},${alpha(c)})"/>`);
+    }
+    const arrows = [];
+    for (const l of svg.querySelectorAll('line')) {
+      if (dragged(l)) continue; // not until the button is released
+      const a = square(l, 'x1', 'y1'), b = square(l, 'x2', 'y2');
+      if (auto.has(keyAt(a, white) + keyAt(b, white))) continue;
+      arrows.push([a, b, ARROW_COLORS[l.getAttribute('stroke')] || ARROW_COLORS['#15781B'], alpha(l)]);
+    }
+    for (const s of window.cdcReviewArrows || [])
+      arrows.push([center(s.orig, white), center(s.dest, white), REVIEW_COLOR, 0.8]);
+
+    const king = matedKing(ctrl?.node);
     if (king && ctrl.node !== mateNode) (mateNode = ctrl.node), (mateAt = Date.now());
     if (!king) mateNode = null;
     const phase = !king ? 0 : Date.now() - mateAt < MATE_DELAY ? 1 : 2;
     html.classList.toggle('cdc-mate', !!king);
 
-    const key = JSON.stringify([white, arrows, king, phase]);
+    const key = JSON.stringify([fills, arrows, king, phase]);
     if (key === last) return;
     last = key;
 
@@ -150,10 +190,11 @@
           : `<div class="cdc-mate__square" style="${pos}"><div class="cdc-mate__icon">${MATE_ICON}</div></div>
              <div class="cdc-mate__label" style="left:${x + 6.25}%;top:${y + 1.1}%">${MATE_LABEL}</div>`;
     }
-    const svg = arrows.length
-      ? `<svg class="cdc-shapes__arrows" viewBox="0 0 8 8">${arrows.map(a => arrow(...a, white)).join('')}</svg>`
+    const arrowSvg = arrows.length
+      ? `<svg class="cdc-shapes__arrows" viewBox="0 0 8 8">${arrows.map(arrow).join('')}</svg>`
       : '';
-    layer.innerHTML = svg + mate;
+    marks.innerHTML = fills.join('');
+    layer.innerHTML = arrowSvg + mate;
   }
 
   requestAnimationFrame(frame);

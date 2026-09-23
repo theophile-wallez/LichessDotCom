@@ -9,6 +9,8 @@
   --cdc-sq-dark: #739552;
   --cdc-highlight: rgba(255, 255, 51, 0.5);
   --cdc-hint: rgba(0, 0, 0, 0.14);
+  /* Chess.com's premove red covers the square whole, on both colors. */
+  --cdc-premove: #f19082;
 }
 
 /* ----------------------------------------------------------------- board --- */
@@ -65,33 +67,55 @@ cg-board square.move-dest.hover {
   box-shadow: inset 0 0 0 max(3px, 0.35vmin) rgba(255, 255, 255, 0.65);
 }
 
+/* Picking a piece up on the opponent's move: Chess.com shows the same hints as
+   on your own move, not a warning color. */
 cg-board square.premove-dest {
-  background: radial-gradient(rgba(244, 42, 50, 0.35) 22%, transparent 23%) !important;
+  background: radial-gradient(var(--cdc-hint) 22%, transparent 23%) !important;
 }
 
 cg-board square.oc.premove-dest {
-  background: radial-gradient(transparent 0 57%, rgba(244, 42, 50, 0.35) 58% 70%, transparent 71%) !important;
+  background: radial-gradient(transparent 0 57%, var(--cdc-hint) 58% 70%, transparent 71%) !important;
 }
 
-cg-board square.current-premove {
-  background: rgba(244, 42, 50, 0.55) !important;
+/* A premove that's set: both of its squares, the piece already on the new one
+   (chessground moves it). Opaque, like Chess.com's. */
+cg-board square.current-premove,
+body[data-board] .is2d cg-board square.current-premove {
+  background: var(--cdc-premove) !important;
 }
 
 cg-board square.check {
   background: radial-gradient(ellipse at center, #ff3b3b 0%, #e70000 25%, rgba(169, 0, 0, 0) 89%) !important;
 }
 
-/* Arrows: Lichess's default green brush becomes Chess.com's orange. */
-.cg-shapes [stroke='#15781B'] { stroke: #ffaa00 !important; }
-.cg-shapes [fill='#15781B']   { fill: #ffaa00 !important; }
+/* ------------------------------------------------- shapes, arrows & mate --- */
 
-/* ---------------------------------------------- analysis arrows & mate --- */
-
-/* src/board.js redraws analysis arrows Chess.com-style in #cdc-shapes, so
-   chessground's own arrow lines are hidden (circles stay). */
-html.cdc-arrows main.analyse svg.cg-shapes line {
+/* board.js redraws every shape of the main board Chess.com-style: a
+   right-clicked square as a fill (.cdc-marks) instead of a circle, and the
+   arrows in #cdc-shapes. Chessground's own are hidden — but only once board.js
+   has put its layers up, so a board it doesn't reach keeps Lichess's shapes
+   rather than none at all. */
+html.cdc-shapes main .main-board svg.cg-shapes > g {
   display: none;
 }
+
+/* The fills go under the pieces, like Chess.com's: z-index 1, as chessground's
+   own below-the-pieces layer, and after it in the DOM so they also cover the
+   last-move highlight. The arrows go over them, in #cdc-shapes. */
+svg.cdc-marks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Boards board.js leaves alone (mini boards, previews): Lichess's default green
+   brush becomes Chess.com's orange. */
+.cg-shapes [stroke='#15781B'] { stroke: #ffaa00 !important; }
+.cg-shapes [fill='#15781B']   { fill: #ffaa00 !important; }
 
 #cdc-shapes {
   position: absolute;

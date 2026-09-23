@@ -54,7 +54,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, fetches a finished game's move times (and its time control, for the "New 10 min" button), the players' country flags (from their profiles), the home hero, coach title badges, the hover card's rating chips and the font remapping. |
 | `src/dashboard.js` | Isolated world: the puzzle dashboard's theme radar, redrawn as SVG from the page's init JSON (Lichess draws it into a canvas). |
 | `src/page.js` | Page world: wraps `site.sound` to play the right Chess.com sound per move, plus premove / illegal / game-start, which Lichess has no sound for. |
-| `src/board.js` | Page world: analysis arrows redrawn Chess.com-style, checkmate badge and label. |
+| `src/board.js` | Page world: every main board's shapes redrawn Chess.com-style (right-clicked squares filled, arrows), checkmate badge and label. |
 | `src/review.js` | Page world: Game Review (engine, classification, panel, board overlays, eval bar). |
 | `src/styles/theme.css` | Overrides Lichess's `--c-*` color variables, fonts, buttons. |
 | `src/styles/sidebar.css` | Lichess's top header → Chess.com's left sidebar, and the user menu (dasher) as a Chess.com menu. |
@@ -159,7 +159,19 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   `jumpToMain`, `getOrientation`; `jumpToMain` doesn't scroll the move list),
   and `site.analysis.chessground.state.drawable` holds the arrows (`shapes`,
   `autoShapes`, `current`), and the engine is at
-  `npm/stockfish-web/sf_19_smallnet.js`.
+  `npm/stockfish-web/sf_19_smallnet.js`. **Only the analysis page has a
+  controller**: a game page exposes none, so anything that must work on both
+  reads the board's DOM instead (`board.js` does).
+- **Chessground's shapes.** They live in `cg-container > svg.cg-shapes`, one `g`
+  per shape: a circle (a right-clicked square) or a line (an arrow), in square
+  units from the viewBox's corner (`-4 -4 8 8`), *with the orientation already
+  applied* — so reading them needs to know nothing about the position. An
+  arrow's ends are pulled in from the square centers; round back to them. The
+  group's `cgHash` is `width,height,hilite,orig,dest,brush…`, and `hilite` is
+  how chessground draws the shape being dragged: that third field is the only
+  thing telling it apart from a finished one. Engine arrows (`autoShapes`) come
+  with a pale brush, hence an `opacity` below 1; a hand-drawn one is always
+  solid.
 - **Hover cards.** All of them come from one `powertip.ts`, but each kind has
   its own popup element: the **user** card is `#powerTip` (server HTML from
   `/@/<user>/mini`), games are `#miniGame`, board previews `#miniBoard`, lobby
