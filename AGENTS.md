@@ -61,7 +61,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/pages.css` | Modern look for every other page (headings, side menus, tabs, tables, forms, dialogs, lobby, editor, tournaments). |
 | `src/styles/dropdowns.css` | Every dropdown as one menu style: Lichess's `.mselect`, native `<select>` (via `appearance: base-select`) and autocomplete lists. |
 | `src/styles/powertip.css` | The profile hover card (`#powerTip`, filled with `/@/<user>/mini`) as a Chess.com player card. |
-| `src/styles/home.css` | Home page (`main.lobby`) as a 12-column card dashboard, with quick pairing as Chess.com's time-control picker; the hero is added by `content.js`. |
+| `src/styles/home.css` | Home page (`main.lobby`) as a 12-column card dashboard, with quick pairing as Chess.com's time-control picker (same-size buttons, three to a row); the hero is added by `content.js`. |
 | `src/styles/coach.css` | Coach directory (`main.coach-list`) as a grid of coach cards; the title badges are split out of the names by `content.js`. |
 | `src/styles/teams.css` | Team lists (`main.team-list`) as a grid of club cards with avatar tiles. |
 | `src/styles/study.css` | Study lists (`.study-index`) as a grid of study cards, the compact list view, the toolbar, topics and staff picks. |
@@ -125,8 +125,10 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   `theme.css`: use those for anything button-like instead of flat colors.
   Where Lichess glues a button to an input (`.copy-me`, search forms) or
   stacks buttons flush (editor actions), drop the shadow or add a gap.
-- **Scroll state.** Once the page scrolls, Lichess adds `.scrolled` to `#top`
-  and hides `#topnav`. The sidebar is fixed, so `sidebar.css` forces it back.
+- **Scroll state.** Once the page scrolls down, Lichess adds `.hide` to `#top`,
+  which hides `#topnav` and the dropdowns with `visibility`, `opacity` *and*
+  `pointer-events: none`. The sidebar is fixed, so `sidebar.css` forces all
+  three back; forgetting `pointer-events` leaves a visible but dead sidebar.
 - **JS-sized widgets.** The home blog carousel sets each card's width from
   the carousel's `clientWidth`, which counts padding. Inset it with a
   transparent border, not padding, or the last card is clipped.
