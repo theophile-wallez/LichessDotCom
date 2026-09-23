@@ -193,12 +193,37 @@
     }
   };
 
+  // Profile hover card (see styles/powertip.css): Lichess right-aligns the
+  // eight ratings in fixed columns by padding the short ones with non-breaking
+  // spaces ("&nbsp;&nbsp;&nbsp;?"). Our chips center their value, so the
+  // padding has to go, and an unrated chip is dimmed instead of left blank.
+  // Lichess rebuilds the card's HTML on every hover, so an observer catches it
+  // before the paint: polling would show the padded value first.
+  const cleanRatings = tip => {
+    for (const span of tip.querySelectorAll('.upt__info__ratings > span')) {
+      const text = span.textContent.replace(/\u00a0/g, '').trim();
+      if (span.textContent !== text) span.textContent = text;
+      span.dataset.cdcRating = text === '?' || text === '-' ? 'none' : 'rated';
+    }
+  };
+  let watchedTip = null;
+  const syncPowertip = () => {
+    // Lichess only adds #powerTip on the first hover (or on idle, on the pages
+    // that preload the cards).
+    const tip = document.getElementById('powerTip');
+    if (!tip || tip === watchedTip) return;
+    watchedTip = tip;
+    new MutationObserver(() => cleanRatings(tip)).observe(tip, { childList: true });
+    cleanRatings(tip);
+  };
+
   setInterval(() => {
     syncControlsHeight();
     syncCaptured();
     syncBoardInset();
     syncHero();
     syncCoachTitles();
+    syncPowertip();
   }, 250);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncHero);
   else syncHero();

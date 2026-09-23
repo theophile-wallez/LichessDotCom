@@ -1,0 +1,371 @@
+/*
+ * Profile hover card (#powerTip, filled with /@/<user>/mini) as Chess.com's
+ * player card:
+ *
+ *   +------------------------------------------+
+ *   | [avatar]  GM thibault  (flag) France  ..||
+ *   |        o  Thibault Duplessis            |
+ *   |                                         |
+ *   |  (b) 1774  (z) 1712  (r) 1802  (c)  -   |
+ *   |  (9) 1650  ...                          |
+ *   |  23,855 games · Joined 14 years ago     |
+ *   |  [tv] [chat] [challenge] [ + Follow   ] |
+ *   +------------------------------------------+
+ *
+ * Lichess stacks the same parts in one flat fragment, in a different order
+ * (actions above the games / joined line), so the card is a flex column that
+ * re-orders them, and the header is a grid the avatar spans. The ratings are
+ * cleaned up by content.js: Lichess pads unrated values with non-breaking
+ * spaces, which a centered chip can't have.
+ *
+ * Only the user card lives in #powerTip: the game and board tips Lichess also
+ * builds with powertip.ts get their own ids (#miniGame, #miniBoard).
+ */
+
+#powerTip {
+  --cdc-upt-avatar: 56px;
+  --cdc-upt-pad: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-sizing: border-box;
+  /* Lichess sizes the card in rem, so its width follows the font-size pref;
+     Chess.com's is wide enough for a full name and four rating chips.
+     Its own #powerTip rule ties with ours on specificity, hence !important. */
+  width: 340px !important;
+  max-width: calc(100vw - 16px);
+  padding: var(--cdc-upt-pad) 0;
+  border: 1px solid var(--cdc-menu-border);
+  border-radius: 10px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: var(--cdc-menu-shadow) !important;
+  font-size: 14px;
+}
+
+/* ---------------------------------------------------------------- header --- */
+
+/* The avatar is column 1, the name (and the real name, when there is one)
+ * column 2, and the ratings span both. Lichess clips this block, which would
+ * cut the online dot off the avatar's corner. */
+#powerTip .upt__info {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: var(--cdc-upt-avatar) minmax(0, 1fr);
+  align-content: start;
+  align-items: center;
+  gap: 2px 14px;
+  padding: 0 var(--cdc-upt-pad) !important;
+  border: none !important;
+  overflow: visible !important;
+}
+
+/* Lichess has no profile pictures: Chess.com's default avatar. It is a square
+ * silhouette bled to the edges, so it gets rounded corners, not a circle. */
+#powerTip .upt__info::before {
+  content: '';
+  grid-column: 1;
+  align-self: start;
+  width: var(--cdc-upt-avatar);
+  height: var(--cdc-upt-avatar);
+  border-radius: 8px;
+  background: #e7e5e3 url('https://www.chess.com/bundles/web/images/user-image.007dad08.svg')
+    center / cover no-repeat;
+}
+
+#powerTip .upt__info:has(.upt__info__realname)::before {
+  grid-row: span 2;
+}
+
+/* Online: a green dot on the avatar's corner, as on the friend cards. */
+#powerTip .upt__info:has(.user-link.online)::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--cdc-upt-avatar) - 15px);
+  inset-inline-start: calc(var(--cdc-upt-pad) + var(--cdc-upt-avatar) - 15px);
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  border: 3px solid var(--cdc-bg-panel);
+  border-radius: 50%;
+  background: var(--cdc-green);
+}
+
+/* Lichess spreads the name, the country and the signal bars apart
+ * (space-between); Chess.com keeps the country against the name. */
+#powerTip .upt__info__top {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Lichess pins the name at its natural width (flex: 0 0 auto), which pushes
+ * the country out of a narrow card; let a long name ellipsize instead. */
+#powerTip .upt__info__top .user-link {
+  flex: 0 1 auto;
+  min-width: 0;
+  color: var(--cdc-text-strong) !important;
+  font-size: 17px !important;
+  font-weight: 700;
+  text-overflow: ellipsis;
+}
+
+#powerTip .upt__info__top .user-link:hover {
+  color: var(--cdc-green-hover) !important;
+}
+
+#powerTip .upt__info__top .user-link .utitle {
+  display: inline-block;
+  margin-inline-end: 3px;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: #7c2929;
+  color: #fff !important;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 16px;
+  vertical-align: 2px;
+}
+
+#powerTip .upt__info__top .user-link .uflair {
+  width: 18px;
+  height: 18px;
+  margin-inline-start: 6px;
+  vertical-align: -3px;
+}
+
+/* The disc in front of the name says online; the dot on the avatar says it
+ * better. Patrons have wings there instead, which stay as a badge. */
+#powerTip .upt__info__top .user-link .line:not(.patron) {
+  display: none;
+}
+
+#powerTip .upt__info__top .user-link .line.patron {
+  width: auto;
+  margin-inline-end: 5px;
+  font-size: 14px;
+  opacity: 1;
+  vertical-align: -1px;
+}
+
+/* The country keeps to one line next to the name, whatever the name's length:
+   Lichess wraps it (flex-flow: row wrap) under its own flag instead. */
+#powerTip .upt__info__top__flag {
+  flex: 0 1 auto;
+  flex-wrap: nowrap;
+  min-width: 0;
+  margin: 0 !important;
+  color: var(--cdc-text-dim) !important;
+  font-size: 12px !important;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+#powerTip .upt__info__top__flag .flag {
+  width: 18px;
+  height: auto;
+  border-radius: 2px;
+}
+
+#powerTip .upt__info__top signal {
+  margin-inline-start: auto;
+  font-size: 15px;
+}
+
+#powerTip .upt__info__realname {
+  grid-column: 2;
+  min-width: 0;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--cdc-text-dim) !important;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: start !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --------------------------------------------------------------- ratings --- */
+
+/* Lichess's eight best perfs, as Chess.com's game-mode chips: its colored
+ * icon (see theme.css) and the rating, four to a row. */
+#powerTip .upt__info__ratings {
+  grid-column: 1 / -1;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 12px !important;
+}
+
+#powerTip .upt__info__ratings > span {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: none !important;
+  max-width: none !important;
+  padding: 7px 2px !important;
+  border-radius: 6px;
+  background: #ffffff0a;
+  color: var(--cdc-text-strong) !important;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center !important;
+}
+
+#powerTip .upt__info__ratings > span::before {
+  margin: 0 !important;
+  font-size: 14px;
+  opacity: 1 !important;
+}
+
+/* Unrated (no games yet, or too few to be rated): a quiet chip. */
+#powerTip .upt__info__ratings > span[data-cdc-rating='none'] {
+  background: #ffffff05;
+  color: var(--cdc-text-dim) !important;
+}
+
+#powerTip .upt__info__ratings > span[data-cdc-rating='none']::before {
+  opacity: 0.4 !important;
+}
+
+/* Marked accounts show a warning where the ratings would be. */
+#powerTip .upt__info__warning {
+  grid-column: 1 / -1;
+  margin-top: 12px;
+  padding: 8px;
+  border-radius: 6px;
+  background: #e0282814;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------- games, joined, score --- */
+
+/* Lichess puts the action buttons above this line; Chess.com's sit at the foot
+ * of the card, so the order of the four blocks below is ours, not Lichess's. */
+#powerTip .upt__details {
+  order: 3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start !important;
+  flex-wrap: wrap;
+  gap: 0 6px;
+  padding: 0 var(--cdc-upt-pad);
+  color: var(--cdc-text-dim);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+#powerTip .upt__details > span {
+  padding: 0 !important;
+}
+
+#powerTip .upt__details > span:not(:first-child, .upt__details__marks)::before {
+  content: '·';
+  margin-inline-end: 6px;
+}
+
+#powerTip .upt__details .upt__details__marks {
+  margin-inline-start: auto;
+  padding: 1px 6px !important;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+/* The crosstable score against the visitor, on the pages that have one. */
+#powerTip .upt__score {
+  order: 2;
+  margin: 0 var(--cdc-upt-pad);
+  padding: 8px;
+  border-radius: 6px;
+  background: #ffffff0a;
+  color: var(--cdc-text) !important;
+  font-size: 13px !important;
+  font-weight: 600;
+  line-height: 1.2 !important;
+}
+
+#powerTip .upt__score:hover {
+  background: #ffffff14;
+}
+
+#powerTip .upt__score strong {
+  color: var(--cdc-text-strong);
+}
+
+/* Their current game, when they are playing one. */
+#powerTip .mini-game {
+  order: 1;
+  margin: 0 var(--cdc-upt-pad);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#powerTip .mini-game .mini-game__player {
+  padding: 4px 8px !important;
+  font-size: 13px;
+}
+
+#powerTip .mini-game cg-board {
+  border-radius: 0;
+}
+
+/* --------------------------------------------------------------- actions --- */
+
+/* Lichess glues the actions into one rack; Chess.com spaces them out as grey
+ * buttons across the foot of the card. */
+#powerTip .upt__actions.btn-rack {
+  order: 4;
+  display: flex;
+  gap: 6px;
+  width: auto;
+  padding: 0 var(--cdc-upt-pad);
+  border: none !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+#powerTip .upt__actions .btn-rack__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 0 0 auto !important;
+  box-sizing: border-box;
+  min-width: 40px;
+  height: 38px;
+  padding: 0 12px !important;
+  border: none !important;
+  border-radius: 7px !important;
+  background: var(--cdc-btn-grey) !important;
+  box-shadow: var(--cdc-btn-grey-shadow) !important;
+  color: var(--cdc-text) !important;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: none !important;
+  transition: background 0.15s;
+}
+
+#powerTip .upt__actions .btn-rack__btn:hover {
+  background: var(--cdc-btn-grey-hover) !important;
+  color: var(--cdc-text-strong) !important;
+}
+
+#powerTip .upt__actions .btn-rack__btn::before {
+  margin: 0 !important;
+  font-size: 16px;
+  opacity: 1;
+}
+
+/* Follow / Following / Blocked carries the label, so it takes the rest. */
+#powerTip .upt__actions .relation-button {
+  flex: 1 1 auto !important;
+}
