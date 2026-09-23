@@ -48,6 +48,7 @@ Tip: Lichess's _coordinates_ setting (Preferences → Display) picks between Che
 | `src/styles/coach.css` | Coach directory as a grid of coach cards with title badges. |
 | `src/styles/teams.css` | Team lists as a grid of club cards. |
 | `src/styles/study.css` | Study lists as a grid of study cards. |
+| `src/styles/blog.css` | Blog posts as Chess.com-style articles. |
 | `src/background.js` | Downloads the Chess.com sounds once and caches them in `chrome.storage.local`. |
 | `src/content.js` | Passes the sounds to the page and measures the controls height for the layout grid. |
 | `src/page.js` | Runs in the page and wraps `site.sound` so each event plays the matching Chess.com sound. |
