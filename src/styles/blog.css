@@ -1,0 +1,252 @@
+/*
+ * Blog: a post (.ublog-post) reads like a Chess.com article: rounded hero
+ * image, a big left-aligned title, one compact meta line, then comfortable
+ * article typography.
+ */
+
+/* ------------------------------------------------------------ post --- */
+
+.ublog-post .ublog-post__image {
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+
+.ublog-post .ublog-post__title {
+  margin: 28px 0 14px !important;
+  color: #fff;
+  font-size: clamp(28px, 3vw, 40px) !important;
+  font-weight: 800 !important;
+  line-height: 1.15;
+  letter-spacing: -0.02em !important;
+  text-align: start !important;
+}
+
+/* Author, date, likes and views on one line, left-aligned under the title. */
+.ublog-post .ublog-post__meta {
+  justify-content: flex-start !important;
+  gap: 6px 16px !important;
+  margin: 0 0 20px !important;
+  color: var(--cdc-text-dim);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ublog-post .ublog-post__meta .user-link {
+  color: #fff !important;
+  font-size: 15px !important;
+  font-weight: 800;
+}
+
+.ublog-post .ublog-post__meta__disclaimer {
+  margin-inline-start: -10px !important;
+}
+
+.ublog-post .ublog-post__meta__date {
+  color: var(--cdc-text-dim);
+}
+
+.ublog-post .ublog-post__like--mini {
+  margin: 0 !important;
+  padding: 4px 10px !important;
+  border: 1px solid #ffffff14;
+  border-radius: 999px;
+  background: #ffffff0a;
+  color: var(--cdc-text) !important;
+  font-weight: 700;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s !important;
+}
+
+.ublog-post .ublog-post__like--mini:hover {
+  border-color: #e0282866;
+  background: #e0282814;
+  color: #fff !important;
+}
+
+.ublog-post .ublog-post__views strong {
+  color: var(--cdc-text);
+}
+
+/* The report link is a quiet icon, not a big grey button. */
+.ublog-post .ublog-post__meta__report.button {
+  padding: 4px 6px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--cdc-font-dimmer) !important;
+}
+
+.ublog-post .ublog-post__meta__report.button:hover {
+  background: #ffffff0f !important;
+  color: var(--c-bad) !important;
+}
+
+.ublog-post .ublog-post__topics {
+  justify-content: flex-start !important;
+  gap: 8px;
+  margin: 0 0 8px !important;
+  line-height: normal !important;
+}
+
+.ublog-post .ublog-post__topics a {
+  margin: 0 !important;
+  padding: 6px 12px !important;
+  border: 1px solid #ffffff14;
+  border-radius: 999px !important;
+  background: #ffffff0a !important;
+  color: var(--cdc-text) !important;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ublog-post .ublog-post__topics a:hover {
+  border-color: #81b64c80;
+  background: #81b64c26 !important;
+  color: #fff !important;
+}
+
+.ublog-post .ublog-post__intro {
+  margin: 24px 0 28px !important;
+  padding-inline-start: 16px;
+  border-inline-start: 3px solid var(--cdc-green);
+  color: #e8e7e5;
+  font-size: 19px !important;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* ------------------------------------------------------ typography --- */
+
+.ublog-post .ublog-post__markup {
+  color: #d4d3d1;
+  font-size: 16px !important;
+  line-height: 1.7 !important;
+}
+
+.ublog-post .ublog-post__markup p {
+  margin: 0 0 1.1em !important;
+}
+
+.ublog-post .ublog-post__markup :is(h2, h3, h4) {
+  margin: 1.8em 0 0.6em !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.ublog-post .ublog-post__markup h2 {
+  font-size: 26px !important;
+}
+
+.ublog-post .ublog-post__markup h3 {
+  font-size: 21px !important;
+}
+
+.ublog-post .ublog-post__markup h4 {
+  font-size: 17px !important;
+}
+
+.ublog-post .ublog-post__markup a {
+  color: var(--cdc-green) !important;
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+
+.ublog-post .ublog-post__markup a:hover {
+  color: var(--cdc-green-hover) !important;
+  text-decoration: underline;
+}
+
+/* Heading anchors are empty links; don't give them an underline. */
+.ublog-post .ublog-post__markup :is(h2, h3, h4) > a:empty {
+  text-decoration: none;
+}
+
+.ublog-post .ublog-post__markup strong {
+  color: #fff;
+}
+
+.ublog-post .ublog-post__markup img,
+.ublog-post .ublog-post__markup .embed,
+.ublog-post .ublog-post__markup iframe {
+  border-radius: 10px;
+}
+
+.ublog-post .ublog-post__markup .embed {
+  overflow: hidden;
+  margin: 1.2em 0 !important;
+}
+
+.ublog-post .ublog-post__markup :is(ul, ol) {
+  margin: 0 0 1.1em !important;
+  padding-inline-start: 1.4em;
+}
+
+.ublog-post .ublog-post__markup li {
+  margin-bottom: 0.35em;
+}
+
+.ublog-post .ublog-post__markup li::marker {
+  color: var(--cdc-green);
+}
+
+.ublog-post .ublog-post__markup blockquote {
+  margin: 1.2em 0 !important;
+  padding: 12px 18px !important;
+  border: none !important;
+  border-inline-start: 3px solid var(--cdc-green) !important;
+  border-radius: 0 8px 8px 0;
+  background: #ffffff08;
+  color: #e8e7e5;
+}
+
+.ublog-post .ublog-post__markup :not(pre) > code {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #ffffff12;
+  font-size: 0.9em;
+}
+
+.ublog-post .ublog-post__markup hr {
+  margin: 2em 0;
+  border: none;
+  border-top: 1px solid #ffffff14;
+}
+
+/* Lichess's links and charity note after a Lichess post: quiet, not green. */
+.ublog-post .ublog-post__lichess {
+  margin: 40px 0 !important;
+  padding-top: 24px;
+  border-top: 1px solid #ffffff14;
+  color: var(--cdc-text-dim);
+  font-size: 13px;
+}
+
+.ublog-post .ublog-post__lichess .connect-links a {
+  margin: 0 4px 12px !important;
+  padding: 6px 12px;
+  border: 1px solid #ffffff14;
+  border-radius: 999px;
+  color: var(--cdc-text) !important;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ublog-post .ublog-post__lichess .connect-links a:hover {
+  border-color: #ffffff33;
+  color: #fff !important;
+}
+
+.ublog-post .ublog-post__lichess a:not(.connect-links a) {
+  color: var(--cdc-text-dim) !important;
+}
+
+.ublog-post .ublog-post__footer {
+  margin-top: 48px !important;
+}
+
+.ublog-post .ublog-post__footer h2 {
+  margin-bottom: 20px !important;
+  color: #fff;
+  font-size: 22px !important;
+  font-weight: 800 !important;
+}
