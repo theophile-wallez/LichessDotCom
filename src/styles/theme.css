@@ -244,16 +244,30 @@ select {
   --cdc-mode-color: #f7c631;
 }
 
-/* Variants aren't time controls, so they keep the text color. */
+/* Variants, in the colors Chess.com's dark mode gives them. */
 [data-icon='\e066']::before {
   --cdc-mode-icon: var(--cdc-mode-crazyhouse);
-  --cdc-mode-color: currentColor;
+  --cdc-mode-color: #008cd1;
 }
 
 /* Chess960, also on the editor's "random 960 position" buttons. */
 [data-icon='\e006']::before {
   --cdc-mode-icon: var(--cdc-mode-960);
-  --cdc-mode-color: currentColor;
+  --cdc-mode-color: #fa742c;
+}
+
+/* King of the Hill and Three-check keep Lichess's glyph, in Chess.com's color. */
+[data-icon='\e007']::before {
+  --cdc-mode-color: #ca9350;
+}
+
+[data-icon='\e00d']::before {
+  --cdc-mode-color: #26c2a3;
+}
+
+:is([data-icon='\e007'], [data-icon='\e00d'])::before {
+  color: var(--cdc-mode-color) !important;
+  opacity: 1 !important;
 }
 
 /* A 1em box keeps the glyph's size and spot: Lichess sizes and aligns the
