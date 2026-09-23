@@ -125,8 +125,10 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   `theme.css`: use those for anything button-like instead of flat colors.
   Where Lichess glues a button to an input (`.copy-me`, search forms) or
   stacks buttons flush (editor actions), drop the shadow or add a gap.
-- **Scroll state.** Once the page scrolls, Lichess adds `.scrolled` to `#top`
-  and hides `#topnav`. The sidebar is fixed, so `sidebar.css` forces it back.
+- **Scroll state.** Once the page scrolls down, Lichess adds `.hide` to `#top`,
+  which hides `#topnav` and the dropdowns with `visibility`, `opacity` *and*
+  `pointer-events: none`. The sidebar is fixed, so `sidebar.css` forces all
+  three back; forgetting `pointer-events` leaves a visible but dead sidebar.
 - **JS-sized widgets.** The home blog carousel sets each card's width from
   the carousel's `clientWidth`, which counts padding. Inset it with a
   transparent border, not padding, or the last card is clipped.
