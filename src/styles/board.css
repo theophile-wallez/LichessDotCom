@@ -223,8 +223,10 @@ body.coords-in coords.files {
   height: auto !important;
 }
 
+/* Same inset as the ranks (0.25em from their edge), so a letter sits as far
+   from the board's bottom as a number does from its top. */
 body.coords-in coords.files coord {
-  padding: 0 0.3em 0.1em 0 !important;
+  padding: 0 0.3em 0.25em 0 !important;
   text-align: right;
 }
 
@@ -236,4 +238,11 @@ body.coords-out coords coord {
 body.coords-out coords.ranks {
   left: -16px !important;
   right: auto !important;
+}
+
+/* Lichess tucks the files right under the board (`bottom: -15px` for a 17px
+   line, so the letters touch the squares) while the ranks stand clear of it:
+   the letters get the same gap as the numbers. */
+body.coords-out coords.files {
+  bottom: -21px !important;
 }
