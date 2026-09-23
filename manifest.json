@@ -36,6 +36,7 @@
         "src/styles/blog.css",
         "src/styles/practice.css",
         "src/styles/practice-run.css",
+        "src/styles/learn.css",
         "src/styles/puzzles.css",
         "src/styles/dashboard.css",
         "src/styles/broadcast.css"

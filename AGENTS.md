@@ -75,6 +75,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/blog.css` | Blog posts (`.ublog-post`) as Chess.com-style articles, and the blog lists. |
 | `src/styles/practice.css` | Practice (`.practice-app`, `.practice-side`) as playful lesson cards: a color per section, white icons on gradient tiles, progress pills. |
 | `src/styles/practice-run.css` | Inside a lesson (`main.analyse` + `.practice__side`): one lesson panel with the chapter list as numbered steps, the gamebook coach in a white bubble with the octopus, and a drill's goal card and status. |
+| `src/styles/learn.css` | Learn (`#learn-app`, one app for both views): the map (`.learn--map`) in the Practice look, a color per category, white pieces on gradient tiles, star pills; inside a stage (`.learn--run`) the stage list and the goal panel as cards, the levels as pills. |
 | `src/styles/puzzles.css` | Puzzle themes (`.puzzle-themes`) and puzzles by opening (`.puzzle-openings`) in the Practice look: a color per section, theme cards, a card per opening family, opening chips. |
 | `src/styles/dashboard.css` | Puzzle dashboard (`.puzzle-dashboard`): stat tiles, per-theme rows, and the panel around `dashboard.js`'s radar. |
 | `src/styles/broadcast.css` | Broadcasts (`.relay-index` lists, calendar, FIDE pages, info pages) as event cards with a LIVE pill. |
