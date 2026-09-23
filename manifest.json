@@ -34,9 +34,10 @@
         "src/styles/blog.css",
         "src/styles/practice.css",
         "src/styles/puzzles.css",
+        "src/styles/dashboard.css",
         "src/styles/broadcast.css"
       ],
-      "js": ["src/content.js"],
+      "js": ["src/content.js", "src/dashboard.js"],
       "run_at": "document_start"
     },
     {

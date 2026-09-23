@@ -1,0 +1,487 @@
+/*
+ * Puzzle dashboard (.puzzle-dashboard: /training/dashboard/<days>/<page>) as a
+ * Chess.com stats page: the box becomes the bare page, with a header carrying
+ * the range picker, a row of stat tiles, and the per-theme radar in its own
+ * panel. The radar itself is ours (see dashboard.js); Lichess's canvas is only
+ * hidden once ours is in the page.
+ */
+
+/* The replay tile's triangle; its checkmark reuses --cdc-check (dropdowns.css). */
+:root {
+  --cdc-play: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 2.5 13 8l-9 5.5z'/%3E%3C/svg%3E");
+}
+
+/* The tiles and panels below are the cards now, so the box that held them
+ * stops being one. It also stops clipping: the radar's labels sit outside
+ * the plot, and near the rim they reach past it. */
+main.page-menu .page-menu__content.puzzle-dashboard {
+  padding: 0 !important;
+  background: transparent !important;
+  overflow: visible !important;
+}
+
+/* ---------------------------------------------------------------- header --- */
+
+.puzzle-dashboard .box__top {
+  align-items: flex-start !important;
+  gap: 16px;
+  margin: 0 0 18px !important;
+  padding: 14px 0 0 !important;
+  border: none !important;
+}
+
+.puzzle-dashboard .box__top h1 {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0 14px;
+  font-size: 2rem !important;
+  line-height: 1.15;
+}
+
+.puzzle-dashboard .box__top h1::before {
+  content: '';
+  grid-row: 1 / span 2;
+  width: 40px;
+  height: 40px;
+  background: url('https://assets-ds.chess.com/color-icons/rating-stats.svg') center / contain
+    no-repeat;
+}
+
+.puzzle-dashboard .box__top h1 strong {
+  grid-column: 2;
+  color: var(--cdc-text-dim) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+
+/* Lichess blows the range picker up to 2em to match its huge title. */
+.puzzle-dashboard .puzzle-dashboard__day-select.mselect {
+  margin: 5px 0 0 !important;
+  font-size: 1rem !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__day-select .mselect__item {
+  padding: 9px 14px !important;
+  font-size: 14px !important;
+}
+
+/* ------------------------------------------------------------ stat tiles --- */
+
+.puzzle-dashboard__global {
+  display: grid;
+  gap: 16px;
+}
+
+.puzzle-dashboard .puzzle-dashboard__metrics {
+  gap: 14px !important;
+  align-items: stretch;
+}
+
+.puzzle-dashboard .puzzle-dashboard__metric {
+  box-sizing: border-box;
+  flex: 1 1 0 !important;
+  min-width: 0;
+  gap: 3px;
+  /* Top-aligned, so the numbers stay on one line across the row however many
+   * lines each caption takes: they wrap differently per language. */
+  justify-content: flex-start !important;
+  padding: 18px 14px 22px !important;
+  border-radius: 12px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: inset 0 1px 0 #ffffff0f !important;
+  color: #ffffffa6 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  line-height: 1.3;
+  opacity: 1 !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__metric strong {
+  color: #fff !important;
+  font-size: 40px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.1 !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Lichess gives the performance caption its own size and spacing. */
+.puzzle-dashboard .puzzle-dashboard__metric span {
+  color: inherit !important;
+  font-size: inherit !important;
+  letter-spacing: inherit !important;
+}
+
+/* Chess.com tints the number, not the tile: the three of them side by side as
+ * solid gold and green blocks was the loudest thing on the page. */
+.puzzle-dashboard .puzzle-dashboard__metric--perf {
+  background: var(--cdc-bg-panel) !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__metric--perf strong {
+  color: #f2b544 !important;
+}
+
+/* Lichess encodes how the puzzles went in ---first (solved first try) and
+ * ---win (solved at all) and paints the whole tile with them. Keep the reading,
+ * as a bar along the bottom edge. */
+.puzzle-dashboard .puzzle-dashboard__metric--win {
+  position: relative;
+  background: var(--cdc-bg-panel) !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__metric--win strong {
+  color: var(--cdc-green-hover) !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__metric--win::after {
+  content: '';
+  position: absolute;
+  inset: auto 12px 9px;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    var(--cdc-green) 0% var(---first),
+    var(--cdc-green-shadow) var(---first) var(---win),
+    #e02828 var(---win) 100%
+  );
+}
+
+html[dir='rtl'] .puzzle-dashboard .puzzle-dashboard__metric--win::after {
+  background: linear-gradient(
+    to left,
+    var(--cdc-green) 0% var(---first),
+    var(--cdc-green-shadow) var(---first) var(---win),
+    #e02828 var(---win) 100%
+  );
+}
+
+/* --------------------------------------------------------- replay tile --- */
+
+/* With puzzles to redo it's the page's call to action; without, a plain "all
+ * clear" badge (Lichess floats a 5.5em checkmark loose on the page). Which one
+ * it is shows in the href, not in the glyph, so the icon is masked from here. */
+.puzzle-dashboard .puzzle-dashboard__metric--fix {
+  flex-flow: row nowrap !important;
+  gap: 12px;
+  justify-content: center !important;
+  text-decoration: none !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__metric--fix[href] {
+  background: var(--cdc-btn-green) !important;
+  box-shadow: var(--cdc-btn-green-shadow) !important;
+  color: #ffffffcc !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__metric--fix[href]:hover {
+  background: var(--cdc-btn-green-hover) !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__metric--fix__text {
+  align-items: center;
+}
+
+.puzzle-dashboard .puzzle-dashboard__metric--fix icon {
+  position: static !important;
+  display: grid;
+  place-items: center;
+  flex: none;
+  margin: 0 !important;
+  font-size: 0 !important; /* the glyph is replaced below */
+  opacity: 1 !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__metric--fix icon::before {
+  content: '' !important;
+  width: 22px;
+  height: 22px;
+  background: currentcolor;
+  -webkit-mask: var(--cdc-play) center / contain no-repeat;
+  mask: var(--cdc-play) center / contain no-repeat;
+}
+
+.puzzle-dashboard .puzzle-dashboard__metric--fix[href] icon::before {
+  background: #fff;
+}
+
+.puzzle-dashboard .puzzle-dashboard__metric--fix:not([href]) {
+  flex: 0 0 auto !important;
+  align-self: center;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__metric--fix:not([href]) icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #81b64c26;
+}
+
+.puzzle-dashboard .puzzle-dashboard__metric--fix:not([href]) icon::before {
+  width: 28px;
+  height: 28px;
+  background: var(--cdc-green-hover);
+  -webkit-mask-image: var(--cdc-check);
+  mask-image: var(--cdc-check);
+}
+
+/* ----------------------------------------------------------- theme rows --- */
+/* Improvement areas and strengths: one card per theme, its tiles inside. */
+
+.puzzle-dashboard .puzzle-dashboard__theme {
+  gap: 24px;
+  margin: 0 0 12px !important;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: var(--cdc-bg-panel);
+  box-shadow: inset 0 1px 0 #ffffff0f;
+}
+
+.puzzle-dashboard .puzzle-dashboard__theme__meta {
+  margin-inline-end: 0 !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__theme__name {
+  margin: 0 0 4px;
+  font-size: 17px !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__theme__name a {
+  color: #fff !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__theme__name a:hover {
+  color: var(--cdc-green-hover) !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__theme__description {
+  margin: 0;
+  color: var(--cdc-text-dim) !important;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* Inside a card, the tiles are the darker layer, and smaller. Their width is
+ * fixed so that rows line up whichever replay tile they end on. */
+.puzzle-dashboard .puzzle-dashboard__theme .puzzle-dashboard__metrics {
+  flex: 0 0 auto !important;
+  justify-content: flex-end;
+}
+
+.puzzle-dashboard .puzzle-dashboard__theme .puzzle-dashboard__metric {
+  flex: 0 0 106px !important;
+  padding: 12px 8px 20px !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  font-size: 11px !important;
+}
+
+.puzzle-dashboard
+  .puzzle-dashboard__theme
+  .puzzle-dashboard__metric:not(.puzzle-dashboard__metric--fix) {
+  background: var(--cdc-bg-panel-dark) !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__theme .puzzle-dashboard__metric strong {
+  font-size: 26px !important;
+}
+
+/* Too narrow for a stat tile's stacked number and caption: read it as one
+ * line, "3 to replay", next to the triangle. */
+.puzzle-dashboard .puzzle-dashboard__theme .puzzle-dashboard__metric--fix[href] {
+  flex: 0 0 auto !important;
+  gap: 8px;
+  padding-inline: 16px !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__theme .puzzle-dashboard__metric--fix__text {
+  flex-direction: row;
+  gap: 5px;
+  align-items: baseline;
+}
+
+.puzzle-dashboard .puzzle-dashboard__theme .puzzle-dashboard__metric--fix[href] strong {
+  font-size: 18px !important;
+}
+
+.puzzle-dashboard .puzzle-dashboard__theme .puzzle-dashboard__metric--fix icon::before {
+  width: 16px;
+  height: 16px;
+}
+
+.puzzle-dashboard .puzzle-dashboard__theme .puzzle-dashboard__metric--fix:not([href]) icon {
+  width: 46px;
+  height: 46px;
+}
+
+.puzzle-dashboard .puzzle-dashboard__theme .puzzle-dashboard__metric--fix:not([href]) icon::before {
+  width: 22px;
+  height: 22px;
+}
+
+/* ------------------------------------------------------------- no data --- */
+
+.puzzle-dashboard .puzzle-dashboard__empty {
+  margin: 0 !important;
+  padding: 72px 24px !important;
+  border-radius: 12px;
+  background: var(--cdc-bg-panel);
+  box-shadow: inset 0 1px 0 #ffffff0f;
+}
+
+.puzzle-dashboard .puzzle-dashboard__empty a {
+  display: inline-block;
+  padding: 12px 22px;
+  border-radius: 7px;
+  background: var(--cdc-btn-green);
+  box-shadow: var(--cdc-btn-green-shadow);
+  color: #fff !important;
+  font-weight: 800;
+}
+
+.puzzle-dashboard .puzzle-dashboard__empty a:hover {
+  background: var(--cdc-btn-green-hover);
+}
+
+/* ----------------------------------------------------------- our radar --- */
+
+/* Only once ours is in the page: if the data ever moves, Lichess's chart is
+ * still better than an empty panel. */
+.puzzle-dashboard__global:has(.cdc-radar) > .puzzle-dashboard__radar {
+  display: none !important;
+}
+
+/* The padding is the labels' room: they reach about 110px past the rim
+ * sideways and two lines above and below it. */
+.cdc-radar {
+  padding: 46px clamp(18px, 12%, 130px) 42px;
+  border-radius: 12px;
+  /* A vignette centred on the plot: the panel is much wider than the chart. */
+  background: radial-gradient(circle at 50% 52%, #2e2d29, var(--cdc-bg-panel) 65%);
+  box-shadow: inset 0 1px 0 #ffffff0f;
+}
+
+.cdc-radar__plot {
+  position: relative;
+  width: min(100%, 560px);
+  margin-inline: auto;
+  aspect-ratio: 1;
+}
+
+.cdc-radar__chart {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.cdc-radar__rings polygon {
+  fill: none;
+  stroke: #ffffff12;
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+.cdc-radar__rings polygon:last-child {
+  stroke: #ffffff26;
+}
+
+.cdc-radar__spokes line {
+  stroke: #ffffff12;
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+.cdc-radar__area {
+  fill: #81b64c2e;
+  stroke: var(--cdc-green);
+  stroke-width: 2px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 10px #81b64c40);
+}
+
+.cdc-radar__dots circle {
+  fill: var(--cdc-green-hover);
+  stroke: var(--cdc-bg-panel);
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Each label sits on its own spoke (--cdc-x / --cdc-y), then slides outwards
+ * along it by half its own box, so it clears the rim whatever its size. */
+.cdc-radar__label {
+  position: absolute;
+  top: var(--cdc-y);
+  left: var(--cdc-x);
+  width: max-content;
+  max-width: 13ch;
+  translate: calc(-50% + var(--cdc-ox) * (50% + 9px)) calc(-50% + var(--cdc-oy) * (50% + 9px));
+  text-align: center;
+}
+
+.cdc-radar__name {
+  display: block;
+  color: var(--cdc-text);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.cdc-radar__value {
+  display: block;
+  color: var(--cdc-green-hover);
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1100px) {
+  .cdc-radar {
+    padding-inline: clamp(12px, 9%, 60px);
+  }
+
+  .cdc-radar__label {
+    max-width: 11ch;
+  }
+
+  .cdc-radar__name {
+    font-size: 12px;
+  }
+}
+
+/* Stacked tiles below the Chess.com breakpoint: Lichess switches its own row
+ * to a column there too. */
+@media (max-width: 1019px) {
+  .puzzle-dashboard .box__top {
+    flex-flow: row wrap !important;
+  }
+
+  .puzzle-dashboard .box__top h1 {
+    font-size: 1.6rem !important;
+  }
+
+  .puzzle-dashboard .puzzle-dashboard__metric {
+    padding: 14px 10px 16px !important;
+  }
+
+  .puzzle-dashboard .puzzle-dashboard__metric strong {
+    font-size: 28px !important;
+  }
+
+  .puzzle-dashboard .puzzle-dashboard__theme {
+    display: block;
+  }
+
+  .puzzle-dashboard .puzzle-dashboard__theme__meta {
+    margin-bottom: 12px;
+  }
+}
