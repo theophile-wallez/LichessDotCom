@@ -47,7 +47,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | --- | --- |
 | `manifest.json` | Content scripts: CSS + `content.js` + `dashboard.js` (isolated world), `page.js` + `board.js` + `review.js` (page world). |
 | `src/background.js` | Service worker: downloads the Chess.com sounds, caches them as base64. |
-| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, the home hero, coach title badges and the font remapping. |
+| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, the home hero, coach title badges, the hover card's rating chips and the font remapping. |
 | `src/dashboard.js` | Isolated world: the puzzle dashboard's theme radar, redrawn as SVG from the page's init JSON (Lichess draws it into a canvas). |
 | `src/page.js` | Page world: wraps `site.sound` to play the right Chess.com sound per move, plus premove / illegal / game-start, which Lichess has no sound for. |
 | `src/board.js` | Page world: analysis arrows redrawn Chess.com-style, checkmate badge and label. |
@@ -60,7 +60,8 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/review.css` | Game Review panel, eval bar, board annotations. |
 | `src/styles/pages.css` | Modern look for every other page (headings, side menus, tabs, tables, forms, dialogs, lobby, editor, tournaments). |
 | `src/styles/dropdowns.css` | Every dropdown as one menu style: Lichess's `.mselect`, native `<select>` (via `appearance: base-select`) and autocomplete lists. |
-| `src/styles/home.css` | Home page (`main.lobby`) as a 12-column card dashboard; the hero is added by `content.js`. |
+| `src/styles/powertip.css` | The profile hover card (`#powerTip`, filled with `/@/<user>/mini`) as a Chess.com player card. |
+| `src/styles/home.css` | Home page (`main.lobby`) as a 12-column card dashboard, with quick pairing as Chess.com's time-control picker; the hero is added by `content.js`. |
 | `src/styles/coach.css` | Coach directory (`main.coach-list`) as a grid of coach cards; the title badges are split out of the names by `content.js`. |
 | `src/styles/teams.css` | Team lists (`main.team-list`) as a grid of club cards with avatar tiles. |
 | `src/styles/study.css` | Study lists (`.study-index`) as a grid of study cards, the compact list view, the toolbar, topics and staff picks. |
@@ -68,7 +69,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/puzzle.css` | Puzzles (`main.puzzle`): side cards, a status banner, chunky hint / solution buttons, and the move buttons pinned inside the panel. |
 | `src/styles/blog.css` | Blog posts (`.ublog-post`) as Chess.com-style articles, and the blog lists. |
 | `src/styles/practice.css` | Practice (`.practice-app`, `.practice-side`) as playful lesson cards: a color per section, white icons on gradient tiles, progress pills. |
-| `src/styles/puzzles.css` | Puzzle themes (`.puzzle-themes`) in the Practice look: a color per section, theme cards, opening chips. |
+| `src/styles/puzzles.css` | Puzzle themes (`.puzzle-themes`) and puzzles by opening (`.puzzle-openings`) in the Practice look: a color per section, theme cards, a card per opening family, opening chips. |
 | `src/styles/dashboard.css` | Puzzle dashboard (`.puzzle-dashboard`): stat tiles, per-theme rows, and the panel around `dashboard.js`'s radar. |
 | `src/styles/broadcast.css` | Broadcasts (`.relay-index` lists, calendar, FIDE pages, info pages) as event cards with a LIVE pill. |
 
@@ -135,6 +136,14 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   and `site.analysis.chessground.state.drawable` holds the arrows (`shapes`,
   `autoShapes`, `current`), and the engine is at
   `npm/stockfish-web/sf_19_smallnet.js`.
+- **Hover cards.** All of them come from one `powertip.ts`, but each kind has
+  its own popup element: the **user** card is `#powerTip` (server HTML from
+  `/@/<user>/mini`), games are `#miniGame`, board previews `#miniBoard`, lobby
+  hooks `#hook`. The card is re-fetched and re-`innerHTML`'d on every hover, so
+  editing its text is safe, but it has to be re-done each time: watch the
+  popup with a `MutationObserver` on `childList`, don't poll (a poll shows the
+  untouched markup first). Lichess also only creates the element on the first
+  hover.
 - **`<script id="page-init-data">`.** Whatever data a page hands its JS module
   (the game, the puzzle dashboard's radar…) is inlined there as JSON, *not* in
   the `loadEsm(…)` call — and Lichess removes the element once its module has

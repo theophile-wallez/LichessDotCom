@@ -17,6 +17,7 @@ A Chrome extension that makes [Lichess](https://lichess.org) look and sound like
 - **Blog**: posts read like Chess.com articles; the blog lists (community, by month, by topic, a user's blog) are grids of post cards with segmented filters.
 - **Practice**: Chess.com's playful lesson look: a color per section, white icons on bouncy gradient tiles, progress pills, green checks and a green progress bar under Chess.com's Drills illustration.
 - **Puzzle themes**: the same playful look: a color per section, theme cards with white icons on gradient tiles and a count pill, a featured "Healthy mix" card, and openings as chips.
+- **Profile hover cards**: hovering a player anywhere on the site opens a Chess.com-style card: an avatar with an online dot, the name, title badge and flag, the eight best ratings as game-mode chips, games and join date, and the watch / message / challenge / follow buttons across the foot.
 - **Theme**: Chess.com's dark palette, fonts and 3D green buttons across the whole site. Every page is modernized: solid bold text instead of Lichess's thin fonts, pill side menus, clean tabs and tables, card tiles, Chess.com-style dropdown menus, and Chess.com's colorful icons in the sidebar menus.
 - **Game Review**: on any finished game's analysis page, a Chess.com-style review powered by Stockfish 19 running in your browser:
   - A summary with the eval graph, both players' accuracy and counts of brilliant, great, best, excellent, good, book, inaccuracy, mistake, miss and blunder moves.
@@ -47,6 +48,7 @@ Tip: Lichess's _coordinates_ setting (Preferences → Display) picks between Che
 | `src/styles/review.css` | Game Review panel, eval bar and board annotations. |
 | `src/styles/pages.css` | Modern look for every other page: headings, side menus, tabs, tables, forms, lobby tiles. |
 | `src/styles/dropdowns.css` | One Chess.com-style menu for every dropdown: filters, native selects, the variant picker, search suggestions. |
+| `src/styles/powertip.css` | The profile hover card (`#powerTip`) as a Chess.com player card. |
 | `src/styles/home.css` | Home page redesigned as a card dashboard with a hero, featured game and daily puzzle. |
 | `src/styles/coach.css` | Coach directory as a grid of coach cards with title badges. |
 | `src/styles/teams.css` | Team lists as a grid of club cards. |

@@ -344,13 +344,189 @@
     max-height: none !important;
   }
 
-  main.lobby .lpool .perf {
-    font-size: 0.62em;
-  }
-
   main.lobby .lobby__app__content {
     background-color: transparent !important;
     box-shadow: none !important;
+  }
+
+  /* --------------------------------------------------- quick pairing --- */
+
+  /* Chess.com's time-control picker: a heading per speed (icon + name) over
+     a row of flat buttons labelled "1 min", "3 + 2". Every speed is one row
+     of a 12-column grid, split evenly between its pools; the heading lives
+     in the row gap above, drawn by the row's first button. The pools are
+     Lichess's fixed set, so they're matched by data-id; an unknown one
+     still shows up as a plain third-width button. */
+  main.lobby .lpools {
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    grid-template-rows: none !important;
+    grid-auto-rows: 46px;
+    align-content: start;
+    gap: 40px 10px !important;
+    padding: 46px 2px 0 !important;
+    font-size: 16px !important;
+  }
+
+  main.lobby .lpool {
+    position: relative;
+    flex-flow: row !important;
+    gap: 10px;
+    grid-column: span 4;
+    border-radius: 6px !important;
+    font-weight: 600;
+  }
+
+  main.lobby .lpool:is([data-id='1+0'], [data-id='2+1'], [data-id='30+0'], [data-id='30+20']) {
+    grid-column: span 6;
+  }
+
+  main.lobby .lpool:is([data-id='3+0'], [data-id='3+2'], [data-id='5+0'], [data-id='5+3']) {
+    grid-column: span 3;
+  }
+
+  main.lobby .lpool[data-id='1+0']   { --cdc-pool-label: '1 min'; }
+  main.lobby .lpool[data-id='2+1']   { --cdc-pool-label: '2 + 1'; }
+  main.lobby .lpool[data-id='3+0']   { --cdc-pool-label: '3 min'; }
+  main.lobby .lpool[data-id='3+2']   { --cdc-pool-label: '3 + 2'; }
+  main.lobby .lpool[data-id='5+0']   { --cdc-pool-label: '5 min'; }
+  main.lobby .lpool[data-id='5+3']   { --cdc-pool-label: '5 + 3'; }
+  main.lobby .lpool[data-id='10+0']  { --cdc-pool-label: '10 min'; }
+  main.lobby .lpool[data-id='10+5']  { --cdc-pool-label: '10 + 5'; }
+  main.lobby .lpool[data-id='15+10'] { --cdc-pool-label: '15 + 10'; }
+  main.lobby .lpool[data-id='30+0']  { --cdc-pool-label: '30 min'; }
+  main.lobby .lpool[data-id='30+20'] { --cdc-pool-label: '30 + 20'; }
+
+  main.lobby .lpool .clock {
+    font-size: 16px !important;
+    font-weight: 600;
+    line-height: 1 !important;
+    letter-spacing: 0 !important;
+  }
+
+  /* Lichess's text is "10+0": hide it and write Chess.com's label instead. */
+  main.lobby .lpool:is([data-id='1+0'], [data-id='2+1'], [data-id='3+0'], [data-id='3+2'],
+      [data-id='5+0'], [data-id='5+3'], [data-id='10+0'], [data-id='10+5'], [data-id='15+10'],
+      [data-id='30+0'], [data-id='30+20']) .clock {
+    font-size: 0 !important;
+  }
+
+  main.lobby .lpool:is([data-id='1+0'], [data-id='2+1'], [data-id='3+0'], [data-id='3+2'],
+      [data-id='5+0'], [data-id='5+3'], [data-id='10+0'], [data-id='10+5'], [data-id='15+10'],
+      [data-id='30+0'], [data-id='30+20']) .clock::before {
+    content: var(--cdc-pool-label);
+    font-size: 16px;
+  }
+
+  /* The speed is the heading's job now. */
+  main.lobby .lpool .perf {
+    display: none;
+  }
+
+  /* Lichess's hover tints them green; Chess.com's just lightens. */
+  main.lobby .lpool:hover {
+    background: var(--cdc-btn-grey-hover) !important;
+    color: #fff !important;
+  }
+
+  /* Seeking: Chess.com's green ring, with Lichess's spinner or rating range
+     beside the label instead of under it. */
+  main.lobby .lpool.active {
+    box-shadow: inset 0 0 0 2px var(--cdc-green), var(--cdc-btn-grey-shadow) !important;
+  }
+
+  main.lobby .lpool .spinner {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+  }
+
+  main.lobby .lpool .range {
+    margin: 0;
+    font-size: 13px;
+  }
+
+  /* The other pools fade while one is sought. Only their labels: the
+     headings belong to the button that draws them but must stay lit. */
+  main.lobby .lpool.transp .clock {
+    opacity: 0.4;
+  }
+
+  /* Speed headings. Lichess's own speed names sit in .perf, which it swaps
+     for the spinner on the pool being sought, so the names are ours. */
+  main.lobby .lpool:is([data-id='1+0'], [data-id='2+1'])    { --cdc-pool-speed: 'Bullet';    --cdc-pool-icon: var(--cdc-mode-bullet); --cdc-pool-color: #e3aa24; }
+  main.lobby .lpool:is([data-id^='3+'], [data-id^='5+'])    { --cdc-pool-speed: 'Blitz';     --cdc-pool-icon: var(--cdc-mode-blitz);  --cdc-pool-color: #fad541; }
+  main.lobby .lpool:is([data-id^='10+'], [data-id^='15+'])  { --cdc-pool-speed: 'Rapid';     --cdc-pool-icon: var(--cdc-mode-rapid);  --cdc-pool-color: #81b64c; }
+  main.lobby .lpool[data-id^='30+']                         { --cdc-pool-speed: 'Classical'; --cdc-pool-icon: var(--cdc-mode-rapid);  --cdc-pool-color: #81b64c; }
+
+  html[lang^='fr'] main.lobby .lpool:is([data-id^='10+'], [data-id^='15+']) { --cdc-pool-speed: 'Rapide'; }
+  html[lang^='fr'] main.lobby .lpool[data-id^='30+']                        { --cdc-pool-speed: 'Classique'; }
+  html[lang^='de'] main.lobby .lpool:is([data-id^='10+'], [data-id^='15+']) { --cdc-pool-speed: 'Schnellschach'; }
+  html[lang^='de'] main.lobby .lpool[data-id^='30+']                        { --cdc-pool-speed: 'Klassisch'; }
+  html[lang^='es'] main.lobby .lpool:is([data-id^='10+'], [data-id^='15+']) { --cdc-pool-speed: 'Rápida'; }
+  html[lang^='es'] main.lobby .lpool[data-id^='30+']                        { --cdc-pool-speed: 'Clásica'; }
+  html[lang^='pt'] main.lobby .lpool:is([data-id^='10+'], [data-id^='15+']) { --cdc-pool-speed: 'Rápida'; }
+  html[lang^='pt'] main.lobby .lpool[data-id^='30+']                        { --cdc-pool-speed: 'Clássico'; }
+
+  /* Drawn by each row's first button, above it. No pointer events: a click
+     on a heading must not join that pool. */
+  main.lobby .lpool:is([data-id='1+0'], [data-id='3+0'], [data-id='10+0'], [data-id='30+0'])::before,
+  main.lobby .lpool:is([data-id='1+0'], [data-id='3+0'], [data-id='10+0'], [data-id='30+0'])::after {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 2px;
+    pointer-events: none;
+  }
+
+  main.lobby .lpool:is([data-id='1+0'], [data-id='3+0'], [data-id='10+0'], [data-id='30+0'])::before {
+    content: var(--cdc-pool-speed);
+    padding-left: 28px;
+    color: var(--cdc-text);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+  }
+
+  main.lobby .lpool:is([data-id='1+0'], [data-id='3+0'], [data-id='10+0'], [data-id='30+0'])::after {
+    content: '';
+    width: 20px;
+    height: 20px;
+    background: var(--cdc-pool-color);
+    -webkit-mask: var(--cdc-pool-icon) center / contain no-repeat;
+    mask: var(--cdc-pool-icon) center / contain no-repeat;
+  }
+
+  /* "Custom" opens the game setup dialog: Chess.com's "More time controls"
+     link under the grid, not a button. */
+  main.lobby .lpool[data-id='custom'] {
+    grid-column: 1 / -1;
+    justify-self: center;
+    height: 36px;
+    margin-top: -30px;
+    padding: 0 14px;
+    background: none !important;
+    box-shadow: none !important;
+    color: var(--cdc-text-dim) !important;
+    font-size: 15px;
+  }
+
+  main.lobby .lpool[data-id='custom']:hover {
+    color: #fff !important;
+  }
+
+  main.lobby .lpool[data-id='custom']::after {
+    content: '';
+    width: 7px;
+    height: 7px;
+    margin-left: -2px;
+    border: solid currentColor;
+    border-width: 2px 2px 0 0;
+    transform: rotate(45deg);
+    transition: transform 0.15s;
+  }
+
+  main.lobby .lpool[data-id='custom']:hover::after {
+    transform: translateX(3px) rotate(45deg);
   }
 
   main.lobby .lobby__puzzle .text {
