@@ -2,6 +2,10 @@
 
 Guidance for AI coding agents (and humans) working on this repository.
 
+**When a change is done, ship it without being asked: commit, push to `main`
+and pull it into the main checkout (see [Shipping](#shipping)).** Work left
+uncommitted in a worktree never reaches the extension Chrome loads.
+
 ## Goal
 
 LichessDotCom is a Chrome extension (Manifest V3) that gives lichess.org a
@@ -170,7 +174,10 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
 
 ## Testing
 
-Branded Chrome ignores `--load-extension`, so changes are verified by driving
+Branded Chrome ignores `--load-extension`, but Playwright's Chromium
+(`~/.cache/ms-playwright/chromium-*/chrome-linux64/chrome`) honours it:
+`launchPersistentContext` with `--load-extension=<worktree>` runs the real
+extension, content scripts and all. Otherwise, verify by driving
 a headless Chrome over the DevTools protocol. The CSS is injected (prepended,
 so Lichess still wins ties, as it does with a real content script) and the
 page-world scripts are evaluated, then screenshots and measurements are taken
