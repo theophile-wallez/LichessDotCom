@@ -6,35 +6,38 @@
 
 /* ---------------------------------------------------------- header --- */
 
-.relay-index .page-menu__content.box {
+:is(.relay-index, .relay-calendar) .page-menu__content.box {
   padding: 0 !important;
   background: transparent !important;
 }
 
-.relay-index .box__top {
+:is(.relay-index, .relay-calendar) .box__top {
   flex-wrap: wrap;
   gap: 12px 24px;
   margin: 0 !important;
   padding: 16px 0 20px !important;
 }
 
-.relay-index .box__top h1 {
+:is(.relay-index, .relay-calendar) .box__top h1 {
   display: flex;
   align-items: center;
   gap: 12px;
   margin: 0 !important;
 }
 
-/* Chess.com's trophies icon, as in the sidebar's Watch menu. */
-.relay-index .box__top h1::before {
-  content: '';
+/* Chess.com's trophies icon, as in the sidebar's Watch menu (it replaces
+ * the calendar title's Lichess icon). */
+:is(.relay-index, .relay-calendar) .box__top h1::before {
+  content: '' !important;
+  margin: 0 !important;
+  opacity: 1 !important;
   flex: none;
   width: 36px;
   height: 36px;
   background: url('https://assets-ds.chess.com/color-icons/trophies.svg') center / contain no-repeat;
 }
 
-.relay-index .box__top .search input {
+:is(.relay-index, .relay-calendar) .box__top .search input {
   width: 260px;
   padding-inline-start: 38px !important;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='7' cy='7' r='4.75' fill='none' stroke='%23989795' stroke-width='1.8'/%3E%3Cpath d='m10.5 10.5 3.5 3.5' stroke='%23989795' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E") !important;
@@ -43,7 +46,7 @@
   background-size: 16px !important;
 }
 
-html[dir='rtl'] .relay-index .box__top .search input {
+html[dir='rtl'] :is(.relay-index, .relay-calendar) .box__top .search input {
   background-position: calc(100% - 12px) center !important;
 }
 
@@ -52,6 +55,51 @@ html[dir='rtl'] .relay-index .box__top .search input {
   color: #fff;
   font-size: 20px !important;
   font-weight: 800 !important;
+}
+
+/* Calendar: previous / next month as quiet icon buttons around the
+ * pickers, on a plain row rather than a boxed bar. */
+.relay-calendar .calendar-mselect {
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 16px !important;
+}
+
+.relay-calendar .calendar-mselect--top {
+  margin-bottom: 20px !important;
+}
+
+.relay-calendar .calendar-mselect--bottom {
+  margin-top: 24px !important;
+}
+
+.relay-calendar .calendar-mselect > a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--cdc-btn-grey);
+  box-shadow: var(--cdc-btn-grey-shadow);
+  color: var(--cdc-text) !important;
+  font-size: 18px !important;
+}
+
+.relay-calendar .calendar-mselect > a:hover {
+  background: var(--cdc-btn-grey-hover);
+  color: #fff !important;
+}
+
+.relay-calendar .calendar-mselect__selects {
+  gap: 10px !important;
+}
+
+.relay-calendar .calendar-mselect .mselect__label {
+  padding: 8px 12px 8px 14px !important;
+  font-size: 17px;
+  font-weight: 800;
 }
 
 /* ------------------------------------------------------------ grid --- */
@@ -238,7 +286,7 @@ html[dir='rtl'] .relay-index .box__top .search input {
 
 /* Lichess's mobile layout runs the lists edge to edge. */
 @media (max-width: 799.98px) {
-  .relay-index .page-menu__content.box {
+  :is(.relay-index, .relay-calendar) .page-menu__content.box {
     padding: 0 12px 24px !important;
   }
 }
