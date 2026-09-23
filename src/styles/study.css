@@ -322,3 +322,117 @@
     padding: 0 12px 24px !important;
   }
 }
+
+/* ----------------------------------------------------- staff picks --- */
+
+/* /study/staff-picks is a Markdown page with no class of its own; it's the
+ * page whose side menu has the staff-picks link active. Each heading and its
+ * list become one card, in columns: the heading is the card's top, the list
+ * its body, and a column break is never allowed between them. */
+main.page-menu:has(.subnav a.active[href$='/staff-picks']) .page-menu__content.box {
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+main.page-menu:has(.subnav a.active[href$='/staff-picks']) h1.box__top {
+  display: flex;
+  justify-content: flex-start !important;
+  align-items: center;
+  gap: 12px;
+  margin: 0 !important;
+  padding: 16px 0 12px !important;
+}
+
+main.page-menu:has(.subnav a.active[href$='/staff-picks']) h1.box__top::before {
+  content: '';
+  flex: none;
+  width: 36px;
+  height: 36px;
+  background: url('https://assets-ds.chess.com/color-icons/book-open-aqua.svg') center / contain no-repeat;
+}
+
+main.page-menu:has(.subnav a.active[href$='/staff-picks']) .body {
+  columns: 2 340px;
+  column-gap: 16px;
+}
+
+main.page-menu:has(.subnav a.active[href$='/staff-picks']) .body > p {
+  column-span: all;
+  margin: 0 0 20px !important;
+  color: var(--cdc-text-dim);
+  font-size: 15px;
+}
+
+main.page-menu:has(.subnav a.active[href$='/staff-picks']) .body > h2 {
+  margin: 0 !important;
+  padding: 14px 16px 12px !important;
+  border: 1px solid var(--cdc-card-border);
+  border-bottom-color: #ffffff0f;
+  border-radius: 10px 10px 0 0;
+  background: var(--cdc-bg-panel);
+  color: #fff !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  break-after: avoid;
+}
+
+main.page-menu:has(.subnav a.active[href$='/staff-picks']) .body > h2 strong {
+  font-weight: inherit;
+}
+
+main.page-menu:has(.subnav a.active[href$='/staff-picks']) .body > ul {
+  margin: 0 0 16px !important;
+  padding: 6px !important;
+  border: 1px solid var(--cdc-card-border);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  background: var(--cdc-bg-panel);
+  list-style: none;
+  break-before: avoid;
+  break-inside: avoid;
+}
+
+main.page-menu:has(.subnav a.active[href$='/staff-picks']) .body > ul li {
+  margin: 0 !important;
+}
+
+/* Rows: Lichess's study icon, then the study title. */
+main.page-menu:has(.subnav a.active[href$='/staff-picks']) .body > ul a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: var(--cdc-text) !important;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  transition: background-color 0.1s, color 0.1s;
+}
+
+main.page-menu:has(.subnav a.active[href$='/staff-picks']) .body > ul a::before {
+  content: '\e012';
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #81b64c26;
+  color: var(--cdc-green);
+  font-family: lichess;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+main.page-menu:has(.subnav a.active[href$='/staff-picks']) .body > ul a:hover {
+  background: var(--cdc-menu-hover);
+  color: #fff !important;
+}
+
+@media (max-width: 799.98px) {
+  main.page-menu:has(.subnav a.active[href$='/staff-picks']) .page-menu__content.box {
+    padding: 0 12px 24px !important;
+  }
+}
