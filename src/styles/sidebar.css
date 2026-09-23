@@ -675,8 +675,8 @@
   color: #fff !important;
 }
 
-/* Sliders: a thin green-filled track and a round white thumb. */
-/* The vertical volume slider is a native one: drawn like the others. */
+/* Sliders: a thin track and a round white thumb. The vertical volume
+ * slider is a native one, so it's drawn the same way by hand. */
 #top #dasher_app .sound input[type='range']:not(.rate) {
   appearance: none;
   margin: 12px 4px 12px 10px !important;
@@ -713,37 +713,4 @@
   border-radius: 50%;
   background: #fff !important;
   box-shadow: 0 1px 4px #0009;
-}
-
-/* Switches: Chess.com's pill, grey off and green on, with a white knob. */
-#dasher_app .cmn-toggle label {
-  box-sizing: border-box;
-  width: 40px;
-  height: 22px;
-  padding: 0;
-  border: none !important;
-  border-radius: 999px !important;
-  background: #5d5b58 !important;
-}
-
-#dasher_app .cmn-toggle label::before {
-  display: none !important;
-}
-
-#dasher_app .cmn-toggle label::after {
-  bottom: 2px !important;
-  left: 2px !important;
-  width: 18px !important;
-  height: 18px !important;
-  border-radius: 50% !important;
-  background: #fff !important;
-  box-shadow: 0 1px 3px #0006 !important;
-}
-
-#dasher_app .cmn-toggle input:checked + label {
-  background: var(--cdc-green) !important;
-}
-
-#dasher_app .cmn-toggle input:checked + label::after {
-  margin-inline-start: 18px !important;
 }
