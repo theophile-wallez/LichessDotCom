@@ -209,7 +209,8 @@ select {
  * lists, notifications). Swap them for Chess.com's game-time icons, in its
  * colors. Chess.com has no ultrabullet or classical: they get bullet's and
  * rapid's icon. Variants Chess.com also has get its icons: Crazyhouse,
- * Chess960, King of the Hill, Three-check, and Standard in the variant picker. */
+ * Chess960, King of the Hill, Three-check, Atomic, Antichess, Horde, and
+ * Standard in the variant picker. Racing Kings keeps Lichess's. */
 :root {
   --cdc-mode-bullet: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m7.17 15.3 1.43 1.47-8.27 6.9zm-6.87 2.3 4.5-6 .9 2zm10.47-7.5c3.47-3.6 5.93-5.2 8.7-6.4-2.4 0-5.3.37-9.8 4.6.03.5.7 1.47 1.1 1.8zm11.06-7.93s.23 1.1.23 2.77c0 2.67-.67 6.83-4.17 10.33l-2.17 2.17c-.67.67-1.33.6-2.13.27l-7.47 6.3 9.8-12.17-5.23 4.03c-.43-.4-.93-.83-1.33-1.23-1.73-1.7-4.13-5-2.77-6.37l2.2-2.13c3.53-3.5 7.63-4.2 10.3-4.2 1.63 0 2.73.23 2.73.23zm0 0'/%3E%3C/svg%3E");
   --cdc-mode-blitz: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m5.77 15c-1.03 0-1.37-.4-1.2-1.4l1.53-10.2c.17-1 .63-1.4 1.67-1.4h5.8c1.03 0 1.33.4 1.07 1.37l-3.23 11.63zm13.06-6c1.03 0 1.2.33.57 1.13l-9.67 12.73c-1.23 1.63-1.6 1.47-1.27-.57l2.2-13.3zm0 0'/%3E%3C/svg%3E");
@@ -300,5 +301,28 @@ select {
   background: var(--cdc-mode-color) !important;
   -webkit-mask: var(--cdc-mode-icon) center / contain no-repeat;
   mask: var(--cdc-mode-icon) center / contain no-repeat;
+  opacity: 1 !important;
+}
+
+/* Atomic, Antichess and Horde have no Chess.com glyph, only the full-color
+ * pictures of its variants page, so they're images rather than masks. */
+[data-icon='\e01c']::before {
+  --cdc-mode-image: url('https://www.chess.com/bundles/web/images/variants/variant-atomic.svg');
+}
+
+[data-icon='\e01e']::before {
+  --cdc-mode-image: url('https://www.chess.com/bundles/web/images/variants/giveaway.svg');
+}
+
+[data-icon='\e03d']::before {
+  --cdc-mode-image: url('https://www.chess.com/bundles/web/images/variants/horde.svg');
+}
+
+:is([data-icon='\e01c'], [data-icon='\e01e'], [data-icon='\e03d'])::before {
+  content: '' !important;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background: var(--cdc-mode-image) center / contain no-repeat !important;
   opacity: 1 !important;
 }
