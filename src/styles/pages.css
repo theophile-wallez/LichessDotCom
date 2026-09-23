@@ -382,7 +382,7 @@ input:not([type='hidden']) + .button.button-metal:hover {
 
 /* "Challenge a friend" and "Play the computer" get Chess.com's colour
  * illustrations (a handshake, a smiling monitor) instead of Lichess's
- * font glyphs.
+ * font glyphs. */
 :is(.lobby__start__button--friend, .lobby__start__button--friend-user, .lobby__start__button--ai).button::before {
   content: '' !important;
   flex: none;
