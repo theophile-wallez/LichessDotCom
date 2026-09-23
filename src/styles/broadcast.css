@@ -1,0 +1,244 @@
+/*
+ * Broadcasts: the lists (.relay-index: live and upcoming, past, calendar,
+ * subscribed, a player's broadcasts) as grids of Chess.com-style event
+ * cards, with a red LIVE pill instead of Lichess's red frame.
+ */
+
+/* ---------------------------------------------------------- header --- */
+
+.relay-index .page-menu__content.box {
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.relay-index .box__top {
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin: 0 !important;
+  padding: 16px 0 20px !important;
+}
+
+.relay-index .box__top h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 !important;
+}
+
+/* Chess.com's trophies icon, as in the sidebar's Watch menu. */
+.relay-index .box__top h1::before {
+  content: '';
+  flex: none;
+  width: 36px;
+  height: 36px;
+  background: url('https://assets-ds.chess.com/color-icons/trophies.svg') center / contain no-repeat;
+}
+
+.relay-index .box__top .search input {
+  width: 260px;
+  padding-inline-start: 38px !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='7' cy='7' r='4.75' fill='none' stroke='%23989795' stroke-width='1.8'/%3E%3Cpath d='m10.5 10.5 3.5 3.5' stroke='%23989795' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+  background-position: 12px center !important;
+  background-repeat: no-repeat !important;
+  background-size: 16px !important;
+}
+
+html[dir='rtl'] .relay-index .box__top .search input {
+  background-position: calc(100% - 12px) center !important;
+}
+
+.relay-index .relay-index__section {
+  margin: 32px 0 14px !important;
+  color: #fff;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+}
+
+/* ------------------------------------------------------------ grid --- */
+
+.relay-cards {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+  gap: 14px !important;
+  margin-bottom: 14px !important;
+}
+
+.relay-cards--tier-best {
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)) !important;
+}
+
+/* ------------------------------------------------------------ card --- */
+
+.relay-card {
+  display: flex !important;
+  flex-direction: column;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px !important;
+  outline: none !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: none !important;
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s !important;
+}
+
+.relay-card:hover {
+  border-color: var(--cdc-card-border-hover);
+  background: var(--cdc-card-hover) !important;
+  box-shadow: var(--cdc-card-shadow-hover) !important;
+}
+
+/* Live: a red edge and a red pill, not a thick red frame and glow. */
+.relay-card--live {
+  border-color: #e0282880;
+}
+
+.relay-card--live:hover {
+  border-color: #e02828cc;
+}
+
+.relay-card__image {
+  opacity: 1 !important;
+  transition: filter 0.15s !important;
+}
+
+.relay-card:hover .relay-card__image {
+  filter: brightness(1.08);
+}
+
+.relay-card__body {
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px 14px 14px !important;
+}
+
+/* Round and start time on one line: the round shortens, not the time. */
+.relay-card__info {
+  flex-wrap: nowrap !important;
+  gap: 8px !important;
+  min-width: 0;
+  margin: 0 !important;
+  color: var(--cdc-text-dim) !important;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.relay-card__round {
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+}
+
+.relay-card__info time {
+  flex: none;
+  font-weight: 600;
+}
+
+/* LIVE: a red pill with a pulsing dot, then the viewer count. */
+.relay-card__live {
+  flex: none !important;
+  justify-content: flex-start !important;
+  gap: 8px;
+  color: #fff !important;
+  font-size: 11px;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em;
+}
+
+.relay-card__live::before {
+  content: '';
+  order: -1;
+  width: 6px;
+  height: 6px;
+  margin-inline-end: -4px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 0 #ffffffb3;
+  animation: cdc-live-pulse 1.6s ease-out infinite;
+}
+
+.relay-card__live {
+  padding: 2px 8px 2px 7px;
+  border-radius: 4px;
+  background: #e02828;
+}
+
+@keyframes cdc-live-pulse {
+  70% {
+    box-shadow: 0 0 0 5px #ffffff00;
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 #ffffff00;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .relay-card__live::before {
+    animation: none;
+  }
+}
+
+.relay-card__crowd {
+  margin-inline-start: 4px;
+  padding-inline-start: 8px;
+  border-inline-start: 1px solid #ffffff4d;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.relay-card__crowd::before {
+  color: #ffffffcc !important;
+}
+
+.relay-card__finished {
+  color: var(--cdc-green) !important;
+}
+
+.relay-card__title {
+  margin: 0 !important;
+  color: #fff !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  line-height: 1.3;
+}
+
+.relay-cards--tier-best .relay-card__title {
+  font-size: 20px !important;
+}
+
+.relay-card__players {
+  display: block !important;
+  overflow: hidden;
+  height: auto !important;
+  color: var(--cdc-text-dim) !important;
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.relay-card__players span {
+  display: inline;
+}
+
+/* The link to the calendar at the bottom of the list. */
+.relay-index__calendar .button {
+  padding: 18px 32px !important;
+}
+
+.relay-index__calendar .button strong {
+  font-size: 18px !important;
+}
+
+.relay-index__calendar .button small {
+  color: var(--cdc-text-dim);
+  font-weight: 600;
+}
+
+/* Lichess's mobile layout runs the lists edge to edge. */
+@media (max-width: 799.98px) {
+  .relay-index .page-menu__content.box {
+    padding: 0 12px 24px !important;
+  }
+}

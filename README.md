@@ -16,6 +16,7 @@ A Chrome extension that makes [Lichess](https://lichess.org) look and sound like
 - **Studies**: study lists are a grid of cards (flair tile, name, likes and author, chapters and members) under a one-row toolbar; the list view becomes dense rows.
 - **Blog**: posts read like Chess.com articles; the blog lists (community, by month, by topic, a user's blog) are grids of post cards with segmented filters.
 - **Practice**: Chess.com's playful lesson look: a color per section, white icons on bouncy gradient tiles, progress pills, green checks and a green progress bar under Chess.com's Drills illustration.
+- **Puzzle themes**: the same playful look: a color per section, theme cards with white icons on gradient tiles and a count pill, a featured "Healthy mix" card, and openings as chips.
 - **Theme**: Chess.com's dark palette, fonts and 3D green buttons across the whole site. Every page is modernized: solid bold text instead of Lichess's thin fonts, pill side menus, clean tabs and tables, card tiles, Chess.com-style dropdown menus, and Chess.com's colorful icons in the sidebar menus.
 - **Game Review**: on any finished game's analysis page, a Chess.com-style review powered by Stockfish 19 running in your browser:
   - A summary with the eval graph, both players' accuracy and counts of brilliant, great, best, excellent, good, book, inaccuracy, mistake, miss and blunder moves.
@@ -54,6 +55,8 @@ Tip: Lichess's _coordinates_ setting (Preferences → Display) picks between Che
 | `src/styles/puzzle.css` | Puzzles with Chess.com's banner and buttons. |
 | `src/styles/blog.css` | Blog posts as Chess.com-style articles, and the blog lists as grids of post cards. |
 | `src/styles/practice.css` | Practice page as playful, colorful lesson cards. |
+| `src/styles/puzzles.css` | Puzzle themes page as colorful theme cards. |
+| `src/styles/broadcast.css` | Broadcast pages as Chess.com-style event cards. |
 | `src/background.js` | Downloads the Chess.com sounds once and caches them in `chrome.storage.local`. |
 | `src/content.js` | Passes the sounds to the page and measures the controls height for the layout grid. |
 | `src/page.js` | Runs in the page and wraps `site.sound` so each event plays the matching Chess.com sound. |

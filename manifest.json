@@ -32,7 +32,9 @@
         "src/styles/friends.css",
         "src/styles/puzzle.css",
         "src/styles/blog.css",
-        "src/styles/practice.css"
+        "src/styles/practice.css",
+        "src/styles/puzzles.css",
+        "src/styles/broadcast.css"
       ],
       "js": ["src/content.js"],
       "run_at": "document_start"
