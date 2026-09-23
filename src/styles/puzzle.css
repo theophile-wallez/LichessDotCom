@@ -1,0 +1,382 @@
+/*
+ * Puzzles (main.puzzle) with Chess.com's playful look: rounded cards in the
+ * side column, a coloured status banner instead of grey text (light or dark
+ * for the side to move, green when right, red when wrong), and chunky
+ * rounded buttons for the hint, the solution and the move controls.
+ * Lichess's grid (side, board, tools, controls) is kept.
+ */
+
+/* ------------------------------------------------------------ cards --- */
+
+main.puzzle .puzzle__side {
+  gap: 10px !important;
+}
+
+main.puzzle .puzzle__side > *,
+main.puzzle .puzzle__tools {
+  box-sizing: border-box;
+  border: none !important;
+  border-radius: 12px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: inset 0 1px 0 #ffffff0d, 0 10px 28px #00000033 !important;
+}
+
+main.puzzle .puzzle__side > * {
+  padding: 14px !important;
+  color: var(--cdc-text-dim);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+main.puzzle .puzzle__side strong {
+  color: #fff;
+}
+
+/* Puzzle and game info: the theme picture and the perf icon as tiles. */
+main.puzzle .puzzle__side__metas .infos {
+  gap: 12px;
+}
+
+main.puzzle .puzzle__side__metas .infos__angle-img,
+main.puzzle .puzzle__side__metas .infos::before {
+  flex: none;
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px !important;
+  margin: 0 !important;
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--cdc-bg-raised);
+}
+
+main.puzzle .puzzle__side__metas .infos::before {
+  display: grid;
+  place-items: center;
+  color: var(--cdc-text-dim) !important;
+  font-size: 26px !important;
+}
+
+main.puzzle .puzzle__side__metas .infos.puzzle {
+  margin-bottom: 10px !important;
+  padding-bottom: 10px !important;
+  border-bottom: 1px solid #ffffff14 !important;
+}
+
+main.puzzle .puzzle__side__metas .infos.puzzle p:first-child {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+main.puzzle .puzzle__side__metas p {
+  margin: 0;
+}
+
+/* Your puzzle rating, big, after Chess.com's puzzle icon. */
+main.puzzle .puzzle__side__user__rating strong {
+  gap: 12px;
+  color: #fff !important;
+  font-size: 44px !important;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+main.puzzle .puzzle__side__user__rating strong::before {
+  content: '';
+  width: 44px;
+  height: 44px;
+  background: url('https://assets-ds.chess.com/color-icons/puzzle-piece.svg') center / contain no-repeat;
+}
+
+main.puzzle .puzzle__side__user .rp {
+  font-size: 18px !important;
+  font-weight: 800;
+}
+
+main.puzzle .puzzle__side__user > p {
+  margin: 0 0 12px;
+}
+
+main.puzzle .puzzle__side__user > a.button {
+  display: block;
+  text-align: center;
+}
+
+/* The theme, as the card's title. */
+main.puzzle .puzzle__side__theme__back {
+  margin-bottom: 6px !important;
+  color: #fff !important;
+  font-size: 17px !important;
+  font-weight: 800;
+  transition: color 0.15s;
+}
+
+main.puzzle .puzzle__side__theme__back:hover {
+  color: var(--cdc-green-hover) !important;
+}
+
+main.puzzle .puzzle__side__config {
+  color: var(--cdc-text);
+}
+
+/* Puzzles played this session: rounded green and red chips. */
+main.puzzle .puzzle__session a {
+  height: 26px !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+  opacity: 1 !important;
+}
+
+main.puzzle .puzzle__session a.result-true {
+  background: var(--cdc-btn-green) !important;
+}
+
+main.puzzle .puzzle__session a.result-false {
+  background: var(--cdc-btn-red) !important;
+}
+
+main.puzzle .puzzle__session a.current {
+  box-shadow: 0 0 0 2px #fff;
+}
+
+/* ------------------------------------------------------ status banner --- */
+
+main.puzzle .puzzle__feedback {
+  margin: 10px;
+  border-radius: 12px;
+  background: var(--cdc-bg-raised) !important;
+  transition: background 0.2s;
+}
+
+/* The heading at the top and the buttons at the bottom, so the banner
+ * doesn't look empty while Lichess keeps the buttons hidden. */
+main.puzzle .puzzle__feedback:not(.after) {
+  justify-content: flex-start !important;
+  padding: 20px !important;
+}
+
+main.puzzle .puzzle__feedback .no-square,
+main.puzzle .puzzle__feedback .icon {
+  flex: 0 0 56px !important;
+  width: 56px !important;
+  height: 56px !important;
+  margin-inline-end: 14px !important;
+}
+
+/* The king sits on a tile, so it reads on both the light and dark banner. */
+main.puzzle .puzzle__feedback .no-square {
+  box-sizing: border-box;
+  padding: 4px;
+  border-radius: 12px;
+  background: #0000000f;
+}
+
+main.puzzle .puzzle__feedback.play:has(piece.black) .no-square {
+  background: #ffffffd9;
+}
+
+main.puzzle .puzzle__feedback .instruction strong {
+  font-size: 19px !important;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+main.puzzle .puzzle__feedback .instruction em {
+  margin-top: 2px;
+  font-size: 14px;
+  font-style: normal;
+  opacity: 0.85;
+}
+
+/* Your turn: the banner takes the colour of the side to move. */
+main.puzzle .puzzle__feedback.play:has(piece.white) {
+  background: linear-gradient(#fff, #e8e7e5) !important;
+  color: #312e2b !important;
+}
+
+main.puzzle .puzzle__feedback.play:has(piece.white) strong {
+  color: #312e2b;
+}
+
+main.puzzle .puzzle__feedback.play:has(piece.black) {
+  background: linear-gradient(#2a2926, #1d1c1a) !important;
+  box-shadow: inset 0 0 0 1px #ffffff1a;
+  color: #fff !important;
+}
+
+/* Right and wrong moves: green and red, with the mark in a round badge. */
+main.puzzle .puzzle__feedback.good {
+  background: var(--cdc-btn-green) !important;
+  color: #fff !important;
+}
+
+main.puzzle .puzzle__feedback.fail {
+  background: var(--cdc-btn-red) !important;
+  color: #fff !important;
+}
+
+main.puzzle .puzzle__feedback:is(.good, .fail) .icon {
+  border-radius: 50%;
+  background: #ffffff33;
+  color: #fff !important;
+  font-size: 32px !important;
+  font-weight: 800;
+  line-height: 56px !important;
+}
+
+/* Hint and solution: two full-width buttons with a real gap. Side by side
+ * they're too narrow for their labels, in English already. */
+main.puzzle .puzzle__feedback .view_solution {
+  display: grid;
+  gap: 8px;
+  margin-top: auto !important;
+  padding-top: 18px;
+}
+
+main.puzzle .puzzle__feedback .view_solution.show {
+  opacity: 1 !important;
+}
+
+main.puzzle .puzzle__feedback .view_solution .button {
+  min-height: 42px;
+  margin: 0 !important;
+  padding: 6px 12px !important;
+  border: none !important;
+  border-radius: 8px !important;
+  background: var(--cdc-btn-grey) !important;
+  box-shadow: var(--cdc-btn-grey-shadow) !important;
+  color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.15;
+  text-transform: none !important;
+  white-space: normal;
+}
+
+main.puzzle .puzzle__feedback .view_solution .button:hover {
+  background: var(--cdc-btn-grey-hover) !important;
+}
+
+/* The hint, once shown: pressed in, not a green call to action. */
+main.puzzle .puzzle__feedback .view_solution .button:not(.button-empty) {
+  background: #282725 !important;
+  box-shadow: inset 0 2px 5px #00000080 !important;
+  color: var(--cdc-text-dim) !important;
+}
+
+/* Solved or failed: a big title and Chess.com's green "next" button. */
+main.puzzle .puzzle__feedback.after {
+  gap: 12px;
+  padding: 20px !important;
+}
+
+main.puzzle .puzzle__feedback.after .complete {
+  flex: none !important;
+  padding: 0 !important;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+}
+
+main.puzzle .puzzle__feedback.after .continue {
+  gap: 10px;
+  padding: 16px !important;
+  border-radius: 10px;
+  background: var(--cdc-btn-green) !important;
+  box-shadow: var(--cdc-btn-green-shadow);
+  color: #fff !important;
+  font-size: 18px !important;
+  font-weight: 800;
+  text-transform: none !important;
+}
+
+main.puzzle .puzzle__feedback.after .continue:hover {
+  background: var(--cdc-btn-green-hover) !important;
+}
+
+main.puzzle .puzzle__feedback.after .continue icon::before {
+  margin: 0 !important;
+  font-size: 1.4em !important;
+}
+
+main.puzzle .puzzle__feedback.after .puzzle__more {
+  gap: 8px;
+  padding: 0 !important;
+}
+
+main.puzzle .puzzle__feedback.after .puzzle__more .button {
+  border: none !important;
+  border-radius: 8px !important;
+  background: var(--cdc-btn-grey) !important;
+  box-shadow: var(--cdc-btn-grey-shadow) !important;
+}
+
+main.puzzle .puzzle__feedback.after .puzzle__more .button:hover {
+  background: var(--cdc-btn-grey-hover) !important;
+}
+
+/* ------------------------------------------------------------ controls --- */
+
+/* Chess.com's move buttons: a row of equal, chunky grey buttons, dimmer
+ * and flatter when disabled. */
+main.puzzle .puzzle__controls {
+  height: auto !important;
+  margin: 10px 0 0 !important;
+}
+
+main.puzzle .puzzle__controls .jumps {
+  gap: 8px;
+  padding: 0 !important;
+  font-size: 20px !important;
+}
+
+main.puzzle .puzzle__controls .jumps .fbt {
+  flex: 1 1 0 !important;
+  height: 48px;
+  border-radius: 8px !important;
+  background: var(--cdc-btn-grey) !important;
+  box-shadow: var(--cdc-btn-grey-shadow);
+  color: #c5c5c4 !important;
+  text-shadow: none !important;
+}
+
+main.puzzle .puzzle__controls .jumps .fbt:hover:not(.disabled, [disabled]) {
+  background: var(--cdc-btn-grey-hover) !important;
+  color: #fff !important;
+}
+
+main.puzzle .puzzle__controls .jumps .fbt:is(.disabled, [disabled]) {
+  background: linear-gradient(#2c2b29, #272624) !important;
+  box-shadow: 0 1px 2px #00000033;
+  color: #747372 !important;
+  opacity: 1 !important;
+}
+
+main.puzzle .puzzle__controls .jumps .fbt.glowing {
+  color: #fff !important;
+  box-shadow: var(--cdc-btn-grey-shadow), 0 0 0 2px var(--cdc-green);
+}
+
+/* ---------------------------------------------------- moves, engine --- */
+
+/* The current move: a soft highlight, not Lichess's flat green block. */
+main.puzzle .tview2 move.active {
+  border-radius: 4px;
+  background: #ffffff24 !important;
+  color: #fff !important;
+  font-weight: 700;
+}
+
+/* The engine line shown once the puzzle is over, and the eval bar. */
+/* Padding only across: the engine row has a fixed height. */
+main.puzzle .ceval {
+  padding-inline: 8px !important;
+  border-bottom: 1px solid #ffffff14;
+  background: none !important;
+}
+
+main.puzzle .eval-gauge {
+  border-radius: 4px;
+  background: linear-gradient(to bottom, #403d39 var(--eval-percent), #fff var(--eval-percent)) !important;
+}
