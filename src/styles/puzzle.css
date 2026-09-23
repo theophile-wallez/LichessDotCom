@@ -1,8 +1,8 @@
 /*
  * Puzzles (main.puzzle) with Chess.com's playful look: rounded cards in the
- * side column, a coloured status banner instead of grey text (light or dark
- * for the side to move, green when right, red when wrong), and chunky
- * rounded buttons for the hint, the solution and the move controls.
+ * side column, a status banner instead of grey text (dark while it's your turn,
+ * green when right, red when wrong), and chunky rounded buttons for the hint,
+ * the solution and the move controls, those last ones moved inside the panel.
  * Lichess's grid (side, board, tools, controls) is kept.
  */
 
@@ -54,6 +54,14 @@ main.puzzle .puzzle__side__metas .infos::before {
   place-items: center;
   color: var(--cdc-text-dim) !important;
   font-size: 26px !important;
+}
+
+/* A mix of all themes has no picture of its own, just a grey target; show
+ * Chess.com's puzzle piece instead. A real theme keeps its own drawing. */
+main.puzzle .puzzle__side__metas .infos__angle-img[src*='/mix.'] {
+  padding: 0;
+  background: none;
+  content: url('https://assets-ds.chess.com/color-icons/puzzle-piece.svg');
 }
 
 main.puzzle .puzzle__side__metas .infos.puzzle {
@@ -163,12 +171,14 @@ main.puzzle .puzzle__feedback .icon {
   margin-inline-end: 14px !important;
 }
 
-/* The king sits on a tile, so it reads on both the light and dark banner. */
+/* The king sits on a tile. The panel stays dark, so only the tile follows the
+ * side to move: a faint one under the white king, a light one under the black
+ * king, which would otherwise disappear. */
 main.puzzle .puzzle__feedback .no-square {
   box-sizing: border-box;
   padding: 4px;
   border-radius: 12px;
-  background: #0000000f;
+  background: #ffffff14;
 }
 
 main.puzzle .puzzle__feedback.play:has(piece.black) .no-square {
@@ -188,20 +198,15 @@ main.puzzle .puzzle__feedback .instruction em {
   opacity: 0.85;
 }
 
-/* Your turn: the banner takes the colour of the side to move. */
-main.puzzle .puzzle__feedback.play:has(piece.white) {
-  background: linear-gradient(#fff, #e8e7e5) !important;
-  color: #312e2b !important;
+/* Your turn: one dark card whichever side moves, like Chess.com on its dark
+ * theme. A white card next to the board was the brightest thing on the page. */
+main.puzzle .puzzle__feedback.play {
+  background: var(--cdc-bg-raised) !important;
+  color: var(--cdc-text) !important;
 }
 
-main.puzzle .puzzle__feedback.play:has(piece.white) strong {
-  color: #312e2b;
-}
-
-main.puzzle .puzzle__feedback.play:has(piece.black) {
-  background: linear-gradient(#2a2926, #1d1c1a) !important;
-  box-shadow: inset 0 0 0 1px #ffffff1a;
-  color: #fff !important;
+main.puzzle .puzzle__feedback.play strong {
+  color: #fff;
 }
 
 /* Right and wrong moves: green and red, with the mark in a round badge. */
@@ -318,11 +323,35 @@ main.puzzle .puzzle__feedback.after .puzzle__more .button:hover {
 
 /* ------------------------------------------------------------ controls --- */
 
-/* Chess.com's move buttons: a row of equal, chunky grey buttons, dimmer
- * and flatter when disabled. */
+main.puzzle {
+  --cdc-jumps-h: 48px;
+}
+
+/* Chess.com keeps the move buttons inside the panel, at its bottom: same card,
+ * same width as the status banner. Lichess puts them in a row *under* the
+ * panel, full width, which is what makes the page scroll. So drop them into
+ * the panel's own grid cell, pinned to its end, and reserve their height as the
+ * panel's bottom padding so nothing hides behind them. Desktop only: below
+ * 1020px Lichess stacks the page and has no 'tools' area. */
+@media (min-width: 1020px) {
+  /* Lichess pins the panel to the squares' height, a few px short of the board
+   * wrapper; let it fill its cell instead, so the buttons pinned to the cell's
+   * end keep the same 10px inset as the banner. */
+  main.puzzle .puzzle__tools {
+    height: auto !important;
+    padding-bottom: calc(var(--cdc-jumps-h) + 10px) !important;
+  }
+
+  main.puzzle .puzzle__controls {
+    grid-area: tools !important;
+    align-self: end;
+    margin: 0 10px 10px !important;
+  }
+}
+
+/* A row of equal, chunky grey buttons, dimmer and flatter when disabled. */
 main.puzzle .puzzle__controls {
   height: auto !important;
-  margin: 10px 0 0 !important;
 }
 
 main.puzzle .puzzle__controls .jumps {
@@ -333,7 +362,7 @@ main.puzzle .puzzle__controls .jumps {
 
 main.puzzle .puzzle__controls .jumps .fbt {
   flex: 1 1 0 !important;
-  height: 48px;
+  height: var(--cdc-jumps-h);
   border-radius: 8px !important;
   background: var(--cdc-btn-grey) !important;
   box-shadow: var(--cdc-btn-grey-shadow);

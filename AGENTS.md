@@ -60,12 +60,12 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/review.css` | Game Review panel, eval bar, board annotations. |
 | `src/styles/pages.css` | Modern look for every other page (headings, side menus, tabs, tables, forms, dialogs, lobby, editor, tournaments). |
 | `src/styles/dropdowns.css` | Every dropdown as one menu style: Lichess's `.mselect`, native `<select>` (via `appearance: base-select`) and autocomplete lists. |
-| `src/styles/home.css` | Home page (`main.lobby`) as a 12-column card dashboard; the hero is added by `content.js`. |
+| `src/styles/home.css` | Home page (`main.lobby`) as a 12-column card dashboard, with quick pairing as Chess.com's time-control picker; the hero is added by `content.js`. |
 | `src/styles/coach.css` | Coach directory (`main.coach-list`) as a grid of coach cards; the title badges are split out of the names by `content.js`. |
 | `src/styles/teams.css` | Team lists (`main.team-list`) as a grid of club cards with avatar tiles. |
 | `src/styles/study.css` | Study lists (`.study-index`) as a grid of study cards, the compact list view, the toolbar, topics and staff picks. |
 | `src/styles/friends.css` | Player lists (following, blocks, favourite opponents) as Chess.com friend cards with avatars and an online dot. |
-| `src/styles/puzzle.css` | Puzzles (`main.puzzle`): side cards, a coloured status banner, chunky hint / solution and move buttons. |
+| `src/styles/puzzle.css` | Puzzles (`main.puzzle`): side cards, a status banner, chunky hint / solution buttons, and the move buttons pinned inside the panel. |
 | `src/styles/blog.css` | Blog posts (`.ublog-post`) as Chess.com-style articles, and the blog lists. |
 | `src/styles/practice.css` | Practice (`.practice-app`, `.practice-side`) as playful lesson cards: a color per section, white icons on gradient tiles, progress pills. |
 | `src/styles/puzzles.css` | Puzzle themes (`.puzzle-themes`) and puzzles by opening (`.puzzle-openings`) in the Practice look: a color per section, theme cards, a card per opening family, opening chips. |
