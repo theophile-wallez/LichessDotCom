@@ -682,6 +682,72 @@ dialog .help th p {
   outline-offset: -2px;
 }
 
+/* Strength: Chess.com never shows a bot without its rating, so each Stockfish
+ * level carries an approximate Elo. The numbers are the ones a Lichess dev
+ * gave for these very levels (forum, "How strong are the stockfish levels?"),
+ * from the Fairy-Stockfish skill level and depth each one runs at. They target
+ * OTB classical, not Lichess's Glicko-2, hence the "~". Radio ids are stable
+ * across languages, and a number needs no translating. */
+/* Cells are sized by their content, so a "~400" cell would be narrower than a
+ * "~1100" one: give them all the same share of the track. */
+.game-setup group.radio:has(label[for^='sf_level_']) > div {
+  flex-basis: 0 !important;
+}
+
+.game-setup group.radio label[for^='sf_level_'] {
+  flex-direction: column;
+  gap: 2px;
+  min-height: 46px;
+  padding: 6px 4px !important;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.game-setup group.radio label[for^='sf_level_']::after {
+  content: var(--cdc-level-elo);
+  color: var(--cdc-text-dim);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.15s;
+}
+
+.game-setup group.radio input:checked + label[for^='sf_level_']::after {
+  color: var(--cdc-green-hover);
+}
+
+.game-setup label[for='sf_level_1'] {
+  --cdc-level-elo: '~400';
+}
+
+.game-setup label[for='sf_level_2'] {
+  --cdc-level-elo: '~500';
+}
+
+.game-setup label[for='sf_level_3'] {
+  --cdc-level-elo: '~800';
+}
+
+.game-setup label[for='sf_level_4'] {
+  --cdc-level-elo: '~1100';
+}
+
+.game-setup label[for='sf_level_5'] {
+  --cdc-level-elo: '~1500';
+}
+
+.game-setup label[for='sf_level_6'] {
+  --cdc-level-elo: '~1900';
+}
+
+.game-setup label[for='sf_level_7'] {
+  --cdc-level-elo: '~2300';
+}
+
+.game-setup label[for='sf_level_8'] {
+  --cdc-level-elo: '2800+';
+}
+
 /* Rating and the rating filter: quiet lines under the mode. */
 .game-setup .ratings {
   display: flex;
