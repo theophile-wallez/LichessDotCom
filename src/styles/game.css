@@ -414,14 +414,14 @@
     height: 40px !important;
     line-height: 40px !important;
     border-radius: 5px;
-    background: var(--cdc-bg-raised) !important;
+    background: var(--cdc-btn-grey) !important;
     color: var(--cdc-text) !important;
     font-size: 18px;
-    box-shadow: 0 3px 0 0 #1f1e1c;
+    box-shadow: var(--cdc-btn-grey-shadow);
   }
 
   main.round :is(i5d, rm6) bo3 .fbt:hover:not(.disabled) {
-    background: var(--cdc-bg-raised-hover) !important;
+    background: var(--cdc-btn-grey-hover) !important;
     color: #fff !important;
   }
 
@@ -468,31 +468,31 @@
     margin: 0 !important;
     padding: 12px 0 !important;
     border-radius: 6px !important;
-    background: var(--cdc-bg-raised) !important;
+    background: var(--cdc-btn-grey) !important;
     color: var(--cdc-text) !important;
     font-weight: 700;
     text-shadow: none !important;
-    box-shadow: 0 4px 0 0 #1f1e1c !important;
+    box-shadow: var(--cdc-btn-grey-shadow) !important;
   }
 
   main.round .rcontrols .follow-up .fbt:hover:not(.disabled) {
-    background: var(--cdc-bg-raised-hover) !important;
+    background: var(--cdc-btn-grey-hover) !important;
     color: #fff !important;
   }
 
   main.round .rcontrols .follow-up .fbt.strong,
   main.round .rcontrols .rematch.fbt {
     padding: 16px 0 !important;
-    background: var(--cdc-green) !important;
+    background: var(--cdc-btn-green) !important;
     color: #fff !important;
     font-size: 18px !important;
     font-weight: 800;
-    box-shadow: 0 4px 0 0 var(--cdc-green-shadow) !important;
+    box-shadow: var(--cdc-btn-green-shadow) !important;
   }
 
   main.round .rcontrols .follow-up .fbt.strong:hover:not(.disabled),
   main.round .rcontrols .rematch.fbt:hover:not(.disabled) {
-    background: var(--cdc-green-hover) !important;
+    background: var(--cdc-btn-green-hover) !important;
   }
 
   /* ---------------------------------------------------------------- chat --- */

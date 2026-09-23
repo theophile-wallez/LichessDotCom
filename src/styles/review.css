@@ -455,24 +455,25 @@
     text-align: center;
     border: none;
     border-radius: 6px;
-    background: var(--cdc-bg-raised);
+    background: var(--cdc-btn-grey);
     color: #fff;
     font-size: 15px;
     font-weight: 800;
-    box-shadow: 0 4px 0 0 #1f1e1c;
+    box-shadow: var(--cdc-btn-grey-shadow);
   }
 
   .cdc-btn:hover:not(:disabled) {
-    background: var(--cdc-bg-raised-hover);
+    background: var(--cdc-btn-grey-hover);
   }
 
   .cdc-btn--green {
-    background: var(--cdc-green);
-    box-shadow: 0 4px 0 0 var(--cdc-green-shadow);
+    background: var(--cdc-btn-green);
+    text-shadow: 0 1px 1px #00000033;
+    box-shadow: var(--cdc-btn-green-shadow);
   }
 
   .cdc-btn--green:hover:not(:disabled) {
-    background: var(--cdc-green-hover);
+    background: var(--cdc-btn-green-hover);
   }
 
   .cdc-btn:disabled {

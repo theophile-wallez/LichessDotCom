@@ -28,6 +28,18 @@
   --cdc-menu-border: #ffffff24;
   --cdc-menu-hover: #ffffff17;
   --cdc-menu-shadow: 0 0 0 1px #0000008c, 0 16px 40px #000000b3, 0 4px 12px #00000080;
+  /* Chess.com's buttons, measured from its UI: a vertical gradient, a 1px
+   * lighter top edge, a 1px darker bottom edge and a soft drop shadow. No
+   * solid 3D ledge. */
+  --cdc-btn-green: linear-gradient(#8bbe52 0%, #7fb34c 12%, #6ea749 50%, #599144 100%);
+  --cdc-btn-green-hover: linear-gradient(#9ccd5f 0%, #8dc054 12%, #7bb44f 50%, #69a34c 100%);
+  --cdc-btn-green-shadow: inset 0 1px 0 #9ccd5e, inset 0 -1px 0 #45753c, 0 1px 4px #0000005c;
+  --cdc-btn-grey: linear-gradient(#3c3a38, #32302e);
+  --cdc-btn-grey-hover: linear-gradient(#4a4845, #3d3b38);
+  --cdc-btn-grey-shadow: inset 0 1px 0 #ffffff17, inset 0 -1px 0 #0000000f, 0 1px 4px #0000005c;
+  --cdc-btn-red: linear-gradient(#e25a55 0%, #d64742 50%, #c0392f 100%);
+  --cdc-btn-red-hover: linear-gradient(#ea6a65, #dc5550 50%, #c9453b);
+  --cdc-btn-red-shadow: inset 0 1px 0 #ec7570, inset 0 -1px 0 #8e2a2a, 0 1px 4px #0000005c;
   --cdc-font: 'CDC Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
     sans-serif;
 
@@ -115,38 +127,50 @@ html.transp body {
 /* --------------------------------------------------------------- buttons --- */
 
 .button {
-  background: var(--cdc-green) !important;
+  background: var(--cdc-btn-green) !important;
   color: #fff !important;
-  border-radius: 6px !important;
+  border: none !important;
+  border-radius: 7px !important;
   text-transform: none !important;
   font-weight: 800 !important;
-  text-shadow: 0 1px 0 #00000040 !important;
-  box-shadow: 0 4px 0 0 var(--cdc-green-shadow) !important;
+  text-shadow: 0 1px 1px #00000033 !important;
+  box-shadow: var(--cdc-btn-green-shadow) !important;
   filter: none !important;
+  transition: filter 0.1s, transform 0.1s;
 }
 
 .button:not(.disabled):hover {
-  background: var(--cdc-green-hover) !important;
+  background: var(--cdc-btn-green-hover) !important;
+}
+
+.button:not(.disabled):active {
+  transform: translateY(1px);
 }
 
 .button.button-empty,
 .button.button-metal,
 .button.button-inverse {
-  background: var(--cdc-bg-raised) !important;
+  background: var(--cdc-btn-grey) !important;
   color: var(--cdc-text) !important;
-  box-shadow: 0 4px 0 0 #1f1e1c !important;
+  text-shadow: none !important;
+  box-shadow: var(--cdc-btn-grey-shadow) !important;
 }
 
 .button.button-empty:not(.disabled):hover,
 .button.button-metal:not(.disabled):hover,
 .button.button-inverse:not(.disabled):hover {
-  background: var(--cdc-bg-raised-hover) !important;
+  background: var(--cdc-btn-grey-hover) !important;
   color: #fff !important;
 }
 
 .button.button-red {
-  background: #d84343 !important;
-  box-shadow: 0 4px 0 0 #8e2a2a !important;
+  background: var(--cdc-btn-red) !important;
+  color: #fff !important;
+  box-shadow: var(--cdc-btn-red-shadow) !important;
+}
+
+.button.button-red:not(.disabled):hover {
+  background: var(--cdc-btn-red-hover) !important;
 }
 
 /* ----------------------------------------------------------------- boxes --- */

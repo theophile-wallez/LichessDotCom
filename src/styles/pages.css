@@ -188,14 +188,14 @@ input:not([type='hidden']) + .button.button-metal:hover {
 .lpool {
   border: none !important;
   border-radius: 8px !important;
-  background: var(--cdc-bg-raised) !important;
-  box-shadow: 0 4px 0 0 #1f1e1c !important;
+  background: var(--cdc-btn-grey) !important;
+  box-shadow: var(--cdc-btn-grey-shadow) !important;
   color: #fff !important;
   opacity: 1 !important;
 }
 
 .lpool:hover {
-  background: var(--cdc-bg-raised-hover) !important;
+  background: var(--cdc-btn-grey-hover) !important;
 }
 
 .lpool .clock {
@@ -213,13 +213,14 @@ input:not([type='hidden']) + .button.button-metal:hover {
  * repeat .button-metal to outrank the generic metal-button hover in
  * theme.css, and the icon stays white (Lichess tints it green on hover). */
 .lobby__start__button--hook.button.button-metal {
-  background: var(--cdc-green) !important;
+  background: var(--cdc-btn-green) !important;
   color: #fff !important;
-  box-shadow: 0 4px 0 0 var(--cdc-green-shadow) !important;
+  text-shadow: 0 1px 1px #00000033 !important;
+  box-shadow: var(--cdc-btn-green-shadow) !important;
 }
 
 .lobby__start__button--hook.button.button-metal:not(.disabled):hover {
-  background: var(--cdc-green-hover) !important;
+  background: var(--cdc-btn-green-hover) !important;
   color: #fff !important;
 }
 
@@ -369,14 +370,14 @@ dialog .help th p {
   width: 100%;
   height: 52px !important;
   border: none !important;
-  background: var(--cdc-green) !important;
-  box-shadow: 0 4px 0 0 var(--cdc-green-shadow) !important;
+  background: var(--cdc-btn-green) !important;
+  box-shadow: var(--cdc-btn-green-shadow) !important;
   color: #fff !important;
   font-size: 20px !important;
 }
 
 .game-setup .footer .lobby__start__button.button:not(.disabled):hover {
-  background: var(--cdc-green-hover) !important;
+  background: var(--cdc-btn-green-hover) !important;
 }
 
 dialog .game-setup .footer .lobby__start__button.button::before {

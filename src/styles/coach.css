@@ -109,8 +109,8 @@
   margin-top: 16px;
   padding: 10px 14px 9px;
   border-radius: 6px;
-  background: var(--cdc-bg-raised);
-  box-shadow: 0 4px 0 0 #1f1e1c;
+  background: var(--cdc-btn-grey);
+  box-shadow: var(--cdc-btn-grey-shadow);
   color: #fff !important;
   font-size: 14px;
   font-weight: 700;
@@ -119,7 +119,7 @@
 }
 
 .coach-list__side p a:hover {
-  background: var(--cdc-bg-raised-hover);
+  background: var(--cdc-btn-grey-hover);
 }
 
 /* ------------------------------------------------------------ list --- */

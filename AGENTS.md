@@ -104,10 +104,12 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
 - **Two worlds.** `content.js` can't see page JS objects (`site`, chessground's
   `cgKey` expandos); `page.js`, `board.js` and `review.js` can. Communicate with
   `window.postMessage`.
-- **3D buttons in groups.** Every `.button` gets Chess.com's 4px bottom
-  edge. Where Lichess glues a button to an input (`.copy-me`, search forms)
-  or stacks buttons flush (editor actions), that edge overlaps its
-  neighbour: flatten it or add a gap.
+- **Buttons.** Chess.com's buttons are a gradient with a 1px top highlight,
+  a 1px darker bottom edge and a soft drop shadow, not a solid 3D ledge.
+  The recipe lives in `--cdc-btn-{green,grey,red}[-hover|-shadow]` in
+  `theme.css`: use those for anything button-like instead of flat colors.
+  Where Lichess glues a button to an input (`.copy-me`, search forms) or
+  stacks buttons flush (editor actions), drop the shadow or add a gap.
 - **Useful page APIs.** `site.sound` is Lichess's sound player, and
   `site.analysis` is the analysis controller (`mainline`, `node.ply`,
   `jumpToMain`, `getOrientation`; `jumpToMain` doesn't scroll the move list),
