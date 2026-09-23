@@ -226,7 +226,8 @@
     display: flex !important;
     align-items: center;
     gap: 6px;
-    margin-top: calc(var(--cdc-off) + 6px) !important;
+    /* Level with the avatar, which is as tall as the clock. */
+    margin-top: calc(var(--cdc-off) + 8px) !important;
     margin-right: var(--cdc-inset-r, 0px) !important;
   }
 
@@ -240,14 +241,16 @@
     align-items: center !important;
     justify-content: flex-end;
     gap: 0;
-    height: 44px;
-    min-width: 138px;
+    /* Chess.com's clock is a fixed 140 x 40, whatever the time reads. */
+    width: 140px;
+    height: 40px;
     padding: 0 12px !important;
+    overflow: hidden;
     border-radius: 4px !important;
     box-shadow: none !important;
     z-index: auto !important;
     font-family: var(--cdc-font) !important;
-    font-size: 26px !important;
+    font-size: 24px !important;
     font-weight: 600 !important;
     font-variant-numeric: tabular-nums;
     letter-spacing: 0 !important;
