@@ -154,7 +154,9 @@
 }
 
 .study-index .studies .study .body {
-  gap: 12px;
+  display: grid !important;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 16px;
   margin-top: 14px;
   padding-top: 12px;
   border-top: 1px solid #ffffff0f;
@@ -163,23 +165,21 @@
 
 .study-index .studies .study .chapters,
 .study-index .studies .study .members {
+  min-width: 0;
+  max-width: none !important;
   margin: 0 !important;
 }
 
-.study-index .studies .study .chapters {
-  flex: 1 1 60% !important;
-  max-width: none !important;
-}
-
-.study-index .studies .study .members {
-  flex: 0 1 40% !important;
-  max-width: 40% !important;
-}
-
+/* Block, not Lichess's flex rows: a flex row clips its text mid-letter,
+ * a block ends it in an ellipsis. */
 .study-index .studies .study li {
+  display: block !important;
+  overflow: hidden;
   padding: 2px 0;
   color: #c8c7c4 !important;
   line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .study-index .studies .study .members li {
