@@ -251,3 +251,74 @@
     padding: 0 12px 24px !important;
   }
 }
+
+/* ---------------------------------------------------------- topics --- */
+
+/* /study/topic: a header with Chess.com's study icon, then each group of
+ * topics as pill chips on a card. */
+.study-topics.box {
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.study-topics h1.box__top {
+  display: flex;
+  justify-content: flex-start !important;
+  align-items: center;
+  gap: 12px;
+  margin: 0 !important;
+  padding: 16px 0 20px !important;
+}
+
+.study-topics h1.box__top::before {
+  content: '';
+  flex: none;
+  width: 36px;
+  height: 36px;
+  background: url('https://assets-ds.chess.com/color-icons/book-open-aqua.svg') center / contain no-repeat;
+}
+
+.study-topics h2 {
+  margin: 0 0 12px !important;
+  color: #fff;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+}
+
+.study-topics h2:not(:first-of-type) {
+  margin-top: 28px !important;
+}
+
+.study-topics .topic-list {
+  gap: 8px;
+  margin: 0 !important;
+  padding: 20px;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px;
+  background: var(--cdc-bg-panel);
+  line-height: normal !important;
+}
+
+.study-topics .topic-list a {
+  margin: 0 !important;
+  padding: 8px 14px !important;
+  border: 1px solid #ffffff14;
+  border-radius: 999px !important;
+  background: #ffffff0a !important;
+  color: var(--cdc-text) !important;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.study-topics .topic-list a:hover {
+  border-color: #81b64c80;
+  background: #81b64c26 !important;
+  color: #fff !important;
+}
+
+@media (max-width: 799.98px) {
+  .study-topics.box {
+    padding: 0 12px 24px !important;
+  }
+}
