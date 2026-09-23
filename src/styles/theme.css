@@ -201,3 +201,63 @@ select {
   background: #4b4847;
   border-radius: 4px;
 }
+
+/* ------------------------------------------------------------ game modes --- */
+
+/* Lichess draws its time-control icons as font glyphs in [data-icon]::before,
+ * the same six everywhere (lobby, profiles, game info, tournaments, player
+ * lists, notifications). Swap them for Chess.com's game-time icons, in its
+ * colors. Chess.com has no ultrabullet or classical: they get bullet's and
+ * rapid's icon. */
+:root {
+  --cdc-mode-bullet: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m7.17 15.3 1.43 1.47-8.27 6.9zm-6.87 2.3 4.5-6 .9 2zm10.47-7.5c3.47-3.6 5.93-5.2 8.7-6.4-2.4 0-5.3.37-9.8 4.6.03.5.7 1.47 1.1 1.8zm11.06-7.93s.23 1.1.23 2.77c0 2.67-.67 6.83-4.17 10.33l-2.17 2.17c-.67.67-1.33.6-2.13.27l-7.47 6.3 9.8-12.17-5.23 4.03c-.43-.4-.93-.83-1.33-1.23-1.73-1.7-4.13-5-2.77-6.37l2.2-2.13c3.53-3.5 7.63-4.2 10.3-4.2 1.63 0 2.73.23 2.73.23zm0 0'/%3E%3C/svg%3E");
+  --cdc-mode-blitz: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m5.77 15c-1.03 0-1.37-.4-1.2-1.4l1.53-10.2c.17-1 .63-1.4 1.67-1.4h5.8c1.03 0 1.33.4 1.07 1.37l-3.23 11.63zm13.06-6c1.03 0 1.2.33.57 1.13l-9.67 12.73c-1.23 1.63-1.6 1.47-1.27-.57l2.2-13.3zm0 0'/%3E%3C/svg%3E");
+  --cdc-mode-rapid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m11.97 14.63c-.9 0-1.87-.73-1.5-2.23l1.03-4.4h1l1.03 4.37c.37 1.53-.63 2.27-1.57 2.27zm.03 7.87c-5.23 0-9.5-4.27-9.5-9.5s4.27-9.5 9.5-9.5 9.5 4.27 9.5 9.5-4.27 9.5-9.5 9.5zm0-3c4 0 6.5-2.5 6.5-6.5s-2.5-6.5-6.5-6.5-6.5 2.5-6.5 6.5 2.5 6.5 6.5 6.5zm-1.5-14.27v-4.23h3v4.23zm5-3.23h-7c0-1.7.43-2 3.5-2s3.5.3 3.5 2zm0 0'/%3E%3C/svg%3E");
+  --cdc-mode-daily: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m.93 11.63c3.3-1.33 3.77-2.83 1.77-5.77l-.93-1.33 1.63.5c3.4 1 4.6.1 4.63-3.43l.03-1.6 1 1.27c2.17 2.8 3.7 2.8 5.87 0l1-1.27.03 1.6c.03 3.53 1.23 4.43 4.63 3.43l1.63-.5-.93 1.33c-2 2.93-1.53 4.43 1.77 5.77l.93.37-.93.37c-3.3 1.33-3.77 2.83-1.77 5.77l.93 1.33-1.63-.5c-3.4-1-4.6-.1-4.63 3.43l-.03 1.6-1-1.27c-2.17-2.8-3.7-2.8-5.87 0l-1 1.27-.03-1.6c-.03-3.53-1.23-4.43-4.63-3.43l-1.63.5.93-1.33c2-2.93 1.53-4.43-1.77-5.77l-.93-.37zm5.07.37c0 3.19 2.86 6 6 6 3.18 0 6-2.82 6-6 0-3.14-2.81-6-6-6-3.15 0-6 2.85-6 6zm2 0c0-2.32 1.68-4 4-4 2.35 0 4 1.68 4 4 0 2.35-1.65 4-4 4-2.32 0-4-1.65-4-4zm0 0'/%3E%3C/svg%3E");
+}
+
+/* UltraBullet, Bullet */
+[data-icon='\e059']::before,
+[data-icon='\e032']::before {
+  --cdc-mode-icon: var(--cdc-mode-bullet);
+  --cdc-mode-color: #e3aa24;
+}
+
+/* Blitz */
+[data-icon='\e008']::before {
+  --cdc-mode-icon: var(--cdc-mode-blitz);
+  --cdc-mode-color: #fad541;
+}
+
+/* Rapid, Classical */
+[data-icon='\e002']::before,
+[data-icon='\e00a']::before {
+  --cdc-mode-icon: var(--cdc-mode-rapid);
+  --cdc-mode-color: #81b64c;
+}
+
+/* Correspondence */
+[data-icon='\e019']::before {
+  --cdc-mode-icon: var(--cdc-mode-daily);
+  --cdc-mode-color: #f7c631;
+}
+
+/* A 1em box keeps the glyph's size and spot: Lichess sizes and aligns the
+ * ::before, so display and size stay overridable where it lays them out. */
+:is(
+    [data-icon='\e059'],
+    [data-icon='\e032'],
+    [data-icon='\e008'],
+    [data-icon='\e002'],
+    [data-icon='\e00a'],
+    [data-icon='\e019']
+  )::before {
+  content: '' !important;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background: var(--cdc-mode-color) !important;
+  -webkit-mask: var(--cdc-mode-icon) center / contain no-repeat;
+  mask: var(--cdc-mode-icon) center / contain no-repeat;
+  opacity: 1 !important;
+}

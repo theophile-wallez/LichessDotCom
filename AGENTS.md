@@ -107,6 +107,11 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
 - **Icons.** Sidebar icons are Chess.com's own
   (`https://assets-ds.chess.com/color-icons/<name>.svg`). The names come from
   the nav data embedded in chess.com pages (`"icon":{"name":…}`).
+  Time-control icons are Lichess font glyphs in `[data-icon]::before`
+  (`\e059` ultrabullet, `\e032` bullet, `\e008` blitz, `\e002` rapid,
+  `\e00a` classical, `\e019` correspondence). `theme.css` masks them with
+  Chess.com's game-time icons in `--cdc-mode-color`; set that variable on the
+  `::before` to recolor one in context.
 - **Two worlds.** `content.js` can't see page JS objects (`site`, chessground's
   `cgKey` expandos); `page.js`, `board.js` and `review.js` can. Communicate with
   `window.postMessage`.
