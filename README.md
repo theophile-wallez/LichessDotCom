@@ -55,6 +55,7 @@ Tip: Lichess's _coordinates_ setting (Preferences → Display) picks between Che
 | `src/styles/blog.css` | Blog posts as Chess.com-style articles, and the blog lists as grids of post cards. |
 | `src/styles/practice.css` | Practice page as playful, colorful lesson cards. |
 | `src/styles/puzzles.css` | Puzzle themes page as colorful theme cards. |
+| `src/styles/broadcast.css` | Broadcast pages as Chess.com-style event cards. |
 | `src/background.js` | Downloads the Chess.com sounds once and caches them in `chrome.storage.local`. |
 | `src/content.js` | Passes the sounds to the page and measures the controls height for the layout grid. |
 | `src/page.js` | Runs in the page and wraps `site.sound` so each event plays the matching Chess.com sound. |
