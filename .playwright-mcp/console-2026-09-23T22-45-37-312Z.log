@@ -1,3 +1,0 @@
-[    1241ms] [INFO] Lichess is open source! See https://lichess.org/source @ https://lichess1.org/assets/compiled/site.7FNPDDWG.js:3
-[    1933ms] [WARNING] The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page.  @ https://lichess1.org/assets/compiled/site.7FNPDDWG.js:3
-[   27255ms] A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
