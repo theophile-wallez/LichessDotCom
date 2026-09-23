@@ -65,6 +65,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/study.css` | Study lists (`.study-index`) as a grid of study cards, the compact list view, the toolbar, topics and staff picks. |
 | `src/styles/blog.css` | Blog posts (`.ublog-post`) as Chess.com-style articles, and the blog lists. |
 | `src/styles/practice.css` | Practice (`.practice-app`, `.practice-side`) as playful lesson cards: a color per section, white icons on gradient tiles, progress pills. |
+| `src/styles/puzzles.css` | Puzzle themes (`.puzzle-themes`) in the Practice look: a color per section, theme cards, opening chips. |
 
 There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
 

@@ -30,7 +30,8 @@
         "src/styles/teams.css",
         "src/styles/study.css",
         "src/styles/blog.css",
-        "src/styles/practice.css"
+        "src/styles/practice.css",
+        "src/styles/puzzles.css"
       ],
       "js": ["src/content.js"],
       "run_at": "document_start"
