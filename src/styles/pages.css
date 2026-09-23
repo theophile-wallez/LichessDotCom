@@ -144,6 +144,40 @@ input[type='radio'] {
   accent-color: var(--cdc-green);
 }
 
+/* Lichess's switches (.cmn-toggle) as Chess.com's pill: grey when off,
+ * green when on, with a round white knob and no icon. */
+.cmn-toggle label {
+  box-sizing: border-box !important;
+  width: 40px !important;
+  height: 22px !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 999px !important;
+  background: #5d5b58 !important;
+}
+
+.cmn-toggle label::before {
+  display: none !important;
+}
+
+.cmn-toggle label::after {
+  bottom: 2px !important;
+  left: 2px !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  box-shadow: 0 1px 3px #0006 !important;
+}
+
+.cmn-toggle input:checked + label {
+  background: var(--cdc-green) !important;
+}
+
+.cmn-toggle input:checked + label::after {
+  margin-inline-start: 18px !important;
+}
+
 /* The sidebar search box keeps its borderless look. */
 #top #clinput input {
   border: none !important;
