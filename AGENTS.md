@@ -65,7 +65,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/teams.css` | Team lists (`main.team-list`) as a grid of club cards with avatar tiles. |
 | `src/styles/study.css` | Study lists (`.study-index`) as a grid of study cards, the compact list view, the toolbar, topics and staff picks. |
 | `src/styles/friends.css` | Player lists (following, blocks, favourite opponents) as Chess.com friend cards with avatars and an online dot. |
-| `src/styles/puzzle.css` | Puzzles (`main.puzzle`): side cards, a coloured status banner, chunky hint / solution and move buttons. |
+| `src/styles/puzzle.css` | Puzzles (`main.puzzle`): side cards, a status banner, chunky hint / solution buttons, and the move buttons pinned inside the panel. |
 | `src/styles/blog.css` | Blog posts (`.ublog-post`) as Chess.com-style articles, and the blog lists. |
 | `src/styles/practice.css` | Practice (`.practice-app`, `.practice-side`) as playful lesson cards: a color per section, white icons on gradient tiles, progress pills. |
 | `src/styles/puzzles.css` | Puzzle themes (`.puzzle-themes`) in the Practice look: a color per section, theme cards, opening chips. |
