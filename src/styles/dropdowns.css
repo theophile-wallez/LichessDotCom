@@ -214,6 +214,11 @@ dialog .scrollable:has(.game-setup .mselect__toggle:checked) {
   color: inherit !important;
 }
 
+/* Lichess paints everything in a hovered row green, icons included. */
+.game-setup .mselect .mselect__item:hover td > * {
+  background: transparent !important;
+}
+
 .game-setup .mselect__item:hover,
 .game-setup .mselect__item:focus-visible {
   background: transparent !important;
@@ -230,6 +235,8 @@ dialog .scrollable:has(.game-setup .mselect__toggle:checked) {
 
 .game-setup .mselect__item .icon span {
   color: var(--cdc-text-dim);
+  font-size: 20px;
+  line-height: 1;
 }
 
 .game-setup .mselect__item.current .icon span {

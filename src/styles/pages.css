@@ -470,55 +470,278 @@ dialog .help th p {
   font-weight: 800 !important;
 }
 
-/* Game setup (create a game, challenge a friend, play the computer). */
+/* Game setup (create a game, challenge a friend, play the computer): one
+ * column of left-aligned sections, segmented controls on a sunken track, and
+ * one way to show a choice everywhere (presets, mode, level, color): a green
+ * ring on a green tint. */
+.game-setup {
+  --cdc-setup-track: #1c1b19;
+  --cdc-setup-chosen: inset 0 0 0 2px var(--cdc-green);
+  --cdc-setup-tint: #81b64c26;
+}
+
 .game-setup h2 {
   margin: 24px 56px 20px !important;
+  font-size: 22px !important;
 }
 
 .game-setup .setup-content {
+  gap: 22px !important;
   border: none !important;
   background: transparent !important;
-  padding: 0 24px 8px !important;
+  padding: 0 24px 4px !important;
 }
 
-.game-setup .config-group .label {
+.game-setup .config-group {
+  gap: 10px !important;
+}
+
+.game-setup .radio-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.game-setup :is(.config-group, .radio-pane) > .label {
+  margin: 0 !important;
   color: var(--cdc-text-dim) !important;
+  font-size: 13px;
   font-weight: 700 !important;
+  text-align: start;
 }
 
-.game-setup .time-control-tabs .time-panel .presets .preset-btn {
-  border-radius: 6px !important;
-  background: var(--cdc-bg-raised) !important;
-  color: var(--cdc-text) !important;
+/* Variant: a tall row, like Chess.com's game-type picker. */
+.game-setup .mselect .mselect__label {
+  min-height: 56px;
+  gap: 14px !important;
+  padding-inline: 16px 14px !important;
+  border-radius: 10px !important;
+}
+
+.game-setup .mselect .mselect__label .icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.game-setup .mselect .mselect__label .text .name {
+  font-size: 17px;
   font-weight: 700;
 }
 
-.game-setup .time-control-tabs .time-panel .presets .preset-btn:hover {
-  background: var(--cdc-bg-raised-hover) !important;
+.game-setup .mselect .mselect__label .text .desc {
+  font-size: 13px !important;
+  font-weight: 400;
+}
+
+/* Unlimited / real time / correspondence: a segmented control, not tabs. */
+.game-setup .time-control-tabs .tabs-horiz {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 18px !important;
+  padding: 4px;
+  border: none !important;
+  border-radius: 10px;
+  background: var(--cdc-setup-track);
+}
+
+.game-setup .time-control-tabs .tabs-horiz button {
+  flex: 1;
+  height: 36px;
+  margin: 0 !important;
+  padding: 0 8px !important;
+  border: none !important;
+  border-radius: 7px;
+  background: transparent;
+  font-size: 14px;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.game-setup .time-control-tabs .tabs-horiz button:hover {
+  background: #ffffff0a;
+}
+
+.game-setup .time-control-tabs .tabs-horiz button.active {
+  background: var(--cdc-bg-raised) !important;
+  box-shadow: 0 1px 3px #00000080;
   color: #fff !important;
 }
 
-.game-setup .time-control-tabs .time-panel .presets .preset-btn.active,
+.game-setup .time-control-tabs .time-panel {
+  gap: 16px !important;
+}
+
+/* Minutes + increment: the numbers read as a value, not as green badges. */
+.game-setup .time-control-tabs .time-panel .slider-container .label-row {
+  align-items: baseline !important;
+  margin-bottom: 10px !important;
+  color: var(--cdc-text-dim);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .game-setup .time-control-tabs .time-panel .slider-container .label-row .val-box {
-  background: var(--cdc-green) !important;
+  padding: 0 !important;
+  background: transparent !important;
+  color: #fff !important;
+  font-size: 20px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.game-setup .time-control-tabs .time-panel .slider-separator {
+  align-self: start;
+  color: var(--cdc-text-dim);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 20px !important;
+  text-align: center;
+}
+
+.game-setup input.range {
+  height: 18px;
+}
+
+.game-setup input.range::-webkit-slider-runnable-track {
+  height: 6px !important;
+  border-radius: 3px !important;
+}
+
+.game-setup input.range::-webkit-slider-thumb {
+  width: 18px !important;
+  height: 18px !important;
+  margin-top: -6px;
+  border-radius: 50% !important;
+  box-shadow: 0 1px 3px #00000080;
+  transition: box-shadow 0.15s;
+}
+
+.game-setup input.range:hover::-webkit-slider-thumb {
+  box-shadow: 0 1px 3px #00000080, 0 0 0 5px #81b64c33;
+}
+
+/* Presets: one row of chips that share the width; the chosen one gets the
+ * green ring. */
+.game-setup .time-control-tabs .time-panel .presets {
+  gap: 6px !important;
+  margin-top: 4px !important;
+}
+
+.game-setup .time-control-tabs .time-panel .presets .preset-btn {
+  flex: 1 0 auto;
+  height: 36px;
+  padding: 0 6px !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-variant-numeric: tabular-nums;
+  transition: background-color 0.15s, box-shadow 0.15s;
+}
+
+.game-setup .time-control-tabs .time-panel .presets .preset-btn.active {
+  background: var(--cdc-setup-tint) !important;
+  box-shadow: var(--cdc-setup-chosen);
   color: #fff !important;
 }
 
-/* White / random / black: separate cards, the chosen one outlined in green. */
-.game-setup .color-cards {
-  gap: 8px;
-  box-shadow: none !important;
+/* Mode (casual / rated) and computer level: segmented on the same track. */
+.game-setup group.radio {
+  gap: 4px;
+  padding: 4px;
+  border-radius: 10px !important;
+  background: var(--cdc-setup-track);
   overflow: visible !important;
 }
 
+.game-setup group.radio label {
+  min-height: 36px;
+  padding: 6px 8px !important;
+  border: none !important;
+  border-radius: 7px;
+  background: transparent !important;
+  color: var(--cdc-text-dim);
+  font-size: 14px;
+  font-weight: 700;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.game-setup group.radio label:not(.disabled):hover {
+  background: #ffffff0a !important;
+  color: #fff;
+}
+
+.game-setup group.radio input:checked + label,
+.game-setup group.radio input:checked + label:not(.disabled):hover {
+  background: var(--cdc-setup-tint) !important;
+  box-shadow: var(--cdc-setup-chosen) !important;
+  color: #fff !important;
+}
+
+.game-setup group.radio input:focus-visible + label {
+  outline: 2px solid #fff !important;
+  outline-offset: -2px;
+}
+
+/* Rating and the rating filter: quiet lines under the mode. */
+.game-setup .ratings {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-top: -8px;
+  color: var(--cdc-text-dim);
+  font-size: 14px;
+}
+
+.game-setup .ratings strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 !important;
+  color: #fff;
+}
+
+.game-setup .setup-content > div.disabled {
+  opacity: 1 !important;
+  color: var(--cdc-text-dim);
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.game-setup .rating-range {
+  gap: 10px;
+  margin-top: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.game-setup .rating-range :is(.rating-min, .rating-max) {
+  color: #fff;
+}
+
+/* White / random / black: separate cards, the chosen one ringed in green.
+ * It's a group.radio too, but cards don't sit on the segmented track. */
+.game-setup group.radio.color-cards {
+  gap: 8px;
+  padding: 0;
+  background: none;
+  box-shadow: none !important;
+}
+
 .game-setup .color-cards label.card-radio {
-  border: 2px solid transparent !important;
-  border-radius: 8px !important;
+  border: none !important;
+  border-radius: 10px !important;
+  background: var(--cdc-bg-raised) !important;
+  transition: background-color 0.15s, box-shadow 0.15s;
+}
+
+.game-setup .color-cards label.card-radio:hover {
+  background: var(--cdc-bg-raised-hover) !important;
 }
 
 .game-setup .color-cards input:checked + label.card-radio {
-  border-color: var(--cdc-green) !important;
-  background: #81b64c26 !important;
+  background: var(--cdc-setup-tint) !important;
+  box-shadow: var(--cdc-setup-chosen) !important;
   text-shadow: none !important;
 }
 
@@ -528,14 +751,15 @@ dialog .help th p {
 
 /* The footer button is the dialog's primary action. */
 .game-setup .footer {
-  padding: 16px 24px 24px !important;
+  padding: 24px !important;
 }
 
 .game-setup .footer .lobby__start__button.button {
   justify-content: center;
   width: 100%;
-  height: 52px !important;
+  height: 56px !important;
   border: none !important;
+  border-radius: 10px !important;
   background: var(--cdc-btn-green) !important;
   box-shadow: var(--cdc-btn-green-shadow) !important;
   color: #fff !important;
