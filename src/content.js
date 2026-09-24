@@ -3,7 +3,8 @@
 //    the page-world script (page.js), which hooks Lichess's sound player.
 // 2. Keeps a CSS variable in sync with the height of the game controls, which
 //    the game layout grid needs (see styles/game.css).
-// 3. Renders Chess.com-style captured pieces in the game page's player bars.
+// 3. Renders Chess.com-style captured pieces in the player bars, and the
+//    analysis board's players.
 // 4. When loaded unpacked, reloads the extension after a ship changed its files.
 
 (() => {
@@ -85,10 +86,11 @@
       .join('') + (lead > 0 ? `<span class="cdc-captured__score">+${lead}</span>` : '');
 
   const syncCaptured = () => {
-    const main = document.querySelector('main.round');
-    const wrap = main?.querySelector('.round__app__board .cg-wrap');
+    const main = document.querySelector('main.round, main.analyse');
+    const wrap = main?.querySelector('.round__app__board .cg-wrap, .analyse__board > .cg-wrap');
     const board = wrap?.querySelector('cg-board');
-    if (!board) return;
+    // On the analysis board, only under the players of a game.
+    if (!board || (main.matches('.analyse') && !main.querySelector(':scope > .cdc-player'))) return;
     const onBoard = { white: {}, black: {} };
     const material = { white: 0, black: 0 };
     for (const p of board.querySelectorAll('piece:not(.ghost):not(.fading)')) {
@@ -120,6 +122,61 @@
     lastCaptured = key;
     captured.top.innerHTML = html.top;
     captured.bottom.innerHTML = html.bottom;
+  };
+
+  // The analysis board's player bars, like the game page's (see
+  // styles/playerbar.css). Lichess names the players only in the game info,
+  // which analysis.css hides: each one is copied into a bar of our own, in
+  // the markup of the round's `.ruser` so both pages share one style.
+  const players = { top: null, bottom: null };
+  let lastPlayers = '';
+
+  const fillPlayer = (bar, source) => {
+    const link = source?.querySelector('a.user-link');
+    if (!link) {
+      // Anonymous, or the computer.
+      const name = document.createElement('name');
+      name.textContent = source?.textContent.trim() || '';
+      bar.replaceChildren(name);
+      return;
+    }
+    const a = link.cloneNode(true);
+    const rating = a.querySelector('.rating')?.textContent.replace(/[()\s]/g, '');
+    const diff = a.querySelector('good, bad');
+    a.querySelectorAll('.rating, good, bad').forEach(el => el.remove());
+    // The title's badge has its own margin: drop the non-breaking space.
+    for (const node of a.childNodes)
+      if (node.nodeType === Node.TEXT_NODE) node.data = node.data.replace(/^[\s\u00a0]+|[\s\u00a0]+$/g, '');
+    const parts = [a];
+    if (rating) {
+      const el = document.createElement('rating');
+      el.textContent = rating;
+      parts.push(el);
+    }
+    if (diff) parts.push(diff);
+    bar.replaceChildren(...parts);
+  };
+
+  const syncPlayers = () => {
+    const main = document.querySelector('main.analyse');
+    const wrap = main?.querySelector('.analyse__board > .cg-wrap');
+    const meta = main?.querySelector('.game__meta__players');
+    if (!wrap || !meta || main.querySelector('.practice__side')) return;
+    for (const side of ['top', 'bottom']) {
+      if (!players[side] || players[side].parentNode !== main) {
+        players[side] = document.createElement('div');
+        players[side].className = `cdc-player cdc-player--${side}`;
+        main.appendChild(players[side]);
+        lastPlayers = '';
+      }
+    }
+    // Flipping the board swaps them.
+    const bottom = wrap.classList.contains('orientation-black') ? 'black' : 'white';
+    const key = bottom + meta.innerHTML;
+    if (key === lastPlayers) return;
+    lastPlayers = key;
+    fillPlayer(players.top, meta.querySelector(`.player.${bottom === 'white' ? 'black' : 'white'}`));
+    fillPlayer(players.bottom, meta.querySelector(`.player.${bottom}`));
   };
 
   // Move times, like Chess.com once a game is over: the time spent on each
@@ -235,7 +292,7 @@
     }
   };
   const syncFlags = () => {
-    const bars = [...document.querySelectorAll('main.round .ruser')];
+    const bars = [...document.querySelectorAll('main.round .ruser, main.analyse > .cdc-player')];
     const nameOf = bar => bar.querySelector('a.user-link')?.pathname.split('/').pop().toLowerCase();
     const missing = bars.map(nameOf).filter(n => n && !flags.has(n));
     if (missing.length) loadFlags(missing);
@@ -367,6 +424,7 @@
 
   setInterval(() => {
     syncControlsHeight();
+    syncPlayers();
     syncCaptured();
     syncMoveTimes();
     syncNewGame();

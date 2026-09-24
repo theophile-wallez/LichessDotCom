@@ -19,7 +19,7 @@
     --cdc-review-top: 92px;
     --cdc-chat-h: min(clamp(150px, 24vh, 260px), calc(var(--cdc-board) * 0.32));
     grid-template-rows:
-      max(0px, calc(var(--cdc-board) - var(--cdc-review-top) - var(--cdc-ctrl-h) - var(--cdc-chat-h)))
+      max(0px, calc(var(--cdc-stage) - var(--cdc-review-top) - var(--cdc-ctrl-h) - var(--cdc-chat-h)))
       var(--cdc-review-top)
       var(--cdc-ctrl-h)
       var(--cdc-chat-h) !important;
@@ -32,7 +32,7 @@
 
   html.cdc-review-normal main.analyse:not(:has(> .mchat)) {
     grid-template-rows:
-      max(0px, calc(var(--cdc-board) - var(--cdc-review-top) - var(--cdc-ctrl-h)))
+      max(0px, calc(var(--cdc-stage) - var(--cdc-review-top) - var(--cdc-ctrl-h)))
       var(--cdc-review-top)
       var(--cdc-ctrl-h) !important;
     grid-template-areas:
@@ -42,7 +42,7 @@
   }
 
   html.cdc-review-summary main.analyse {
-    grid-template-rows: var(--cdc-board) !important;
+    grid-template-rows: var(--cdc-stage) !important;
     grid-template-areas: 'gauge board rtop' !important;
   }
 
@@ -54,7 +54,7 @@
     --cdc-review-ctrl: 72px;
     grid-template-rows:
       var(--cdc-review-top)
-      max(0px, calc(var(--cdc-board) - var(--cdc-review-top) - var(--cdc-review-graph) - var(--cdc-review-ctrl)))
+      max(0px, calc(var(--cdc-stage) - var(--cdc-review-top) - var(--cdc-review-graph) - var(--cdc-review-ctrl)))
       var(--cdc-review-graph)
       var(--cdc-review-ctrl) !important;
     grid-template-areas:
@@ -266,17 +266,6 @@
     mix-blend-mode: difference;
   }
 
-  /* Placeholder icons while the game is analyzed. */
-  .cdc-cls-icon--empty {
-    border-radius: 50%;
-    background: #141311;
-    animation: cdc-pulse 1.4s ease-in-out infinite;
-  }
-
-  @keyframes cdc-pulse {
-    50% { opacity: 0.6; }
-  }
-
   #cdc-review-graph {
     grid-area: rgraph;
     position: relative;
@@ -399,12 +388,13 @@
   /* ----------------------------------------------------------- coach --- */
 
   /* Like Chess.com: the coach as a cut-out, and the bubble's tail just under
-   * the coach's mouth; the bubble grows down from there. That's 64% of the
-   * portraits' height, and the tail's tip is 30px below the bubble's top,
-   * hence the bubble's offset. It's at least tall enough for the tail to
-   * meet its straight edge, below the rounded corners. */
+   * the coach's mouth (--cdc-tip, 64% of the portraits' height). The tail
+   * stays there and the bubble is centered on it, growing both ways; only a
+   * bubble too tall for that is pinned to the top. review.js measures the
+   * bubble into --cdc-bubble-h. */
   .cdc-coach {
     --cdc-coach-h: 114px;
+    --cdc-tip: calc(var(--cdc-coach-h) * 0.64);
     flex: none;
     display: flex;
     align-items: flex-start;
@@ -471,25 +461,26 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    min-height: 58px;
-    margin-top: calc(var(--cdc-coach-h) * 0.64 - 30px);
+    min-height: 56px;
+    margin-top: max(0px, var(--cdc-tip) - var(--cdc-bubble-h, 56px) / 2);
     box-sizing: border-box;
     padding: 10px 14px;
-    border-radius: 14px;
+    border-radius: 12px;
     background: #fff;
     color: #312e2b;
   }
 
   /* Chess.com's tail: a horn out of the bubble's left edge, a concave curve
-   * on top and a convex one below, meeting in a point. It overlaps the edge
-   * by 1px, so no seam. */
+   * on top and a convex one below, meeting in a point 15px down. It overlaps
+   * the edge by 1px, so no seam. The bubble's min-height keeps it on the
+   * straight part of the edge, clear of the rounded corners. */
   .cdc-bubble::before {
     content: '';
     position: absolute;
-    left: -20px;
-    top: 12px;
-    width: 21px;
-    height: 29px;
+    left: -17px;
+    top: calc(min(50%, var(--cdc-tip)) - 15px);
+    width: 18px;
+    height: 25px;
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 69'%3E%3Cpath fill='%23fff' d='M49 0A49 42 0 0 1 0 42A49 27 0 0 0 49 69H50V0z'/%3E%3C/svg%3E")
       center / 100% 100% no-repeat;
   }
@@ -505,7 +496,7 @@
     margin: 0;
     color: #312e2b;
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 400;
     line-height: 1.3;
   }
 
@@ -725,8 +716,9 @@
     position: relative;
     width: 26px;
     margin-right: 10px;
-    margin-top: var(--cdc-inset-t, 0px);
-    margin-bottom: var(--cdc-inset-b, 0px);
+    /* Level with the squares, between the player bars if any. */
+    margin-top: calc(var(--cdc-bar, 0px) + var(--cdc-inset-t, 0px));
+    margin-bottom: calc(var(--cdc-bar, 0px) + var(--cdc-coords-off, 0px) + var(--cdc-inset-b, 0px));
     overflow: hidden;
     border-radius: 3px;
     background: #403d39;

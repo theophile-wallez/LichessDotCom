@@ -933,7 +933,7 @@
   }
 
   // Like Chess.com, the summary keeps its layout while the game is analyzed:
-  // a quote from the coach, the graph filling in, and empty placeholders.
+  // a quote from the coach, the graph filling in, and the counts at zero.
   function renderSummary(ctrl) {
     const p = players(ctrl);
     const r = state.review;
@@ -944,7 +944,7 @@
     const rows = CLASSES.map(
       c => `<tr><td class="cdc-t-label">${esc(c.label)}</td>
         <td class="cdc-t-num" style="color:${c.color}">${r?.counts.w[c.key] || 0}</td>
-        <td class="cdc-t-icon">${r ? icon(c.key) : '<span class="cdc-cls-icon cdc-cls-icon--empty"></span>'}</td>
+        <td class="cdc-t-icon">${icon(c.key)}</td>
         <td class="cdc-t-num" style="color:${c.color}">${r?.counts.b[c.key] || 0}</td></tr>`,
     ).join('');
     // Only the classification rows scroll: they're a table of their own, with
@@ -1117,8 +1117,21 @@
       if (state.mode === 'summary') renderSummary(ctrl);
       else if (state.mode === 'moves') renderMoves(ctrl);
       else renderNormal(ctrl);
+      fitBubble();
     }
     renderBoard(ctrl);
+  }
+
+  // The coach's bubble is centered on its tail, which stays at the coach's
+  // chin (review.css); CSS can't read an element's height, so hand it over.
+  // It only moves the bubble, never resizes it, so it can't loop.
+  const bubbleSize = new ResizeObserver(entries => {
+    for (const e of entries) e.target.style.setProperty('--cdc-bubble-h', `${e.borderBoxSize[0].blockSize}px`);
+  });
+  function fitBubble() {
+    bubbleSize.disconnect();
+    const bubble = dom.panel.querySelector('.cdc-bubble');
+    if (bubble) bubbleSize.observe(bubble);
   }
 
   const onClick = e => {
