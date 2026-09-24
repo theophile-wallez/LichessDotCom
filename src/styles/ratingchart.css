@@ -48,9 +48,28 @@
 }
 
 .cdc-rchart__ranges {
+  position: relative;
+  isolation: isolate;
   padding: 3px;
   border-radius: 9px;
   background: #ffffff0a;
+}
+
+/* The active range's raised pill, one element that slides from the previous
+ * choice to the new one (placed by ratingchart.js). */
+.cdc-rchart__thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  border-radius: 7px;
+  background: var(--cdc-bg-raised);
+  box-shadow: 0 1px 2px #00000059, inset 0 1px 0 #ffffff14;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cdc-rchart__thumb--still {
+  transition: none;
 }
 
 .cdc-rchart__ranges button {
@@ -71,8 +90,6 @@
 }
 
 .cdc-rchart__ranges button.active {
-  background: var(--cdc-bg-raised);
-  box-shadow: 0 1px 2px #00000059, inset 0 1px 0 #ffffff14;
   color: #fff;
 }
 
@@ -305,6 +322,7 @@
   .cdc-rchart__line,
   .cdc-rchart__area,
   .cdc-rchart__wipe,
+  .cdc-rchart__thumb,
   .cdc-rchart__tip,
   .cdc-rchart__hover {
     transition: none !important;
