@@ -50,6 +50,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | Path | What it does |
 | --- | --- |
 | `manifest.json` | Content scripts: CSS + `content.js` + `dashboard.js` + `ratingchart.js` (isolated world), `page.js` + `board.js` + `review.js` (page world). |
+| `img/coaches/` | The Game Review coach's faces (`coach-<n>.webp`), web-accessible so `review.css` can load them. |
 | `src/background.js` | Service worker: downloads the Chess.com sounds, caches them as base64. |
 | `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, fetches a finished game's move times (and its time control, for the "New 10 min" button), the players' country flags (from their profiles), the home hero, coach title badges, the hover card's rating chips, the puzzle eval bar's score and the font remapping. |
 | `src/dashboard.js` | Isolated world: the puzzle dashboard's theme radar, redrawn as SVG from the page's init JSON (Lichess draws it into a canvas). |
@@ -143,7 +144,10 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   fixed minimum once the content overflows: put the minimum on the items.
 - **Two worlds.** `content.js` can't see page JS objects (`site`, chessground's
   `cgKey` expandos); `page.js`, `board.js` and `review.js` can. Communicate with
-  `window.postMessage`.
+  `window.postMessage`. Page-world scripts can't call `chrome.runtime.getURL`
+  either: to show a bundled image, list it in `web_accessible_resources` and
+  load it from manifest CSS with
+  `url('chrome-extension://__MSG_@@extension_id__/<path>')`.
 - **Buttons.** Chess.com's buttons are a gradient with a 1px top highlight,
   a 1px darker bottom edge and a soft drop shadow, not a solid 3D ledge.
   The recipe lives in `--cdc-btn-{green,grey,red}[-hover|-shadow]` in

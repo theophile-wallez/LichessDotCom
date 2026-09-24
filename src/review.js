@@ -25,14 +25,14 @@
     ? {
         review: 'Bilan', start: 'Démarrer le bilan', next: 'Suivant', explain: 'Expliquer', best: 'Meilleur',
         analysing: 'Analyse de la partie…', players: 'Joueurs', accuracy: 'Précision',
-        anonymous: 'Anonyme', close: 'Fermer le bilan', back: 'Retour',
+        anonymous: 'Anonyme', close: 'Fermer le bilan', back: 'Retour', coach: 'Changer de coach',
         intro: 'Passons en revue cette partie !', bestWas: 'Le meilleur coup était {m}.',
         engineError: "Le moteur n'a pas pu démarrer.",
       }
     : {
         review: 'Game Review', start: 'Start Review', next: 'Next', explain: 'Explain', best: 'Best',
         analysing: 'Analyzing game…', players: 'Players', accuracy: 'Accuracy',
-        anonymous: 'Anonymous', close: 'Close review', back: 'Back',
+        anonymous: 'Anonymous', close: 'Close review', back: 'Back', coach: 'Change coach',
         intro: "Let's review this game!", bestWas: '{m} was best.',
         engineError: 'The engine failed to start.',
       };
@@ -54,6 +54,17 @@
         '"Between the opening and the end game, the gods have placed the middle game." – Siegbert Tarrasch',
       ];
   const QUOTE = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+
+  // The coach's face, one of img/coaches/coach-<n>.webp (set by review.css).
+  // Picked at random the first time, then kept; clicking it picks the next.
+  const COACHES = 4;
+  let coach = +localStorage.getItem('cdc-coach');
+  if (!(coach >= 1 && coach <= COACHES)) {
+    coach = 1 + Math.floor(Math.random() * COACHES);
+    localStorage.setItem('cdc-coach', coach);
+  }
+  const coachAvatar = () =>
+    `<button class="cdc-coach__avatar" data-cdc="coach" data-coach="${coach}" title="${esc(T.coach)}" aria-label="${esc(T.coach)}"></button>`;
 
   // key, color, icon, label, sentence ({m} = move)
   const CLASSES = [
@@ -558,7 +569,7 @@
         <td class="cdc-t-num" style="color:${c.color}">${r?.counts.b[c.key] || 0}</td></tr>`,
     ).join('');
     dom.panel.innerHTML = `${header(T.review, 'normal')}
-      <div class="cdc-coach cdc-coach--summary"><div class="cdc-coach__avatar"></div>
+      <div class="cdc-coach cdc-coach--summary">${coachAvatar()}
         <div class="cdc-bubble"><p class="cdc-bubble__say">${say}</p></div></div>
       <div class="cdc-review__body">
         <div class="cdc-review__graph cdc-summary-graph">${loading ? `<span class="cdc-summary-pct">${pct}%</span>` : ''}</div>
@@ -611,7 +622,7 @@
     const atEnd = ctrl.onMainline && ply >= ctrl.mainline.length - 1;
     const canBest = shown || (move && move.best && !GOOD.has(move.cls));
     dom.panel.innerHTML = `${header(T.review, 'summary')}
-      <div class="cdc-coach"><div class="cdc-coach__avatar"></div><div class="cdc-bubble">${bubble}</div></div>
+      <div class="cdc-coach">${coachAvatar()}<div class="cdc-bubble">${bubble}</div></div>
       <div class="cdc-review__nav">
         <button class="cdc-btn${state.explain ? ' cdc-btn--on' : ''}" data-cdc="explain">${svgIcon('bulb')}${esc(T.explain)}</button>
         <button class="cdc-btn${shown ? ' cdc-btn--on' : ''}" data-cdc="best" ${canBest ? '' : 'disabled'}>${svgIcon('star')}${esc(T.best)}</button>
@@ -732,6 +743,12 @@
     if (!btn || btn.disabled) return;
     const ctrl = site.analysis;
     const act = btn.dataset.cdc;
+    if (act === 'coach') {
+      coach = (coach % COACHES) + 1;
+      localStorage.setItem('cdc-coach', coach);
+      btn.dataset.coach = coach;
+      return;
+    }
     const last = ctrl.mainline.length - 1;
     if (act !== 'play') stopPlaying();
     if (act === 'play') togglePlay(ctrl);
