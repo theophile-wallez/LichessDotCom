@@ -691,6 +691,24 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
   }
 }
 
+/* The puzzle modes wear the same Chess.com icons as in the sidebar's Puzzles
+ * menu (sidebar.css), not Lichess's grey glyphs. They're full-color pictures,
+ * so a background, not the one-color mask the time controls get (theme.css).
+ * Matched on where each card leads, as Lichess localizes nothing there. */
+.side.sub-ratings a:is([href*='/training/dashboard'], [href*='/storm/dashboard/'], [href$='/racer'], [href$='/streak'])::before {
+  content: '' !important;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background: var(--cdc-puzzle-icon) center / contain no-repeat;
+  opacity: 1 !important;
+}
+
+.side.sub-ratings a[href*='/training/dashboard'] { --cdc-puzzle-icon: url('https://assets-ds.chess.com/color-icons/puzzle-piece.svg'); }
+.side.sub-ratings a[href*='/storm/dashboard/']   { --cdc-puzzle-icon: url('https://assets-ds.chess.com/color-icons/puzzle-rush.svg'); }
+.side.sub-ratings a[href$='/racer']              { --cdc-puzzle-icon: url('https://assets-ds.chess.com/color-icons/battle.svg'); }
+.side.sub-ratings a[href$='/streak']             { --cdc-puzzle-icon: url('https://assets-ds.chess.com/color-icons/calendar-dailypuzzle.svg'); }
+
 /* --------------------------------------------------- chart and about --- */
 
 .user-show > #us_profile {
