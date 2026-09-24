@@ -19,7 +19,7 @@
     --cdc-review-top: 92px;
     --cdc-chat-h: min(clamp(150px, 24vh, 260px), calc(var(--cdc-board) * 0.32));
     grid-template-rows:
-      max(0px, calc(var(--cdc-board) - var(--cdc-review-top) - var(--cdc-ctrl-h) - var(--cdc-chat-h)))
+      max(0px, calc(var(--cdc-stage) - var(--cdc-review-top) - var(--cdc-ctrl-h) - var(--cdc-chat-h)))
       var(--cdc-review-top)
       var(--cdc-ctrl-h)
       var(--cdc-chat-h) !important;
@@ -32,7 +32,7 @@
 
   html.cdc-review-normal main.analyse:not(:has(> .mchat)) {
     grid-template-rows:
-      max(0px, calc(var(--cdc-board) - var(--cdc-review-top) - var(--cdc-ctrl-h)))
+      max(0px, calc(var(--cdc-stage) - var(--cdc-review-top) - var(--cdc-ctrl-h)))
       var(--cdc-review-top)
       var(--cdc-ctrl-h) !important;
     grid-template-areas:
@@ -42,7 +42,7 @@
   }
 
   html.cdc-review-summary main.analyse {
-    grid-template-rows: var(--cdc-board) !important;
+    grid-template-rows: var(--cdc-stage) !important;
     grid-template-areas: 'gauge board rtop' !important;
   }
 
@@ -54,7 +54,7 @@
     --cdc-review-ctrl: 72px;
     grid-template-rows:
       var(--cdc-review-top)
-      max(0px, calc(var(--cdc-board) - var(--cdc-review-top) - var(--cdc-review-graph) - var(--cdc-review-ctrl)))
+      max(0px, calc(var(--cdc-stage) - var(--cdc-review-top) - var(--cdc-review-graph) - var(--cdc-review-ctrl)))
       var(--cdc-review-graph)
       var(--cdc-review-ctrl) !important;
     grid-template-areas:
@@ -220,6 +220,20 @@
     padding: 12px 16px;
   }
 
+  /* The summary's graph, players and accuracy stay put above the scrolling
+   * rows. Both reserve the scrollbar's gutter so their columns line up. */
+  .cdc-review__top {
+    flex: none;
+    overflow: hidden;
+    padding: 12px 16px 0;
+    scrollbar-gutter: stable;
+  }
+
+  .cdc-review__top + .cdc-review__body {
+    padding-top: 0;
+    scrollbar-gutter: stable;
+  }
+
   .cdc-review__foot {
     flex: none;
     padding: 12px 16px 16px;
@@ -250,16 +264,6 @@
     font-size: 12px;
     font-weight: 800;
     mix-blend-mode: difference;
-  }
-
-  /* Placeholder icons while the game is analyzed. */
-  .cdc-cls-icon--empty {
-    background: #141311;
-    animation: cdc-pulse 1.4s ease-in-out infinite;
-  }
-
-  @keyframes cdc-pulse {
-    50% { opacity: 0.6; }
   }
 
   #cdc-review-graph {
@@ -308,6 +312,15 @@
   .cdc-review__table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .cdc-t-c-label {
+    width: 34%;
+  }
+
+  .cdc-t-c-icon {
+    width: 32px;
   }
 
   .cdc-review__table td {
@@ -317,7 +330,6 @@
   }
 
   .cdc-review__table .cdc-t-label {
-    width: 34%;
     text-align: left;
     color: #fff;
     font-size: 14px;
@@ -334,10 +346,6 @@
   .cdc-t-num {
     font-size: 16px;
     font-weight: 800;
-  }
-
-  .cdc-t-icon {
-    width: 32px;
   }
 
   .cdc-t-sep td {
@@ -367,25 +375,12 @@
 
   .cdc-cls-icon {
     display: inline-flex;
-    align-items: center;
-    justify-content: center;
     width: 22px;
     height: 22px;
-    border-radius: 50%;
-    background: var(--c);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: -1px;
     flex: none;
   }
 
-  .cdc-cls-icon--svg {
-    background: none;
-  }
-
-  .cdc-cls-icon--svg svg {
+  .cdc-cls-icon svg {
     width: 100%;
     height: 100%;
   }
@@ -689,27 +684,12 @@
   }
 
   html.cdc-review-moves main.analyse .tview2 > move[data-cdc-badge]::before {
-    content: attr(data-cdc-icon);
+    content: '';
     position: absolute;
     left: 6px;
     top: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     width: 18px;
     height: 18px;
-    border-radius: 50%;
-    background: var(--c);
-    color: #fff;
-    font-size: 9px;
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: -1px;
-  }
-
-  html.cdc-review-moves main.analyse .tview2 > move[data-cdc-badge][data-cdc-img]::before {
-    content: '';
-    border-radius: 0;
     background: var(--i) center / contain no-repeat;
   }
 
@@ -731,8 +711,9 @@
     position: relative;
     width: 26px;
     margin-right: 10px;
-    margin-top: var(--cdc-inset-t, 0px);
-    margin-bottom: var(--cdc-inset-b, 0px);
+    /* Level with the squares, between the player bars if any. */
+    margin-top: calc(var(--cdc-bar, 0px) + var(--cdc-inset-t, 0px));
+    margin-bottom: calc(var(--cdc-bar, 0px) + var(--cdc-coords-off, 0px) + var(--cdc-inset-b, 0px));
     overflow: hidden;
     border-radius: 3px;
     background: #403d39;
@@ -788,29 +769,12 @@
 
 .cdc-badge {
   position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 4.8%;
   aspect-ratio: 1;
   transform: translate(-72%, -28%);
-  border-radius: 50%;
-  background: var(--c);
-  box-shadow: 0 2px 3px #00000059;
-  color: #fff;
-  font-family: var(--cdc-font);
-  font-size: calc(var(--cdc-board, 640px) * 0.022);
-  font-weight: 900;
-  letter-spacing: -1px;
-  line-height: 1;
 }
 
-.cdc-badge--svg {
-  background: none;
-  box-shadow: none;
-}
-
-.cdc-badge--svg svg {
+.cdc-badge svg {
   width: 100%;
   height: 100%;
 }
@@ -820,10 +784,10 @@
 html.cdc-review-moves[data-cdc-cls='brilliant'] main.analyse cg-board square.last-move { background: rgba(38, 194, 163, 0.5) !important; }
 html.cdc-review-moves[data-cdc-cls='great'] main.analyse cg-board square.last-move { background: rgba(116, 155, 191, 0.5) !important; }
 html.cdc-review-moves[data-cdc-cls='best'] main.analyse cg-board square.last-move { background: rgba(129, 182, 76, 0.5) !important; }
-html.cdc-review-moves[data-cdc-cls='excellent'] main.analyse cg-board square.last-move { background: rgba(150, 188, 75, 0.5) !important; }
-html.cdc-review-moves[data-cdc-cls='good'] main.analyse cg-board square.last-move { background: rgba(150, 175, 139, 0.5) !important; }
+html.cdc-review-moves[data-cdc-cls='excellent'] main.analyse cg-board square.last-move { background: rgba(129, 182, 76, 0.5) !important; }
+html.cdc-review-moves[data-cdc-cls='good'] main.analyse cg-board square.last-move { background: rgba(149, 183, 118, 0.5) !important; }
 html.cdc-review-moves[data-cdc-cls='book'] main.analyse cg-board square.last-move { background: rgba(168, 136, 101, 0.5) !important; }
-html.cdc-review-moves[data-cdc-cls='inaccuracy'] main.analyse cg-board square.last-move { background: rgba(247, 192, 69, 0.5) !important; }
+html.cdc-review-moves[data-cdc-cls='inaccuracy'] main.analyse cg-board square.last-move { background: rgba(247, 198, 49, 0.5) !important; }
 html.cdc-review-moves[data-cdc-cls='mistake'] main.analyse cg-board square.last-move { background: rgba(255, 164, 89, 0.5) !important; }
 html.cdc-review-moves[data-cdc-cls='miss'] main.analyse cg-board square.last-move { background: rgba(255, 119, 105, 0.5) !important; }
 html.cdc-review-moves[data-cdc-cls='blunder'] main.analyse cg-board square.last-move { background: rgba(250, 65, 45, 0.5) !important; }

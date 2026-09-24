@@ -66,19 +66,19 @@
   const coachAvatar = () =>
     `<button class="cdc-coach__avatar" data-cdc="coach" data-coach="${coach}" title="${esc(T.coach)}" aria-label="${esc(T.coach)}"></button>`;
 
-  // key, color, icon, label, sentence ({m} = move)
+  // key, color, label, sentence ({m} = move), in Chess.com's summary order.
   const CLASSES = [
-    ['brilliant', '#26c2a3', '!!', fr ? 'Brillant' : 'Brilliant', fr ? '{m} est brillant !' : '{m} is brilliant!'],
-    ['great', '#749bbf', '!', fr ? 'Excellent' : 'Great', fr ? '{m} est un excellent coup' : '{m} is a great move'],
-    ['best', '#81b64c', '★', fr ? 'Meilleur' : 'Best', fr ? '{m} est le meilleur coup' : '{m} is best'],
-    ['excellent', '#96bc4b', '✓', fr ? 'Très bon' : 'Excellent', fr ? '{m} est très bon' : '{m} is excellent'],
-    ['good', '#96af8b', '✓', fr ? 'Bon' : 'Good', fr ? '{m} est bon' : '{m} is good'],
-    ['book', '#d5a47d', '≡', fr ? 'Théorique' : 'Book', fr ? '{m} est un coup théorique' : '{m} is a book move'],
-    ['inaccuracy', '#f7c045', '?!', fr ? 'Imprécision' : 'Inaccuracy', fr ? '{m} est une imprécision' : '{m} is an inaccuracy'],
-    ['mistake', '#ffa459', '?', fr ? 'Erreur' : 'Mistake', fr ? '{m} est une erreur' : '{m} is a mistake'],
-    ['miss', '#ff7769', '✕', fr ? 'Manqué' : 'Miss', fr ? '{m} est un coup manqué' : '{m} is a miss'],
-    ['blunder', '#fa412d', '??', fr ? 'Gaffe' : 'Blunder', fr ? '{m} est une gaffe' : '{m} is a blunder'],
-  ].map(([key, color, icon, label, sentence]) => ({ key, color, icon, label, sentence }));
+    ['brilliant', '#26c2a3', fr ? 'Brillant' : 'Brilliant', fr ? '{m} est brillant !' : '{m} is brilliant!'],
+    ['great', '#749bbf', fr ? 'Excellent' : 'Great', fr ? '{m} est un excellent coup' : '{m} is a great move'],
+    ['book', '#d5a47d', fr ? 'Théorique' : 'Book', fr ? '{m} est un coup théorique' : '{m} is a book move'],
+    ['best', '#81b64c', fr ? 'Meilleur' : 'Best', fr ? '{m} est le meilleur coup' : '{m} is best'],
+    ['excellent', '#81b64c', fr ? 'Très bien' : 'Excellent', fr ? '{m} est très bien' : '{m} is excellent'],
+    ['good', '#95b776', fr ? 'Bon' : 'Good', fr ? '{m} est bon' : '{m} is good'],
+    ['inaccuracy', '#f7c631', fr ? 'Imprécision' : 'Inaccuracy', fr ? '{m} est une imprécision' : '{m} is an inaccuracy'],
+    ['mistake', '#ffa459', fr ? 'Erreur' : 'Mistake', fr ? '{m} est une erreur' : '{m} is a mistake'],
+    ['miss', '#ff7769', fr ? 'Manqué' : 'Miss', fr ? '{m} est un coup manqué' : '{m} is a miss'],
+    ['blunder', '#fa412d', fr ? 'Gaffe' : 'Blunder', fr ? '{m} est une gaffe' : '{m} is a blunder'],
+  ].map(([key, color, label, sentence]) => ({ key, color, label, sentence }));
   const CLS = Object.fromEntries(CLASSES.map(c => [c.key, c]));
   // The counts shown over the Game Review button, like Chess.com.
   const COUNTED = ['brilliant', 'great', 'best'];
@@ -93,8 +93,12 @@
   const GOOD = new Set(['brilliant', 'great', 'best', 'book']);
 
   // Chess.com's own icons: a shadowed circle, and white glyphs whose shadow is
-  // the same glyphs half a unit lower. Classes without one keep a text icon.
+  // the same glyphs half a unit lower.
   const ICONS = {
+    brilliant: [
+      'M12.57,14.1a.51.51,0,0,1,0,.13.44.44,0,0,1-.08.11l-.11.08-.13,0h-2l-.13,0L10,14.34A.41.41,0,0,1,10,14.1V12.2A.32.32,0,0,1,10,12a.39.39,0,0,1,.1-.08l.13,0h2a.31.31,0,0,1,.24.1.39.39,0,0,1,.08.1.51.51,0,0,1,0,.13Zm-.12-3.93a.17.17,0,0,1,0,.12.41.41,0,0,1-.07.11.4.4,0,0,1-.23.08H10.35a.31.31,0,0,1-.34-.31L9.86,3.4A.36.36,0,0,1,10,3.16a.23.23,0,0,1,.11-.08.27.27,0,0,1,.13,0H12.3a.32.32,0,0,1,.25.1.36.36,0,0,1,.09.24Z',
+      'M8.07,14.1a.51.51,0,0,1,0,.13.44.44,0,0,1-.08.11l-.11.08-.13,0h-2l-.13,0-.11-.08a.41.41,0,0,1-.08-.24V12.2a.27.27,0,0,1,0-.13.36.36,0,0,1,.07-.1.39.39,0,0,1,.1-.08l.13,0h2A.31.31,0,0,1,8,12a.39.39,0,0,1,.08.1.51.51,0,0,1,0,.13ZM8,10.17a.17.17,0,0,1,0,.12.41.41,0,0,1-.07.11.4.4,0,0,1-.23.08H5.85a.31.31,0,0,1-.34-.31L5.36,3.4a.36.36,0,0,1,.09-.24.23.23,0,0,1,.11-.08.27.27,0,0,1,.13,0H7.8a.35.35,0,0,1,.25.1.36.36,0,0,1,.09.24Z',
+    ],
     book: [
       'M8.45,5.4c-1-.75-2.51-1.09-4.83-1.09H3V13h.58a8.09,8.09,0,0,1,4.83,1.17Z',
       'M9.54,14.19A8.14,8.14,0,0,1,14.38,13H15V4.31h-.58c-2.31,0-3.81.34-4.84,1.09Z',
@@ -114,6 +118,20 @@
       'M6.79,12.15H4.91l-.12,0a.34.34,0,0,0-.18.29v1.82a.36.36,0,0,0,.08.23.23.23,0,0,0,.1.07l.12,0H6.79a.24.24,0,0,0,.12,0A.26.26,0,0,0,7,14.51a.36.36,0,0,0,.07-.1.28.28,0,0,0,0-.13V12.46a.27.27,0,0,0,0-.12.61.61,0,0,0-.07-.1A.32.32,0,0,0,6.79,12.15Z',
       'M8.39,4A3.76,3.76,0,0,0,7.3,3.48a4.07,4.07,0,0,0-1.2-.19,3.92,3.92,0,0,0-1.18.17,5.87,5.87,0,0,0-.9.37,3.37,3.37,0,0,0-.55.38l-.21.19a.32.32,0,0,0,0,.41l1,1.2a.26.26,0,0,0,.2.12.48.48,0,0,0,.24-.06L4.78,6a2.9,2.9,0,0,1,.29-.19l.4-.17A1.66,1.66,0,0,1,6,5.56a1.1,1.1,0,0,1,.72.24.72.72,0,0,1,.23.26A.77.77,0,0,1,7,6.4a1,1,0,0,1-.26.67,7.6,7.6,0,0,1-.64.63,6.28,6.28,0,0,0-.49.43,2.93,2.93,0,0,0-.45.54,2.72,2.72,0,0,0-.33.66,2.62,2.62,0,0,0-.13.83v.35a.43.43,0,0,0,0,.12.39.39,0,0,0,.08.1.18.18,0,0,0,.1.07.21.21,0,0,0,.12,0H6.72l.12,0a.23.23,0,0,0,.1-.07.36.36,0,0,0,.07-.1.5.5,0,0,0,0-.12V10.3a1,1,0,0,1,.27-.7A8,8,0,0,1,8,9c.18-.15.35-.31.52-.48A7,7,0,0,0,9,7.89a3.23,3.23,0,0,0,.36-.72,3.07,3.07,0,0,0,.13-1A2.66,2.66,0,0,0,9.15,5,2.58,2.58,0,0,0,8.39,4Z',
     ],
+    excellent: [
+      'M13.79,10.84c0-.2.4-.53.4-.94S14,9.22,14,9.08a2.06,2.06,0,0,0,.18-.83,1,1,0,0,0-.3-.69,1.13,1.13,0,0,0-.55-.2,10.29,10.29,0,0,1-2.07,0c-.37-.23,0-1.18.18-1.7s.51-2.12-.77-2.43c-.69-.17-.66.37-.78.9-.05.21-.09.43-.13.57A5,5,0,0,1,7.05,7.73a1.57,1.57,0,0,1-.42.18v4.94A7.23,7.23,0,0,1,8,13c.52.12.91.25,1.44.33a11.11,11.11,0,0,0,1.62.16,6.65,6.65,0,0,0,1.18,0,1.09,1.09,0,0,0,1-.59.66.66,0,0,0,.06-.2,1.63,1.63,0,0,1,.07-.3c.13-.28.37-.3.5-.68S13.74,11,13.79,10.84Z',
+      'M5.49,7.59H4.31a.5.5,0,0,0-.5.5v4.56a.5.5,0,0,0,.5.5H5.49a.5.5,0,0,0,.5-.5V8.09A.5.5,0,0,0,5.49,7.59Z',
+    ],
+    good: [
+      'M15.11,6.31,9.45,12,7.79,13.63a.39.39,0,0,1-.28.11.39.39,0,0,1-.27-.11L2.89,9.28A.39.39,0,0,1,2.78,9a.39.39,0,0,1,.11-.27L4.28,7.35a.34.34,0,0,1,.12-.09l.15,0a.37.37,0,0,1,.15,0,.38.38,0,0,1,.13.09L7.52,10l5.65-5.65a.38.38,0,0,1,.13-.09.37.37,0,0,1,.15,0,.4.4,0,0,1,.15,0,.34.34,0,0,1,.12.09l1.39,1.38a.41.41,0,0,1,.08.13.33.33,0,0,1,0,.15.4.4,0,0,1,0,.15A.5.5,0,0,1,15.11,6.31Z',
+    ],
+    inaccuracy: [
+      'M13.66,14.3a.28.28,0,0,1,0,.13.23.23,0,0,1-.08.11.28.28,0,0,1-.11.08l-.12,0h-2l-.13,0a.27.27,0,0,1-.1-.08A.36.36,0,0,1,11,14.3V12.4a.59.59,0,0,1,0-.13.36.36,0,0,1,.07-.1l.1-.08.13,0h2a.33.33,0,0,1,.23.1.39.39,0,0,1,.08.1.28.28,0,0,1,0,.13Zm-.12-3.93a.31.31,0,0,1,0,.13.3.3,0,0,1-.07.1.3.3,0,0,1-.23.08H11.43a.31.31,0,0,1-.34-.31L10.94,3.6A.5.5,0,0,1,11,3.36l.11-.08.13,0h2.11a.35.35,0,0,1,.26.1.41.41,0,0,1,.08.24Z',
+      'M7.65,14.32a.27.27,0,0,1,0,.12.26.26,0,0,1-.07.11l-.1.07-.13,0H5.43a.25.25,0,0,1-.12,0,.27.27,0,0,1-.1-.08.31.31,0,0,1-.09-.22V12.49a.36.36,0,0,1,.09-.23l.1-.07.12,0H7.32a.32.32,0,0,1,.23.09.3.3,0,0,1,.07.1.28.28,0,0,1,0,.13Zm2.2-7.17a3.1,3.1,0,0,1-.36.73,5.58,5.58,0,0,1-.49.6A4.85,4.85,0,0,1,8.48,9a8,8,0,0,0-.65.63,1,1,0,0,0-.27.7v.22a.21.21,0,0,1,0,.12.17.17,0,0,1-.06.1.23.23,0,0,1-.1.07l-.12,0H5.53a.21.21,0,0,1-.12,0,.18.18,0,0,1-.1-.07.2.2,0,0,1-.08-.1.37.37,0,0,1,0-.12v-.35a2.68,2.68,0,0,1,.13-.84,2.91,2.91,0,0,1,.33-.66,3.38,3.38,0,0,1,.45-.55c.16-.15.33-.29.49-.42a7.84,7.84,0,0,0,.65-.64,1,1,0,0,0,.25-.67.77.77,0,0,0-.07-.34.67.67,0,0,0-.23-.27,1.16,1.16,0,0,0-.72-.24A1.61,1.61,0,0,0,6,5.61a3,3,0,0,0-.41.18A1.75,1.75,0,0,0,5.3,6l-.11.09A.5.5,0,0,1,5,6.12.31.31,0,0,1,4.74,6l-1-1.21a.3.3,0,0,1,0-.4A1.36,1.36,0,0,1,4,4.18a3.07,3.07,0,0,1,.56-.38,5.49,5.49,0,0,1,.9-.37,3.69,3.69,0,0,1,1.19-.17A3.92,3.92,0,0,1,8.93,4a2.85,2.85,0,0,1,.77.92A2.82,2.82,0,0,1,10,6.21,3,3,0,0,1,9.85,7.15Z',
+    ],
+    miss: [
+      'M13.99,12.01s.06,.08,.08,.13c.02,.05,.03,.1,.03,.15s-.01,.1-.03,.15c-.02,.05-.05,.09-.08,.13l-1.37,1.37s-.08,.06-.13,.08c-.05,.02-.1,.03-.15,.03s-.1-.01-.15-.03c-.05-.02-.09-.05-.13-.08l-3.06-3.06-3.06,3.06s-.08,.06-.13,.08c-.05,.02-.1,.03-.15,.03s-.1-.01-.15-.03c-.05-.02-.09-.05-.13-.08l-1.37-1.37c-.07-.07-.11-.17-.11-.28s.04-.2,.11-.28l3.06-3.06-3.06-3.06c-.07-.07-.11-.17-.11-.28s.04-.2,.11-.28l1.37-1.37c.07-.07,.17-.11,.28-.11s.2,.04,.28,.11l3.06,3.06,3.06-3.06c.07-.07,.17-.11,.28-.11s.2,.04,.28,.11l1.37,1.37s.06,.08,.08,.13c.02,.05,.03,.1,.03,.15s-.01,.1-.03,.15c-.02,.05-.05,.09-.08,.13l-3.06,3.06,3.06,3.06Z',
+    ],
   };
   for (const [key, paths] of Object.entries(ICONS)) {
     const glyphs = paths.map(d => `<path d="${d}"/>`).join('');
@@ -122,7 +140,7 @@
       <path opacity="0.3" d="M9,.5a9,9,0,1,0,9,9A9,9,0,0,0,9,.5Z"/>
       <path fill="${c.color}" d="M9,0a9,9,0,1,0,9,9A9,9,0,0,0,9,0Z"/>
       <g opacity="${key === 'book' ? 0.3 : 0.2}" transform="translate(0 .5)">${glyphs}</g>
-      <g fill="#fff">${glyphs}</g></svg>`;
+      <g fill="${key === 'miss' ? '#f1f2f2' : '#fff'}">${glyphs}</g></svg>`;
     c.img = `url("data:image/svg+xml,${encodeURIComponent(c.svg)}")`;
   }
   CLS.book.text = '#312e2b';
@@ -464,7 +482,7 @@
     const area = pts.length ? `M0,${height} L${pts.join(' L')} L${end},${height} Z` : '';
     const dots = review.moves
       .filter(m => GRAPH_DOTS.has(m.cls))
-      .map(m => `<circle cx="${x(m.ply).toFixed(1)}" cy="${y(review.positions[m.ply].wp).toFixed(1)}" r="3.5" fill="${CLS[m.cls].color}" stroke="#fff" stroke-width="1"/>`)
+      .map(m => `<circle cx="${x(m.ply).toFixed(1)}" cy="${y(review.positions[m.ply].wp).toFixed(1)}" r="3.5" fill="${CLS[m.cls].color}"/>`)
       .join('');
     const marker = ply > 0 ? `<line x1="${x(ply)}" x2="${x(ply)}" y1="0" y2="${height}" stroke="#81b64c" stroke-width="2"/>` : '';
     return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
@@ -533,10 +551,7 @@
     ctrl.redraw?.();
   }
 
-  const icon = cls =>
-    CLS[cls].svg
-      ? `<span class="cdc-cls-icon cdc-cls-icon--svg">${CLS[cls].svg}</span>`
-      : `<span class="cdc-cls-icon" style="--c:${CLS[cls].color}">${CLS[cls].icon}</span>`;
+  const icon = cls => `<span class="cdc-cls-icon">${CLS[cls].svg}</span>`;
 
   // Back and close as drawn icons of one size: the font's "←" is a sliver
   // next to its "✕".
@@ -554,7 +569,7 @@
   }
 
   // Like Chess.com, the summary keeps its layout while the game is analyzed:
-  // a quote from the coach, the graph filling in, and empty placeholders.
+  // a quote from the coach, the graph filling in, and the counts at zero.
   function renderSummary(ctrl) {
     const p = players(ctrl);
     const r = state.review;
@@ -565,23 +580,28 @@
     const rows = CLASSES.map(
       c => `<tr><td class="cdc-t-label">${esc(c.label)}</td>
         <td class="cdc-t-num" style="color:${c.color}">${r?.counts.w[c.key] || 0}</td>
-        <td class="cdc-t-icon">${r ? icon(c.key) : '<span class="cdc-cls-icon cdc-cls-icon--empty"></span>'}</td>
+        <td class="cdc-t-icon">${icon(c.key)}</td>
         <td class="cdc-t-num" style="color:${c.color}">${r?.counts.b[c.key] || 0}</td></tr>`,
     ).join('');
+    // Only the classification rows scroll: they're a table of their own, with
+    // the same fixed columns as the one above so the two line up.
+    const cols = '<colgroup><col class="cdc-t-c-label"><col><col class="cdc-t-c-icon"><col></colgroup>';
     dom.panel.innerHTML = `${header(T.review, 'normal')}
       <div class="cdc-coach cdc-coach--summary">${coachAvatar()}
         <div class="cdc-bubble"><p class="cdc-bubble__say">${say}</p></div></div>
-      <div class="cdc-review__body">
+      <div class="cdc-review__top">
         <div class="cdc-review__graph cdc-summary-graph">${loading ? `<span class="cdc-summary-pct">${pct}%</span>` : ''}</div>
-        <table class="cdc-review__table${loading ? ' cdc-review__table--loading' : ''}">
+        <table class="cdc-review__table">${cols}
           <tr class="cdc-t-names"><td></td><td>${esc(playerName(p.w))}</td><td></td><td>${esc(playerName(p.b))}</td></tr>
           <tr><td class="cdc-t-label">${esc(T.players)}</td><td><span class="cdc-avatar"></span></td><td></td><td><span class="cdc-avatar"></span></td></tr>
           <tr><td class="cdc-t-label">${esc(T.accuracy)}</td>
             <td><span class="cdc-acc cdc-acc--w">${acc('w')}</span></td><td></td>
             <td><span class="cdc-acc cdc-acc--b">${acc('b')}</span></td></tr>
           <tr class="cdc-t-sep"><td colspan="4"></td></tr>
-          ${rows}
         </table>
+      </div>
+      <div class="cdc-review__body">
+        <table class="cdc-review__table${loading ? ' cdc-review__table--loading' : ''}">${cols}${rows}</table>
       </div>
       <div class="cdc-review__foot"><button class="cdc-btn cdc-btn--green" data-cdc="moves" ${r ? '' : 'disabled'}>${esc(T.start)}</button></div>`;
     const g = dom.panel.querySelector('.cdc-summary-graph');
@@ -695,7 +715,7 @@
       if (node.san.startsWith('O-O')) dest = (node.san.startsWith('O-O-O') ? 'c' : 'g') + node.uci[1];
       const [dx, dy] = toXY(dest);
       const c = CLS[move.cls];
-      overlay = `<div class="cdc-badge${c.svg ? ' cdc-badge--svg' : ''}" style="left:${(dx + 1) * 12.5}%;top:${dy * 12.5}%;--c:${c.color}">${c.svg || c.icon}</div>`;
+      overlay = `<div class="cdc-badge" style="left:${(dx + 1) * 12.5}%;top:${dy * 12.5}%">${c.svg}</div>`;
     }
     if (dom.overlay.innerHTML !== overlay) dom.overlay.innerHTML = overlay;
     // The best move, drawn by board.js with the other arrows.
@@ -712,11 +732,7 @@
         const c = CLS[mv.cls];
         m.dataset.cdcCls = mv.cls;
         m.style.setProperty('--c', c.color);
-        m.dataset.cdcIcon = c.icon;
-        if (c.img) {
-          m.style.setProperty('--i', c.img);
-          m.dataset.cdcImg = '';
-        }
+        m.style.setProperty('--i', c.img);
         const badge = LIST_BADGES.has(mv.cls) && !(mv.cls === 'book' && r.moves[i + 1]?.cls === 'book');
         if (badge) m.dataset.cdcBadge = '';
         else delete m.dataset.cdcBadge;

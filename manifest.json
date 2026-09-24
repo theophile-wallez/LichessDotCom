@@ -20,6 +20,7 @@
         "src/styles/theme.css",
         "src/styles/sidebar.css",
         "src/styles/board.css",
+        "src/styles/playerbar.css",
         "src/styles/game.css",
         "src/styles/analysis.css",
         "src/styles/review.css",

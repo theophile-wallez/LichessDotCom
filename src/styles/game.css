@@ -84,6 +84,8 @@
 
   /* ------------------------------------------------------- player bars --- */
 
+  /* Which bar each piece goes in, and how far its content sits from the bar's
+     top (`--cdc-off`); playerbar.css draws them. */
   main.round .ruser-top,
   main.round .rclock-top,
   main.round .material-top,
@@ -100,84 +102,7 @@
     --cdc-off: calc(var(--cdc-coords-off) - var(--cdc-inset-b, 0px));
   }
 
-  main.round .ruser {
-    position: relative;
-    justify-self: start;
-    align-self: start;
-    display: flex !important;
-    align-items: center;
-    gap: 5px;
-    height: 20px;
-    margin: calc(var(--cdc-off) + 8px) 0 0 var(--cdc-inset-l, 0px) !important;
-    padding: 0 0 0 50px !important;
-    overflow: visible !important;
-    font-size: 14px !important;
-    line-height: 20px !important;
-    color: var(--cdc-text-strong) !important;
-  }
-
-  main.round .ruser::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 40px;
-    height: 40px;
-    border-radius: 3px;
-    /* Chess.com's default avatar. */
-    background: #e7e5e3 url('https://www.chess.com/bundles/web/images/user-image.007dad08.svg')
-      center / cover no-repeat;
-  }
-
-  main.round .ruser .line {
-    display: none !important;
-  }
-
-  main.round .ruser a,
-  main.round .ruser name {
-    flex: none !important;
-    font-weight: 700;
-    color: var(--cdc-text-strong) !important;
-    letter-spacing: 0 !important;
-  }
-
-  main.round .ruser .utitle,
-  main.round .ruser a .utitle {
-    display: inline-block;
-    margin-right: 5px;
-    padding: 0 3px;
-    border-radius: 3px;
-    background: var(--cdc-title-bg);
-    color: #fff !important;
-    font-size: 11px;
-    font-weight: 800;
-    line-height: 16px;
-    vertical-align: 1px;
-  }
-
-  main.round .ruser rating {
-    margin: 0 !important;
-    color: var(--cdc-text-dim) !important;
-    letter-spacing: 0 !important;
-    font-weight: 400;
-  }
-
-  main.round .ruser rating::before { content: '('; }
-  main.round .ruser rating::after  { content: ')'; }
-
-  /* The player's country flag, right after the name (set by content.js). */
-  main.round .ruser :is(rating, good, bad) { order: 2; }
-  main.round .ruser[data-cdc-flag]:not([data-cdc-flag=''])::after {
-    order: 1;
-    content: attr(data-cdc-flag);
-    font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
-    font-size: 16px;
-    line-height: 20px;
-  }
-
-  /* Captured pieces, Chess.com style (built by content.js): the opponent's
-     pieces you took, grouped by type, then the material lead. Lichess's own
-     material-difference row is hidden. */
+  /* Lichess's material difference: the bars show captured pieces instead. */
   main.round .material {
     display: none !important;
   }
@@ -186,38 +111,6 @@
   main.round .cdc-captured--bottom {
     grid-area: user-bot;
     --cdc-off: calc(var(--cdc-coords-off) - var(--cdc-inset-b, 0px));
-  }
-
-  main.round .cdc-captured {
-    justify-self: start;
-    align-self: start;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    height: 18px;
-    margin: calc(var(--cdc-off) + 30px) 0 0 calc(50px + var(--cdc-inset-l, 0px));
-    pointer-events: none;
-  }
-
-  .cdc-captured__group {
-    display: flex;
-  }
-
-  .cdc-captured__group img {
-    display: block;
-    width: 18px;
-    height: 18px;
-  }
-
-  .cdc-captured__group img + img {
-    margin-left: -11px;
-  }
-
-  .cdc-captured__score {
-    margin-left: 3px;
-    color: var(--cdc-text-dim);
-    font-size: 12px;
-    font-weight: 700;
   }
 
   main.round .expiration {
@@ -230,6 +123,7 @@
 
   /* ------------------------------------------------------------ clocks --- */
 
+  /* Where the clocks sit; clock.css draws them. */
   main.round .rclock {
     justify-self: end;
     align-self: start;
@@ -243,75 +137,6 @@
 
   main.round .rclock .bar {
     display: none !important;
-  }
-
-  main.round .rclock .time {
-    box-sizing: border-box;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-end;
-    gap: 0;
-    /* Chess.com's clock is a fixed 140 x 40, whatever the time reads. */
-    width: 140px;
-    height: 40px;
-    padding: 0 12px !important;
-    overflow: hidden;
-    border-radius: 4px !important;
-    box-shadow: none !important;
-    z-index: auto !important;
-    font-family: var(--cdc-font) !important;
-    font-size: 24px !important;
-    font-weight: 600 !important;
-    font-variant-numeric: tabular-nums;
-    letter-spacing: 0 !important;
-    line-height: 1 !important;
-    backdrop-filter: none !important;
-  }
-
-  main.round .rclock .time sep {
-    opacity: 1 !important;
-    font-size: 1em !important;
-  }
-
-  main.round .rclock-white .time {
-    background: #989795 !important;
-    color: #312e2b99 !important;
-  }
-
-  main.round .rclock-white.running .time {
-    background: #fff !important;
-    color: #312e2b !important;
-  }
-
-  main.round .rclock-black .time {
-    background: #2b2926 !important;
-    color: #82807d !important;
-  }
-
-  main.round .rclock-black.running .time {
-    background: #1c1b19 !important;
-    color: #fff !important;
-  }
-
-  main.round .rclock.emerg.running .time,
-  main.round .rclock.outoftime .time {
-    background: #c33a2f !important;
-    color: #fff !important;
-  }
-
-  /* Stopwatch icon on the running clock. */
-  main.round .rclock.running .time::before {
-    content: '';
-    width: 18px;
-    height: 18px;
-    margin-right: auto;
-    padding-right: 10px;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='13' r='9' fill='none' stroke='%23312e2b' stroke-width='2.5'/%3E%3Cpath d='M12 13V8' stroke='%23312e2b' stroke-width='2.5' stroke-linecap='round'/%3E%3Crect x='9' y='1' width='6' height='2.5' rx='1' fill='%23312e2b'/%3E%3C/svg%3E")
-      left center / 18px no-repeat;
-  }
-
-  main.round .rclock-black.running .time::before {
-    filter: invert(1);
   }
 
   /* ----------------------------------------------------------- move list --- */

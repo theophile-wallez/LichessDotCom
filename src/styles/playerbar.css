@@ -1,0 +1,219 @@
+/*
+ * Chess.com's player bars, one look for both places Lichess shows players
+ * around a board: the game page (`.ruser`, `.rclock`) and the analysis board
+ * (our `.cdc-player`, copied from the game info by content.js, and Lichess's
+ * `.analyse__clock`, the time each side had left at the current move).
+ *
+ *   [avatar] TITLE name flag (rating)                 [ clock ]
+ *            captured pieces +2
+ *
+ * This is only how they look. Where each piece sits is the page's own layout
+ * (game.css, analysis.css): it puts it in the right bar and sets `--cdc-off`,
+ * how far down the bar the board's inset and coordinates push the content.
+ */
+
+@media (min-width: 1020px) {
+  /* ------------------------------------------------------------ player --- */
+
+  :is(main.round .ruser, main.analyse > .cdc-player) {
+    position: relative;
+    justify-self: start;
+    align-self: start;
+    display: flex !important;
+    align-items: center;
+    gap: 5px;
+    height: 20px;
+    margin: calc(var(--cdc-off) + 8px) 0 0 var(--cdc-inset-l, 0px) !important;
+    padding: 0 0 0 50px !important;
+    overflow: visible !important;
+    font-size: 14px !important;
+    line-height: 20px !important;
+    color: var(--cdc-text-strong) !important;
+  }
+
+  :is(main.round .ruser, main.analyse > .cdc-player)::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
+    /* Chess.com's default avatar. */
+    background: #e7e5e3 url('https://www.chess.com/bundles/web/images/user-image.007dad08.svg')
+      center / cover no-repeat;
+  }
+
+  :is(main.round .ruser, main.analyse > .cdc-player) .line {
+    display: none !important;
+  }
+
+  :is(main.round .ruser, main.analyse > .cdc-player) a,
+  :is(main.round .ruser, main.analyse > .cdc-player) name {
+    flex: none !important;
+    font-weight: 700;
+    color: var(--cdc-text-strong) !important;
+    letter-spacing: 0 !important;
+  }
+
+  :is(main.round .ruser, main.analyse > .cdc-player) .utitle,
+  :is(main.round .ruser, main.analyse > .cdc-player) a .utitle {
+    display: inline-block;
+    margin-right: 5px;
+    padding: 0 3px;
+    border-radius: 3px;
+    background: var(--cdc-title-bg);
+    color: #fff !important;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 16px;
+    vertical-align: 1px;
+  }
+
+  :is(main.round .ruser, main.analyse > .cdc-player) rating {
+    margin: 0 !important;
+    color: var(--cdc-text-dim) !important;
+    letter-spacing: 0 !important;
+    font-weight: 400;
+  }
+
+  :is(main.round .ruser, main.analyse > .cdc-player) rating::before { content: '('; }
+  :is(main.round .ruser, main.analyse > .cdc-player) rating::after  { content: ')'; }
+
+  /* The player's country flag, right after the name (set by content.js). */
+  :is(main.round .ruser, main.analyse > .cdc-player) :is(rating, good, bad) { order: 2; }
+  :is(main.round .ruser, main.analyse > .cdc-player)[data-cdc-flag]:not([data-cdc-flag=''])::after {
+    order: 1;
+    content: attr(data-cdc-flag);
+    font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  /* ---------------------------------------------------- captured pieces --- */
+
+  /* Chess.com style (built by content.js): the opponent's pieces you took,
+     grouped by type, then the material lead, under the name. */
+  :is(main.round, main.analyse) > .cdc-captured {
+    justify-self: start;
+    align-self: start;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 18px;
+    margin: calc(var(--cdc-off) + 30px) 0 0 calc(50px + var(--cdc-inset-l, 0px));
+    pointer-events: none;
+  }
+
+  .cdc-captured__group {
+    display: flex;
+  }
+
+  .cdc-captured__group img {
+    display: block;
+    width: 18px;
+    height: 18px;
+  }
+
+  .cdc-captured__group img + img {
+    margin-left: -11px;
+  }
+
+  .cdc-captured__score {
+    margin-left: 3px;
+    color: var(--cdc-text-dim);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* ------------------------------------------------------------- clock --- */
+
+  /* A fixed 140 x 40 box, dim while waiting, lit with a stopwatch while
+     running, red when time is short. Each page only maps its markup onto the
+     clock's state: which side it is, whether it runs, whether it's low. */
+
+  /* Which side. The game says it in a class; the analysis board only says top
+     or bottom, so the board's orientation tells. */
+  main.round .rclock-white .time,
+  main.analyse:has(.analyse__board > .orientation-white) .analyse__clock.bottom,
+  main.analyse:has(.analyse__board > .orientation-black) .analyse__clock.top {
+    --cdc-clock-bg: #989795;
+    --cdc-clock-fg: #312e2b99;
+    --cdc-clock-on-bg: #fff;
+    --cdc-clock-on-fg: #312e2b;
+    --cdc-clock-icon: none;
+  }
+
+  main.round .rclock-black .time,
+  main.analyse:has(.analyse__board > .orientation-white) .analyse__clock.top,
+  main.analyse:has(.analyse__board > .orientation-black) .analyse__clock.bottom {
+    --cdc-clock-bg: #2b2926;
+    --cdc-clock-fg: #82807d;
+    --cdc-clock-on-bg: #1c1b19;
+    --cdc-clock-on-fg: #fff;
+    --cdc-clock-icon: invert(1);
+  }
+
+  main.round .rclock .time,
+  main.analyse .analyse__clock {
+    box-sizing: border-box;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end;
+    gap: 0;
+    /* Chess.com's clock is a fixed 140 x 40, whatever the time reads. */
+    flex: none !important;
+    width: 140px !important;
+    height: 40px !important;
+    margin: 0 !important;
+    padding: 0 12px !important;
+    overflow: hidden;
+    border: none !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    z-index: auto !important;
+    background: var(--cdc-clock-bg) !important;
+    color: var(--cdc-clock-fg) !important;
+    font-family: var(--cdc-font) !important;
+    font-size: 24px !important;
+    font-weight: 600 !important;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0 !important;
+    line-height: 1 !important;
+    white-space: nowrap;
+    backdrop-filter: none !important;
+  }
+
+  main.round .rclock .time sep {
+    opacity: 1 !important;
+    font-size: 1em !important;
+  }
+
+  /* Running. On the analysis board, the side to move. */
+  main.round .rclock.running .time,
+  main.analyse .analyse__clock.active {
+    background: var(--cdc-clock-on-bg) !important;
+    color: var(--cdc-clock-on-fg) !important;
+  }
+
+  main.round .rclock.emerg.running .time,
+  main.round .rclock.outoftime .time {
+    background: #c33a2f !important;
+    color: #fff !important;
+    --cdc-clock-icon: invert(1);
+  }
+
+  /* Stopwatch icon on the running clock. */
+  main.round .rclock.running .time::before,
+  main.analyse .analyse__clock.active::before {
+    content: '';
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin-right: auto;
+    padding-right: 10px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='13' r='9' fill='none' stroke='%23312e2b' stroke-width='2.5'/%3E%3Cpath d='M12 13V8' stroke='%23312e2b' stroke-width='2.5' stroke-linecap='round'/%3E%3Crect x='9' y='1' width='6' height='2.5' rx='1' fill='%23312e2b'/%3E%3C/svg%3E")
+      left center / 18px no-repeat;
+    filter: var(--cdc-clock-icon);
+  }
+}
