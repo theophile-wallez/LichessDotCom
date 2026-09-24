@@ -52,7 +52,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `manifest.json` | Content scripts: CSS + `content.js` + `dashboard.js` + `ratingchart.js` (isolated world), `page.js` + `board.js` + `review.js` (page world). |
 | `img/coaches/` | The Game Review coach's faces (`coach-<n>.webp`), web-accessible so `review.css` can load them. |
 | `src/background.js` | Service worker: downloads the Chess.com sounds, caches them as base64. |
-| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, fetches a finished game's move times (and its time control, for the "New 10 min" button), the players' country flags (from their profiles), the analysis board's players (copied from the hidden game info), the home hero, coach title badges, the hover card's rating chips, the puzzle eval bar's score and the font remapping. |
+| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, fetches a finished game's move times (and its time control, for the "New 10 min" button), the players' country flags (from their profiles), the analysis board's players (copied from the hidden game info), the home hero, coach title badges, the hover card's rating chips and its fit in the window, the eval bar's score and the font remapping. |
 | `src/dashboard.js` | Isolated world: the puzzle dashboard's theme radar, redrawn as SVG from the page's init JSON (Lichess draws it into a canvas). |
 | `src/ratingchart.js` | Isolated world: the rating history chart (profile, rating stats page), redrawn in SVG from the page's init JSON (Lichess draws it with Chart.js into a canvas): smooth curves over gradients, range pills, one chip per rating, a hover tooltip. |
 | `src/page.js` | Page world: wraps `site.sound` to play the right Chess.com sound per move, plus premove / illegal / game-start, which Lichess has no sound for. |
@@ -60,7 +60,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/review.js` | Page world: Game Review (engine, classification, panel, the coach's remarks per move, board overlays, eval bar). |
 | `src/styles/theme.css` | Overrides Lichess's `--c-*` color variables, fonts, buttons. |
 | `src/styles/sidebar.css` | Lichess's top header → Chess.com's left sidebar, and the user menu (dasher) as a Chess.com menu. |
-| `src/styles/board.css` | Board, pieces, highlights, move hints, arrows, coordinates. |
+| `src/styles/board.css` | Board, pieces, highlights, move hints, arrows, coordinates, and Lichess's eval bar drawn like the Game Review's. |
 | `src/styles/playerbar.css` | The player bars' look, shared by the game page (`.ruser`, `.rclock`) and the analysis board (`.cdc-player`, `.analyse__clock`): avatar, title, name, flag, rating, captured pieces and the clock. Each page only places them. |
 | `src/styles/game.css` | Game page (`main.round`) grid, where the player bars and clocks sit, moves, chat, and the game-over panel (Game Review button, move times). |
 | `src/styles/analysis.css` | Analysis page (`main.analyse`) grid (with the game page's player bars when there are players or clocks), engine header and lines, move list (glyph badges, comment cards) and controls. |

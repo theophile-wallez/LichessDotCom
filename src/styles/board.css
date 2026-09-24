@@ -269,3 +269,59 @@ body.coords-out coords.ranks {
 body.coords-out coords.files {
   bottom: -21px !important;
 }
+
+/* -------------------------------------------------------------- eval bar --- */
+
+/* Lichess's eval bar (analysis, practice, studies, puzzles), drawn like the
+   Game Review's (review.css): wider, dark over white, no ticks, the score
+   written at the leading side's end. Lichess turns the bar upside down for
+   Black with a transform, which would flip the score too, so the gradient is
+   turned instead. `--eval-percent` is Black's share, from the top, registered
+   so the bar slides like the review's; content.js copies the score from the
+   engine line. Each page sets the width (--cdc-gauge-w) and the margins. */
+@property --eval-percent {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 50%;
+}
+
+.eval-gauge {
+  box-sizing: border-box;
+  width: var(--cdc-gauge-w, 15px) !important;
+  overflow: hidden;
+  border-radius: 3px !important;
+  background: linear-gradient(to bottom, #403d39 var(--eval-percent), #fff var(--eval-percent)) !important;
+  transition: --eval-percent 0.3s ease;
+}
+
+.eval-gauge.reverse {
+  transform: none !important;
+  background: linear-gradient(to top, #403d39 var(--eval-percent), #fff var(--eval-percent)) !important;
+}
+
+.eval-gauge tick {
+  display: none !important;
+}
+
+.eval-gauge::after {
+  content: attr(data-cdc-eval) !important;
+  inset: auto 0 !important;
+  bottom: 5px !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  color: #403d39;
+  font-family: var(--cdc-font);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+}
+
+.eval-gauge:is([data-cdc-lead='black']:not(.reverse), [data-cdc-lead='white'].reverse)::after {
+  top: 5px !important;
+  bottom: auto !important;
+}
+
+.eval-gauge[data-cdc-lead='black']::after {
+  color: #fff;
+}

@@ -50,9 +50,13 @@
     margin: var(--cdc-bar) 0 0 !important;
   }
 
+  /* As wide and as placed as the Game Review's bar (review.css), which takes
+     its place: level with the squares, between the player bars if any. */
   main.analyse .eval-gauge {
+    --cdc-gauge-w: 26px;
     grid-area: gauge !important;
-    margin: var(--cdc-bar) 8px calc(var(--cdc-bar) + var(--cdc-coords-off)) 0 !important;
+    margin: calc(var(--cdc-bar) + var(--cdc-inset-t, 0px)) 10px
+      calc(var(--cdc-bar) + var(--cdc-coords-off) + var(--cdc-inset-b, 0px)) 0 !important;
   }
 
   /* ------------------------------------------------------- player bars --- */

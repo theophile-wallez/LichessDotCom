@@ -695,47 +695,8 @@ main.puzzle .ceval {
   background: none !important;
 }
 
-/* The eval bar, drawn like the analysis page's (review.css): wider, dark over
- * white, no ticks, the score written at the leading side's end. Lichess turns
- * the bar upside down for Black with a transform, which would flip the score
- * too, so the gradient is turned instead. `--eval-percent` is Black's share,
- * from the top; content.js copies the score from the engine line. */
+/* The eval bar is drawn in board.css, as on every page; its width is
+ * --cdc-gauge-w, set with the layout above. */
 main.puzzle .eval-gauge {
-  box-sizing: border-box;
-  width: var(--cdc-gauge-w, 15px) !important;
   margin-left: var(--cdc-gap, 0px);
-  border-radius: 3px !important;
-  background: linear-gradient(to bottom, #403d39 var(--eval-percent), #fff var(--eval-percent)) !important;
-}
-
-main.puzzle .eval-gauge.reverse {
-  transform: none !important;
-  background: linear-gradient(to top, #403d39 var(--eval-percent), #fff var(--eval-percent)) !important;
-}
-
-main.puzzle .eval-gauge tick {
-  display: none !important;
-}
-
-main.puzzle .eval-gauge::after {
-  content: attr(data-cdc-eval) !important;
-  inset: auto 0 !important;
-  bottom: 5px !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-  color: #403d39;
-  font-family: var(--cdc-font);
-  font-size: 10px;
-  font-weight: 700;
-  line-height: 1;
-  text-align: center;
-}
-
-main.puzzle .eval-gauge:is([data-cdc-lead='black']:not(.reverse), [data-cdc-lead='white'].reverse)::after {
-  top: 5px !important;
-  bottom: auto !important;
-}
-
-main.puzzle .eval-gauge[data-cdc-lead='black']::after {
-  color: #fff;
 }
