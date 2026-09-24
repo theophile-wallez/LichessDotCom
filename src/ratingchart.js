@@ -227,7 +227,7 @@
       el.style.d = `path("${d}")`;
     };
 
-    // Full redraw: a new range or a new width. `animate` draws the lines in.
+    // Full redraw: a new range or a new width. `animate` wipes the curves in.
     const draw = animate => {
       const s = (view = scales(layout()));
       const xlabels = timeTicks(s.start, end, s.width - PAD.l - PAD.r)
@@ -242,14 +242,17 @@
       const groups = s.rows
         .map(r => `<g class="cdc-rchart__series" data-i="${r.i}" style="--c:${r.color}">` +
           `<path class="cdc-rchart__area" fill="url(#cdc-rg-${r.i})"/>` +
-          `<path class="cdc-rchart__line" pathLength="1"/></g>`)
+          `<path class="cdc-rchart__line"/></g>`)
         .join('');
       svg.setAttribute('width', s.width);
       svg.setAttribute('height', HEIGHT);
       svg.setAttribute('viewBox', `0 0 ${s.width} ${HEIGHT}`);
       svg.innerHTML =
-        `<defs>${defs}</defs><g class="cdc-rchart__axis">${xlabels}</g>` +
-        `<g class="cdc-rchart__all" style="--cdc-bottom:${s.bottom}px">${groups}</g>` +
+        // One wipe reveals every line and fill together, left to right.
+        `<defs>${defs}<clipPath id="cdc-rclip"><rect class="cdc-rchart__wipe" x="${PAD.l - 4}" y="0" ` +
+        `width="${s.width - PAD.l - PAD.r + 8}" height="${HEIGHT}"/></clipPath></defs>` +
+        `<g class="cdc-rchart__axis">${xlabels}</g>` +
+        `<g class="cdc-rchart__all" clip-path="url(#cdc-rclip)">${groups}</g>` +
         `<g class="cdc-rchart__hover"><line class="cdc-rchart__guide" y1="${PAD.t}" y2="${s.bottom}"/>` +
         s.rows.map(r => `<circle class="cdc-rchart__dot" data-i="${r.i}" r="4.5" style="--c:${r.color}"/>`).join('') +
         '</g>' +
