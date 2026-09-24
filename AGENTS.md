@@ -49,10 +49,11 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 
 | Path | What it does |
 | --- | --- |
-| `manifest.json` | Content scripts: CSS + `content.js` + `dashboard.js` (isolated world), `page.js` + `board.js` + `review.js` (page world). |
+| `manifest.json` | Content scripts: CSS + `content.js` + `dashboard.js` + `ratingchart.js` (isolated world), `page.js` + `board.js` + `review.js` (page world). |
 | `src/background.js` | Service worker: downloads the Chess.com sounds, caches them as base64. |
 | `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, fetches a finished game's move times (and its time control, for the "New 10 min" button), the players' country flags (from their profiles), the home hero, coach title badges, the hover card's rating chips, the puzzle eval bar's score and the font remapping. |
 | `src/dashboard.js` | Isolated world: the puzzle dashboard's theme radar, redrawn as SVG from the page's init JSON (Lichess draws it into a canvas). |
+| `src/ratingchart.js` | Isolated world: the rating history chart (profile, rating stats page), redrawn in SVG from the page's init JSON (Lichess draws it with Chart.js into a canvas): smooth curves over gradients, range pills, one chip per rating, a hover tooltip. |
 | `src/page.js` | Page world: wraps `site.sound` to play the right Chess.com sound per move, plus premove / illegal / game-start, which Lichess has no sound for. |
 | `src/board.js` | Page world: every main board's shapes redrawn Chess.com-style (right-clicked squares filled, arrows), checkmate badge and label. |
 | `src/review.js` | Page world: Game Review (engine, classification, panel, board overlays, eval bar). |
@@ -66,6 +67,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/dropdowns.css` | Every dropdown as one menu style: Lichess's `.mselect`, native `<select>` (via `appearance: base-select`) and autocomplete lists. |
 | `src/styles/powertip.css` | The profile hover card (`#powerTip`, filled with `/@/<user>/mini`) as a Chess.com player card. |
 | `src/styles/profile.css` | Player profile (`main.page-menu` + `.user-show`) as a Chess.com member page: a hero card (avatar, name, awards, counters, actions), the side ratings as a full-width strip of rating cards, the about card and rating chart, pill tabs, the activity timeline and the game rows. |
+| `src/styles/ratingchart.css` | The SVG rating chart of `ratingchart.js`: chips, range pills, curves and their draw-in / morph animations, the tooltip. Hides Lichess's chart only once ours is in. |
 | `src/styles/home.css` | Home page (`main.lobby`) as a 12-column card dashboard, with quick pairing as Chess.com's time-control picker (same-size buttons, three to a row); the hero is added by `content.js`. |
 | `src/styles/coach.css` | Coach directory (`main.coach-list`) as a grid of coach cards; the title badges are split out of the names by `content.js`. |
 | `src/styles/teams.css` | Team lists (`main.team-list`) as a grid of club cards with avatar tiles. |

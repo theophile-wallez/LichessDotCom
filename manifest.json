@@ -27,6 +27,7 @@
         "src/styles/dropdowns.css",
         "src/styles/powertip.css",
         "src/styles/profile.css",
+        "src/styles/ratingchart.css",
         "src/styles/home.css",
         "src/styles/coach.css",
         "src/styles/teams.css",
@@ -41,7 +42,7 @@
         "src/styles/dashboard.css",
         "src/styles/broadcast.css"
       ],
-      "js": ["src/content.js", "src/dashboard.js"],
+      "js": ["src/content.js", "src/dashboard.js", "src/ratingchart.js"],
       "run_at": "document_start"
     },
     {
