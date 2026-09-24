@@ -79,6 +79,7 @@
 
   #cdc-review {
     grid-area: rtop;
+    container: cdc-review / inline-size;
     display: flex;
     flex-direction: column;
     min-height: 0;
@@ -391,9 +392,9 @@
 
   /* ----------------------------------------------------------- coach --- */
 
-  /* Like Chess.com: the coach as a cut-out, and the bubble's tail at the
-   * coach's mouth; the bubble grows down from there. The mouth sits at 58.5%
-   * of the portraits' height and the tail's tip 30px below the bubble's top,
+  /* Like Chess.com: the coach as a cut-out, and the bubble's tail just under
+   * the coach's mouth; the bubble grows down from there. That's 64% of the
+   * portraits' height, and the tail's tip is 30px below the bubble's top,
    * hence the bubble's offset. It's at least tall enough for the tail to
    * meet its straight edge, below the rounded corners. */
   .cdc-coach {
@@ -405,6 +406,14 @@
     height: 128px;
     padding: 4px 16px 0 10px;
     box-sizing: border-box;
+  }
+
+  /* A narrow panel wraps the bubble's lines: a smaller coach leaves the
+   * bubble more room, so two-line titles and openings still clear the nav. */
+  @container cdc-review (max-width: 400px) {
+    .cdc-coach {
+      --cdc-coach-h: 100px;
+    }
   }
 
   .cdc-coach--summary {
@@ -452,17 +461,12 @@
     flex-direction: column;
     justify-content: center;
     min-height: 58px;
-    max-height: calc(100% - var(--cdc-coach-h) * 0.585 + 30px);
-    margin-top: calc(var(--cdc-coach-h) * 0.585 - 30px);
+    margin-top: calc(var(--cdc-coach-h) * 0.64 - 30px);
     box-sizing: border-box;
     padding: 10px 14px;
     border-radius: 14px;
     background: #fff;
     color: #312e2b;
-  }
-
-  .cdc-coach--summary .cdc-bubble {
-    max-height: none;
   }
 
   /* Chess.com's tail: a horn out of the bubble's left edge, a concave curve
