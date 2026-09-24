@@ -768,6 +768,206 @@
     return typo(pool[hash(seed) % pool.length]);
   }
 
+  // ---------------------------------------------------- explanations ---
+
+  // Full sentences under the verdict, like Chess.com's coach: how the
+  // evaluation moved, and one concrete fact from the board and the engine
+  // (a piece left hanging, a mate allowed or missed, the better move, a
+  // mistake punished, what a capture won). The pools above only fill in
+  // when a good move has nothing concrete to say.
+  const PIECE = fr
+    ? { p: ['pion'], n: ['cavalier'], b: ['fou'], r: ['tour', 'f'], q: ['dame', 'f'], k: ['roi'] }
+    : { p: ['pawn'], n: ['knight'], b: ['bishop'], r: ['rook'], q: ['queen'], k: ['king'] };
+  const fem = t => PIECE[t][1] === 'f';
+  const the = t => (fr ? (fem(t) ? 'la ' : 'le ') : 'the ') + PIECE[t][0];
+  const one = t => (fr ? (fem(t) ? 'une ' : 'un ') : 'a ') + PIECE[t][0];
+  const side = c => (fr ? (c === 'w' ? 'les Blancs' : 'les Noirs') : c === 'w' ? 'White' : 'Black');
+  const sides = c => (fr ? (c === 'w' ? 'des Blancs' : 'des Noirs') : c === 'w' ? 'White’s' : 'Black’s');
+  const cap = s => s[0].toUpperCase() + s.slice(1);
+  // Moves in text with figurines, which read the same in every language.
+  const FIG = { w: { K: '♔', Q: '♕', R: '♖', B: '♗', N: '♘' }, b: { K: '♚', Q: '♛', R: '♜', B: '♝', N: '♞' } };
+  const fig = (san, c) => san.replace(/^[KQRBN]/, l => FIG[c][l]);
+
+  // White's view of an evaluation, from -4 (Black mates) to 4 (White mates).
+  function level(e) {
+    if (e.mate !== undefined) return e.mate > 0 || (e.mate === 0 && e.wp > 50) ? 4 : -4;
+    const w = e.wp;
+    return (w >= 90 ? 3 : w >= 70 ? 2 : w >= 58 ? 1 : 0) - (w <= 10 ? 3 : w <= 30 ? 2 : w <= 42 ? 1 : 0);
+  }
+  const NOUN = fr
+    ? ['', 'un léger avantage', 'un net avantage', 'une position gagnante', 'un mat forcé']
+    : ['', 'a slight edge', 'a clear advantage', 'a winning position', 'a forced mate'];
+  const noun = (l, e) =>
+    Math.abs(l) === 4 && e.mate ? (fr ? `un mat en ${Math.abs(e.mate)}` : `a mate in ${Math.abs(e.mate)}`) : NOUN[Math.abs(l)];
+  const de = s => (fr ? s.replace(/^un(e?) /, 'd’un$1 ') : s);
+
+  // How the move changed the game, e.g. "The game was balanced, but now
+  // Black has a clear advantage."
+  function trajectory(eb, ea, mover, seed) {
+    const b = level(eb), a = level(ea);
+    const who = l => (l > 0 ? 'w' : 'b');
+    const nb = noun(b, eb), na = noun(a, ea);
+    if (b === a) {
+      const still = !a
+        ? fr
+          ? ['La partie reste équilibrée.', 'L’équilibre tient toujours.', 'Les chances restent égales.']
+          : ['The game stays balanced.', 'It’s still an even game.', 'The balance holds.']
+        : fr
+          ? [`${cap(side(who(a)))} ont toujours ${na}.`, `${cap(side(who(a)))} gardent ${na}.`]
+          : [`${side(who(a))} still has ${na}.`, `${side(who(a))} keeps ${na}.`];
+      return still[seed % still.length];
+    }
+    if (!b) {
+      const good = who(a) === mover;
+      return fr
+        ? `La partie était équilibrée, ${good ? 'et' : 'mais'} maintenant ${side(who(a))} ont ${na}.`
+        : `The game was balanced, ${good ? 'and' : 'but'} now ${side(who(a))} has ${na}.`;
+    }
+    if (!a)
+      return fr
+        ? `${cap(side(who(b)))} avaient ${nb}, mais la partie est maintenant équilibrée.`
+        : `${side(who(b))} had ${nb}, but the game is now balanced.`;
+    if (who(a) === who(b)) {
+      const s = side(who(a));
+      if (Math.abs(a) > Math.abs(b)) return fr ? `${cap(s)} passent ${de(nb)} à ${na}.` : `${s} goes from ${nb} to ${na}.`;
+      return fr ? `${cap(s)} avaient ${nb}, il ne leur reste qu’${na}.` : `${s} had ${nb}; now it’s only ${na}.`;
+    }
+    return fr
+      ? `${cap(side(who(b)))} avaient ${nb}, mais maintenant ${side(who(a))} ont ${na}.`
+      : `${side(who(b))} had ${nb}, but now ${side(who(a))} has ${na}.`;
+  }
+
+  // One thing the board or the engine shows about the move, or null.
+  function fact(ctrl, r, move) {
+    const nodes = ctrl.mainline, node = nodes[move.ply], prev = nodes[move.ply - 1];
+    const me = move.color, them = me === 'w' ? 'b' : 'w', sign = me === 'w' ? 1 : -1;
+    const before = parseFen(prev.fen).board, after = parseFen(node.fen).board;
+    const eb = r.positions[move.ply - 1], ea = move.eval;
+    const san = move.san, dest = move.uci.slice(2, 4);
+    const best = move.bestSan ? fig(move.bestSan, me) : '';
+    const reply = r.positions[move.ply]?.best;
+    const replySan = reply ? fig(uciToSan(node.fen, reply), them) : '';
+    const mates = (e, s) => e.mate !== undefined && e.mate * s > 0;
+
+    if (san.includes('#'))
+      return fr
+        ? `Échec et mat : le roi ${them === 'w' ? 'blanc' : 'noir'} n’a plus aucune case.`
+        : `Checkmate: the ${them === 'w' ? 'white' : 'black'} king has nowhere to go.`;
+
+    if (!GOOD.has(move.cls) && move.cls !== 'excellent' && move.cls !== 'good') {
+      if (mates(ea, -sign) && !mates(eb, -sign) && replySan)
+        return fr
+          ? `${cap(side(them))} peuvent maintenant forcer le mat, à commencer par ${replySan}.`
+          : `${side(them)} can now force mate, starting with ${replySan}.`;
+      if (mates(eb, sign) && !mates(ea, sign) && best)
+        return fr ? `${best} forçait le mat en ${Math.abs(eb.mate)}.` : `${best} would have forced mate in ${Math.abs(eb.mate)}.`;
+      if (move.cls === 'miss' && best)
+        return fr
+          ? `Le dernier coup ${sides(them)} était une erreur, et ${best} l’aurait puni.`
+          : `${sides(them)} last move was a mistake, and ${best} would have punished it.`;
+      const victim = reply && after[reply.slice(2, 4)];
+      if (move.loss >= 10 && victim?.color === me && VALUES[victim.type] >= 3 && victim.type !== 'k') {
+        const at = reply.slice(2, 4);
+        if (!attackers(after, at, me).length)
+          return fr
+            ? `${cap(the(victim.type))} en ${at} n’est plus défendu${fem(victim.type) ? 'e' : ''} : ${replySan} ${fem(victim.type) ? 'la' : 'le'} gagne.`
+            : `The ${PIECE[victim.type][0]} on ${at} is left undefended: ${replySan} wins it.`;
+        if (Math.min(...attackers(after, at, them)) < VALUES[victim.type])
+          return fr ? `${replySan} gagne ${the(victim.type)} en ${at}.` : `${replySan} wins the ${PIECE[victim.type][0]} on ${at}.`;
+      }
+      if (!best) return null;
+      const taken = move.best && before[move.best.slice(2, 4)];
+      if (taken && taken.color === them && taken.type !== 'p')
+        return fr ? `${best}, qui prend ${the(taken.type)}, était plus fort.` : `${best}, taking the ${PIECE[taken.type][0]}, was stronger.`;
+      if (move.cls === 'inaccuracy') return fr ? `${best} était plus précis.` : `${best} was more precise.`;
+      return fr ? `Il fallait jouer ${best}.` : `${best} was the better move.`;
+    }
+
+    const prevMove = r.moves[move.ply - 2];
+    if (['brilliant', 'great', 'best'].includes(move.cls) && ['mistake', 'blunder', 'miss'].includes(prevMove?.cls))
+      return fr ? `Il punit aussitôt l’erreur ${sides(them)}.` : `It punishes ${sides(them)} mistake right away.`;
+    const moved = after[dest];
+    if (move.cls === 'brilliant' && moved)
+      return fr
+        ? `${cap(the(moved.type))} est offert${fem(moved.type) ? 'e' : ''}, et ${side(them)} ne peuvent pas ${fem(moved.type) ? 'la' : 'le'} prendre sans risque.`
+        : `The ${PIECE[moved.type][0]} is offered, and ${side(them)} can’t safely take it.`;
+    if (move.cls === 'great')
+      return level(ea) * sign >= 2
+        ? fr ? 'Tout autre coup laissait filer l’avantage.' : 'Every other move would have let the advantage slip.'
+        : fr ? `Tout autre coup mettait ${side(me)} en difficulté.` : `Every other move would have left ${side(me)} worse off.`;
+    const promo = san.match(/=([QRBN])/);
+    if (promo)
+      return fr ? `Le pion devient ${one(promo[1].toLowerCase())}.` : `The pawn promotes to ${one(promo[1].toLowerCase())}.`;
+    if (san.startsWith('O-O'))
+      return fr ? 'Le roi est à l’abri, et la tour entre en jeu.' : 'The king is safe, and the rook joins the game.';
+    if (san.includes('x') && moved) {
+      const victim = before[dest] || { type: 'p' }; // en passant
+      if (prev.san?.includes('x') && prev.uci?.slice(2, 4) === dest) return fr ? `Il reprend en ${dest}.` : `It takes back on ${dest}.`;
+      if (!attackers(before, dest, them).length)
+        return fr ? `Il gagne ${one(victim.type)} sans contrepartie.` : `It wins ${one(victim.type)} for free.`;
+      if (VALUES[victim.type] > VALUES[moved.type])
+        return fr ? `Il gagne ${one(victim.type)} contre ${one(moved.type)}.` : `It wins ${one(victim.type)} for ${one(moved.type)}.`;
+    }
+    if (san.includes('+')) return fr ? `L’échec force ${side(them)} à réagir.` : `The check forces ${side(them)} to respond.`;
+    if (move.cls === 'good' && best) return fr ? `${best} était un peu plus précis.` : `${best} was a little more precise.`;
+    return null;
+  }
+
+  // The coach's comment: [sentence, droppable?] pairs. The trajectory is the
+  // one dropped when the bubble has no room for both.
+  function explanation(ctrl, r, move) {
+    if (move.cls === 'book')
+      return [[remark(ctrl, r, move)], ...(state.openingName ? [[`${fr ? 'Ouverture' : 'Opening'}: ${state.openingName}.`, true]] : [])];
+    const f = fact(ctrl, r, move);
+    if (move.san.includes('#')) return [[f]];
+    const seed = hash(`${ctrl.data.game.id}:${move.ply}:${coach}:t`);
+    const t = [trajectory(r.positions[move.ply - 1], move.eval, move.color, seed), true];
+    if (!GOOD.has(move.cls) && move.cls !== 'excellent' && move.cls !== 'good') return f ? [t, [f]] : [[t[0]]];
+    return [[f || remark(ctrl, r, move)], t];
+  }
+
+  // ------------------------------------------------------- streaming ---
+
+  // The comment is typed out word by word, like a chat reply. Every word is
+  // laid out from the start, hidden until its turn, so the bubble has its
+  // final size at once and stays put while the text comes in.
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+  const stream = { key: '', shown: 0, timer: 0 };
+
+  function streamHtml(parts) {
+    const key = parts.map(p => p[0]).join('|');
+    if (key !== stream.key) {
+      stream.key = key;
+      stream.shown = calm.matches ? Infinity : 0;
+    }
+    let i = 0;
+    return parts
+      .map(([text, drop]) => {
+        const words = typo(text).match(/\S+\s*/g) || [];
+        const html = words.map(w => `<span class="cdc-w${i++ >= stream.shown ? ' cdc-w--off' : ''}">${esc(w)}</span>`).join('');
+        return `<span class="cdc-say${drop ? ' cdc-say--drop' : ''}">${html} </span>`;
+      })
+      .join('');
+  }
+
+  // After a render: drop what doesn't fit, then carry on typing.
+  function startStream() {
+    const sub = dom.panel.querySelector('.cdc-bubble__sub');
+    if (!sub) return;
+    if (sub.scrollHeight > sub.clientHeight + 1) sub.querySelector('.cdc-say--drop')?.remove();
+    if (stream.shown < sub.querySelectorAll('.cdc-w').length && !stream.timer) stream.timer = setInterval(tickStream, 35);
+  }
+
+  function tickStream() {
+    const words = dom.panel.querySelectorAll('.cdc-bubble__sub .cdc-w');
+    const w = words[stream.shown++];
+    if (w) w.className = 'cdc-w cdc-w--in';
+    if (stream.shown >= words.length) {
+      clearInterval(stream.timer);
+      stream.timer = 0;
+    }
+  }
+
   // ------------------------------------------------------------- UI ---
 
   const html = document.documentElement;
@@ -1004,7 +1204,7 @@
       bubble = `<div class="cdc-bubble__row">${icon(move.cls)}
           <p class="cdc-bubble__title" style="color:${c.text || c.color}">${esc(typo(c.sentence.replace('{m}', move.san)))}</p>
           <span class="cdc-bubble__eval">${esc(formatEval(move.eval))}</span></div>
-        <p class="cdc-bubble__sub">${esc(hint ? typo(hint) : remark(ctrl, r, move))}</p>`;
+        <p class="cdc-bubble__sub">${streamHtml(hint ? [[hint]] : explanation(ctrl, r, move))}</p>`;
     }
     const atEnd = ctrl.onMainline && ply >= ctrl.mainline.length - 1;
     const canBest = shown || (move && move.best && !GOOD.has(move.cls));
@@ -1117,6 +1317,7 @@
       if (state.mode === 'summary') renderSummary(ctrl);
       else if (state.mode === 'moves') renderMoves(ctrl);
       else renderNormal(ctrl);
+      startStream();
       fitBubble();
     }
     renderBoard(ctrl);
