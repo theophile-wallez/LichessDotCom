@@ -143,7 +143,6 @@
       <g fill="${key === 'miss' ? '#f1f2f2' : '#fff'}">${glyphs}</g></svg>`;
     c.img = `url("data:image/svg+xml,${encodeURIComponent(c.svg)}")`;
   }
-  CLS.book.text = '#312e2b';
 
   const SVG = {
     first: '<path d="M5 4h3v16H5zM20 4v16L9 12z"/>',
@@ -977,6 +976,12 @@
     }
   }
 
+  // The verdict, with the move's piece as a solid figurine like Chess.com,
+  // drawn by Lichess's "Noto Chess" font. Only the icon is colored.
+  const FIGURINES = { K: '♚', Q: '♛', R: '♜', B: '♝', N: '♞' };
+  const title = (c, san) =>
+    esc(typo(c.sentence)).replace('{m}', esc(san).replace(/[KQRBN]/g, p => `<span class="cdc-fig">${FIGURINES[p]}</span>`));
+
   function renderMoves(ctrl) {
     const r = state.review;
     const ply = ctrl.node.ply;
@@ -986,7 +991,7 @@
     if (!r) bubble = `<p class="cdc-bubble__title">${esc(T.analysing)} ${Math.round(state.progress * 100)}%</p>`;
     else if (shown)
       bubble = `<div class="cdc-bubble__row">${icon('best')}
-          <p class="cdc-bubble__title" style="color:${CLS.best.color}">${esc(CLS.best.sentence.replace('{m}', ctrl.node.san))}</p>
+          <p class="cdc-bubble__title">${title(CLS.best, ctrl.node.san)}</p>
           <span class="cdc-bubble__eval">${esc(formatEval(r.positions[shown.ply - 1]))}</span></div>`;
     else if (!move) bubble = `<p class="cdc-bubble__title">${esc(T.intro)}</p>`;
     else {
@@ -1002,7 +1007,7 @@
             ? T.bestWas.replace('{m}', move.bestSan)
             : '';
       bubble = `<div class="cdc-bubble__row">${icon(move.cls)}
-          <p class="cdc-bubble__title" style="color:${c.text || c.color}">${esc(typo(c.sentence.replace('{m}', move.san)))}</p>
+          <p class="cdc-bubble__title">${title(c, move.san)}</p>
           <span class="cdc-bubble__eval">${esc(formatEval(move.eval))}</span></div>
         <p class="cdc-bubble__sub">${esc(hint ? typo(hint) : remark(ctrl, r, move))}</p>`;
     }
