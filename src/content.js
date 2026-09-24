@@ -319,13 +319,13 @@
     ['t', 'r', 'b', 'l'].forEach((side, i) => main.style.setProperty(`--cdc-inset-${side}`, inset[i] + 'px'));
   };
 
-  // The puzzle's eval bar, analysis-style (styles/puzzle.css): its score, read
+  // Lichess's eval bar, Game Review-style (styles/board.css): its score, read
   // from the engine line, written like Chess.com's ("1.2", "M3") at the
-  // leading side's end. And the session chips, one sideways-scrolling row:
-  // keep the latest in view.
+  // leading side's end. And the puzzle's session chips, one sideways-scrolling
+  // row: keep the latest in view.
   let lastChips = 0;
   const syncPuzzle = () => {
-    const main = document.querySelector('main.puzzle');
+    const main = document.querySelector('main.puzzle, main.analyse');
     if (!main) return;
     const gauge = main.querySelector('.eval-gauge');
     if (gauge) {
@@ -411,6 +411,33 @@
       span.dataset.cdcRating = text === '?' || text === '-' ? 'none' : 'rated';
     }
   };
+  // Lichess picks the card's side (below, above, beside the name) from its
+  // size when placed, and keeps the last side tried when none fits. Our card
+  // is taller than Lichess's, and grows once placed (a player in a game gets
+  // a mini board, drawn afterwards), so it can hang past the window's edge.
+  // Pull it back in: below the name, else above, else against the edge.
+  const TIP_MARGIN = 8;
+  let tipAnchor = null;
+  document.addEventListener('mouseover', e => {
+    const anchor = e.target.closest?.('a, [data-href]');
+    if (anchor && !anchor.closest('#powerTip')) tipAnchor = anchor;
+  }, true);
+  const fitPowertip = tip => {
+    if (getComputedStyle(tip).visibility !== 'visible') return;
+    const r = tip.getBoundingClientRect();
+    const maxTop = innerHeight - TIP_MARGIN - r.height, maxLeft = innerWidth - TIP_MARGIN - r.width;
+    if (r.top >= TIP_MARGIN && r.top <= maxTop && r.left >= TIP_MARGIN && r.left <= maxLeft) return;
+    let top = Math.max(TIP_MARGIN, Math.min(r.top, maxTop));
+    const a = tipAnchor?.isConnected && tipAnchor.getBoundingClientRect();
+    // Above or below the name (not beside it): stay clear of it if possible.
+    if (a && r.left < a.right && r.right > a.left) {
+      if (a.bottom + 10 <= maxTop) top = a.bottom + 10;
+      else if (a.top - 10 - r.height >= TIP_MARGIN) top = a.top - 10 - r.height;
+    }
+    const left = Math.max(TIP_MARGIN, Math.min(r.left, maxLeft));
+    tip.style.top = (parseFloat(tip.style.top) || 0) + top - r.top + 'px';
+    tip.style.left = (parseFloat(tip.style.left) || 0) + left - r.left + 'px';
+  };
   let watchedTip = null;
   const syncPowertip = () => {
     // Lichess only adds #powerTip on the first hover (or on idle, on the pages
@@ -418,7 +445,11 @@
     const tip = document.getElementById('powerTip');
     if (!tip || tip === watchedTip) return;
     watchedTip = tip;
-    new MutationObserver(() => cleanRatings(tip)).observe(tip, { childList: true });
+    new MutationObserver(records => {
+      if (records.some(r => r.type === 'childList')) cleanRatings(tip);
+      fitPowertip(tip);
+    }).observe(tip, { childList: true, attributes: true, attributeFilter: ['style'] });
+    new ResizeObserver(() => fitPowertip(tip)).observe(tip);
     cleanRatings(tip);
   };
 
