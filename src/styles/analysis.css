@@ -435,7 +435,7 @@
   main.analyse .tview2 move.brilliant { --cdc-glyph: #26c2a3; }
   main.analyse .tview2 move.good { --cdc-glyph: #749bbf; }
   main.analyse .tview2 move.interesting { --cdc-glyph: #96af8b; }
-  main.analyse .tview2 move.inaccuracy { --cdc-glyph: #f7c045; }
+  main.analyse .tview2 move.inaccuracy { --cdc-glyph: #f7c631; }
   main.analyse .tview2 move.mistake { --cdc-glyph: #ffa459; }
   main.analyse .tview2 move.blunder { --cdc-glyph: #fa412d; }
 
@@ -479,7 +479,7 @@
     font-family: var(--cdc-font) !important;
   }
 
-  main.analyse .tview2-column > interrupt:has(> comment.inaccuracy) { --cdc-note: #f7c045; }
+  main.analyse .tview2-column > interrupt:has(> comment.inaccuracy) { --cdc-note: #f7c631; }
   main.analyse .tview2-column > interrupt:has(> comment.mistake) { --cdc-note: #ffa459; }
   main.analyse .tview2-column > interrupt:has(> comment.blunder) { --cdc-note: #fa412d; }
 

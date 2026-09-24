@@ -244,6 +244,7 @@
   #topnav div a[href$='/streamer']             { --cdc-sub-icon: url('https://assets-ds.chess.com/color-icons/stream.svg'); }
   #topnav div a[href$='/video']                { --cdc-sub-icon: url('https://assets-ds.chess.com/color-icons/today.svg'); }
   #topnav div a[href$='/player']               { --cdc-sub-icon: url('https://assets-ds.chess.com/color-icons/masters.svg'); }
+  #topnav div a[href$='/following']            { --cdc-sub-icon: url('https://assets-ds.chess.com/color-icons/friends.svg'); }
   #topnav div a[href$='/team']                 { --cdc-sub-icon: url('https://assets-ds.chess.com/color-icons/clubs.svg'); }
   #topnav div a[href$='/forum']                { --cdc-sub-icon: url('https://assets-ds.chess.com/color-icons/communication-bubbles.svg'); }
   #topnav div a[href*='/blog']                 { --cdc-sub-icon: url('https://assets-ds.chess.com/color-icons/page-blog.svg'); }

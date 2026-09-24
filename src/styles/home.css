@@ -160,10 +160,20 @@
     display: flex !important;
     position: static !important;
     flex-flow: row !important;
+    align-items: center !important;
     gap: 18px;
     justify-content: flex-start !important;
+    height: 22px;
     margin-top: 18px;
     text-shadow: none !important;
+  }
+
+  /* The counters are added by JS after load, and the table sits at the bottom
+     of the hero: until they arrive, hold their room so the buttons don't jump. */
+  main.lobby .lobby__table:not(:has(.lobby__counters))::after {
+    content: '';
+    display: block;
+    height: 40px; /* margin-top + height of .lobby__counters */
   }
 
   main.lobby .lobby__counters a {
