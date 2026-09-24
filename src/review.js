@@ -569,7 +569,7 @@
   }
 
   // Like Chess.com, the summary keeps its layout while the game is analyzed:
-  // a quote from the coach, the graph filling in, and empty placeholders.
+  // a quote from the coach, the graph filling in, and the counts at zero.
   function renderSummary(ctrl) {
     const p = players(ctrl);
     const r = state.review;
@@ -580,7 +580,7 @@
     const rows = CLASSES.map(
       c => `<tr><td class="cdc-t-label">${esc(c.label)}</td>
         <td class="cdc-t-num" style="color:${c.color}">${r?.counts.w[c.key] || 0}</td>
-        <td class="cdc-t-icon">${r ? icon(c.key) : '<span class="cdc-cls-icon cdc-cls-icon--empty"></span>'}</td>
+        <td class="cdc-t-icon">${icon(c.key)}</td>
         <td class="cdc-t-num" style="color:${c.color}">${r?.counts.b[c.key] || 0}</td></tr>`,
     ).join('');
     // Only the classification rows scroll: they're a table of their own, with

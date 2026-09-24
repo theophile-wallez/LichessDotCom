@@ -266,17 +266,6 @@
     mix-blend-mode: difference;
   }
 
-  /* Placeholder icons while the game is analyzed. */
-  .cdc-cls-icon--empty {
-    border-radius: 50%;
-    background: #141311;
-    animation: cdc-pulse 1.4s ease-in-out infinite;
-  }
-
-  @keyframes cdc-pulse {
-    50% { opacity: 0.6; }
-  }
-
   #cdc-review-graph {
     grid-area: rgraph;
     position: relative;
