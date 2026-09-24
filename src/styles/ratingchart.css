@@ -262,12 +262,13 @@
   z-index: 2;
   min-width: 150px;
   padding: 9px 11px;
-  border: 1px solid #ffffff14;
+  border: 1px solid #ffffff1f;
   border-radius: 10px;
-  background: #1f1e1ce6;
-  box-shadow: 0 10px 28px #00000073;
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  /* Frosted glass: see-through enough for the blurred curves to show. */
+  background: #1f1e1c8c;
+  box-shadow: inset 0 1px 0 #ffffff14, 0 10px 28px #00000073;
+  -webkit-backdrop-filter: blur(14px) saturate(1.5);
+  backdrop-filter: blur(14px) saturate(1.5);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s, transform 0.12s ease-out;
