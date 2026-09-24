@@ -3,26 +3,34 @@
  * left, one Chess.com-style panel on the right with engine + moves, the
  * navigation controls and the chat. The page itself never scrolls.
  * `--cdc-controls-h` is measured and set by content.js.
+ *
+ * The panel's rows add up to `--cdc-stage`: the board, plus the player bars
+ * above and below it when a game's players or clocks are shown (see
+ * "player bars").
  */
 
 @media (min-width: 1020px) {
   main.analyse {
     --cdc-gap: 24px;
+    --cdc-bar: 0px;
+    --cdc-coords-off: 0px;
+    --cdc-v-room: 56px;
     --cdc-panel-w: clamp(300px, 26vw, 460px);
     --cdc-board: max(
       320px,
       min(
-        calc(100vh - 56px),
+        calc(100vh - var(--cdc-v-room) - 2 * var(--cdc-bar) - var(--cdc-coords-off)),
         calc(100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-panel-w) - var(--cdc-gap) - 72px)
       )
     );
+    --cdc-stage: calc(var(--cdc-board) + 2 * var(--cdc-bar) + var(--cdc-coords-off));
     --cdc-chat-h: min(clamp(180px, 30vh, 320px), calc(var(--cdc-board) * 0.4));
     --cdc-ctrl-h: var(--cdc-controls-h, 48px);
 
     display: grid !important;
     grid-template-columns: auto var(--cdc-board) calc(var(--cdc-panel-w) + var(--cdc-gap)) !important;
     grid-template-rows:
-      max(0px, calc(var(--cdc-board) - var(--cdc-ctrl-h) - var(--cdc-chat-h)))
+      max(0px, calc(var(--cdc-stage) - var(--cdc-ctrl-h) - var(--cdc-chat-h)))
       var(--cdc-ctrl-h)
       var(--cdc-chat-h) !important;
     grid-auto-rows: auto !important;
@@ -38,12 +46,75 @@
 
   main.analyse .analyse__board {
     grid-area: board !important;
-    margin: 0 !important;
+    align-self: start;
+    margin: var(--cdc-bar) 0 0 !important;
   }
 
   main.analyse .eval-gauge {
     grid-area: gauge !important;
-    margin: 0 8px 0 0 !important;
+    margin: var(--cdc-bar) 8px calc(var(--cdc-bar) + var(--cdc-coords-off)) 0 !important;
+  }
+
+  /* ------------------------------------------------------- player bars --- */
+
+  /* A game gets Chess.com's player bars, as on the game page (playerbar.css
+     draws them): the board shrinks by a bar above and below, and the panel
+     keeps the full height. The players are ours (content.js), in the board's
+     cell; the clocks are Lichess's, in strips it already places absolutely
+     on the board, which grow into the bars. A lesson has no players. */
+  main.analyse:is(:has(> .cdc-player), :has(.analyse__clock)):not(:has(.practice__side)) {
+    --cdc-bar: 56px;
+    --cdc-v-room: 32px;
+    margin-top: 0 !important;
+  }
+
+  body.coords-out main.analyse:is(:has(> .cdc-player), :has(.analyse__clock)):not(:has(.practice__side)) {
+    --cdc-coords-off: 18px;
+  }
+
+  main.analyse > :is(.cdc-player, .cdc-captured) {
+    grid-area: board;
+  }
+
+  main.analyse > :is(.cdc-player--top, .cdc-captured--top) {
+    --cdc-off: var(--cdc-inset-t, 0px);
+  }
+
+  main.analyse > :is(.cdc-player--bottom, .cdc-captured--bottom) {
+    --cdc-off: calc(var(--cdc-bar) + var(--cdc-board) + var(--cdc-coords-off) - var(--cdc-inset-b, 0px));
+  }
+
+  main.analyse:has(> .cdc-player) .analyse__player_strip .material {
+    display: none !important;
+  }
+
+  main.analyse:has(.analyse__clock) .analyse__player_strip {
+    left: 0 !important;
+    right: 0 !important;
+    box-sizing: border-box;
+    display: flex !important;
+    justify-content: flex-end !important;
+    height: var(--cdc-bar) !important;
+    pointer-events: none;
+  }
+
+  main.analyse:has(.analyse__clock) .analyse__player_strip > * {
+    pointer-events: auto;
+  }
+
+  /* The clock level with the avatar, as on the game page. */
+  main.analyse:has(.analyse__clock) .analyse__player_strip.top {
+    top: auto !important;
+    bottom: calc(100% - var(--cdc-inset-t, 0px)) !important;
+    align-items: flex-end !important;
+    padding: 0 var(--cdc-inset-r, 0px) 8px var(--cdc-inset-l, 0px) !important;
+  }
+
+  main.analyse:has(.analyse__clock) .analyse__player_strip.bottom {
+    top: calc(100% + var(--cdc-coords-off) - var(--cdc-inset-b, 0px)) !important;
+    bottom: auto !important;
+    align-items: flex-start !important;
+    padding: 8px var(--cdc-inset-r, 0px) 0 var(--cdc-inset-l, 0px) !important;
   }
 
   main.analyse > :is(.analyse__tools, .analyse__controls, .mchat) {
@@ -543,7 +614,7 @@
   /* No chat (e.g. the free analysis board): tools take the whole panel. */
   main.analyse:not(:has(> .mchat)) {
     grid-template-rows:
-      max(0px, calc(var(--cdc-board) - var(--cdc-ctrl-h)))
+      max(0px, calc(var(--cdc-stage) - var(--cdc-ctrl-h)))
       var(--cdc-ctrl-h) !important;
   }
 
@@ -578,5 +649,12 @@
     margin: 0 0 0 var(--cdc-gap) !important;
     padding: 6px 8px;
     background: var(--cdc-bg-panel);
+  }
+}
+
+/* Lichess's mobile layout keeps its own board, without our player bars. */
+@media (max-width: 1019.98px) {
+  main.analyse > :is(.cdc-player, .cdc-captured) {
+    display: none !important;
   }
 }

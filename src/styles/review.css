@@ -19,7 +19,7 @@
     --cdc-review-top: 92px;
     --cdc-chat-h: min(clamp(150px, 24vh, 260px), calc(var(--cdc-board) * 0.32));
     grid-template-rows:
-      max(0px, calc(var(--cdc-board) - var(--cdc-review-top) - var(--cdc-ctrl-h) - var(--cdc-chat-h)))
+      max(0px, calc(var(--cdc-stage) - var(--cdc-review-top) - var(--cdc-ctrl-h) - var(--cdc-chat-h)))
       var(--cdc-review-top)
       var(--cdc-ctrl-h)
       var(--cdc-chat-h) !important;
@@ -32,7 +32,7 @@
 
   html.cdc-review-normal main.analyse:not(:has(> .mchat)) {
     grid-template-rows:
-      max(0px, calc(var(--cdc-board) - var(--cdc-review-top) - var(--cdc-ctrl-h)))
+      max(0px, calc(var(--cdc-stage) - var(--cdc-review-top) - var(--cdc-ctrl-h)))
       var(--cdc-review-top)
       var(--cdc-ctrl-h) !important;
     grid-template-areas:
@@ -42,7 +42,7 @@
   }
 
   html.cdc-review-summary main.analyse {
-    grid-template-rows: var(--cdc-board) !important;
+    grid-template-rows: var(--cdc-stage) !important;
     grid-template-areas: 'gauge board rtop' !important;
   }
 
@@ -54,7 +54,7 @@
     --cdc-review-ctrl: 72px;
     grid-template-rows:
       var(--cdc-review-top)
-      max(0px, calc(var(--cdc-board) - var(--cdc-review-top) - var(--cdc-review-graph) - var(--cdc-review-ctrl)))
+      max(0px, calc(var(--cdc-stage) - var(--cdc-review-top) - var(--cdc-review-graph) - var(--cdc-review-ctrl)))
       var(--cdc-review-graph)
       var(--cdc-review-ctrl) !important;
     grid-template-areas:
@@ -747,8 +747,9 @@
     position: relative;
     width: 26px;
     margin-right: 10px;
-    margin-top: var(--cdc-inset-t, 0px);
-    margin-bottom: var(--cdc-inset-b, 0px);
+    /* Level with the squares, between the player bars if any. */
+    margin-top: calc(var(--cdc-bar, 0px) + var(--cdc-inset-t, 0px));
+    margin-bottom: calc(var(--cdc-bar, 0px) + var(--cdc-coords-off, 0px) + var(--cdc-inset-b, 0px));
     overflow: hidden;
     border-radius: 3px;
     background: #403d39;
