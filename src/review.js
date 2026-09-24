@@ -783,9 +783,9 @@
   const side = c => (fr ? (c === 'w' ? 'les Blancs' : 'les Noirs') : c === 'w' ? 'White' : 'Black');
   const sides = c => (fr ? (c === 'w' ? 'des Blancs' : 'des Noirs') : c === 'w' ? 'White’s' : 'Black’s');
   const cap = s => s[0].toUpperCase() + s.slice(1);
-  // Moves in text with figurines, which read the same in every language.
-  const FIG = { w: { K: '♔', Q: '♕', R: '♖', B: '♗', N: '♘' }, b: { K: '♚', Q: '♛', R: '♜', B: '♝', N: '♞' } };
-  const fig = (san, c) => san.replace(/^[KQRBN]/, l => FIG[c][l]);
+  // Moves in text with the title's figurines (FIGURINES, drawn as .cdc-fig
+  // by streamHtml), which read the same in every language.
+  const fig = san => san.replace(/^[KQRBN]/, l => FIGURINES[l]);
 
   // White's view of an evaluation, from -4 (Black mates) to 4 (White mates).
   function level(e) {
@@ -843,9 +843,9 @@
     const before = parseFen(prev.fen).board, after = parseFen(node.fen).board;
     const eb = r.positions[move.ply - 1], ea = move.eval;
     const san = move.san, dest = move.uci.slice(2, 4);
-    const best = move.bestSan ? fig(move.bestSan, me) : '';
+    const best = move.bestSan ? fig(move.bestSan) : '';
     const reply = r.positions[move.ply]?.best;
-    const replySan = reply ? fig(uciToSan(node.fen, reply), them) : '';
+    const replySan = reply ? fig(uciToSan(node.fen, reply)) : '';
     const mates = (e, s) => e.mate !== undefined && e.mate * s > 0;
 
     if (san.includes('#'))
@@ -943,7 +943,12 @@
     return parts
       .map(([text, drop]) => {
         const words = typo(text).match(/\S+\s*/g) || [];
-        const html = words.map(w => `<span class="cdc-w${i++ >= stream.shown ? ' cdc-w--off' : ''}">${esc(w)}</span>`).join('');
+        const html = words
+          .map(w => {
+            const word = esc(w).replace(/[♚♛♜♝♞]/g, g => `<span class="cdc-fig">${g}</span>`);
+            return `<span class="cdc-w${i++ >= stream.shown ? ' cdc-w--off' : ''}">${word}</span>`;
+          })
+          .join('');
         return `<span class="cdc-say${drop ? ' cdc-say--drop' : ''}">${html} </span>`;
       })
       .join('');
@@ -1182,6 +1187,10 @@
   const title = (c, san) =>
     esc(typo(c.sentence)).replace('{m}', esc(san).replace(/[KQRBN]/g, p => `<span class="cdc-fig">${FIGURINES[p]}</span>`));
 
+  // Like Chess.com, the score is dark when Black is better.
+  const evalChip = e =>
+    `<span class="cdc-bubble__eval${(e?.mate ?? e?.cp ?? 0) < 0 || (e?.mate === 0 && e.wp < 50) ? ' cdc-bubble__eval--black' : ''}">${esc(formatEval(e))}</span>`;
+
   function renderMoves(ctrl) {
     const r = state.review;
     const ply = ctrl.node.ply;
@@ -1192,7 +1201,7 @@
     else if (shown)
       bubble = `<div class="cdc-bubble__row">${icon('best')}
           <p class="cdc-bubble__title">${title(CLS.best, ctrl.node.san)}</p>
-          <span class="cdc-bubble__eval">${esc(formatEval(r.positions[shown.ply - 1]))}</span></div>`;
+          ${evalChip(r.positions[shown.ply - 1])}</div>`;
     else if (!move) bubble = `<p class="cdc-bubble__title">${esc(T.intro)}</p>`;
     else {
       const c = CLS[move.cls];
@@ -1208,7 +1217,7 @@
             : '';
       bubble = `<div class="cdc-bubble__row">${icon(move.cls)}
           <p class="cdc-bubble__title">${title(c, move.san)}</p>
-          <span class="cdc-bubble__eval">${esc(formatEval(move.eval))}</span></div>
+          ${evalChip(move.eval)}</div>
         <p class="cdc-bubble__sub">${streamHtml(hint ? [[hint]] : explanation(ctrl, r, move))}</p>`;
     }
     const atEnd = ctrl.onMainline && ply >= ctrl.mainline.length - 1;
