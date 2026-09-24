@@ -84,6 +84,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/dashboard.css` | Puzzle dashboard (`.puzzle-dashboard`): stat tiles, per-theme rows, and the panel around `dashboard.js`'s radar. |
 | `src/styles/broadcast.css` | Broadcasts (`.relay-index` lists, calendar, FIDE pages, info pages) as event cards with a LIVE pill. |
 | `src/styles/swiss.css` | Swiss tournaments home (`main.swiss-home`): now playing / starting soon as tournament cards (time-control tile, rounds progress bar, player chip), the explanations as point cards, a comparison card and a grid of FAQ cards. |
+| `src/styles/leaderboard.css` | Players leaderboard (`/player`, `.community`) in the Practice look: a card per leaderboard with its icon white on a tile in its own color, medals for the top three, and the online players in a sticky side card with rating chips. |
 
 There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
 
