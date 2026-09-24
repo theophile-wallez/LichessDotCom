@@ -68,7 +68,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/dropdowns.css` | Every dropdown as one menu style: Lichess's `.mselect`, native `<select>` (via `appearance: base-select`) and autocomplete lists. |
 | `src/styles/powertip.css` | The profile hover card (`#powerTip`, filled with `/@/<user>/mini`) as a Chess.com player card. |
 | `src/styles/profile.css` | Player profile (`main.page-menu` + `.user-show`) as a Chess.com member page: a hero card (avatar, name, awards, counters, actions), the side ratings as a full-width strip of rating cards, the about card and rating chart, pill tabs, the activity timeline and the game rows. |
-| `src/styles/ratingchart.css` | The SVG rating chart of `ratingchart.js`: chips, range pills, curves and their draw-in / morph animations, the tooltip. Hides Lichess's chart only once ours is in. |
+| `src/styles/ratingchart.css` | The SVG rating chart of `ratingchart.js`: chips, range pills, curves and their wipe-in / morph animations, the tooltip. Hides Lichess's chart only once ours is in. |
 | `src/styles/home.css` | Home page (`main.lobby`) as a 12-column card dashboard, with quick pairing as Chess.com's time-control picker (same-size buttons, three to a row); the hero is added by `content.js`. |
 | `src/styles/coach.css` | Coach directory (`main.coach-list`) as a grid of coach cards; the title badges are split out of the names by `content.js`. |
 | `src/styles/teams.css` | Team lists (`main.team-list`) as a grid of club cards with avatar tiles. |
