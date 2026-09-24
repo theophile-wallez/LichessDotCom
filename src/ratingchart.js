@@ -186,7 +186,7 @@
     root.className = 'cdc-rchart';
     root.innerHTML =
       '<div class="cdc-rchart__top"><div class="cdc-rchart__legend"></div>' +
-      `<div class="cdc-rchart__ranges">${RANGES.map(([k]) => `<button type="button" data-range="${k}">${k}</button>`).join('')}</div></div>` +
+      `<div class="cdc-rchart__ranges"><span class="cdc-rchart__thumb"></span>${RANGES.map(([k]) => `<button type="button" data-range="${k}">${k}</button>`).join('')}</div></div>` +
       '<div class="cdc-rchart__plot"><svg class="cdc-rchart__svg" aria-hidden="true"></svg><div class="cdc-rchart__tip"></div></div>';
     host.appendChild(root);
     host.classList.add('cdc-rchart-on');
@@ -196,6 +196,25 @@
     const tip = root.querySelector('.cdc-rchart__tip');
 
     let view = null; // What's drawn: the range's samples and the scales.
+
+    // The active range's highlight is one element sliding under the pills,
+    // from the previous choice to the new one. Placed without a transition the
+    // first time (and whenever the pills reflow), so it doesn't fly in.
+    const thumb = root.querySelector('.cdc-rchart__thumb');
+    let thumbKey = '';
+    const placeThumb = () => {
+      const b = root.querySelector('[data-range].active');
+      if (!b) return;
+      const key = `${b.offsetLeft},${b.offsetTop},${b.offsetWidth}`;
+      if (key === thumbKey) return;
+      const slide = !!thumbKey && root.dataset.cdcSlide === '1';
+      thumb.classList.toggle('cdc-rchart__thumb--still', !slide);
+      thumb.style.width = `${b.offsetWidth}px`;
+      thumb.style.height = `${b.offsetHeight}px`;
+      thumb.style.transform = `translate(${b.offsetLeft}px, ${b.offsetTop}px)`;
+      thumbKey = key;
+      delete root.dataset.cdcSlide;
+    };
 
     const layout = () => {
       const width = Math.max(200, Math.round(plot.clientWidth));
@@ -261,6 +280,7 @@
       update();
       renderLegend();
       for (const b of root.querySelectorAll('[data-range]')) b.classList.toggle('active', b.dataset.range === state.range);
+      placeThumb();
     };
 
     // Same range, other ratings shown: new scale, same samples, so the curves
@@ -351,6 +371,7 @@
       if (range && range.dataset.range !== state.range) {
         state.range = range.dataset.range;
         localStorage.setItem(RANGE_KEY, state.range);
+        root.dataset.cdcSlide = '1';
         leave();
         draw(true);
       }
