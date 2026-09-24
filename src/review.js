@@ -734,8 +734,21 @@
       if (state.mode === 'summary') renderSummary(ctrl);
       else if (state.mode === 'moves') renderMoves(ctrl);
       else renderNormal(ctrl);
+      fitBubble();
     }
     renderBoard(ctrl);
+  }
+
+  // The coach's bubble is centered on its tail, which stays at the coach's
+  // chin (review.css); CSS can't read an element's height, so hand it over.
+  // It only moves the bubble, never resizes it, so it can't loop.
+  const bubbleSize = new ResizeObserver(entries => {
+    for (const e of entries) e.target.style.setProperty('--cdc-bubble-h', `${e.borderBoxSize[0].blockSize}px`);
+  });
+  function fitBubble() {
+    bubbleSize.disconnect();
+    const bubble = dom.panel.querySelector('.cdc-bubble');
+    if (bubble) bubbleSize.observe(bubble);
   }
 
   const onClick = e => {
