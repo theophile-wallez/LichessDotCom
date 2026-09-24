@@ -404,6 +404,370 @@
     return { moves, positions, accuracy: { w: accuracy('w'), b: accuracy('b') }, counts };
   }
 
+  // --------------------------------------------------- coach remarks ---
+
+  // A short comment under the coach's verdict. Each classification has its
+  // pool, and some situations (mate, castling, a capture…) their own: the
+  // strongest replace the classification's, the others mix with it. The pick
+  // hashes the game, the move and the coach, so it's stable across redraws
+  // and each coach words things their own way.
+  const REMARKS = fr
+    ? {
+        brilliant: [
+          'Un sacrifice qui fonctionne. Magnifique.',
+          'Waouh ! Du matériel donné pour une attaque gagnante.',
+          'Il fallait oser, et ça paie.',
+          'Le genre de coup dont on se souvient.',
+          'Voir aussi loin, chapeau.',
+          'Superbe. Le moteur est bien d’accord.',
+          'Le matériel passe, l’idée reste.',
+          'Peu de joueurs oseraient jouer ça.',
+        ],
+        great: [
+          'Le seul coup qui tient tout ensemble.',
+          'Belle trouvaille ! Tout le reste était moins bon.',
+          'Le seul bon coup de la position.',
+          'Précis. Rien d’autre ne tenait ici.',
+          'Un moment critique, bien négocié.',
+          'Bien vu ! Ce n’était pas facile à trouver.',
+          'Le coup qu’un maître aurait choisi.',
+          'Sous la pression, la bonne réponse.',
+        ],
+        book: [
+          'Un coup d’ouverture bien connu.',
+          'Tout droit sorti des livres d’ouverture.',
+          'De la théorie : les grands maîtres jouent ça tout le temps.',
+          'Un choix solide, qui a fait ses preuves.',
+          'On suit les lignes principales.',
+          'Du jeu d’ouverture classique.',
+          'Toujours dans la théorie. Jusqu’ici, tout va bien.',
+          'Un coup joué dans des milliers de parties.',
+        ],
+        best: [
+          'Exactement ce que voulait le moteur.',
+          'Le coup du moteur. Bien joué.',
+          'Impossible de faire mieux.',
+          'Dans le mille.',
+          'C’est le coup le plus précis.',
+          'Propre et précis.',
+          'Parfait. Continue comme ça !',
+          'Rien de mieux ici.',
+          'Simple et fort.',
+        ],
+        excellent: [
+          'Tout près du meilleur coup.',
+          'Un coup fort, la position reste sous contrôle.',
+          'Très bien. Le moteur chipote à peine.',
+          'Presque parfait.',
+          'Une suite sensée et solide.',
+          'Bien joué, la position reste saine.',
+          'Bon jugement ici.',
+          'Du jeu solide. Continue.',
+        ],
+        good: [
+          'Un coup correct, mais il y avait mieux.',
+          'Jouable, sans être le plus précis.',
+          'Ça va, juste un peu lent.',
+          'D’accord, mais ça lâche un tout petit peu.',
+          'Pas mal, mais il y avait plus actif.',
+          'Ça marche, mais la position offrait plus.',
+          'Un choix raisonnable.',
+          'Sûr, quoiqu’un peu passif.',
+        ],
+        inaccuracy: [
+          'Pas le plus précis : un peu d’avantage s’envole.',
+          'Un petit faux pas. Il y avait une idée plus forte.',
+          'Hmm, ça laisse respirer l’adversaire.',
+          'Jouable, mais ça passe à côté de l’essentiel.',
+          'Un peu imprécis. Il y avait un meilleur plan.',
+          'L’emprise se relâche un peu.',
+          'Pas une catastrophe, mais pas idéal non plus.',
+          'Un peu négligent. Regarde de plus près.',
+        ],
+        mistake: [
+          'Une erreur, qui donne un vrai avantage à l’adversaire.',
+          'Aïe, ça remet l’adversaire dans la partie.',
+          'Un faux pas qui coûte cher.',
+          'Ça change beaucoup l’évaluation.',
+          'Vérifie d’abord les réponses de l’adversaire.',
+          'La position méritait plus d’attention.',
+          'Ça offre une belle occasion à l’adversaire.',
+          'Attention ! Ce coup a un défaut concret.',
+        ],
+        miss: [
+          'L’adversaire s’est trompé, mais ce n’est pas puni.',
+          'Une occasion manquée d’en profiter.',
+          'Il y avait une punition bien plus forte.',
+          'L’erreur de l’adversaire reste impunie.',
+          'L’adversaire s’en tire à bon compte.',
+          'Si près ! L’occasion était sous tes yeux.',
+          'Une occasion qui s’envole.',
+          'Demande-toi toujours : qu’a permis son dernier coup ?',
+        ],
+        blunder: [
+          'Une gaffe, qui gâche la position.',
+          'Oh non ! Ça coûte très cher.',
+          'C’est une grosse erreur.',
+          'Ça renverse la partie.',
+          'Aïe. L’adversaire doit être ravi.',
+          'Cherche les menaces avant de jouer.',
+          'Celle-là fait mal.',
+          'Prends le temps de respirer avant chaque coup.',
+        ],
+        mate: [
+          'Échec et mat ! La partie est finie.',
+          'Et c’est mat. Bien joué !',
+          'Échec et mat. Une fin parfaite.',
+          'Le roi n’a plus de case. Mat !',
+        ],
+        allowsMate: [
+          'Ça permet un mat forcé.',
+          'Un mat se prépare maintenant contre ce roi.',
+          'Attention : le roi est pris dans un filet de mat.',
+          'Ce coup tombe dans un mat forcé.',
+        ],
+        missedMate: [
+          'Il y avait un mat forcé ici !',
+          'Un mat était sur l’échiquier.',
+          'Un échec et mat s’est échappé.',
+          'Le mat était là. Regarde d’abord les échecs !',
+        ],
+        mating: [
+          'Le filet de mat se resserre.',
+          'Le mat arrive. Continue !',
+          'Encore un pas vers le mat.',
+          'Plus d’échappatoire pour le roi.',
+        ],
+        castle: [
+          'Le roque : roi à l’abri, tour en jeu.',
+          'Bon moment pour mettre le roi à l’abri.',
+          'La sécurité d’abord. Bien roqué.',
+          'Les tours vont pouvoir se connecter.',
+        ],
+        promote: [
+          'Une nouvelle dame entre en jeu !',
+          'Promotion ! Ce pion est allé jusqu’au bout.',
+          'Le long voyage du pion paie enfin.',
+        ],
+        check: [
+          'Un échec qui garde l’initiative.',
+          'Échec ! L’adversaire doit répondre.',
+          'Du jeu forcé : les échecs sont puissants.',
+        ],
+        capture: [
+          'Prendre est la bonne décision ici.',
+          'Une bonne prise.',
+          'Du matériel encaissé. Bien vu.',
+        ],
+        badCapture: [
+          'Cette prise a un inconvénient caché.',
+          'Toutes les prises ne sont pas bonnes.',
+          'Prendre du matériel ici est risqué.',
+        ],
+        winning: [
+          'C’est gagnant. Reste concentré.',
+          'La position est gagnante maintenant.',
+          'Il ne reste qu’à conclure calmement.',
+        ],
+        losing: [
+          'La position est maintenant très dure à tenir.',
+          'Ça laisse une position perdante.',
+        ],
+        earlyQueen: ['Sortir la dame si tôt est risqué.', 'La dame sort trop tôt : elle va se faire chasser.'],
+        earlyKing: ['Bouger le roi si tôt coûte le roque.', 'Le roi ferait mieux de rester à l’abri.'],
+      }
+    : {
+        brilliant: [
+          'A sacrifice that works. Beautiful.',
+          'Wow! Giving up material for a winning attack.',
+          'That took courage, and it pays off.',
+          'The kind of move people remember.',
+          'Seeing that far ahead, impressive.',
+          'Stunning. The engine agrees.',
+          'Material is temporary; this idea isn’t.',
+          'Few players would dare to play this.',
+        ],
+        great: [
+          'The only move that holds everything together.',
+          'Great find! Everything else was worse.',
+          'The one good move in the position.',
+          'Precise. Nothing else holds here.',
+          'A critical moment, handled perfectly.',
+          'Sharp eyes! This was hard to see.',
+          'That’s the move a master would pick.',
+          'Under pressure, the right answer.',
+        ],
+        book: [
+          'A well-known opening move.',
+          'Straight out of the opening books.',
+          'Theory. Grandmasters play this all the time.',
+          'A solid, time-tested choice.',
+          'Following the main lines.',
+          'Classic opening play.',
+          'Still in theory. So far, so good.',
+          'A move played in thousands of games.',
+        ],
+        best: [
+          'Exactly what the engine wanted.',
+          'The engine’s top move. Well played.',
+          'Couldn’t have done better.',
+          'Spot on.',
+          'That’s the most accurate move.',
+          'Clean and precise.',
+          'Just right. Keep it up!',
+          'Nothing better here.',
+          'Strong and simple.',
+        ],
+        excellent: [
+          'Very close to the best move.',
+          'A strong move that keeps things under control.',
+          'Very good. The engine barely disagrees.',
+          'Almost perfect.',
+          'A sensible, strong continuation.',
+          'Nicely done, the position stays healthy.',
+          'Good judgment here.',
+          'Solid play. Keep going.',
+        ],
+        good: [
+          'A decent move, but there was something better.',
+          'Playable, though not the most precise.',
+          'It’s fine, just a little slow.',
+          'Okay, but it gives away a tiny bit.',
+          'Not bad, but there was a more active idea.',
+          'It works, but the position offered more.',
+          'A reasonable choice.',
+          'Safe, if a bit passive.',
+        ],
+        inaccuracy: [
+          'Not the most accurate: some edge slips away.',
+          'A small slip. There was a stronger idea.',
+          'Hmm, this gives the opponent some air.',
+          'Playable, but it misses the point of the position.',
+          'A little imprecise. There was a better plan.',
+          'This loosens the grip a little.',
+          'Not a disaster, but not ideal either.',
+          'A bit careless. Take a closer look.',
+        ],
+        mistake: [
+          'A mistake that hands over a real advantage.',
+          'Ouch, this lets the opponent back in.',
+          'That’s a costly slip.',
+          'This changes the evaluation a lot.',
+          'Check the opponent’s replies first.',
+          'The position deserved more care here.',
+          'This gives the opponent a clear chance.',
+          'Careful! That move has a concrete flaw.',
+        ],
+        miss: [
+          'The opponent slipped, but it goes unpunished.',
+          'A missed chance to take advantage.',
+          'There was a much stronger punishment.',
+          'The opponent’s mistake goes unpunished.',
+          'That lets the opponent off the hook.',
+          'So close! The chance was right there.',
+          'An opportunity slips away.',
+          'Always ask: what did their last move allow?',
+        ],
+        blunder: [
+          'A blunder that throws away the position.',
+          'Oh no! This loses a lot.',
+          'That’s a serious error.',
+          'This turns the game around.',
+          'Ouch. The opponent must be delighted.',
+          'Check for threats before moving.',
+          'This one hurts.',
+          'Take a breath before each move.',
+        ],
+        mate: [
+          'Checkmate! Game over.',
+          'And that’s mate. Well played!',
+          'Checkmate. A perfect finish.',
+          'The king has nowhere to go. Mate!',
+        ],
+        allowsMate: [
+          'This allows a forced checkmate.',
+          'Now there’s a mate coming against this king.',
+          'Careful: the king is in a mating net now.',
+          'This walks into a forced mate.',
+        ],
+        missedMate: [
+          'There was a forced checkmate here!',
+          'There was a mate on the board.',
+          'A checkmate slipped away.',
+          'Mate was available. Look for checks first!',
+        ],
+        mating: [
+          'The mating net tightens.',
+          'Mate is coming. Keep going!',
+          'One step closer to checkmate.',
+          'No escape for the king now.',
+        ],
+        castle: [
+          'Castling: king safe, rook in the game.',
+          'Good time to tuck the king away.',
+          'Safety first. Nice castle.',
+          'The rooks can now connect.',
+        ],
+        promote: [
+          'A new queen joins the fight!',
+          'Promotion! That pawn went all the way.',
+          'The pawn’s long journey pays off.',
+        ],
+        check: [
+          'A check that keeps the initiative.',
+          'Check! The opponent has to respond.',
+          'Forcing play. Checks are powerful.',
+        ],
+        capture: ['Taking is right here.', 'A good capture.', 'Cashing in. Well spotted.'],
+        badCapture: [
+          'This capture has a hidden downside.',
+          'Not every capture is a good one.',
+          'Grabbing material here is risky.',
+        ],
+        winning: ['This is winning. Stay focused.', 'The position is winning now.', 'Now just convert calmly.'],
+        losing: ['The position is now very hard to hold.', 'This leaves a losing position.'],
+        earlyQueen: ['Bringing the queen out this early is risky.', 'The queen is out early and will get chased.'],
+        earlyKing: ['Moving the king this early costs castling.', 'The king would rather stay safe.'],
+      };
+
+  // French puts a space before ! ? : ;, which mustn't wrap away from its word.
+  const typo = s => (fr ? s.replace(/ ([!?:;])/g, '\u00a0$1') : s);
+
+  const hash = s => {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+    return h >>> 0;
+  };
+
+  function remark(ctrl, r, move) {
+    const R = REMARKS, san = move.san;
+    const sign = move.color === 'w' ? 1 : -1;
+    const before = r.positions[move.ply - 1], after = move.eval;
+    const mateFor = e => e.mate !== undefined && e.mate * sign > 0;
+    const bad = ['inaccuracy', 'mistake', 'miss', 'blunder'].includes(move.cls);
+    let only;
+    if (san.includes('#')) only = R.mate;
+    else if (bad && after.mate !== undefined && after.mate * sign < 0) only = R.allowsMate;
+    else if (mateFor(before)) only = mateFor(after) ? R.mating : R.missedMate;
+    const ctx = [];
+    const wp = pov(after.wp, move.color);
+    if (!bad) {
+      if (san.startsWith('O-O')) ctx.push(...R.castle);
+      if (san.includes('=Q')) ctx.push(...R.promote);
+      if (san.includes('+')) ctx.push(...R.check);
+      if (san.includes('x')) ctx.push(...R.capture);
+      if (wp >= 90) ctx.push(...R.winning);
+    } else {
+      if (san.includes('x')) ctx.push(...R.badCapture);
+      if (san[0] === 'Q' && move.ply <= 12) ctx.push(...R.earlyQueen);
+      if (san[0] === 'K' && move.ply <= 20) ctx.push(...R.earlyKing);
+      if (wp <= 10) ctx.push(...R.losing);
+    }
+    const seed = `${ctrl.data.game.id}:${move.ply}:${coach}`;
+    const pool = only || (ctx.length && hash(seed + ':ctx') % 2 ? ctx : R[move.cls]);
+    return typo(pool[hash(seed) % pool.length]);
+  }
+
   // ------------------------------------------------------------- UI ---
 
   const html = document.documentElement;
@@ -628,16 +992,19 @@
     else {
       const c = CLS[move.cls];
       const good = GOOD.has(move.cls);
-      const sub =
-        move.cls === 'book'
-          ? esc(state.openingName || '')
+      // Explain swaps the remark for the opening's name, or the move that
+      // was best: the bubble has room for two lines under the title.
+      const hint = !state.explain
+        ? ''
+        : move.cls === 'book'
+          ? state.openingName || ''
           : !good && move.bestSan
-            ? esc(T.bestWas.replace('{m}', move.bestSan))
+            ? T.bestWas.replace('{m}', move.bestSan)
             : '';
       bubble = `<div class="cdc-bubble__row">${icon(move.cls)}
-          <p class="cdc-bubble__title" style="color:${c.text || c.color}">${esc(c.sentence.replace('{m}', move.san))}</p>
+          <p class="cdc-bubble__title" style="color:${c.text || c.color}">${esc(typo(c.sentence.replace('{m}', move.san)))}</p>
           <span class="cdc-bubble__eval">${esc(formatEval(move.eval))}</span></div>
-        ${sub && state.explain ? `<p class="cdc-bubble__sub">${sub}</p>` : ''}`;
+        <p class="cdc-bubble__sub">${esc(hint ? typo(hint) : remark(ctrl, r, move))}</p>`;
     }
     const atEnd = ctrl.onMainline && ply >= ctrl.mainline.length - 1;
     const canBest = shown || (move && move.best && !GOOD.has(move.cls));
@@ -763,6 +1130,8 @@
       coach = (coach % COACHES) + 1;
       localStorage.setItem('cdc-coach', coach);
       btn.dataset.coach = coach;
+      // Each coach words the remarks their own way.
+      if (state.mode === 'moves') render(true);
       return;
     }
     const last = ctrl.mainline.length - 1;

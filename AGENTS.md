@@ -57,7 +57,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/ratingchart.js` | Isolated world: the rating history chart (profile, rating stats page), redrawn in SVG from the page's init JSON (Lichess draws it with Chart.js into a canvas): smooth curves over gradients, range pills, one chip per rating, a hover tooltip. |
 | `src/page.js` | Page world: wraps `site.sound` to play the right Chess.com sound per move, plus premove / illegal / game-start, which Lichess has no sound for. |
 | `src/board.js` | Page world: every main board's shapes redrawn Chess.com-style (right-clicked squares filled, arrows), checkmate badge and label. |
-| `src/review.js` | Page world: Game Review (engine, classification, panel, board overlays, eval bar). |
+| `src/review.js` | Page world: Game Review (engine, classification, panel, the coach's remarks per move, board overlays, eval bar). |
 | `src/styles/theme.css` | Overrides Lichess's `--c-*` color variables, fonts, buttons. |
 | `src/styles/sidebar.css` | Lichess's top header → Chess.com's left sidebar, and the user menu (dasher) as a Chess.com menu. |
 | `src/styles/board.css` | Board, pieces, highlights, move hints, arrows, coordinates. |

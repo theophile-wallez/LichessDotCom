@@ -49,7 +49,7 @@
   /* Like Chess.com: coach and buttons, moves, graph, then our own big
      controls (with play) instead of Lichess's. No engine lines. */
   html.cdc-review-moves main.analyse {
-    --cdc-review-top: 246px;
+    --cdc-review-top: 254px;
     --cdc-review-graph: 92px;
     --cdc-review-ctrl: 72px;
     grid-template-rows:
@@ -409,16 +409,21 @@
     display: flex;
     align-items: flex-start;
     gap: 4px;
-    height: 128px;
+    /* Room for a two-line title over a two-line remark. */
+    height: 136px;
     padding: 4px 16px 0 10px;
     box-sizing: border-box;
   }
 
   /* A narrow panel wraps the bubble's lines: a smaller coach leaves the
    * bubble more room, so two-line titles and openings still clear the nav. */
-  @container cdc-review (max-width: 400px) {
+  @container cdc-review (max-width: 440px) {
     .cdc-coach {
       --cdc-coach-h: 100px;
+    }
+
+    .cdc-bubble .cdc-bubble__title {
+      font-size: 14px;
     }
   }
 
