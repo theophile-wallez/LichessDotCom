@@ -464,7 +464,7 @@
     const area = pts.length ? `M0,${height} L${pts.join(' L')} L${end},${height} Z` : '';
     const dots = review.moves
       .filter(m => GRAPH_DOTS.has(m.cls))
-      .map(m => `<circle cx="${x(m.ply).toFixed(1)}" cy="${y(review.positions[m.ply].wp).toFixed(1)}" r="3.5" fill="${CLS[m.cls].color}" stroke="#fff" stroke-width="1"/>`)
+      .map(m => `<circle cx="${x(m.ply).toFixed(1)}" cy="${y(review.positions[m.ply].wp).toFixed(1)}" r="3.5" fill="${CLS[m.cls].color}"/>`)
       .join('');
     const marker = ply > 0 ? `<line x1="${x(ply)}" x2="${x(ply)}" y1="0" y2="${height}" stroke="#81b64c" stroke-width="2"/>` : '';
     return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
@@ -568,20 +568,25 @@
         <td class="cdc-t-icon">${r ? icon(c.key) : '<span class="cdc-cls-icon cdc-cls-icon--empty"></span>'}</td>
         <td class="cdc-t-num" style="color:${c.color}">${r?.counts.b[c.key] || 0}</td></tr>`,
     ).join('');
+    // Only the classification rows scroll: they're a table of their own, with
+    // the same fixed columns as the one above so the two line up.
+    const cols = '<colgroup><col class="cdc-t-c-label"><col><col class="cdc-t-c-icon"><col></colgroup>';
     dom.panel.innerHTML = `${header(T.review, 'normal')}
       <div class="cdc-coach cdc-coach--summary">${coachAvatar()}
         <div class="cdc-bubble"><p class="cdc-bubble__say">${say}</p></div></div>
-      <div class="cdc-review__body">
+      <div class="cdc-review__top">
         <div class="cdc-review__graph cdc-summary-graph">${loading ? `<span class="cdc-summary-pct">${pct}%</span>` : ''}</div>
-        <table class="cdc-review__table${loading ? ' cdc-review__table--loading' : ''}">
+        <table class="cdc-review__table">${cols}
           <tr class="cdc-t-names"><td></td><td>${esc(playerName(p.w))}</td><td></td><td>${esc(playerName(p.b))}</td></tr>
           <tr><td class="cdc-t-label">${esc(T.players)}</td><td><span class="cdc-avatar"></span></td><td></td><td><span class="cdc-avatar"></span></td></tr>
           <tr><td class="cdc-t-label">${esc(T.accuracy)}</td>
             <td><span class="cdc-acc cdc-acc--w">${acc('w')}</span></td><td></td>
             <td><span class="cdc-acc cdc-acc--b">${acc('b')}</span></td></tr>
           <tr class="cdc-t-sep"><td colspan="4"></td></tr>
-          ${rows}
         </table>
+      </div>
+      <div class="cdc-review__body">
+        <table class="cdc-review__table${loading ? ' cdc-review__table--loading' : ''}">${cols}${rows}</table>
       </div>
       <div class="cdc-review__foot"><button class="cdc-btn cdc-btn--green" data-cdc="moves" ${r ? '' : 'disabled'}>${esc(T.start)}</button></div>`;
     const g = dom.panel.querySelector('.cdc-summary-graph');
