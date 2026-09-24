@@ -398,6 +398,17 @@
     }
   };
 
+  // Swiss tournaments home (see styles/swiss.css): a running tournament's
+  // rounds ("5/10 rounds", digits in every language) as a progress bar. The
+  // page is server-rendered, so styling Lichess's span is safe.
+  const syncSwissRounds = () => {
+    for (const rounds of document.querySelectorAll('.swiss-home .swisses .rounds:not([data-cdc-rounds])')) {
+      rounds.dataset.cdcRounds = '';
+      const m = rounds.textContent.match(/(\d+)\s*\/\s*(\d+)/);
+      if (m && +m[2]) rounds.style.setProperty('--cdc-progress', Math.min(100, (100 * m[1]) / m[2]) + '%');
+    }
+  };
+
   // Profile hover card (see styles/powertip.css): Lichess right-aligns the
   // eight ratings in fixed columns by padding the short ones with non-breaking
   // spaces ("&nbsp;&nbsp;&nbsp;?"). Our chips center their value, so the
@@ -464,6 +475,7 @@
     syncPuzzle();
     syncHero();
     syncCoachTitles();
+    syncSwissRounds();
     syncPowertip();
   }, 250);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncHero);

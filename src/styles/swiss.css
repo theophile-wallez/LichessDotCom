@@ -1,0 +1,429 @@
+/*
+ * Swiss tournaments home (main.swiss-home): "Now playing" and "Starting
+ * soon" as lists of Chess.com-style tournament cards (the time control on a
+ * tile, the rounds with a progress bar from content.js), then the
+ * explanations as point cards, a comparison card and a grid of FAQ cards.
+ * Lichess always renders both lists, playing first, even when empty.
+ */
+
+/* ------------------------------------------------------------ page --- */
+
+main.swiss-home {
+  gap: 28px !important;
+  padding-bottom: 40px;
+}
+
+main.swiss-home > .box {
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+main.swiss-home h1.box__top {
+  justify-content: flex-start !important;
+  align-items: center;
+  gap: 12px;
+  margin: 0 !important;
+  padding: 16px 0 24px !important;
+}
+
+/* Chess.com's clipboard icon, as in the sidebar's Swiss entry. */
+main.swiss-home h1.box__top::before {
+  content: '';
+  flex: none;
+  width: 36px;
+  height: 36px;
+  background: url('https://assets-ds.chess.com/color-icons/clipboard-vote.svg') center / contain no-repeat;
+}
+
+/* ----------------------------------------------------------- lists --- */
+
+main.swiss-home .swisses {
+  display: block;
+  margin: 0 0 28px !important;
+  border: none !important;
+}
+
+main.swiss-home .swisses:has(tbody:empty) {
+  display: none;
+}
+
+main.swiss-home .swisses :is(thead, thead tr, thead th) {
+  display: block;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+main.swiss-home .swisses thead th {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: #fff !important;
+  font-family: var(--cdc-font) !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  text-align: start;
+}
+
+/* Now playing: a pulsing green dot, the lists' only live cue. */
+main.swiss-home .swisses:nth-of-type(1) thead th::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cdc-green);
+  box-shadow: 0 0 0 0 #81b64cb3;
+  animation: cdc-swiss-pulse 1.6s ease-out infinite;
+}
+
+@keyframes cdc-swiss-pulse {
+  70% {
+    box-shadow: 0 0 0 6px #81b64c00;
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 #81b64c00;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main.swiss-home .swisses:nth-of-type(1) thead th::before {
+    animation: none;
+  }
+}
+
+main.swiss-home .swisses tbody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ------------------------------------------------------------ card --- */
+
+/* Icon, name, rounds and time control, start and players. The link covers
+ * the whole card (its ::after), not just the name. */
+main.swiss-home .swisses tbody tr {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 190px 110px;
+  align-items: center;
+  column-gap: 18px;
+  padding: 12px 18px;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px;
+  background: var(--cdc-bg-panel) !important;
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+main.swiss-home .swisses tbody tr:hover {
+  border-color: var(--cdc-card-border-hover);
+  background: var(--cdc-card-hover) !important;
+  box-shadow: var(--cdc-card-shadow-hover);
+}
+
+main.swiss-home .swisses td {
+  min-width: 0;
+  padding: 0 !important;
+  border: none !important;
+}
+
+main.swiss-home .swisses td.icon icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: var(--cdc-bg-raised);
+  font-size: 28px !important;
+}
+
+main.swiss-home .swisses td.header a {
+  display: block;
+  padding: 0 !important;
+  color: var(--cdc-text-dim) !important;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+main.swiss-home .swisses td.header a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+main.swiss-home .swisses .name {
+  overflow: hidden;
+  margin-bottom: 3px;
+  color: #fff;
+  font-size: 17px !important;
+  font-weight: 800;
+  text-overflow: ellipsis;
+}
+
+main.swiss-home .swisses .team {
+  color: var(--cdc-text) !important;
+  font-weight: 700;
+}
+
+main.swiss-home .swisses tr:hover .team {
+  color: #fff !important;
+}
+
+main.swiss-home .swisses .team .uflair {
+  width: 1.3em;
+  height: 1.3em;
+  margin-inline-start: 4px;
+  vertical-align: -0.3em;
+}
+
+/* Rounds, then the time control in quiet type. */
+main.swiss-home .swisses td.infos {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+main.swiss-home .swisses .rounds {
+  color: var(--cdc-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+main.swiss-home .swisses .rounds[style*='--cdc-progress']::after {
+  content: '';
+  display: block;
+  height: 4px;
+  margin-top: 5px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--cdc-green) var(--cdc-progress), #ffffff14 0);
+}
+
+html[dir='rtl'] main.swiss-home .swisses .rounds[style*='--cdc-progress']::after {
+  background: linear-gradient(to left, var(--cdc-green) var(--cdc-progress), #ffffff14 0);
+}
+
+main.swiss-home .swisses .setup {
+  overflow: hidden;
+  color: var(--cdc-text-dim);
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Start time over a player-count chip, against the end of the card. */
+main.swiss-home .swisses td:last-child {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+main.swiss-home .swisses td:last-child br {
+  display: none;
+}
+
+main.swiss-home .swisses time {
+  color: var(--cdc-text-dim);
+  font-size: 12px !important;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+main.swiss-home .swisses .players {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 5px;
+  margin: 0 !important;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--cdc-bg-raised);
+  color: #fff !important;
+  font-size: 13px;
+  font-weight: 800 !important;
+}
+
+main.swiss-home .swisses .players::before {
+  color: var(--cdc-text-dim);
+  font-size: 12px;
+  vertical-align: 0 !important;
+}
+
+/* ------------------------------------------------------ about swiss --- */
+
+main.swiss-home .swiss-home__infos {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 14px;
+}
+
+main.swiss-home .swiss-home__infos > :is(.comparison, #faq) {
+  grid-column: 1 / -1;
+}
+
+main.swiss-home .swiss-home__infos .main-point {
+  gap: 18px;
+  margin: 0 !important;
+  padding: 20px 22px !important;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px;
+  background: var(--cdc-bg-panel);
+}
+
+main.swiss-home .swiss-home__infos :is(.main-point, .faq) p {
+  color: var(--cdc-text);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+main.swiss-home .swiss-home__infos .main-point icon {
+  display: flex;
+  flex: none !important;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 !important;
+  border-radius: 12px;
+  background: var(--cdc-bg-raised);
+  font-size: 26px !important;
+}
+
+/* The comparison: a card, the Swiss column brought forward. */
+main.swiss-home .comparison {
+  overflow: hidden;
+  margin: 14px 0 0 !important;
+  border: 1px solid var(--cdc-card-border) !important;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px;
+  clip-path: inset(0 round 10px);
+  background: var(--cdc-bg-panel);
+}
+
+main.swiss-home .comparison :is(th, td) {
+  padding: 12px 20px !important;
+  border: none !important;
+  font-size: 14px;
+  text-align: start;
+}
+
+main.swiss-home .comparison thead th {
+  padding-block: 14px !important;
+  color: var(--cdc-text-dim);
+  font-family: var(--cdc-font) !important;
+  font-size: 13px;
+  font-weight: 700 !important;
+}
+
+main.swiss-home .comparison thead strong {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+main.swiss-home .comparison thead th:nth-child(3) strong {
+  color: var(--cdc-green);
+}
+
+main.swiss-home .comparison tbody th {
+  width: 28%;
+  color: #fff;
+  font-family: var(--cdc-font) !important;
+  font-weight: 700 !important;
+}
+
+main.swiss-home .comparison tbody td {
+  color: var(--cdc-text-dim);
+  font-weight: 600;
+}
+
+main.swiss-home .comparison tbody td:nth-child(3) {
+  color: var(--cdc-text);
+}
+
+main.swiss-home .comparison tbody tr:hover {
+  background: #ffffff08 !important;
+}
+
+/* FAQ: a grid of question cards, the "?" as a round badge. */
+main.swiss-home #faq {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+  padding: 0 !important;
+}
+
+main.swiss-home #faq .faq {
+  align-items: flex-start !important;
+  gap: 14px;
+  margin: 0 !important;
+  padding: 18px 20px;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px;
+  background: var(--cdc-bg-panel);
+}
+
+main.swiss-home #faq .faq icon {
+  display: flex;
+  flex: none !important;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0 !important;
+  border-radius: 50%;
+  background: var(--cdc-bg-raised);
+  color: #e3aa24 !important;
+  font-family: var(--cdc-font);
+  font-size: 17px !important;
+  font-weight: 800 !important;
+}
+
+main.swiss-home #faq .faq strong {
+  margin: 5px 0 6px !important;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+/* ---------------------------------------------------------- mobile --- */
+
+@media (max-width: 799.98px) {
+  main.swiss-home {
+    padding-inline: 12px;
+  }
+
+  main.swiss-home .swisses tbody tr {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    row-gap: 10px;
+    column-gap: 14px;
+    padding: 12px 14px;
+  }
+
+  main.swiss-home .swisses td.infos {
+    grid-column: 2 / -1;
+    grid-row: 2;
+  }
+
+  main.swiss-home .swiss-home__infos,
+  main.swiss-home #faq {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  main.swiss-home .comparison :is(th, td) {
+    padding: 10px 12px !important;
+  }
+}

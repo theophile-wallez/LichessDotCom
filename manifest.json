@@ -41,7 +41,8 @@
         "src/styles/learn.css",
         "src/styles/puzzles.css",
         "src/styles/dashboard.css",
-        "src/styles/broadcast.css"
+        "src/styles/broadcast.css",
+        "src/styles/swiss.css"
       ],
       "js": ["src/content.js", "src/dashboard.js", "src/ratingchart.js"],
       "run_at": "document_start"
