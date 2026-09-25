@@ -260,8 +260,8 @@
   /* Lichess only renders its lone Donate link after the nav for non-patrons,
      and not on zen pages (a game), while the flyout's copy (Play, or Community
      for patrons) is always there: content.js builds #cdc-donate from that one,
-     a sidebar item of its own right under Tools, with a heart that beats on
-     hover. */
+     a sidebar item of its own right under Tools. Its icon is Lichess's own 3D
+     money bag emoji (a flair), which jingles on hover. */
   #topnav div a.community-patron,
   #top .site-title-nav__donate {
     display: none !important;
@@ -288,7 +288,7 @@
     flex: none;
     width: 28px;
     height: 28px;
-    background: url('https://assets-ds.chess.com/color-icons/heart-red.svg') center / contain no-repeat;
+    background: url('https://lichess1.org/assets/flair/img/objects.money-bag.webp') center / contain no-repeat;
   }
 
   #cdc-donate:hover {
@@ -297,14 +297,16 @@
   }
 
   #cdc-donate:hover::before {
-    animation: cdc-heartbeat 0.9s ease-in-out infinite;
+    transform-origin: 50% 85%;
+    animation: cdc-jingle 0.8s ease-in-out infinite;
   }
 
-  @keyframes cdc-heartbeat {
-    0%, 60%, 100% { transform: scale(1); }
-    15% { transform: scale(1.2); }
-    30% { transform: scale(1.05); }
-    45% { transform: scale(1.15); }
+  @keyframes cdc-jingle {
+    0%, 70%, 100% { transform: rotate(0) scale(1); }
+    15% { transform: rotate(-14deg) scale(1.12); }
+    30% { transform: rotate(12deg) scale(1.12); }
+    45% { transform: rotate(-8deg) scale(1.06); }
+    60% { transform: rotate(4deg) scale(1.02); }
   }
 
   @media (prefers-reduced-motion: reduce) {
