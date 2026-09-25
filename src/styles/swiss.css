@@ -13,7 +13,10 @@ main.swiss-home {
   padding-bottom: 40px;
 }
 
+/* No longer a card, so nothing to clip: Lichess's overflow: hidden would cut
+ * the live dot's pulse ring at the page edge. */
 main.swiss-home > .box {
+  overflow: visible !important;
   padding: 0 !important;
   border: none !important;
   background: transparent !important;
