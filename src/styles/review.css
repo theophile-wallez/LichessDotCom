@@ -461,9 +461,7 @@
 
   /* The coach: our own portraits, shipped with the extension (the page world
    * can't call chrome.runtime.getURL, but manifest CSS gets the extension id
-   * substituted). A button: clicking it changes coach. It reacts to each
-   * verdict with translate / rotate / scale, which add up with the hover's
-   * transform; the portrait inside breathes on its own. */
+   * substituted). A button: clicking it changes coach. */
   .cdc-coach__avatar {
     position: relative;
     flex: none;
@@ -489,114 +487,216 @@
     animation: cdc-breathe 3.5s var(--cdc-idle, 0s) ease-in-out infinite;
   }
 
-  /* The portraits are 300×275 and fill the button, so the eyes are placed
-   * in percents of the image. Each lid is the skin above the eye fading into
-   * the skin below, with the lash line on its lower edge: closed, it's the
-   * arc of a shut eye. */
-  .cdc-coach__avatar[data-coach='1'] .cdc-coach__face { --cdc-lid: #f39e6e, #f9b789; background-image: url('chrome-extension://__MSG_@@extension_id__/img/coaches/coach-1.webp'); }
-  .cdc-coach__avatar[data-coach='2'] .cdc-coach__face { --cdc-lid: #fab494, #fcbb95; background-image: url('chrome-extension://__MSG_@@extension_id__/img/coaches/coach-2.webp'); }
-  .cdc-coach__avatar[data-coach='3'] .cdc-coach__face { --cdc-lid: #bd6843, #c97650; background-image: url('chrome-extension://__MSG_@@extension_id__/img/coaches/coach-3.webp'); }
-  .cdc-coach__avatar[data-coach='4'] .cdc-coach__face { --cdc-lid: #f39e77, #fac09b; background-image: url('chrome-extension://__MSG_@@extension_id__/img/coaches/coach-4.webp'); }
+  @keyframes cdc-breathe {
+    50% { transform: scaleY(1.012); }
+  }
 
-  .cdc-coach__avatar[data-coach='1'] .cdc-coach__lid:nth-child(1) { left: 36.33%; top: 34.55%; width: 10%; height: 5.45%; }
-  .cdc-coach__avatar[data-coach='1'] .cdc-coach__lid:nth-child(2) { left: 54%; top: 34.55%; width: 10.33%; height: 5.09%; }
-  .cdc-coach__avatar[data-coach='2'] .cdc-coach__lid:nth-child(1) { left: 36.33%; top: 36.73%; width: 9.33%; height: 4.73%; }
-  .cdc-coach__avatar[data-coach='2'] .cdc-coach__lid:nth-child(2) { left: 54.33%; top: 36.73%; width: 9%; height: 4.73%; }
-  .cdc-coach__avatar[data-coach='3'] .cdc-coach__lid:nth-child(1) { left: 35.33%; top: 38.55%; width: 11%; height: 5.09%; }
-  .cdc-coach__avatar[data-coach='3'] .cdc-coach__lid:nth-child(2) { left: 54.67%; top: 38.18%; width: 12%; height: 5.82%; }
-  .cdc-coach__avatar[data-coach='4'] .cdc-coach__lid:nth-child(1) { left: 36.33%; top: 36.73%; width: 10%; height: 5.09%; }
-  .cdc-coach__avatar[data-coach='4'] .cdc-coach__lid:nth-child(2) { left: 54%; top: 36.73%; width: 10%; height: 5.09%; }
+  /* ---- the coach's face --- */
 
+  /* The portraits are 300×275 and fill the button, so every feature is
+   * placed in percents of the image. The expressions move the portrait's own
+   * brows and mouth: each part is the portrait again (`background: inherit`),
+   * clipped to that feature and transformed, over a patch of skin hiding the
+   * feature where it was. At rest a part sits exactly on its original, so
+   * the face is the portrait itself. */
+
+  .cdc-coach__avatar[data-coach='1'] .cdc-coach__face {
+    background-image: url('chrome-extension://__MSG_@@extension_id__/img/coaches/coach-1.webp');
+    --cdc-lid: #f39e6e, #f9b789;
+    --cdc-skin-brow: linear-gradient(#fbbd90 30%, #f39e6e 35.5%);
+    --cdc-skin-mouth: #e8b08a;
+    --cdc-brow-l: polygon(34.17% 32.84%, 35.31% 32.35%, 36.44% 31.61%, 37.58% 31.04%, 38.72% 30.64%, 39.86% 30.41%, 41% 30.34%, 42.14% 30.45%, 43.28% 30.72%, 44.42% 31.16%, 45.56% 31.77%, 46.69% 32.55%, 47.83% 33.06%, 47.83% 35.1%, 46.69% 34.97%, 45.56% 34.73%, 44.42% 34.62%, 43.28% 34.52%, 42.14% 34.46%, 41% 34.45%, 39.86% 34.49%, 38.72% 34.57%, 37.58% 34.69%, 36.44% 34.73%, 35.31% 35.08%, 34.17% 35.23%);
+    --cdc-brow-l-at: 41.17% 32.4%;
+    --cdc-brow-r: polygon(52.5% 32.76%, 53.69% 32.24%, 54.89% 31.47%, 56.08% 30.86%, 57.28% 30.41%, 58.47% 30.12%, 59.67% 29.99%, 60.86% 30.03%, 62.06% 30.22%, 63.25% 30.58%, 64.44% 31.1%, 65.64% 31.77%, 66.83% 32.24%, 66.83% 34.61%, 65.64% 34.45%, 64.44% 34.24%, 63.25% 34.08%, 62.06% 33.98%, 60.86% 33.94%, 59.67% 33.96%, 58.47% 34.03%, 57.28% 34.16%, 56.08% 34.35%, 54.89% 34.6%, 53.69% 34.73%, 52.5% 35.11%);
+    --cdc-brow-r-at: 59.83% 31.97%;
+    --cdc-mouth-x: 50.17%;
+    --cdc-mouth-y: 57.45%;
+    --cdc-mouth-r: 11.70% 4.41%;
+  }
+
+  .cdc-coach__avatar[data-coach='2'] .cdc-coach__face {
+    background-image: url('chrome-extension://__MSG_@@extension_id__/img/coaches/coach-2.webp');
+    --cdc-lid: #fab494, #fcbb95;
+    --cdc-skin-brow: linear-gradient(#fdc9a5 31.5%, #fab494 36.5%);
+    --cdc-skin-mouth: #fbcaa5;
+    --cdc-brow-l: polygon(34.83% 33.4%, 35.83% 33.12%, 36.83% 32.63%, 37.83% 32.26%, 38.83% 31.99%, 39.83% 31.84%, 40.83% 31.79%, 41.83% 31.86%, 42.83% 32.04%, 43.83% 32.33%, 44.83% 32.73%, 45.83% 33.23%, 46.83% 33.53%, 46.83% 36.46%, 45.83% 36.2%, 44.83% 35.75%, 43.83% 35.36%, 42.83% 35.05%, 41.83% 34.8%, 40.83% 34.61%, 39.83% 34.5%, 38.83% 34.45%, 37.83% 34.48%, 36.83% 34.57%, 35.83% 34.72%, 34.83% 34.83%);
+    --cdc-brow-l-at: 41% 33.22%;
+    --cdc-brow-r: polygon(53.17% 33.34%, 54.06% 33.09%, 54.94% 32.6%, 55.83% 32.21%, 56.72% 31.91%, 57.61% 31.71%, 58.5% 31.6%, 59.39% 31.59%, 60.28% 31.68%, 61.17% 31.86%, 62.06% 32.15%, 62.94% 32.52%, 63.83% 32.72%, 63.83% 34.31%, 62.94% 34.25%, 62.06% 34.16%, 61.17% 34.13%, 60.28% 34.16%, 59.39% 34.25%, 58.5% 34.4%, 57.61% 34.61%, 56.72% 34.88%, 55.83% 35.22%, 54.94% 35.61%, 54.06% 36.07%, 53.17% 36.28%);
+    --cdc-brow-r-at: 58.67% 32.98%;
+    --cdc-mouth-x: 49.77%;
+    --cdc-mouth-y: 58.73%;
+    --cdc-mouth-r: 11.05% 5.16%;
+  }
+
+  .cdc-coach__avatar[data-coach='3'] .cdc-coach__face {
+    background-image: url('chrome-extension://__MSG_@@extension_id__/img/coaches/coach-3.webp');
+    --cdc-lid: #bd6843, #c97650;
+    --cdc-skin-brow: linear-gradient(#d08057 33.3%, #bd6843 39%);
+    --cdc-skin-mouth: #ce7f56;
+    --cdc-brow-l: polygon(33.5% 36.95%, 34.67% 36.31%, 35.83% 35.34%, 37% 34.58%, 38.17% 34.02%, 39.33% 33.67%, 40.5% 33.52%, 41.67% 33.58%, 42.83% 33.84%, 44% 34.31%, 45.17% 34.98%, 46.33% 35.85%, 47.5% 36.44%, 47.5% 39.13%, 46.33% 38.72%, 45.17% 38.09%, 44% 37.58%, 42.83% 37.18%, 41.67% 36.89%, 40.5% 36.72%, 39.33% 36.65%, 38.17% 36.7%, 37% 36.87%, 35.83% 37.14%, 34.67% 37.53%, 33.5% 37.8%);
+    --cdc-brow-l-at: 40.67% 35.13%;
+    --cdc-brow-r: polygon(53.17% 36.06%, 54.33% 35.52%, 55.5% 34.72%, 56.67% 34.1%, 57.83% 33.66%, 59% 33.41%, 60.17% 33.35%, 61.33% 33.46%, 62.5% 33.76%, 63.67% 34.24%, 64.83% 34.91%, 66% 35.76%, 67.17% 36.32%, 67.17% 37.33%, 66% 37.11%, 64.83% 36.79%, 63.67% 36.57%, 62.5% 36.45%, 61.33% 36.43%, 60.17% 36.51%, 59% 36.69%, 57.83% 36.96%, 56.67% 37.34%, 55.5% 37.81%, 54.33% 38.36%, 53.17% 38.75%);
+    --cdc-brow-r-at: 60.33% 34.92%;
+    --cdc-mouth-x: 50.17%;
+    --cdc-mouth-y: 60.55%;
+    --cdc-mouth-r: 11.70% 4.66%;
+  }
+
+  .cdc-coach__avatar[data-coach='4'] .cdc-coach__face {
+    background-image: url('chrome-extension://__MSG_@@extension_id__/img/coaches/coach-4.webp');
+    --cdc-lid: #f39e77, #fac09b;
+    --cdc-skin-brow: linear-gradient(#fbc9a6 32.5%, #f39e77 37.8%);
+    --cdc-skin-mouth: #e2aa87;
+    --cdc-brow-l: polygon(33.5% 35.71%, 34.69% 35.1%, 35.89% 34.2%, 37.08% 33.49%, 38.28% 32.97%, 39.47% 32.63%, 40.67% 32.48%, 41.86% 32.52%, 43.06% 32.75%, 44.25% 33.16%, 45.44% 33.77%, 46.64% 34.56%, 47.83% 35.1%, 47.83% 37.58%, 46.64% 36.91%, 45.44% 36.91%, 44.25% 36.81%, 43.06% 36.65%, 41.86% 36.56%, 40.67% 36.54%, 39.47% 36.6%, 38.28% 36.73%, 37.08% 36.91%, 35.89% 37.22%, 34.69% 37.58%, 33.5% 37.82%);
+    --cdc-brow-l-at: 40.83% 34.51%;
+    --cdc-brow-r: polygon(52.5% 35.09%, 53.69% 34.57%, 54.89% 33.82%, 56.08% 33.24%, 57.28% 32.84%, 58.47% 32.61%, 59.67% 32.55%, 60.86% 32.67%, 62.06% 32.96%, 63.25% 33.43%, 64.44% 34.07%, 65.64% 34.88%, 66.83% 35.43%, 66.83% 37.59%, 65.64% 37.37%, 64.44% 37.06%, 63.25% 36.82%, 62.06% 36.65%, 60.86% 36.56%, 59.67% 36.54%, 58.47% 36.6%, 57.28% 36.73%, 56.08% 36.91%, 54.89% 36.91%, 53.69% 36.91%, 52.5% 37.82%);
+    --cdc-brow-r-at: 59.83% 34.55%;
+    --cdc-mouth-x: 50.2%;
+    --cdc-mouth-y: 58.91%;
+    --cdc-mouth-r: 10.18% 3.19%;
+  }
+
+  .cdc-coach__avatar[data-coach='1'] .cdc-coach__lid--l { left: 36.33%; top: 34.55%; width: 10%; height: 5.45%; }
+  .cdc-coach__avatar[data-coach='1'] .cdc-coach__lid--r { left: 54%; top: 34.55%; width: 10.33%; height: 5.09%; }
+  .cdc-coach__avatar[data-coach='2'] .cdc-coach__lid--l { left: 36.33%; top: 36.73%; width: 9.33%; height: 4.73%; }
+  .cdc-coach__avatar[data-coach='2'] .cdc-coach__lid--r { left: 54.33%; top: 36.73%; width: 9%; height: 4.73%; }
+  .cdc-coach__avatar[data-coach='3'] .cdc-coach__lid--l { left: 35.33%; top: 38.55%; width: 11%; height: 5.09%; }
+  .cdc-coach__avatar[data-coach='3'] .cdc-coach__lid--r { left: 54.67%; top: 38.18%; width: 12%; height: 5.82%; }
+  .cdc-coach__avatar[data-coach='4'] .cdc-coach__lid--l { left: 36.33%; top: 36.73%; width: 10%; height: 5.09%; }
+  .cdc-coach__avatar[data-coach='4'] .cdc-coach__lid--r { left: 54%; top: 36.73%; width: 10%; height: 5.09%; }
+
+  .cdc-coach__face {
+    --cdc-mouth-at: var(--cdc-mouth-x) var(--cdc-mouth-y);
+  }
+
+  .cdc-coach__part,
+  .cdc-coach__patch {
+    position: absolute;
+    inset: 0;
+  }
+
+  .cdc-coach__part {
+    background: inherit;
+    animation: none;
+  }
+
+  .cdc-coach__part--brow-l { clip-path: var(--cdc-brow-l); transform-origin: var(--cdc-brow-l-at); }
+  .cdc-coach__part--brow-r { clip-path: var(--cdc-brow-r); transform-origin: var(--cdc-brow-r-at); }
+
+  /* The mouth fades out at its edges, so a stretched or squeezed mouth
+   * blends into the skin around it. */
+  .cdc-coach__part--mouth {
+    mask: radial-gradient(var(--cdc-mouth-r) at var(--cdc-mouth-at), #000 70%, transparent) no-repeat;
+    transform-origin: var(--cdc-mouth-at);
+  }
+
+  .cdc-coach__patch {
+    opacity: 0;
+  }
+
+  .cdc-coach__patch--brow-l { clip-path: var(--cdc-brow-l); background: var(--cdc-skin-brow); }
+  .cdc-coach__patch--brow-r { clip-path: var(--cdc-brow-r); background: var(--cdc-skin-brow); }
+
+  .cdc-coach__patch--mouth {
+    background: var(--cdc-skin-mouth);
+    mask: radial-gradient(var(--cdc-mouth-r) at var(--cdc-mouth-at), #000 78%, transparent) no-repeat;
+  }
+
+  /* A mood that moves a feature uncovers the patch under it. */
+  .cdc-coach__avatar:is([data-mood='delight'], [data-mood='doubt'], [data-mood='worry'], [data-mood='shock']) .cdc-coach__patch--brow-l,
+  .cdc-coach__avatar:is([data-mood='delight'], [data-mood='doubt'], [data-mood='worry'], [data-mood='shock']) .cdc-coach__patch--brow-r,
+  .cdc-coach__avatar:is([data-mood='doubt'], [data-mood='worry'], [data-mood='shock']) .cdc-coach__patch--mouth {
+    opacity: 1;
+  }
+
+  /* Each lid is the skin above the eye fading into the skin below, with the
+   * lash line on its lower edge: closed, it's the arc of a shut eye. At rest
+   * it's open (--cdc-rest: 0) unless the mood narrows the eyes. */
   .cdc-coach__lid {
     position: absolute;
     border-radius: 50%;
     background: linear-gradient(var(--cdc-lid));
     box-shadow: inset 0 -1.5px 0 rgba(40, 22, 16, 0.85);
-    transform: scaleY(0);
+    transform: scaleY(var(--cdc-rest, 0));
     transform-origin: 50% 0;
     animation: cdc-blink 7s var(--cdc-idle, 0s) infinite;
   }
 
   /* One blink, then a double one, every 7s. */
   @keyframes cdc-blink {
-    0%, 38%, 41.6%, 85%, 88.2%, 90%, 93.2%, 100% { transform: scaleY(0); animation-timing-function: ease-in; }
+    0%, 38%, 41.6%, 85%, 88.2%, 90%, 93.2%, 100% { transform: scaleY(var(--cdc-rest, 0)); animation-timing-function: ease-in; }
     39.8%, 86.6%, 91.6% { transform: scaleY(1); animation-timing-function: ease-out; }
-  }
-
-  @keyframes cdc-breathe {
-    50% { transform: scaleY(1.012); }
-  }
-
-  /* ---- the coach's reactions --- */
-
-  /* Brilliant, great: a hop, happy eyes, sparkles. */
-  .cdc-coach__avatar--react[data-mood='delight'] { animation: cdc-hop 0.8s ease-out; }
-  .cdc-coach__avatar--react[data-mood='delight'] .cdc-coach__lid { animation: cdc-squint 1.1s ease-in-out, cdc-blink 7s 1.1s infinite; }
-
-  @keyframes cdc-hop {
-    15% { scale: 1.05 0.93; }
-    40% { translate: 0 -8%; scale: 0.96 1.05; }
-    65% { translate: 0 0; scale: 1.04 0.96; }
-    80% { translate: 0 -3%; scale: 1; }
-  }
-
-  @keyframes cdc-squint {
-    25%, 70% { transform: scaleY(0.4); }
-  }
-
-  /* Best, excellent: two nods and a blink. */
-  .cdc-coach__avatar--react[data-mood='happy'] { animation: cdc-nod 0.7s ease-in-out; }
-  .cdc-coach__avatar--react[data-mood='happy'] .cdc-coach__lid { animation: cdc-blink-once 0.4s 0.15s, cdc-blink 7s 0.55s infinite; }
-
-  @keyframes cdc-nod {
-    25%, 75% { translate: 0 3%; }
-    50% { translate: 0 0; }
   }
 
   @keyframes cdc-blink-once {
     50% { transform: scaleY(1); }
   }
 
-  /* Good, book: one small nod. */
-  .cdc-coach__avatar--react[data-mood='calm'] { animation: cdc-nod-once 0.45s ease-in-out; }
+  /* ---- the coach's expressions --- */
 
-  @keyframes cdc-nod-once {
-    50% { translate: 0 2%; }
+  /* An expression holds as long as its move is shown. On a new verdict the
+   * face eases into it; a re-render of the same move (Explain, the typing)
+   * shows it straight away. */
+  .cdc-coach__avatar--react .cdc-coach__part { animation: cdc-face-in 0.35s ease-out; }
+  .cdc-coach__avatar--react .cdc-coach__patch { animation: cdc-patch-in 0.35s ease-out; }
+
+  @keyframes cdc-face-in {
+    from { transform: none; }
   }
 
-  /* Inaccuracy: a skeptical tilt, one eye narrowed. */
-  .cdc-coach__avatar--react[data-mood='doubt'] { animation: cdc-tilt 1.5s ease-in-out; }
-  .cdc-coach__avatar--react[data-mood='doubt'] .cdc-coach__lid { animation: cdc-skeptic 1.5s ease-in-out, cdc-blink 7s 1.5s infinite; }
-  .cdc-coach__avatar--react[data-mood='doubt'] .cdc-coach__lid:nth-child(2) { --cdc-skeptic: 0.2; }
-
-  @keyframes cdc-tilt {
-    25%, 75% { rotate: -6deg; }
+  @keyframes cdc-patch-in {
+    from { opacity: 0; }
   }
 
-  @keyframes cdc-skeptic {
-    25%, 75% { transform: scaleY(var(--cdc-skeptic, 0.55)); }
-  }
+  /* Brilliant, great: brows up, a wide grin, smiling eyes. */
+  [data-mood='delight'] .cdc-coach__part--brow-l { transform: translateY(-1.3%) rotate(-3deg); }
+  [data-mood='delight'] .cdc-coach__part--brow-r { transform: translateY(-1.3%) rotate(3deg); }
+  [data-mood='delight'] .cdc-coach__part--mouth { transform: scale(1.14, 1.4); }
+  [data-mood='delight'] .cdc-coach__lid { --cdc-rest: 0.3; }
 
-  /* Mistake, miss: leaning back with a slow blink, and a drop of sweat. */
-  .cdc-coach__avatar--react[data-mood='worry'] { animation: cdc-lean 1.5s ease-in-out; }
+  /* Best, excellent: a brighter smile, a blink. */
+  [data-mood='happy'] .cdc-coach__part--mouth { transform: scale(1.06, 1.15); }
+  .cdc-coach__avatar--react[data-mood='happy'] .cdc-coach__lid { animation: cdc-blink-once 0.35s 0.15s, cdc-blink 7s 0.5s infinite; }
+
+  /* Inaccuracy: one brow up, the other down, one eye narrowed, a smirk. */
+  [data-mood='doubt'] .cdc-coach__part--brow-l { transform: translateY(-1.6%) rotate(-4deg); }
+  [data-mood='doubt'] .cdc-coach__part--brow-r { transform: translateY(0.6%) rotate(-5deg); }
+  [data-mood='doubt'] .cdc-coach__part--mouth { transform: translateX(1.5%) rotate(-6deg) scale(0.82, 0.5); }
+  [data-mood='doubt'] .cdc-coach__lid--r { --cdc-rest: 0.35; }
+
+  /* Mistake, miss: brows knit up in the middle, droopy lids, the smile
+   * turned upside down. */
+  [data-mood='worry'] .cdc-coach__part--brow-l { transform: translateY(-0.8%) rotate(-14deg); }
+  [data-mood='worry'] .cdc-coach__part--brow-r { transform: translateY(-0.8%) rotate(14deg); }
+  [data-mood='worry'] .cdc-coach__part--mouth { transform: scale(0.8, -0.55); }
+  [data-mood='worry'] .cdc-coach__lid { --cdc-rest: 0.2; }
   .cdc-coach__avatar--react[data-mood='worry'] .cdc-coach__lid { animation: cdc-blink-once 0.8s 0.3s ease-in-out, cdc-blink 7s 1.1s infinite; }
 
-  @keyframes cdc-lean {
-    30%, 75% { rotate: 4deg; translate: 3% 0; scale: 0.97; }
+  /* Blunder: brows shot up, a double take, and the mouth an open "O": no
+   * squeeze of the smile reads as one, so it's drawn over the patch. */
+  [data-mood='shock'] .cdc-coach__part--brow-l { transform: translateY(-3%) rotate(-6deg); }
+  [data-mood='shock'] .cdc-coach__part--brow-r { transform: translateY(-3%) rotate(6deg); }
+  [data-mood='shock'] .cdc-coach__part--mouth { opacity: 0; }
+
+  [data-mood='shock'] .cdc-coach__patch--mouth::after {
+    content: '';
+    position: absolute;
+    left: var(--cdc-mouth-x);
+    top: var(--cdc-mouth-y);
+    width: 5.6%;
+    height: 5%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse 60% 45% at 50% 85%, #c2575a 60%, transparent 62%), #4a1616;
+    box-shadow: 0 0 0 1.2px #c86f64;
+    translate: -50% -45%;
   }
 
-  /* Blunder: a jolt, a head shake, a double take. */
-  .cdc-coach__avatar--react[data-mood='shock'] { animation: cdc-jolt 1s ease-out; }
-  .cdc-coach__avatar--react[data-mood='shock'] .cdc-coach__lid { animation: cdc-blink-once 0.2s 0.35s, cdc-blink-once 0.2s 0.6s, cdc-blink 7s 0.8s infinite; }
+  .cdc-coach__avatar--react[data-mood='shock'] .cdc-coach__patch--mouth::after { animation: cdc-o-in 0.3s ease-out; }
 
-  @keyframes cdc-jolt {
-    12% { translate: 0 -6%; scale: 1.05; rotate: 0deg; }
-    30% { translate: 0 0; scale: 1; rotate: 5deg; }
-    45% { rotate: -5deg; }
-    60% { rotate: 3.5deg; }
-    75% { rotate: -2deg; }
-    90% { rotate: 0.5deg; }
+  @keyframes cdc-o-in {
+    from { scale: 0.3 0.1; }
   }
+  .cdc-coach__avatar--react[data-mood='shock'] .cdc-coach__lid { animation: cdc-blink-once 0.2s 0.3s, cdc-blink-once 0.2s 0.55s, cdc-blink 7s 0.75s infinite; }
 
   /* The marks over the head: sparkles, "?", "!" or a drop, in the class's
    * color, popping up and fading away. */
@@ -673,6 +773,9 @@
     .cdc-coach__avatar::before,
     .cdc-coach__avatar::after,
     .cdc-coach__face,
+    .cdc-coach__part,
+    .cdc-coach__patch,
+    .cdc-coach__patch::after,
     .cdc-coach__lid {
       animation: none !important;
     }

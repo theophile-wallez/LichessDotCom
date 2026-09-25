@@ -70,13 +70,20 @@
     coach = 1 + Math.floor(Math.random() * COACHES);
     localStorage.setItem('cdc-coach', coach);
   }
-  // The coach blinks, and reacts to the verdict (review.css): a mood per
-  // class, played once per move, not again when the same move is re-rendered
-  // (Explain, a new coach). `at` names the move: its ply, or its path.
+  // The coach blinks, and its face shows the verdict (review.css): a mood
+  // per class. The face eases into it once per move, not again when the same
+  // move is re-rendered (Explain, a new coach). `at` names the move: its
+  // ply, or its path.
   const MOODS = {
     brilliant: 'delight', great: 'delight', best: 'happy', excellent: 'happy', good: 'calm', book: 'calm',
     inaccuracy: 'doubt', mistake: 'worry', miss: 'worry', blunder: 'shock',
   };
+  // Under the lids, the brows and mouth the expressions move, each over a
+  // patch of skin that hides it where it was.
+  const FACE = ['patch', 'part']
+    .flatMap(k => ['brow-l', 'brow-r', 'mouth'].map(f => `<i class="cdc-coach__${k} cdc-coach__${k}--${f}"></i>`))
+    .concat(['l', 'r'].map(s => `<i class="cdc-coach__lid cdc-coach__lid--${s}"></i>`))
+    .join('');
   let reacted = '';
   const coachAvatar = (cls, at) => {
     const mood = MOODS[cls] || '';
@@ -86,7 +93,7 @@
     // The panel is re-rendered often (every percent of the analysis): start
     // the idle loops where the clock is, so a render doesn't reset a blink.
     const style = `--cdc-idle:${(-(performance.now() / 1000) % 7).toFixed(2)}s${mood ? `;--cdc-mood-c:${CLS[cls].color}` : ''}`;
-    return `<button class="cdc-coach__avatar${react ? ' cdc-coach__avatar--react' : ''}" data-cdc="coach" data-coach="${coach}"${mood ? ` data-mood="${mood}"` : ''} style="${style}" title="${esc(T.coach)}" aria-label="${esc(T.coach)}"><span class="cdc-coach__face"><i class="cdc-coach__lid"></i><i class="cdc-coach__lid"></i></span></button>`;
+    return `<button class="cdc-coach__avatar${react ? ' cdc-coach__avatar--react' : ''}" data-cdc="coach" data-coach="${coach}"${mood ? ` data-mood="${mood}"` : ''} style="${style}" title="${esc(T.coach)}" aria-label="${esc(T.coach)}"><span class="cdc-coach__face">${FACE}</span></button>`;
   };
 
   // key, color, label, sentence ({m} = move), in Chess.com's summary order.
