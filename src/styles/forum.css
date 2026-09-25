@@ -1445,6 +1445,56 @@ main.search .search__results .user-link:hover {
   color: var(--cdc-green-hover) !important;
 }
 
+/* ------------------------------------------------------ sticky title --- */
+
+/* On the long pages (a category's topics, a topic's posts, search results)
+ * the title stays in view, on the page's color, and casts a soft shadow on
+ * the cards only once it's stuck. Its own padding replaces the page's, so it
+ * starts where it was. Desktop only: below that, Lichess's fixed top bar
+ * would cover it. */
+@media (min-width: 1020px) {
+  /* Lichess's box clips its content, which would hold the title back. */
+  main.forum:is(.forum-categ, .forum-topic:not(.topic-form)),
+  main.box.search:has(> .box__top form.search[action$='/forum/search']) {
+    overflow: visible !important;
+    padding-top: 0 !important;
+  }
+
+  main.forum:is(.forum-categ, .forum-topic:not(.topic-form)) > .box__top,
+  main.search:has(> .box__top form.search[action$='/forum/search']) > .box__top {
+    container-type: scroll-state;
+    position: sticky;
+    z-index: 3;
+    top: 0;
+    /* A bit wider than the list, to also cover the shadows and the nudge of
+     * the cards passing under it. */
+    margin-inline: -12px !important;
+    padding: 16px 12px 12px !important;
+    margin-bottom: 10px !important;
+    background: var(--cdc-bg-page);
+  }
+
+  main.forum:is(.forum-categ, .forum-topic:not(.topic-form)) > .box__top::after,
+  main.search:has(> .box__top form.search[action$='/forum/search']) > .box__top::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-page), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    main.forum:is(.forum-categ, .forum-topic:not(.topic-form)) > .box__top::after,
+    main.search:has(> .box__top form.search[action$='/forum/search']) > .box__top::after {
+      opacity: 1;
+    }
+  }
+}
+
 /* ---------------------------------------------------------- motion --- */
 
 @media (prefers-reduced-motion: reduce) {
