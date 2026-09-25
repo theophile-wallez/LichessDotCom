@@ -52,6 +52,7 @@ h3 {
   font-size: 15px;
   font-weight: 600;
   text-shadow: none !important;
+  transition: background-color 0.18s ease-out, color 0.18s ease-out !important;
 }
 
 .subnav a:hover {
