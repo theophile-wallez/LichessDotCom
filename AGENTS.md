@@ -44,6 +44,16 @@ is "a Chess.com user wouldn't notice they're on Lichess".
   (`:nth-of-type`), classes, or how an href ends (`a[href$='/training']`).
 - **Desktop first.** The Chess.com layout applies at ≥ 1020px. Below that,
   Lichess's mobile layout is kept, with our theme, board and pieces.
+- **Make every page playful.** A modernized page should feel fun, like
+  Chess.com's, not just re-skinned: color per section, icons on gradient
+  tiles, cards, pills, and ideally nice illustrations (Neo pieces, Lichess's
+  3D emoji, photos, little boards). Practice, simuls and the forum set the
+  tone.
+- **Only the content scrolls.** On a page that scrolls and has a side panel
+  (a side menu, a help card) and a main title or header at the top, the
+  side panel and the title stay put and only the content moves, as in an
+  app: never the whole page. Pin them with `position: sticky` (see
+  `simul.css`), or make the content its own scrolling area.
 
 ## Layout of the repo
 
