@@ -67,14 +67,14 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/ratingchart.js` | Isolated world: the rating history chart (profile, rating stats page), redrawn in SVG from the page's init JSON (Lichess draws it with Chart.js into a canvas): smooth curves over gradients, range pills, one chip per rating, a hover tooltip. |
 | `src/page.js` | Page world: wraps `site.sound` to play the right Chess.com sound per move, plus premove / illegal / game-start, which Lichess has no sound for. |
 | `src/board.js` | Page world: every main board's shapes redrawn Chess.com-style (right-clicked squares filled, arrows), checkmate badge and label. |
-| `src/review.js` | Page world: Game Review (engine, classification, panel, the coach's comment per move: how the evaluation moved plus one fact from the board and the engine, typed out word by word, board overlays, eval bar). |
+| `src/review.js` | Page world: Game Review (engine, classification, panel, the coach's comment per move: how the evaluation moved plus one fact from the board and the engine, typed out word by word, board overlays, eval bar). On the free analysis board (`/analysis`) the same coach judges each move as it's played, variations included, with the badges on the board and in Lichess's move list. |
 | `src/styles/theme.css` | Overrides Lichess's `--c-*` color variables, fonts, buttons. |
 | `src/styles/sidebar.css` | Lichess's top header → Chess.com's left sidebar, and the user menu (dasher) as a Chess.com menu. |
 | `src/styles/board.css` | Board, pieces, highlights, move hints, arrows, coordinates, and Lichess's eval bar drawn like the Game Review's. |
 | `src/styles/playerbar.css` | The player bars' look, shared by the game page (`.ruser`, `.rclock`) and the analysis board (`.cdc-player`, `.analyse__clock`): avatar, title, name, flag, rating, captured pieces and the clock. Each page only places them. |
 | `src/styles/game.css` | Game page (`main.round`) grid, where the player bars and clocks sit, moves, chat, and the game-over panel (Game Review button, move times). |
 | `src/styles/analysis.css` | Analysis page (`main.analyse`) grid (with the game page's player bars when there are players or clocks), engine header and lines, move list (glyph badges, comment cards) and controls. |
-| `src/styles/review.css` | Game Review panel, eval bar, board annotations. |
+| `src/styles/review.css` | Game Review panel, eval bar, board annotations, and the free analysis board's coach over Lichess's panel. |
 | `src/styles/pages.css` | Modern look for every other page (headings, side menus, tabs, tables, forms, dialogs, lobby, editor, tournaments). |
 | `src/styles/dropdowns.css` | Every dropdown as one menu style: Lichess's `.mselect`, native `<select>` (via `appearance: base-select`) and autocomplete lists. |
 | `src/styles/powertip.css` | The profile hover card (`#powerTip`, filled with `/@/<user>/mini`) as a Chess.com player card. |
@@ -177,13 +177,20 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   the carousel's `clientWidth`, which counts padding. Inset it with a
   transparent border, not padding, or the last card is clipped.
 - **Useful page APIs.** `site.sound` is Lichess's sound player, and
-  `site.analysis` is the analysis controller (`mainline`, `node.ply`,
+  `site.analysis` is the analysis controller (`mainline`, `node.ply`, `path`,
+  `nodeList`, `tree.nodeAtPath`,
   `jumpToMain`, `getOrientation`; `jumpToMain` doesn't scroll the move list),
   and `site.analysis.chessground.state.drawable` holds the arrows (`shapes`,
   `autoShapes`, `current`), and the engine is at
   `npm/stockfish-web/sf_19_smallnet.js`. **Only the analysis page has a
   controller**: a game page exposes none, so anything that must work on both
   reads the board's DOM instead (`board.js` does).
+- **The free analysis board.** `/analysis` is `main.analyse` with
+  `site.analysis.synthetic` set and a game id of `synthetic`: no game to
+  export, and a tree that grows as the user plays. Every `move` in its move
+  list, variations included, carries its tree path in a `p` attribute
+  (`tree.nodeAtPath(p)`). Opening names come from
+  `explorer.fetchMasterOpening(fen)`, which fails with a 401 when signed out.
 - **Chessground's shapes.** They live in `cg-container > svg.cg-shapes`, one `g`
   per shape: a circle (a right-clicked square) or a line (an arrow), in square
   units from the viewBox's corner (`-4 -4 8 8`), *with the orientation already
