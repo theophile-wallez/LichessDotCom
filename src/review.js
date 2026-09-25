@@ -34,6 +34,7 @@
         intro: 'Passons en revue cette partie !', bestWas: 'Le meilleur coup était {m}.',
         engineError: "Le moteur n'a pas pu démarrer.",
         liveIntro: 'Joue un coup, je te dirai ce que j’en pense.', thinking: 'Voyons ce coup…',
+        startPosition: 'Position de départ',
       }
     : {
         review: 'Game Review', start: 'Start Review', next: 'Next', explain: 'Explain', best: 'Best',
@@ -42,6 +43,7 @@
         intro: "Let's review this game!", bestWas: '{m} was best.',
         engineError: 'The engine failed to start.',
         liveIntro: 'Play a move and I’ll tell you what I think.', thinking: 'Let me look at this move…',
+        startPosition: 'Starting position',
       };
 
   // What the coach says while the game is analyzed, like Chess.com.
@@ -1075,6 +1077,7 @@
     controls: el('div', { id: 'cdc-review-controls' }),
     bar: el('div', { id: 'cdc-evalbar' }, '<div class="cdc-evalbar__fill"></div><span class="cdc-evalbar__label"></span>'),
     overlay: el('div', { id: 'cdc-board-overlay' }),
+    opening: el('div', { id: 'cdc-opening' }),
   };
 
   function ensureAttached(ctrl) {
@@ -1380,7 +1383,10 @@
     window.cdcReviewArrows = showBest ? [{ orig: move.best.slice(0, 2), dest: move.best.slice(2, 4), brush: 'best' }] : [];
 
     // Move list badges.
-    if (isLive) liveBadges(ctrl);
+    if (isLive) {
+      liveBadges(ctrl);
+      renderOpening(ctrl);
+    }
     else if (r) {
       const tree = document.querySelector('main.analyse .tview2');
       const mainMoves = tree ? [...tree.querySelectorAll(':scope > move:not(.empty)')] : [];
@@ -1498,12 +1504,14 @@
     return book;
   }
 
+  // The last named opening along `path`: a move out of the book keeps the
+  // name of the line it left.
   const openingAt = (ctrl, path) => {
     for (; path; path = path.slice(0, -2)) {
-      const name = live.books.get(ctrl.tree.nodeAtPath(path).fen)?.name;
-      if (name) return name;
+      const b = live.books.get(ctrl.tree.nodeAtPath(path).fen);
+      if (b?.name) return b;
     }
-    return '';
+    return null;
   };
 
   // The move to `path`, judged, or null until its positions are analyzed.
@@ -1518,7 +1526,7 @@
     let move = null;
     if (a && b && book !== undefined) {
       move = judge(prev, node, a, b, judgeAt(ctrl, up), book, ctrl.data.game.variant?.key === 'chess960');
-      move.opening = openingAt(ctrl, path);
+      move.opening = openingAt(ctrl, path)?.name || '';
     }
     live.judged.set(path, { node, move });
     return move;
@@ -1597,12 +1605,35 @@
     try {
       const late = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
       const d = await Promise.race([ctrl.explorer.fetchMasterOpening(fen), late]);
-      live.books.set(fen, { book: d.white + d.draws + d.black >= BOOK_GAMES, name: d.opening?.name || '' });
+      live.books.set(fen, { book: d.white + d.draws + d.black >= BOOK_GAMES, name: d.opening?.name || '', eco: d.opening?.eco || '' });
     } catch {
       live.noBook = true;
     }
     live.bookBusy = false;
     changed();
+  }
+
+  // The opening's name over Lichess's move list, like Chess.com's. It comes
+  // from the masters database, which needs an account: signed out, there's
+  // no line at all. It's ours, appended to Lichess's panel and put above
+  // the moves by review.css, so Lichess's own children never move.
+  function renderOpening(ctrl) {
+    const tools = document.querySelector('main.analyse .analyse__tools');
+    if (!tools) return;
+    if (dom.opening.parentNode !== tools) tools.appendChild(dom.opening);
+    const o = !ctrl.explorer?.isAuth?.() || live.noBook
+      ? null
+      : ctrl.path ? openingAt(ctrl, ctrl.path) : { name: window.i18n?.site?.startPosition || T.startPosition, eco: '' };
+    const key = o ? `${o.eco}|${o.name}` : '';
+    if (dom.opening.dataset.key === key) return;
+    dom.opening.dataset.key = key;
+    html.classList.toggle('cdc-opening-on', !!o);
+    if (!o) return void (dom.opening.innerHTML = '');
+    // "Ruy Lopez: Morphy Defense": the family bold, then the variation.
+    const [family, ...rest] = o.name.split(': ');
+    dom.opening.title = o.name;
+    dom.opening.style.setProperty('--i', CLS.book.img);
+    dom.opening.innerHTML = `<i class="cdc-opening__icon"></i>${o.eco ? `<span class="cdc-opening__eco">${esc(o.eco)}</span>` : ''}<span class="cdc-opening__name"><b>${esc(family)}</b>${rest.length ? `: ${esc(rest.join(': '))}` : ''}</span>`;
   }
 
   // Badges in Lichess's move list, variations included: each move carries
