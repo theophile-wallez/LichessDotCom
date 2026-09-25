@@ -4,6 +4,10 @@
  * tile that tilts on hover, medals for the top three and a rank for the
  * rest. Online players sit in a side card that stays in view while the
  * leaderboards scroll.
+ *
+ * Tournament winners (/tournament/leaderboard, .tournament-leaderboards)
+ * reuse the same cards, one per kind of tournament, with a cup per winner:
+ * gold, silver and bronze for the yearly, monthly and weekly ones.
  */
 
 /* ------------------------------------------------------------ page --- */
@@ -158,29 +162,32 @@
   border-radius: 0 !important;
 }
 
-/* A color per leaderboard, from its icon. */
-.community .leaderboards .user-top {
+/* A color per leaderboard, from its icon, shared with the tournament
+ * winners (Elite and Marathon only exist there). */
+:is(.community .leaderboards .user-top, .tournament-leaderboards__item) {
   --cdc-lb: #95c85a;
   --cdc-lb-2: #5d9948;
 }
 
-.community .user-top:has(> h2[data-icon='\e032']) { --cdc-lb: #f5a93b; --cdc-lb-2: #d27a1c; }
-.community .user-top:has(> h2[data-icon='\e008']) { --cdc-lb: #fad541; --cdc-lb-2: #e0a21a; }
-.community .user-top:has(> h2[data-icon='\e002']) { --cdc-lb: #95c85a; --cdc-lb-2: #5d9948; }
-.community .user-top:has(> h2[data-icon='\e00a']) { --cdc-lb: #45a3f5; --cdc-lb-2: #2474c9; }
-.community .user-top:has(> h2[data-icon='\e059']) { --cdc-lb: #f06a4a; --cdc-lb-2: #c9412d; }
-.community .user-top:has(> h2[data-icon='\e033']) { --cdc-lb: #a98bf0; --cdc-lb-2: #7458c7; }
-.community .user-top:has(> h2[data-icon='\e045']) { --cdc-lb: #f7c631; --cdc-lb-2: #cf951a; }
-.community .user-top:has(> h2[data-icon='\e066']) { --cdc-lb: #3aa6e0; --cdc-lb-2: #0a78b8; }
-.community .user-top:has(> h2[data-icon='\e006']) { --cdc-lb: #fa8a4c; --cdc-lb-2: #d9601c; }
-.community .user-top:has(> h2[data-icon='\e01e']) { --cdc-lb: #e86bb0; --cdc-lb-2: #b8438a; }
-.community .user-top:has(> h2[data-icon='\e01c']) { --cdc-lb: #f0645a; --cdc-lb-2: #b93a2e; }
-.community .user-top:has(> h2[data-icon='\e00d']) { --cdc-lb: #3fd0b2; --cdc-lb-2: #1f9c83; }
-.community .user-top:has(> h2[data-icon='\e007']) { --cdc-lb: #d4a15f; --cdc-lb-2: #a8743a; }
-.community .user-top:has(> h2[data-icon='\e03d']) { --cdc-lb: #9aa9bd; --cdc-lb-2: #627288; }
-.community .user-top:has(> h2[data-icon='\e065']) { --cdc-lb: #7fb2ff; --cdc-lb-2: #4a7fd6; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e032']) { --cdc-lb: #f5a93b; --cdc-lb-2: #d27a1c; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e008']) { --cdc-lb: #fad541; --cdc-lb-2: #e0a21a; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e002']) { --cdc-lb: #95c85a; --cdc-lb-2: #5d9948; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e00a']) { --cdc-lb: #45a3f5; --cdc-lb-2: #2474c9; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e059']) { --cdc-lb: #f06a4a; --cdc-lb-2: #c9412d; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e033']) { --cdc-lb: #a98bf0; --cdc-lb-2: #7458c7; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e045']) { --cdc-lb: #f7c631; --cdc-lb-2: #cf951a; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e066']) { --cdc-lb: #3aa6e0; --cdc-lb-2: #0a78b8; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e006']) { --cdc-lb: #fa8a4c; --cdc-lb-2: #d9601c; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e01e']) { --cdc-lb: #e86bb0; --cdc-lb-2: #b8438a; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e01c']) { --cdc-lb: #f0645a; --cdc-lb-2: #b93a2e; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e00d']) { --cdc-lb: #3fd0b2; --cdc-lb-2: #1f9c83; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e007']) { --cdc-lb: #d4a15f; --cdc-lb-2: #a8743a; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e03d']) { --cdc-lb: #9aa9bd; --cdc-lb-2: #627288; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e065']) { --cdc-lb: #7fb2ff; --cdc-lb-2: #4a7fd6; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e021']) { --cdc-lb: #c07af5; --cdc-lb-2: #8a45c9; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e03a']) { --cdc-lb: #6e7cf2; --cdc-lb-2: #4453c9; }
 
-.community .leaderboards .user-top {
+:is(.community .leaderboards .user-top, .tournament-leaderboards__item) {
   padding-bottom: 8px;
   border: 1px solid var(--cdc-card-border) !important;
   border-radius: 12px;
@@ -190,7 +197,7 @@
   animation-delay: calc(sibling-index() * 35ms);
 }
 
-.community .leaderboards .user-top:hover {
+:is(.community .leaderboards .user-top, .tournament-leaderboards__item):hover {
   border-color: color-mix(in srgb, var(--cdc-lb) 55%, transparent) !important;
   box-shadow: 0 6px 18px #00000059;
   transform: translateY(-3px);
@@ -204,8 +211,9 @@
 }
 
 /* Header: the icon white on a gradient tile (the h2's ::after), then the
- * name, then a chevron where the name links to the full leaderboard. */
-.community .leaderboards h2 {
+ * name, then a chevron where the name links to the full leaderboard (the
+ * tournament winners' names link nowhere). */
+:is(.community .leaderboards, .tournament-leaderboards) h2 {
   position: relative;
   isolation: isolate;
   justify-content: flex-start !important;
@@ -220,7 +228,7 @@
   line-height: 40px !important;
 }
 
-.community .leaderboards h2::after {
+:is(.community .leaderboards, .tournament-leaderboards) h2::after {
   content: '';
   position: absolute;
   z-index: -1;
@@ -234,7 +242,7 @@
   transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.community .leaderboards h2::before {
+:is(.community .leaderboards, .tournament-leaderboards) h2::before {
   --cdc-mode-color: #fff;
   flex: none;
   width: 24px !important;
@@ -249,19 +257,19 @@
 }
 
 /* Chess.com's masks fill their box. */
-.community .leaderboards h2:is([data-icon='\e032'], [data-icon='\e008'], [data-icon='\e002'], [data-icon='\e00a'], [data-icon='\e059'], [data-icon='\e066'], [data-icon='\e006'], [data-icon='\e007'], [data-icon='\e00d'])::before {
+:is(.community .leaderboards, .tournament-leaderboards) h2:is([data-icon='\e032'], [data-icon='\e008'], [data-icon='\e002'], [data-icon='\e00a'], [data-icon='\e059'], [data-icon='\e066'], [data-icon='\e006'], [data-icon='\e007'], [data-icon='\e00d'])::before {
   font-size: 24px !important;
 }
 
 /* Atomic, Antichess and Horde are full-color pictures (theme.css), which
  * whiten into blobs: Lichess's own glyphs read better on the tile. */
-.community .leaderboards h2:is([data-icon='\e01e'], [data-icon='\e01c'], [data-icon='\e03d'])::before {
+:is(.community .leaderboards, .tournament-leaderboards) h2:is([data-icon='\e01e'], [data-icon='\e01c'], [data-icon='\e03d'])::before {
   content: attr(data-icon) !important;
   background: none !important;
 }
 
-.community .leaderboards .user-top:hover h2::after,
-.community .leaderboards .user-top:hover h2::before {
+:is(.community .leaderboards .user-top, .tournament-leaderboards__item):hover h2::after,
+:is(.community .leaderboards .user-top, .tournament-leaderboards__item):hover h2::before {
   transform: rotate(-6deg) scale(1.08);
 }
 
@@ -387,21 +395,201 @@ html[dir='rtl'] .community .leaderboards h2 a:hover::after {
   font-weight: 800;
 }
 
+/* ------------------------------------------------ tournament winners --- */
+
+.page-menu__content.box:has(> .tournament-leaderboards) {
+  padding: 16px 0 40px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.page-menu__content > h1.box__top:has(+ .tournament-leaderboards) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 12px;
+  margin: 0 !important;
+  padding: 0 0 18px !important;
+  font-size: 28px !important;
+}
+
+/* Chess.com's trophies icon, as on the players leaderboard. */
+.page-menu__content > h1.box__top:has(+ .tournament-leaderboards)::before {
+  content: '';
+  flex: none;
+  width: 36px;
+  height: 36px;
+  background: url('https://assets-ds.chess.com/color-icons/trophies.svg') center / contain no-repeat;
+}
+
+/* Only the cards scroll: the side menu and the title stay in view, the
+ * title on the page's color, casting a soft shadow on the cards only once
+ * it's stuck (as on the blog). Desktop only: below that, Lichess's fixed
+ * top bar would cover them. */
+@media (min-width: 1020px) {
+  main.page-menu:has(.tournament-leaderboards) > .subnav {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+  }
+
+  /* Lichess's box clips, which would make it the title's scroller, and a
+   * scroller that never scrolls doesn't stick anything. */
+  .page-menu__content.box:has(> .tournament-leaderboards) {
+    overflow: visible !important;
+  }
+
+  .page-menu__content > h1.box__top:has(+ .tournament-leaderboards) {
+    container-type: scroll-state;
+    position: sticky;
+    z-index: 3;
+    top: 0;
+    /* Out into the box's top padding, and a bit wider than the grid, to
+     * cover the shadows of the cards passing under it. */
+    margin: -16px -12px 0 !important;
+    padding: 16px 12px 18px !important;
+    background: var(--cdc-bg-page);
+  }
+
+  .page-menu__content > h1.box__top:has(+ .tournament-leaderboards)::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-page), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    .page-menu__content > h1.box__top:has(+ .tournament-leaderboards)::after {
+      opacity: 1;
+    }
+  }
+}
+
+.tournament-leaderboards {
+  --cdc-cup: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg opacity='.55'%3E%3Cpath d='M7 3h10v5a5 5 0 0 1-10 0zm4 11h2v4h-2zm-3 4h8v3H8z'/%3E%3Cpath d='M7 5H4.5v1.5a3 3 0 0 0 3 3M17 5h2.5v1.5a3 3 0 0 1-3 3' fill='none' stroke='%23000' stroke-width='1.8'/%3E%3C/g%3E%3C/svg%3E");
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)) !important;
+  gap: 14px;
+  overflow: visible !important;
+  border-radius: 0 !important;
+}
+
+.tournament-leaderboards h2 {
+  overflow: hidden;
+  box-shadow: none !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  text-overflow: ellipsis;
+}
+
+.tournament-leaderboards ul {
+  padding: 0 6px !important;
+}
+
+.tournament-leaderboards li {
+  flex-wrap: nowrap !important;
+  gap: 10px;
+  padding: 6px 10px !important;
+  border-radius: 8px;
+  background: transparent !important;
+}
+
+.tournament-leaderboards li:hover {
+  background: #ffffff0d !important;
+}
+
+/* A cup per winner, engraved in a medal: gold for the yearly one, silver
+ * for the monthly, bronze for the weekly, plain for the daily. Lichess
+ * always lists them in that order, whatever the language. */
+.tournament-leaderboards li::before {
+  content: '';
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--cdc-cup) center no-repeat, #ffffff1a;
+  background-size: 14px, cover;
+  opacity: 0.8;
+}
+
+.tournament-leaderboards li:nth-child(-n + 3)::before {
+  box-shadow: inset 0 1px 0 #ffffff80, inset 0 -2px 0 #0000002e, 0 2px 4px #00000059;
+  opacity: 1;
+}
+
+.tournament-leaderboards li:nth-child(1)::before {
+  background-image: var(--cdc-cup), linear-gradient(145deg, #ffe07a, #e3a51b);
+}
+
+.tournament-leaderboards li:nth-child(2)::before {
+  background-image: var(--cdc-cup), linear-gradient(145deg, #f1f4f8, #a7b0bc);
+}
+
+.tournament-leaderboards li:nth-child(3)::before {
+  background-image: var(--cdc-cup), linear-gradient(145deg, #f4b27a, #bf6a2c);
+}
+
+/* Elite and Marathon winners each won the same event on another day, so
+ * they all get their card's color. */
+.tournament-leaderboards__item:is(:has(> h2[data-icon='\e021']), :has(> h2[data-icon='\e03a'])) li::before {
+  background-image: var(--cdc-cup), linear-gradient(145deg, var(--cdc-lb), var(--cdc-lb-2));
+  box-shadow: inset 0 1px 0 #ffffff59, inset 0 -2px 0 #0000002e, 0 2px 4px #00000059;
+  opacity: 1;
+}
+
+.tournament-leaderboards .user-link {
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+  color: var(--cdc-text) !important;
+  font-size: 14px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tournament-leaderboards li:hover .user-link {
+  color: #fff !important;
+}
+
+/* The tournament as a pill in the card's color. */
+.tournament-leaderboards li > a:not(.user-link) {
+  flex: none;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cdc-lb) 16%, transparent);
+  color: var(--cdc-lb) !important;
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.tournament-leaderboards li > a:not(.user-link):hover {
+  background: var(--cdc-lb);
+  color: #1f1e1b !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .community__online > h2::before,
-  .community .leaderboards .user-top {
+  :is(.community .leaderboards .user-top, .tournament-leaderboards__item) {
     animation: none;
   }
 
-  .community .leaderboards .user-top,
-  .community .leaderboards h2::before,
-  .community .leaderboards h2::after {
+  :is(.community .leaderboards .user-top, .tournament-leaderboards__item),
+  :is(.community .leaderboards, .tournament-leaderboards) h2::before,
+  :is(.community .leaderboards, .tournament-leaderboards) h2::after {
     transition: none;
   }
 
-  .community .leaderboards .user-top:hover,
-  .community .leaderboards .user-top:hover h2::before,
-  .community .leaderboards .user-top:hover h2::after {
+  :is(.community .leaderboards .user-top, .tournament-leaderboards__item):hover,
+  :is(.community .leaderboards .user-top, .tournament-leaderboards__item):hover h2::before,
+  :is(.community .leaderboards .user-top, .tournament-leaderboards__item):hover h2::after {
     transform: none;
   }
 }
@@ -421,7 +609,8 @@ html[dir='rtl'] .community .leaderboards h2 a:hover::after {
 
 /* Lichess's mobile layout runs the lists edge to edge. */
 @media (max-width: 799.98px) {
-  .community.page-menu__content.box {
+  .community.page-menu__content.box,
+  .page-menu__content.box:has(> .tournament-leaderboards) {
     padding: 12px 12px 32px !important;
   }
 }
