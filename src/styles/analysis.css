@@ -128,6 +128,101 @@
     padding: 8px var(--cdc-inset-r, 0px) 0 var(--cdc-inset-l, 0px) !important;
   }
 
+  /* ------------------------------------------------ study, broadcast --- */
+
+  /* A study's chapters (with its members and chat) and a broadcast game's
+     list of the round's games (with its chat) stand in a column left of the
+     board on Lichess, which our grid hasn't got: a study's was hidden with
+     the game info, a broadcast's fell into an extra track off the page. Both
+     take the panel's last row, where a game's chat goes, and scroll there. */
+  main.analyse:is(:has(> .analyse__side > .study__side), .is-relay:not(.has-relay-tour)) {
+    --cdc-side-h: min(clamp(200px, 36vh, 400px), calc(var(--cdc-board) * 0.45));
+    grid-template-rows:
+      max(0px, calc(var(--cdc-stage) - var(--cdc-ctrl-h) - var(--cdc-side-h)))
+      var(--cdc-ctrl-h)
+      var(--cdc-side-h) !important;
+    grid-template-areas:
+      'gauge board tools'
+      'gauge board controls'
+      'gauge board side' !important;
+  }
+
+  main.analyse > .analyse__side:has(> .study__side),
+  main.analyse.is-relay:not(.has-relay-tour) > .relay-tour__side {
+    grid-area: side !important;
+    display: block !important;
+    align-self: stretch !important;
+    min-height: 0;
+    margin: 0 0 0 var(--cdc-gap) !important;
+    overflow-y: auto;
+    border-top: 1px solid var(--cdc-border);
+    border-radius: 0 0 6px 6px;
+    background: var(--cdc-bg-panel);
+  }
+
+  main.analyse:is(:has(> .analyse__side > .study__side), .is-relay:not(.has-relay-tour)) .analyse__controls {
+    border-radius: 0 !important;
+  }
+
+  /* The list's tabs or header stay at the top as it scrolls. */
+  main.analyse > .analyse__side .study__side > .tabs-horiz,
+  main.analyse > .relay-tour__side > .relay-tour__side__header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--cdc-bg-panel-dark);
+  }
+
+  /* The chapter or game on the board: a lighter row, its green kept for
+     the text or the edge. Lichess tinted the whole row green, and the one
+     under the pointer too. */
+  main.analyse > .analyse__side .study-list > button:hover,
+  main.analyse > .relay-tour__side .relay-game:hover {
+    background: #ffffff0f !important;
+  }
+
+  main.analyse > .analyse__side .study-list > button.active,
+  main.analyse > .relay-tour__side .relay-game--current {
+    background: #ffffff14 !important;
+  }
+
+  /* A broadcast game has Lichess's own player bars, 45px above and below
+     the board. Lichess made room with a margin over the page, and pulled
+     the panel and the list up by as much: in our grid, the bars are rows of
+     the stage, which the panel spans. */
+  main.analyse.is-relay:not(.has-relay-tour) {
+    --cdc-bar: 45px;
+    --cdc-v-room: 32px;
+    margin-top: 0 !important;
+  }
+
+  body:is(.coords-in, .coords-out) main.analyse.is-relay:not(.has-relay-tour) {
+    --cdc-coords-off: calc(1.2 * var(--cdc-coords-size, 13px) + 8px);
+  }
+
+  main.analyse.is-relay:not(.has-relay-tour) > :is(.analyse__tools, .relay-tour__side) {
+    margin-top: 0 !important;
+  }
+
+  /* A study with players has Lichess's thinner bars (1.6rem) over and under
+     the board, which hung into the page's margins, the lower one over the
+     files. */
+  main.analyse.has-players:not(.is-relay, :has(.practice__side)) {
+    --cdc-bar: 1.6rem;
+    --cdc-v-room: 32px;
+    margin-top: 0 !important;
+  }
+
+  body:is(.coords-in, .coords-out) main.analyse.has-players:not(.has-relay-tour, :has(.practice__side)) {
+    --cdc-coords-off: calc(1.2 * var(--cdc-coords-size, 13px) + 8px);
+  }
+
+  /* Below the files, as the game page's bar. */
+  main.analyse.is-relay:not(.has-relay-tour) .relay-board-player-bot,
+  main.analyse.has-players:not(:has(.practice__side)) .study__player-bot {
+    top: calc(100% + var(--cdc-coords-off)) !important;
+  }
+
   main.analyse > :is(.analyse__tools, .analyse__controls, .mchat) {
     margin-left: var(--cdc-gap) !important;
   }
@@ -569,6 +664,37 @@
     color: #fff !important;
   }
 
+  /* A study's "Next chapter", under its moves: a Chess.com button, green
+     once the chapter is done, rather than Lichess's flat strip. */
+  main.analyse .analyse__moves button.next {
+    flex: none;
+    width: calc(100% - 16px) !important;
+    margin: 8px !important;
+    padding: 10px !important;
+    border-radius: 5px !important;
+    background: var(--cdc-btn-grey) !important;
+    box-shadow: var(--cdc-btn-grey-shadow);
+    color: var(--cdc-text) !important;
+    font-family: var(--cdc-font) !important;
+    font-weight: 700;
+  }
+
+  main.analyse .analyse__moves button.next.highlighted {
+    background: var(--cdc-btn-green) !important;
+    box-shadow: var(--cdc-btn-green-shadow);
+    color: #fff !important;
+    text-shadow: 0 1px 1px #00000033;
+  }
+
+  main.analyse .analyse__moves button.next:hover {
+    background: var(--cdc-btn-grey-hover) !important;
+    color: #fff !important;
+  }
+
+  main.analyse .analyse__moves button.next.highlighted:hover {
+    background: var(--cdc-btn-green-hover) !important;
+  }
+
   /* ---------------------------------------------------------- controls --- */
 
   /* Chess.com's navigation: four big grey buttons, with the explorer and
@@ -626,6 +752,30 @@
 
   main.analyse .analyse__controls .jumps .fbt:disabled {
     opacity: 0.45;
+  }
+
+  /* -------------------------------------------------------------- menu --- */
+
+  /* The analysis menu (hamburger) takes the move list's room in the tools.
+     It couldn't shrink, so in a short panel its end ran under the controls,
+     out of reach: it scrolls in place instead. Its header and underline
+     were Lichess's green. */
+  main.analyse .analyse__tools > .action-menu {
+    min-height: 0;
+    overflow-y: auto;
+    border: none !important;
+    background: var(--cdc-bg-panel) !important;
+  }
+
+  main.analyse .action-menu > .title {
+    padding: 14px 12px 6px !important;
+    background: none !important;
+    color: var(--cdc-text-dim) !important;
+    font-size: 12px !important;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.2 !important;
+    text-transform: uppercase;
   }
 
   /* No chat (e.g. the free analysis board): tools take the whole panel. */

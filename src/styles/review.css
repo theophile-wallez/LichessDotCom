@@ -93,9 +93,13 @@
       'gauge board controls' !important;
   }
 
+  /* The review's move list has no engine lines, nor the opening explorer:
+     left open from the analysis, it squeezed the moves, with its toggle out
+     of reach under our controls. It's back as it was once the review is
+     closed. */
   html.cdc-review-summary main.analyse > :is(.analyse__tools, .analyse__controls, .mchat),
   html.cdc-review-moves main.analyse > :is(.analyse__controls, .mchat),
-  html.cdc-review-moves main.analyse .analyse__tools > :is(.ceval, .pv_box),
+  html.cdc-review-moves main.analyse .analyse__tools > :is(.ceval, .pv_box, .explorer-box),
   html.cdc-review:not(.cdc-review-moves) :is(#cdc-review-graph, #cdc-review-controls) {
     display: none !important;
   }
@@ -136,10 +140,11 @@
     border-radius: 0;
   }
 
+  /* Too long a line starts at the left rather than losing both ends. */
   .cdc-review__counts {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: safe center;
     gap: 14px;
     height: 32px;
     overflow: hidden;
@@ -365,11 +370,15 @@
     font-weight: 700;
   }
 
+  /* A long name ends in an ellipsis, as on Chess.com (the full one in its
+     title), rather than breaking its last letters onto a line of their own. */
   .cdc-t-names td {
+    overflow: hidden;
     color: #fff;
     font-size: 13px;
     font-weight: 700;
-    word-break: break-all;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .cdc-t-num {
@@ -443,6 +452,60 @@
 
     .cdc-bubble .cdc-bubble__title {
       font-size: 14px;
+    }
+  }
+
+  /* The narrowest panels (up to about 1380px wide windows): with the icon
+   * and the score beside it, the title had some 45px and broke in three.
+   * A smaller coach and tighter paddings give it twice that; three title
+   * lines over a three-line remark still fit the coach's row. */
+  @container cdc-review (max-width: 360px) {
+    .cdc-coach {
+      --cdc-coach-h: 84px;
+      padding: 4px 10px 0 6px;
+    }
+
+    .cdc-coach .cdc-bubble {
+      padding: 8px 12px;
+    }
+
+    .cdc-bubble .cdc-bubble__row {
+      gap: 6px;
+    }
+
+    .cdc-bubble .cdc-bubble__eval {
+      padding: 2px 5px;
+      font-size: 12px;
+    }
+
+    .cdc-bubble .cdc-bubble__sub {
+      margin-top: 4px;
+    }
+
+    /* Three buttons of 84px: "Expliquer" and its bulb ran into the edges. */
+    #cdc-review .cdc-review__nav {
+      padding-inline: 10px;
+    }
+
+    #cdc-review .cdc-review__nav .cdc-btn {
+      gap: 4px;
+      font-size: 13px;
+    }
+
+    #cdc-review .cdc-review__nav .cdc-i {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* "3 excellents coups, 27 meilleurs coups" ran 6px past both ends. */
+    #cdc-review .cdc-review__counts {
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    #cdc-review .cdc-review__counts .cdc-cls-icon {
+      width: 16px;
+      height: 16px;
     }
   }
 
@@ -1256,3 +1319,15 @@ html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='inaccuracy'] main.ana
 html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='mistake'] main.analyse cg-board square.last-move { background: rgba(255, 164, 89, 0.5) !important; }
 html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='miss'] main.analyse cg-board square.last-move { background: rgba(255, 119, 105, 0.5) !important; }
 html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='blunder'] main.analyse cg-board square.last-move { background: rgba(250, 65, 45, 0.5) !important; }
+
+/* ------------------------------------------------------------- mobile --- */
+
+/* Lichess's mobile layout stays below 1020px, without the review: its
+   panel, graph, controls, bar and opening are only styled for the desktop
+   grid, and unstyled they'd spill into Lichess's (review.js leaves the
+   board alone there too). */
+@media (max-width: 1019.98px) {
+  :is(#cdc-review, #cdc-review-graph, #cdc-review-controls, #cdc-evalbar, #cdc-opening) {
+    display: none !important;
+  }
+}

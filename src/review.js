@@ -982,7 +982,9 @@
   // laid out from the start, hidden until its turn, so the bubble has its
   // final size at once and stays put while the text comes in.
   const calm = matchMedia('(prefers-reduced-motion: reduce)');
-  const stream = { key: '', shown: 0, timer: 0 };
+  // `dropped`: the droppable sentence didn't fit and stays out of every
+  // redraw of this comment, so `shown` keeps counting the same words.
+  const stream = { key: '', shown: 0, timer: 0, dropped: false };
 
   // Chess.com's Neo pieces, from its CDN like the board's.
   const pieceImg = cp => `<img class="cdc-pc" alt="" src="https://images.chesscomfiles.com/chess-themes/pieces/neo/150/${cp}.png">`;
@@ -1002,9 +1004,11 @@
     if (key !== stream.key) {
       stream.key = key;
       stream.shown = calm.matches ? Infinity : 0;
+      stream.dropped = false;
     }
     let i = 0;
     return parts
+      .filter(([, drop]) => !(drop && stream.dropped))
       .map(([text, drop]) => {
         const words = typo(text).match(/\S+\s*/g) || [];
         const html = words
@@ -1018,11 +1022,19 @@
       .join('');
   }
 
-  // After a render: drop what doesn't fit, then carry on typing.
+  // After a render: drop what doesn't fit, then carry on typing. Clamped
+  // lines overflow by a whole line; a move chip's piece pokes a few pixels
+  // out of the last line, which isn't a reason to drop anything.
   function startStream() {
     const sub = dom.panel.querySelector('.cdc-bubble__sub');
     if (!sub) return;
-    if (sub.scrollHeight > sub.clientHeight + 1) sub.querySelector('.cdc-say--drop')?.remove();
+    const drop = sub.querySelector('.cdc-say--drop');
+    if (drop && sub.scrollHeight > sub.clientHeight + (parseFloat(getComputedStyle(sub).lineHeight) || 18) / 2) {
+      drop.remove();
+      stream.dropped = true;
+      // The words typed so far, without it: the ones still on show.
+      if (stream.shown !== Infinity) stream.shown = sub.querySelectorAll('.cdc-w:not(.cdc-w--off)').length;
+    }
     if (stream.shown < sub.querySelectorAll('.cdc-w').length && !stream.timer) stream.timer = setInterval(tickStream, 35);
   }
 
@@ -1036,9 +1048,20 @@
     }
   }
 
+  // A new width: a comment already typed out is laid out afresh, whole,
+  // so a sentence dropped for want of room comes back if there's room now.
+  // Mid-way, it stays as it is: its words would be counted anew.
+  function refitStream() {
+    if (stream.timer) return;
+    stream.dropped = false;
+    stream.shown = Infinity;
+  }
+
   // ------------------------------------------------------------- UI ---
 
   const html = document.documentElement;
+  // The desktop layout, the only one with room for the review (review.css).
+  const wide = matchMedia('(min-width: 1020px)');
   const state = {
     mode: 'summary', review: null, progress: 0, error: null, lastKey: '',
     explain: false, playing: null, revealed: new Set(),
@@ -1050,6 +1073,7 @@
     // The summary is shown until the user moves; then the move-by-move review.
     state.summaryPly = site.analysis?.node.ply;
     if (mode !== 'moves') stopPlaying();
+    if (mode === 'moves') closeTools();
     html.classList.remove('cdc-review-normal', 'cdc-review-summary', 'cdc-review-moves', 'cdc-review-live');
     html.classList.add('cdc-review-' + mode);
     render(true);
@@ -1058,6 +1082,18 @@
   function stopPlaying() {
     clearInterval(state.playing);
     state.playing = null;
+  }
+
+  // The move-by-move review stands in for Lichess's tools and controls.
+  // Left open, their menu took its move list, and "practice with computer"
+  // would even play moves, both with their buttons hidden: they close. (The
+  // summary hides the tools whole, so a page opened in practice keeps it.)
+  function closeTools() {
+    const ctrl = site.analysis;
+    if (!ctrl) return;
+    if (typeof ctrl.actionMenu === 'function' && ctrl.actionMenu()) ctrl.actionMenu(false);
+    if (ctrl.practice) ctrl.togglePractice?.(false);
+    ctrl.redraw?.();
   }
 
   function togglePlay(ctrl) {
@@ -1225,7 +1261,7 @@
       <div class="cdc-review__top">
         <div class="cdc-review__graph cdc-summary-graph">${loading ? `<span class="cdc-summary-pct">${pct}%</span>` : ''}</div>
         <table class="cdc-review__table">${cols}
-          <tr class="cdc-t-names"><td></td><td>${esc(playerName(p.w))}</td><td></td><td>${esc(playerName(p.b))}</td></tr>
+          <tr class="cdc-t-names"><td></td><td title="${esc(playerName(p.w))}">${esc(playerName(p.w))}</td><td></td><td title="${esc(playerName(p.b))}">${esc(playerName(p.b))}</td></tr>
           <tr><td class="cdc-t-label">${esc(T.players)}</td><td><span class="cdc-avatar"></span></td><td></td><td><span class="cdc-avatar"></span></td></tr>
           <tr><td class="cdc-t-label">${esc(T.accuracy)}</td>
             <td><span class="cdc-acc cdc-acc--w">${acc('w')}</span></td><td></td>
@@ -1366,10 +1402,14 @@
       label.className = 'cdc-evalbar__label ' + (whiteShare >= 50 ? 'cdc-evalbar__label--white' : 'cdc-evalbar__label--black');
     }
 
-    // Board overlay.
-    const move = isLive
-      ? judgeAt(ctrl, ctrl.path)
-      : shown ? { ...shown, cls: 'best' } : r && onMain && ply > 0 && reviewing ? r.moves[ply - 1] : null;
+    // Board overlay. Below 1020px Lichess's mobile layout has no room for
+    // the review's panel (review.css hides it), and so no way to close the
+    // review: the board stays Lichess's too.
+    const move = !wide.matches
+      ? null
+      : isLive
+        ? judgeAt(ctrl, ctrl.path)
+        : shown ? { ...shown, cls: 'best' } : r && onMain && ply > 0 && reviewing ? r.moves[ply - 1] : null;
     html.dataset.cdcCls = move ? move.cls : '';
     let overlay = '';
     if (move) {
@@ -1738,8 +1778,16 @@
     window.addEventListener('resize', () => {
       if (Math.abs(window.innerWidth - lastWidth) > 4) {
         lastWidth = window.innerWidth;
+        refitStream();
         render(true);
       }
+    });
+    // Out of the mobile layout, where the panel was hidden (review.css): the
+    // graph and the comment were laid out at no size at all.
+    wide.addEventListener('change', () => {
+      lastWidth = window.innerWidth;
+      refitStream();
+      render(true);
     });
   }
 

@@ -485,8 +485,11 @@ html.cdc-opening-on main.analyse .explorer-box .data > .title:has(> a) {
 /* ---------------------------------------------------- empty, messages --- */
 
 /* Nothing to show ("Max depth reached!", "No game found", "Checkmate"): the
-   tabs and the opening say enough, the move list gets the room. */
-.explorer-box .data.empty > :is(.message, .title:not(:has(> a))) {
+   tabs and the opening say enough, the move list gets the room. A message
+   explained over a close button stays: signed out, the explorer is only
+   "You need an account" (without it, the toggle seemed dead), and an error
+   isn't nothing to show. */
+.explorer-box .data.empty:not(:has(> .message > .explanation ~ button)) > :is(.message, .title:not(:has(> a))) {
   display: none !important;
 }
 
@@ -519,6 +522,40 @@ html.cdc-opening-on main.analyse .explorer-box .data > .title:has(> a) {
 .explorer-box .message .button {
   align-self: center;
   margin: 4px 0 0 !important;
+}
+
+/* Lichess stretches an empty state over the box, a flex column: in the
+   explorer's share of the panel it squeezed the title, which clips, to a
+   sliver. The box scrolls instead. */
+.explorer-box .data.empty > * {
+  flex-shrink: 0;
+}
+
+/* Signed out, or after an error: the explanation, then its buttons side by
+   side, so the message fits the explorer's share of the panel. */
+.explorer-box .message:has(> .explanation ~ button) {
+  flex-flow: row wrap !important;
+  justify-content: center;
+  padding: 10px 12px 14px !important;
+}
+
+.explorer-box .message:has(> .explanation ~ button) > :is(h3, .explanation) {
+  flex: 0 0 100%;
+}
+
+.explorer-box .message:has(> .explanation ~ button) > .button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  font-size: 13px;
+}
+
+.explorer-box .message:has(> .explanation ~ button) > .button::before {
+  margin: 0 !important;
+  font-size: 14px;
 }
 
 /* ------------------------------------------------------------ config --- */
