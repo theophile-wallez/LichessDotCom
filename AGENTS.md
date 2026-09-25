@@ -85,7 +85,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/broadcast.css` | Broadcasts (`.relay-index` lists, calendar, FIDE pages, info pages) as event cards with a LIVE pill. |
 | `src/styles/swiss.css` | Swiss tournaments home (`main.swiss-home`): now playing / starting soon as tournament cards (time-control tile, rounds progress bar, player chip), the explanations as point cards, a comparison card and a grid of FAQ cards. |
 | `src/styles/leaderboard.css` | Players leaderboard (`/player`, `.community`) in the Practice look: a card per leaderboard with its icon white on a tile in its own color, medals for the top three, and the online players in a sticky side card with rating chips. |
-| `src/styles/simul.css` | Simuls home (`main.simul-list`) in the Practice look: a color per section (yours, open, in progress, finished), each simul a card whose tile is a stack of little boards with a Neo piece on it, a dashed "host a simul" card, and the help as a card with Fischer's photo as a polaroid and the rules as numbered steps. |
+| `src/styles/simul.css` | Simuls home (`main.simul-list`) in the Practice look: a color per section (yours, open, in progress, finished), each simul a card whose tile is a stack of little boards with a Neo piece on it, a dashed "host a simul" card, the title pinned while the list scrolls, and the help as a sticky card with Fischer's photo as a polaroid and the rules as numbered steps. |
 
 There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
 

@@ -389,10 +389,17 @@ main.simul-list .slist tr.create .button {
 
 /* ------------------------------------------------------------ help --- */
 
+/* Level with the title's icon (the title's top padding), and it stays there
+ * while the list scrolls, scrolling in place if the window is too short. */
 main.simul-list .simul-list__help {
   counter-reset: cdc-simul-rule;
+  position: sticky;
+  top: 16px;
   align-self: start;
-  margin-top: 84px !important;
+  max-height: calc(100vh - 32px);
+  margin-top: 16px !important;
+  overflow-y: auto;
+  scrollbar-width: thin;
   padding: 20px 20px 8px;
   border: 1px solid var(--cdc-card-border);
   border-radius: 12px;
@@ -421,7 +428,7 @@ main.simul-list .simul-list__help > img {
   padding: 8px 8px 22px;
   border-radius: 4px !important;
   background: #f3efe6;
-  box-shadow: 0 10px 24px #00000080, 0 2px 4px #0006;
+  box-shadow: 0 6px 14px #00000080, 0 2px 4px #0006;
   transform: rotate(-2.5deg);
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -466,6 +473,43 @@ main.simul-list .simul-list__help > em ~ p::before {
 
 main.simul-list .simul-list__help > em ~ p:nth-of-type(3) { --cdc-rule: #95c85a; --cdc-rule-2: #5d9948; }
 main.simul-list .simul-list__help > em ~ p:nth-of-type(4) { --cdc-rule: #f5a93b; --cdc-rule-2: #d27a1c; }
+
+/* ------------------------------------------------------ sticky title --- */
+
+/* The title stays in view over the list, on the page's color, and casts a
+ * soft shadow on the cards only once it's stuck. Desktop only: below that,
+ * Lichess's fixed top bar would cover it. */
+@media (min-width: 1020px) {
+  main.simul-list h1.box__top {
+    container-type: scroll-state;
+    position: sticky;
+    z-index: 3;
+    top: 0;
+    /* A bit wider than the list, to also cover the section markers' halos
+     * and the shadows of the cards passing under it. */
+    margin-inline: -12px !important;
+    padding-inline: 12px !important;
+    background: var(--cdc-bg-page);
+  }
+
+  main.simul-list h1.box__top::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-page), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    main.simul-list h1.box__top::after {
+      opacity: 1;
+    }
+  }
+}
 
 /* ---------------------------------------------------------- motion --- */
 
