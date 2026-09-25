@@ -144,6 +144,24 @@ input[type='radio'] {
   accent-color: var(--cdc-green);
 }
 
+/* A file field's "Choose file" (importing a game, a study): the browser's
+ * flat button, made one of ours. */
+input[type='file']::file-selector-button {
+  margin-inline-end: 10px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background: var(--cdc-btn-grey);
+  box-shadow: var(--cdc-btn-grey-shadow);
+  color: #fff;
+  font: 700 14px var(--cdc-font);
+  cursor: pointer;
+}
+
+input[type='file']::file-selector-button:hover {
+  background: var(--cdc-btn-grey-hover);
+}
+
 /* Lichess's switches (.cmn-toggle) as Chess.com's pill: grey when off,
  * green when on, with a round white knob and no icon. */
 .cmn-toggle label {
@@ -416,6 +434,13 @@ dialog {
   background: var(--cdc-bg-panel) !important;
   box-shadow: 0 24px 64px #0009 !important;
   animation: cdc-dialog-in 0.18s ease-out;
+}
+
+/* Lichess pushes the dialog 16px down to make room for its close button
+ * above the corner. Ours is inside, and the push hung a dialog as tall as
+ * the window (the setup dialog at 640px) 9px past its bottom edge. */
+dialog:not(.touch-scroll) {
+  margin-top: 0 !important;
 }
 
 @keyframes cdc-dialog-in {
@@ -746,6 +771,21 @@ dialog .help th p {
 
 .game-setup label[for='sf_level_8'] {
   --cdc-level-elo: '2800+';
+}
+
+/* A phone's dialog is too narrow for one row of eight levels with their Elo
+ * (seven, then a lone eighth) and for "Correspondence" in a third of the
+ * time track: four levels a row, and tabs sized by their labels. */
+@media (max-width: 459.29px) {
+  .game-setup group.radio:has(label[for^='sf_level_']) > div {
+    flex: 1 0 calc(25% - 3px) !important;
+  }
+
+  .game-setup .time-control-tabs .tabs-horiz button {
+    flex: 1 1 auto;
+    padding: 0 6px !important;
+    font-size: 13px;
+  }
 }
 
 /* Rating and the rating filter: quiet lines under the mode. */

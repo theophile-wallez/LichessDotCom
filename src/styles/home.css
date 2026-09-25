@@ -7,11 +7,12 @@
  *   +------------- quick pairing ----------------+-- daily puzzle ---+
  *   +------------- blog (full width) --------------------------------+
  *   +------------- updates (scrolls) ------------+-- streams, ... ---+
- *   +------------- tournaments ------------------+-- timeline -------+
- *   +------------- support links, footer ----------------------------+
+ *   +------------- tournaments ------------------+-- support links --+
+ *   +------------- footer -------------------------------------------+
  *
  * Lichess's blocks are only re-placed on a 12-column grid; the hero card is
- * our own element, added by content.js.
+ * our own element, added by content.js. (A signed-in user's timeline is in
+ * the side column, under the streams, not a block of its own.)
  */
 
 @media (min-width: 1020px) {
@@ -43,9 +44,8 @@
   main.lobby .lobby__feed             { grid-column: 1 / 9 !important;  grid-row: 5 !important; }
   main.lobby .lobby__side             { grid-column: 9 / 13 !important; grid-row: 5 !important; }
   main.lobby .lobby__tournaments-simuls { grid-column: 1 / 9 !important; grid-row: 6 !important; }
-  main.lobby .lobby__timeline         { grid-column: 9 / 13 !important; grid-row: 6 !important; }
-  main.lobby .lobby__support          { grid-column: 1 / -1 !important; grid-row: 8 !important; }
-  main.lobby .lobby__about            { grid-column: 1 / -1 !important; grid-row: 9 !important; }
+  main.lobby .lobby__support          { grid-column: 9 / 13 !important; grid-row: 6 !important; }
+  main.lobby .lobby__about            { grid-column: 1 / -1 !important; grid-row: 7 !important; }
 
   /* ----------------------------------------------------------- hero --- */
 
@@ -56,12 +56,18 @@
     overflow: hidden;
     box-sizing: border-box;
     min-height: 400px;
-    padding: 44px 40px;
+    /* Lichess's table (buttons, counters: 140px, see below) is laid over the
+       bottom of the hero, so the bottom padding keeps the text clear of it:
+       a longer title or subtitle (French, German) grows the hero instead of
+       running under the buttons. */
+    padding: 44px 40px calc(140px + 28px);
     border-radius: 18px;
+    /* A dark card like the others (green is for the buttons and the badge),
+       lit by a soft white glow behind the king. */
     background:
-      radial-gradient(circle at 88% 18%, rgba(129, 182, 76, 0.38), transparent 52%),
-      radial-gradient(circle at 10% 110%, rgba(129, 182, 76, 0.16), transparent 45%),
-      linear-gradient(135deg, #2d3a22 0%, #262522 50%, #1d1c1a 100%);
+      radial-gradient(circle at 88% 18%, #ffffff17, transparent 52%),
+      radial-gradient(circle at 10% 110%, #ffffff08, transparent 45%),
+      linear-gradient(135deg, #34322f 0%, #262522 50%, #1d1c1a 100%);
     box-shadow: inset 0 1px 0 #ffffff12, 0 12px 32px #00000040;
   }
 
@@ -77,6 +83,21 @@
     filter: drop-shadow(0 18px 24px #0000008c);
     transform: rotate(-8deg);
     pointer-events: none;
+  }
+
+  /* Right to left (Arabic, Hebrew, Persian), the text starts on the right:
+     the king and its glow move to the other corner, clear of it. */
+  html[dir='rtl'] .cdc-hero {
+    background:
+      radial-gradient(circle at 12% 18%, #ffffff17, transparent 52%),
+      radial-gradient(circle at 90% 110%, #ffffff08, transparent 45%),
+      linear-gradient(225deg, #34322f 0%, #262522 50%, #1d1c1a 100%);
+  }
+
+  html[dir='rtl'] .cdc-hero::after {
+    right: auto;
+    left: 26px;
+    transform: rotate(8deg);
   }
 
   .cdc-hero__eyebrow {
@@ -101,9 +122,12 @@
     box-shadow: 0 0 0 4px #81b64c33;
   }
 
+  /* A signed-in title holds the username, a word of up to 20 letters: it
+     breaks rather than running under the king. */
   .cdc-hero__title {
     max-width: 62%;
     margin: 0 0 14px;
+    overflow-wrap: anywhere;
     color: #fff;
     font-size: clamp(34px, 3.4vw, 50px);
     font-weight: 800 !important;
@@ -134,10 +158,13 @@
     z-index: 110;
   }
 
+  /* Lichess adds a top margin below 1260px: the table must stay 140px tall
+     (64px buttons, 40px counters, 36px padding) for the hero's reserve. */
   main.lobby .lobby__start {
     display: flex !important;
     flex-direction: row !important;
     gap: 12px !important;
+    margin: 0 !important;
   }
 
   main.lobby .lobby__start__button {
@@ -154,6 +181,35 @@
 
   main.lobby .lobby__start__button::before {
     font-size: 26px !important;
+  }
+
+  /* Below 1260px the hero is too narrow for three 16px labels beside their
+     icons: in French or German they wrapped to four or five lines and spilled
+     out of the buttons. Smaller type, icons and gutters keep them to three. */
+  @media (max-width: 1259.29px) {
+    .cdc-hero {
+      padding-inline: 28px;
+    }
+
+    main.lobby .lobby__table {
+      padding-inline: 28px;
+    }
+
+    main.lobby .lobby__start__button {
+      gap: 10px !important;
+      padding: 0 10px !important;
+      font-size: 14px !important;
+    }
+
+    main.lobby .lobby__start__button::before {
+      font-size: 22px !important;
+    }
+
+    main.lobby :is(.lobby__start__button--friend, .lobby__start__button--friend-user,
+        .lobby__start__button--ai)::before {
+      width: 30px;
+      height: 30px;
+    }
   }
 
   main.lobby .lobby__counters {
@@ -228,6 +284,18 @@
   html[lang^='fr'] main.lobby .lobby__blog::before { content: 'Articles du blog'; }
   html[lang^='fr'] main.lobby .lobby__feed::before { content: 'Nouveautés'; }
   html[lang^='fr'] main.lobby .lobby__streams::before { content: 'Streams en direct'; }
+  html[lang^='de'] main.lobby .lobby__tv::before   { content: 'Ausgewählte Partie'; }
+  html[lang^='de'] main.lobby .lobby__blog::before { content: 'Aus dem Blog'; }
+  html[lang^='de'] main.lobby .lobby__feed::before { content: 'Neuigkeiten'; }
+  html[lang^='de'] main.lobby .lobby__streams::before { content: 'Live-Streams'; }
+  html[lang^='es'] main.lobby .lobby__tv::before   { content: 'Partida destacada'; }
+  html[lang^='es'] main.lobby .lobby__blog::before { content: 'Del blog'; }
+  html[lang^='es'] main.lobby .lobby__feed::before { content: 'Novedades'; }
+  html[lang^='es'] main.lobby .lobby__streams::before { content: 'Streams en directo'; }
+  html[lang^='pt'] main.lobby .lobby__tv::before   { content: 'Partida em destaque'; }
+  html[lang^='pt'] main.lobby .lobby__blog::before { content: 'Do blog'; }
+  html[lang^='pt'] main.lobby .lobby__feed::before { content: 'Novidades'; }
+  html[lang^='pt'] main.lobby .lobby__streams::before { content: 'Transmissões ao vivo'; }
 
   /* Lichess repeats the support links inside these blocks on some widths. */
   main.lobby :is(.lobby__tv, .lobby__puzzle) > .lobby__support-link {
@@ -411,11 +479,15 @@
   main.lobby .lpool[data-id='30+0']  { --cdc-pool-label: '30 min'; }
   main.lobby .lpool[data-id='30+20'] { --cdc-pool-label: '30 + 20'; }
 
+  /* A time control reads left to right in every language: on a right-to-left
+     page "2 + 1" came out as "1 + 2", and "1 min" as "min 1". */
   main.lobby .lpool .clock {
     font-size: 16px !important;
     font-weight: 600;
     line-height: 1 !important;
     letter-spacing: 0 !important;
+    direction: ltr;
+    unicode-bidi: isolate;
   }
 
   /* Lichess's text is "10+0": hide it and write Chess.com's label instead. */
@@ -488,13 +560,13 @@
   main.lobby .lpool:is([data-id='1+0'], [data-id='3+0'], [data-id='10+0'], [data-id='30+0'])::after {
     position: absolute;
     bottom: calc(100% + 8px);
-    left: 2px;
+    inset-inline-start: 2px;
     pointer-events: none;
   }
 
   main.lobby .lpool:is([data-id='1+0'], [data-id='3+0'], [data-id='10+0'], [data-id='30+0'])::before {
     content: var(--cdc-pool-speed);
-    padding-left: 28px;
+    padding-inline-start: 28px;
     color: var(--cdc-text);
     font-size: 17px;
     font-weight: 600;
@@ -686,6 +758,12 @@
     gap: 6px;
   }
 
+  /* No one live: Lichess leaves the block empty, which left a titled card
+     with nothing in it. */
+  main.lobby .lobby__streams:not(:has(*)) {
+    display: none !important;
+  }
+
   main.lobby .lobby__streams::before {
     margin-bottom: 6px !important;
   }
@@ -796,6 +874,17 @@
     color: var(--cdc-text-dim);
   }
 
+  /* The side column is narrow at 1024: a long name or count (Spanish,
+     French) ends with an ellipsis instead of being cut off at the edge. */
+  main.lobby .tour-spotlight .content {
+    min-width: 0;
+  }
+
+  main.lobby .tour-spotlight :is(.content, .name, .headline) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   main.lobby .about-side {
     flex: none;
     margin: 0 !important;
@@ -897,21 +986,44 @@
     border-bottom: none !important;
   }
 
-  main.lobby .lobby__tournaments-simuls td.name a {
+  /* The name is the first cell (it has no class). */
+  main.lobby .lobby__tournaments-simuls td:first-child a {
     color: #fff !important;
+  }
+
+  /* Lichess's bar is 30ch wide in a cell capped at 21ch, so a narrow table
+     cut off its rounded end: it fills the cell instead, up to 30ch. Its
+     label is centered in it and stops at its end. */
+  main.lobby .lobby__tournaments-simuls .progress {
+    width: auto;
+    min-width: 16ch;
+    max-width: 30ch;
+  }
+
+  main.lobby .lobby__tournaments-simuls .progress__text {
+    top: 50%;
+    inset-inline-end: 1.5ch;
+    width: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    translate: 0 -50%;
   }
 
   /* --------------------------------------------------------- support --- */
 
-  /* Support links become two side-by-side tiles: icon tile, text, chevron. */
+  /* Support links become two tiles stacked beside the tournaments, where the
+     grid would otherwise leave a hole: icon tile, text, chevron. They keep
+     their height when the tournaments (and simuls) run longer. */
   main.lobby .lobby__support {
     display: grid !important;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
     gap: 20px;
     visibility: visible !important;
   }
 
   main.lobby .lobby__support-link {
+    margin: 0 !important;
     gap: 16px;
     padding: 18px 22px 18px 18px !important;
     border-radius: 16px !important;
@@ -954,10 +1066,16 @@
     font-weight: 800;
   }
 
+  /* In a narrow tile the tagline wraps, rather than pushing the chevron out. */
+  main.lobby .lobby__support-link__text {
+    min-width: 0;
+  }
+
   main.lobby .lobby__support-link__text span {
     margin-top: 2px;
     color: var(--cdc-text-dim) !important;
     font-size: 14px !important;
+    white-space: normal;
   }
 
   main.lobby .lobby__support-link::after {
@@ -996,5 +1114,26 @@
 
   main.lobby .lobby__about a:hover {
     color: #fff !important;
+  }
+}
+
+/* ---------------------------------------------------------- mobile --- */
+
+/* Below 1020px Lichess's own layout is kept. The hero has no place in it:
+ * unstyled, it ended up as plain text above the footer. */
+@media (max-width: 1019.29px) {
+  .cdc-hero {
+    display: none;
+  }
+
+  /* Lichess's light theme paints the spotlights with gradients of its own
+   * (light blue at the bottom), which our palette doesn't reach: give them
+   * the dark theme's metal. */
+  :root.light .lobby .tour-spotlight {
+    background-image: linear-gradient(var(--c-metal-top), var(--c-metal-bottom));
+  }
+
+  :root.light .lobby .tour-spotlight:hover {
+    background-image: linear-gradient(var(--c-metal-top-hover), var(--c-metal-bottom-hover));
   }
 }

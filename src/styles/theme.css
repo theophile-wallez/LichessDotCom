@@ -19,6 +19,9 @@
   --cdc-text: #ffffffd9;
   --cdc-text-strong: #fff;
   --cdc-text-dim: #989795;
+  /* Tertiary text (move numbers, "or" in the keyboard help, unrated chips):
+   * dimmer than --cdc-text-dim, still 3:1 on the panels. */
+  --cdc-font-dimmer: #7d7b78;
   --cdc-green: #81b64c;
   --cdc-green-hover: #a3d160;
   --cdc-green-shadow: #45753c;
@@ -73,7 +76,7 @@
   --c-body-gradient: var(--cdc-bg-page) !important;
   --c-font: #d4d3d1 !important;
   --c-font-dim: var(--cdc-text-dim) !important;
-  --c-font-dimmer: #6f6d6a !important;
+  --c-font-dimmer: var(--cdc-font-dimmer) !important;
   --c-font-clear: #f0efed !important;
   --c-font-clearer: #fff !important;
   --c-font-page: var(--cdc-text-dim) !important;
@@ -115,10 +118,17 @@
   background: var(--cdc-bg-page) !important;
 }
 
-html,
-body {
+/* The page's color is html's; body stays clear. Lichess leaves html bare, so
+ * its body background goes to the canvas, under everything: what it draws
+ * behind the page with a negative z-index (a clock's face, a label's frosted
+ * backdrop) shows. Painting body as well hid those. */
+html {
   background: var(--cdc-bg-page) !important;
   background-image: none !important;
+}
+
+body {
+  background: transparent !important;
 }
 
 html,
@@ -131,10 +141,11 @@ select {
   font-family: var(--cdc-font) !important;
 }
 
-/* Lichess's transparent theme uses a full-page wallpaper. */
-body.transp,
-html.transp body {
-  background-image: none !important;
+/* Lichess's transparent theme hangs a full-page wallpaper on html::before;
+ * Chess.com's look has none. (Body's paint used to cover it, but not below
+ * a page shorter than the window.) */
+html.transp::before {
+  display: none !important;
 }
 
 /* --------------------------------------------------------------- buttons --- */

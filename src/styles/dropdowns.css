@@ -82,8 +82,10 @@
 }
 
 /* Desktop: the menu drops below its button and fades in, instead of
- * unrolling over it. (Below 800px Lichess centers it on screen; kept.) */
-@media (min-width: 800px) {
+ * unrolling over it. Up to 800px included, Lichess centers it on screen
+ * (kept): starting at 800px, both applied at exactly 800 and the menu fell
+ * below the window. */
+@media (min-width: 800.02px) {
   /* The click-away mask stays, but a menu doesn't dim the page. */
   .mselect .fullscreen-mask {
     background: transparent !important;
@@ -179,7 +181,7 @@ dialog .scrollable:has(.game-setup .mselect__toggle:checked) {
   overflow: visible !important;
 }
 
-@media (min-width: 800px) {
+@media (min-width: 800.02px) {
   .game-setup .mselect__list {
     max-height: min(50vh, 440px) !important;
   }

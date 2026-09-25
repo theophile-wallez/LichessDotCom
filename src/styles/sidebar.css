@@ -383,9 +383,13 @@
     font-size: 14px;
   }
 
+  /* min-width: a flex item is at least as wide as its content, so a name
+     longer than a dozen letters ran past the sidebar, the avatar icon onto
+     the page: now it ends with an ellipsis. */
   #top .dasher:has(#user_tag) {
     order: 1;
     flex: 1 0 100%;
+    min-width: 0;
   }
 
   /* The name on the left, Lichess's avatar icon pinned to the right. */

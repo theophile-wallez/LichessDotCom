@@ -379,20 +379,41 @@
     }
   };
 
-  // Home page hero card (see styles/home.css).
-  const HERO_TEXT = (document.documentElement.lang || '').startsWith('fr')
-    ? {
-        eyebrow: 'Gratuit · Sans publicité · Open source',
-        title: 'Jouer aux échecs en ligne',
-        titleUser: 'Prêt pour une partie, {name} ?',
-        sub: 'Affrontez des milliers de joueurs du monde entier, résolvez des problèmes et progressez, entièrement gratuitement.',
-      }
-    : {
-        eyebrow: 'Free · No ads · Open source',
-        title: 'Play chess online',
-        titleUser: 'Ready to play, {name}?',
-        sub: 'Take on thousands of players worldwide, solve puzzles and improve, completely free.',
-      };
+  // Home page hero card (see styles/home.css), in the page's language: the
+  // ones home.css also names the cards and speeds in, English otherwise.
+  const HERO_TEXTS = {
+    en: {
+      eyebrow: 'Free · No ads · Open source',
+      title: 'Play chess online',
+      titleUser: 'Ready to play, {name}?',
+      sub: 'Take on thousands of players worldwide, solve puzzles and improve, completely free.',
+    },
+    fr: {
+      eyebrow: 'Gratuit · Sans publicité · Open source',
+      title: 'Jouer aux échecs en ligne',
+      titleUser: 'Prêt pour une partie, {name} ?',
+      sub: 'Affrontez des milliers de joueurs du monde entier, résolvez des problèmes et progressez, entièrement gratuitement.',
+    },
+    de: {
+      eyebrow: 'Kostenlos · Werbefrei · Open Source',
+      title: 'Schach online spielen',
+      titleUser: 'Bereit für eine Partie, {name}?',
+      sub: 'Spiele gegen Tausende Gegner aus aller Welt, löse Aufgaben und werde besser, völlig kostenlos.',
+    },
+    es: {
+      eyebrow: 'Gratis · Sin anuncios · Código abierto',
+      title: 'Juega al ajedrez en línea',
+      titleUser: '¿Listo para jugar, {name}?',
+      sub: 'Enfréntate a miles de jugadores de todo el mundo, resuelve problemas y mejora, totalmente gratis.',
+    },
+    pt: {
+      eyebrow: 'Grátis · Sem anúncios · Código aberto',
+      title: 'Jogue xadrez online',
+      titleUser: 'Pronto para jogar, {name}?',
+      sub: 'Enfrente milhares de jogadores do mundo todo, resolva problemas e evolua, totalmente grátis.',
+    },
+  };
+  const HERO_TEXT = HERO_TEXTS[(document.documentElement.lang || '').slice(0, 2)] || HERO_TEXTS.en;
   const syncHero = () => {
     const main = document.querySelector('main.lobby');
     if (!main || main.querySelector(':scope > .cdc-hero')) return;
