@@ -48,6 +48,11 @@
   --cdc-card-shadow-hover: 0 4px 12px #00000040;
   /* Chess.com's title badge (GM, IM…). */
   --cdc-title-bg: #7c2929;
+  /* Lichess has no profile pictures: Chess.com's default avatar, as one
+   * background for every avatar. Our own pawn sits under it, so a browser that
+   * doesn't get Chess.com's image (or not yet) still shows one. */
+  --cdc-avatar: url('https://www.chess.com/bundles/web/images/user-image.007dad08.svg') center / cover no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Cpath fill='%23e7e5e3' d='M0 0h400v400H0z'/%3E%3Ccircle cx='200' cy='104' r='60' fill='%23bcbbb7'/%3E%3Crect x='124' y='160' width='152' height='32' rx='16' fill='%23bcbbb7'/%3E%3Cpath fill='%23bcbbb7' d='M150 192c0 58-40 88-58 132l-12 76h240l-12-76c-18-44-58-74-58-132z'/%3E%3Cpath fill='%23898785' d='M250 192c0 58 40 88 58 132l12 76h-64l-6-76c-8-44-28-74-28-132z' opacity='.35'/%3E%3C/svg%3E") center / cover no-repeat, #e7e5e3;
   --cdc-font: 'CDC Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
     sans-serif;
 

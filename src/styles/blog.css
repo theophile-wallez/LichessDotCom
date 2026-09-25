@@ -444,6 +444,55 @@
   font-size: 16px;
 }
 
+/* Only the posts scroll: the side menu and the title with its filters stay
+ * in view, the title on the page's color, casting a soft shadow on the cards
+ * only once it's stuck. Desktop only: below that, Lichess's fixed top bar
+ * would cover them. */
+@media (min-width: 1020px) {
+  main.page-menu:has(> .ublog-index) > .subnav {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+  }
+
+  /* Lichess's box clips (overflow: hidden), which would make it the title's
+   * scroller, and a scroller that never scrolls doesn't stick anything. */
+  .ublog-index.box {
+    overflow: visible !important;
+  }
+
+  .ublog-index .box__top {
+    container-type: scroll-state;
+    position: sticky;
+    z-index: 3;
+    top: 0;
+    /* Out into the box's top padding and the gap below, so the title sits
+     * where it did but the cards don't show around it once stuck; a bit
+     * wider than the grid, to cover the shadows of the cards passing under. */
+    margin: -16px -12px -8px !important;
+    padding: 16px 12px 8px !important;
+    background: var(--cdc-bg-page);
+  }
+
+  .ublog-index .box__top::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-page), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    .ublog-index .box__top::after {
+      opacity: 1;
+    }
+  }
+}
+
 /* ---------------------------------------------------------- topics --- */
 
 /* /blog/topic: one card per topic, its latest posts as small image tiles

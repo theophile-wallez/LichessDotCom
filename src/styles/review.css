@@ -5,6 +5,8 @@
  *   .cdc-review-summary  review summary fills the right panel
  *   .cdc-review-moves    move-by-move review: coach, moves, graph, controls
  *                        (entered as soon as the user moves off the summary)
+ *   .cdc-review-live     the free analysis board: the coach over Lichess's
+ *                        engine, moves and controls, judging each move played
  * plus .cdc-evalbar-on and data-cdc-cls="<classification of current move>".
  */
 
@@ -62,6 +64,33 @@
       'gauge board tools'
       'gauge board rgraph'
       'gauge board rctrl' !important;
+  }
+
+  /* The free analysis board, like Chess.com's: the coach on top of the
+     panel, then Lichess's engine and moves, and its controls. */
+  html.cdc-review-live main.analyse {
+    --cdc-review-top: 140px;
+    grid-template-rows:
+      var(--cdc-review-top)
+      max(0px, calc(var(--cdc-stage) - var(--cdc-review-top) - var(--cdc-ctrl-h) - var(--cdc-chat-h)))
+      var(--cdc-ctrl-h)
+      var(--cdc-chat-h) !important;
+    grid-template-areas:
+      'gauge board rtop'
+      'gauge board tools'
+      'gauge board controls'
+      'gauge board chat' !important;
+  }
+
+  html.cdc-review-live main.analyse:not(:has(> .mchat)) {
+    grid-template-rows:
+      var(--cdc-review-top)
+      max(0px, calc(var(--cdc-stage) - var(--cdc-review-top) - var(--cdc-ctrl-h)))
+      var(--cdc-ctrl-h) !important;
+    grid-template-areas:
+      'gauge board rtop'
+      'gauge board tools'
+      'gauge board controls' !important;
   }
 
   html.cdc-review-summary main.analyse > :is(.analyse__tools, .analyse__controls, .mchat),
@@ -358,7 +387,7 @@
     width: 56px;
     height: 56px;
     border-radius: 6px;
-    background: #e7e5e3 url('https://www.chess.com/bundles/web/images/user-image.007dad08.svg') center / cover;
+    background: var(--cdc-avatar);
   }
 
   .cdc-acc {
@@ -734,6 +763,22 @@
     color: var(--c) !important;
   }
 
+  /* The free board keeps Lichess's list, variations and all: the badge
+     goes before the move, in the flow. */
+  html.cdc-review-live main.analyse .tview2 move[data-cdc-badge] san::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    vertical-align: -3px;
+    background: var(--i) center / contain no-repeat;
+  }
+
+  html.cdc-review-live main.analyse .tview2 move[data-cdc-badge] {
+    color: var(--c) !important;
+  }
+
   /* Narrow white column, black gets the rest. */
   html.cdc-review-moves main.analyse .tview2-column > move + move {
     flex: 0 0 calc(74% - 40px) !important;
@@ -816,14 +861,14 @@
 }
 
 
-/* Last-move squares take the classification color. */
-html.cdc-review-moves[data-cdc-cls='brilliant'] main.analyse cg-board square.last-move { background: rgba(38, 194, 163, 0.5) !important; }
-html.cdc-review-moves[data-cdc-cls='great'] main.analyse cg-board square.last-move { background: rgba(116, 155, 191, 0.5) !important; }
-html.cdc-review-moves[data-cdc-cls='best'] main.analyse cg-board square.last-move { background: rgba(129, 182, 76, 0.5) !important; }
-html.cdc-review-moves[data-cdc-cls='excellent'] main.analyse cg-board square.last-move { background: rgba(129, 182, 76, 0.5) !important; }
-html.cdc-review-moves[data-cdc-cls='good'] main.analyse cg-board square.last-move { background: rgba(149, 183, 118, 0.5) !important; }
-html.cdc-review-moves[data-cdc-cls='book'] main.analyse cg-board square.last-move { background: rgba(168, 136, 101, 0.5) !important; }
-html.cdc-review-moves[data-cdc-cls='inaccuracy'] main.analyse cg-board square.last-move { background: rgba(247, 198, 49, 0.5) !important; }
-html.cdc-review-moves[data-cdc-cls='mistake'] main.analyse cg-board square.last-move { background: rgba(255, 164, 89, 0.5) !important; }
-html.cdc-review-moves[data-cdc-cls='miss'] main.analyse cg-board square.last-move { background: rgba(255, 119, 105, 0.5) !important; }
-html.cdc-review-moves[data-cdc-cls='blunder'] main.analyse cg-board square.last-move { background: rgba(250, 65, 45, 0.5) !important; }
+/* Last-move squares take the classification color (the free board's too). */
+html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='brilliant'] main.analyse cg-board square.last-move { background: rgba(38, 194, 163, 0.5) !important; }
+html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='great'] main.analyse cg-board square.last-move { background: rgba(116, 155, 191, 0.5) !important; }
+html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='best'] main.analyse cg-board square.last-move { background: rgba(129, 182, 76, 0.5) !important; }
+html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='excellent'] main.analyse cg-board square.last-move { background: rgba(129, 182, 76, 0.5) !important; }
+html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='good'] main.analyse cg-board square.last-move { background: rgba(149, 183, 118, 0.5) !important; }
+html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='book'] main.analyse cg-board square.last-move { background: rgba(168, 136, 101, 0.5) !important; }
+html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='inaccuracy'] main.analyse cg-board square.last-move { background: rgba(247, 198, 49, 0.5) !important; }
+html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='mistake'] main.analyse cg-board square.last-move { background: rgba(255, 164, 89, 0.5) !important; }
+html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='miss'] main.analyse cg-board square.last-move { background: rgba(255, 119, 105, 0.5) !important; }
+html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='blunder'] main.analyse cg-board square.last-move { background: rgba(250, 65, 45, 0.5) !important; }

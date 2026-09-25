@@ -10,10 +10,15 @@
 //   move list badges, graph, controls), board annotations (badge, colored squares,
 //   best-move arrow) and a Chess.com eval bar.
 //
+// On the free analysis board (/analysis) there's no game to review: the
+// coach judges each move as it's played instead, variations included, with
+// the same badges on the board and in the move list (see "live").
+//
 // Navigation and state go through `site.analysis` (Lichess's AnalyseCtrl).
 
 (() => {
-  if (!/^\/[a-zA-Z0-9]{8}(?:[a-zA-Z0-9]{4})?(?:\/(?:white|black))?\/?$/.test(location.pathname)) return;
+  const GAME = /^\/[a-zA-Z0-9]{8}(?:[a-zA-Z0-9]{4})?(?:\/(?:white|black))?\/?$/;
+  if (!GAME.test(location.pathname) && !/^\/analysis(?:\/|$)/.test(location.pathname)) return;
 
   const ENGINE = { root: 'npm/stockfish-web', js: 'sf_19_smallnet.js', depth: 16, movetime: 1500 };
   const CACHE_VERSION = 1;
@@ -28,6 +33,7 @@
         anonymous: 'Anonyme', close: 'Fermer le bilan', back: 'Retour', coach: 'Changer de coach',
         intro: 'Passons en revue cette partie !', bestWas: 'Le meilleur coup était {m}.',
         engineError: "Le moteur n'a pas pu démarrer.",
+        liveIntro: 'Joue un coup, je te dirai ce que j’en pense.', thinking: 'Voyons ce coup…',
       }
     : {
         review: 'Game Review', start: 'Start Review', next: 'Next', explain: 'Explain', best: 'Best',
@@ -35,6 +41,7 @@
         anonymous: 'Anonymous', close: 'Close review', back: 'Back', coach: 'Change coach',
         intro: "Let's review this game!", bestWas: '{m} was best.',
         engineError: 'The engine failed to start.',
+        liveIntro: 'Play a move and I’ll tell you what I think.', thinking: 'Let me look at this move…',
       };
 
   // What the coach says while the game is analyzed, like Chess.com.
@@ -360,36 +367,42 @@
 
   // -------------------------------------------------------- classify ---
 
+  // One move, from `prev` to `node`: `a` and `b` are the engine's records of
+  // the two positions, `prevMove` the opponent's move just before (a miss
+  // fails to punish it). The nodes and records ride along for the coach.
+  function judge(prev, node, a, b, prevMove, book, chess960) {
+    const color = prev.fen.split(' ')[1];
+    const before = pov(a.wp, color), after = pov(b.wp, color);
+    const loss = Math.max(0, before - after);
+    const second = a.wp2 === null ? null : pov(a.wp2, color);
+    const isBest = normUci(node.uci, chess960) === a.best;
+    let cls;
+    if (book) cls = 'book';
+    else if (isBest || loss < 0.5) {
+      if (after >= 50 && before < 95 && loss < 2 && isSacrifice(prev.fen, node.fen, node.uci)) cls = 'brilliant';
+      else if (second !== null && before - second >= 15 && before < 97 && after > 25) cls = 'great';
+      else cls = 'best';
+    } else if (loss < 2) cls = 'excellent';
+    else if (loss < 5) cls = 'good';
+    else if (loss < 10) cls = 'inaccuracy';
+    else if (loss < 20) cls = 'mistake';
+    else cls = 'blunder';
+    if ((cls === 'mistake' || cls === 'blunder') && prevMove && prevMove.loss >= 10 && before >= 60) cls = 'miss';
+    return {
+      ply: node.ply, san: node.san, uci: node.uci, color, cls, loss,
+      accuracy: cls === 'book' ? 100 : moveAccuracy(loss),
+      best: a.best, bestSan: uciToSan(prev.fen, a.best), eval: b,
+      before: a, node, prev, prevMove,
+    };
+  }
+
   function classify(ctrl, positions, bookPly) {
     const chess960 = ctrl.data.game.variant?.key === 'chess960';
     const nodes = ctrl.mainline;
     const moves = [];
     for (let i = 1; i < nodes.length; i++) {
-      const node = nodes[i], prev = nodes[i - 1];
-      const color = prev.fen.split(' ')[1];
-      const a = positions[i - 1], b = positions[i];
-      const before = pov(a.wp, color), after = pov(b.wp, color);
-      const loss = Math.max(0, before - after);
-      const second = a.wp2 === null ? null : pov(a.wp2, color);
-      const isBest = normUci(node.uci, chess960) === a.best;
-      let cls;
-      if (i <= bookPly) cls = 'book';
-      else if (isBest || loss < 0.5) {
-        if (after >= 50 && before < 95 && loss < 2 && isSacrifice(prev.fen, node.fen, node.uci)) cls = 'brilliant';
-        else if (second !== null && before - second >= 15 && before < 97 && after > 25) cls = 'great';
-        else cls = 'best';
-      } else if (loss < 2) cls = 'excellent';
-      else if (loss < 5) cls = 'good';
-      else if (loss < 10) cls = 'inaccuracy';
-      else if (loss < 20) cls = 'mistake';
-      else cls = 'blunder';
-      const prevMove = moves[i - 2];
-      if ((cls === 'mistake' || cls === 'blunder') && prevMove && prevMove.loss >= 10 && before >= 60) cls = 'miss';
-      moves.push({
-        ply: i, san: node.san, uci: node.uci, color, cls, loss,
-        accuracy: cls === 'book' ? 100 : moveAccuracy(loss),
-        best: a.best, bestSan: uciToSan(prev.fen, a.best), eval: b,
-      });
+      const move = judge(nodes[i - 1], nodes[i], positions[i - 1], positions[i], moves[i - 2], i <= bookPly, chess960);
+      moves.push({ ...move, ply: i });
     }
     const accuracy = color => {
       const accs = moves.filter(m => m.color === color).map(m => m.accuracy);
@@ -738,10 +751,10 @@
     return h >>> 0;
   };
 
-  function remark(ctrl, r, move) {
+  function remark(ctrl, move) {
     const R = REMARKS, san = move.san;
     const sign = move.color === 'w' ? 1 : -1;
-    const before = r.positions[move.ply - 1], after = move.eval;
+    const before = move.before, after = move.eval;
     const mateFor = e => e.mate !== undefined && e.mate * sign > 0;
     const bad = ['inaccuracy', 'mistake', 'miss', 'blunder'].includes(move.cls);
     let only;
@@ -758,11 +771,11 @@
       if (wp >= 90) ctx.push(...R.winning);
     } else {
       if (san.includes('x')) ctx.push(...R.badCapture);
-      if (san[0] === 'Q' && move.ply <= 12) ctx.push(...R.earlyQueen);
-      if (san[0] === 'K' && move.ply <= 20) ctx.push(...R.earlyKing);
+      if (san[0] === 'Q' && move.node.ply <= 12) ctx.push(...R.earlyQueen);
+      if (san[0] === 'K' && move.node.ply <= 20) ctx.push(...R.earlyKing);
       if (wp <= 10) ctx.push(...R.losing);
     }
-    const seed = `${ctrl.data.game.id}:${move.ply}:${coach}`;
+    const seed = `${ctrl.data.game.id}:${move.ply}:${move.uci}:${coach}`;
     const pool = only || (ctx.length && hash(seed + ':ctx') % 2 ? ctx : R[move.cls]);
     return typo(pool[hash(seed) % pool.length]);
   }
@@ -837,14 +850,14 @@
   }
 
   // One thing the board or the engine shows about the move, or null.
-  function fact(ctrl, r, move) {
-    const nodes = ctrl.mainline, node = nodes[move.ply], prev = nodes[move.ply - 1];
+  function fact(move) {
+    const { node, prev } = move;
     const me = move.color, them = me === 'w' ? 'b' : 'w', sign = me === 'w' ? 1 : -1;
     const before = parseFen(prev.fen).board, after = parseFen(node.fen).board;
-    const eb = r.positions[move.ply - 1], ea = move.eval;
+    const eb = move.before, ea = move.eval;
     const san = move.san, dest = move.uci.slice(2, 4);
     const best = move.bestSan ? fig(move.bestSan) : '';
-    const reply = r.positions[move.ply]?.best;
+    const reply = ea.best;
     const replySan = reply ? fig(uciToSan(node.fen, reply)) : '';
     const mates = (e, s) => e.mate !== undefined && e.mate * s > 0;
 
@@ -882,7 +895,7 @@
       return fr ? `Il fallait jouer ${best}.` : `${best} was the better move.`;
     }
 
-    const prevMove = r.moves[move.ply - 2];
+    const prevMove = move.prevMove;
     if (['brilliant', 'great', 'best'].includes(move.cls) && ['mistake', 'blunder', 'miss'].includes(prevMove?.cls))
       return fr ? `Il punit aussitôt l’erreur ${sides(them)}.` : `It punishes ${sides(them)} mistake right away.`;
     const moved = after[dest];
@@ -914,15 +927,16 @@
 
   // The coach's comment: [sentence, droppable?] pairs. The trajectory is the
   // one dropped when the bubble has no room for both.
-  function explanation(ctrl, r, move) {
+  function explanation(ctrl, move) {
+    const opening = move.opening ?? state.openingName;
     if (move.cls === 'book')
-      return [[remark(ctrl, r, move)], ...(state.openingName ? [[`${fr ? 'Ouverture' : 'Opening'}: ${state.openingName}.`, true]] : [])];
-    const f = fact(ctrl, r, move);
+      return [[remark(ctrl, move)], ...(opening ? [[`${fr ? 'Ouverture' : 'Opening'}: ${opening}.`, true]] : [])];
+    const f = fact(move);
     if (move.san.includes('#')) return [[f]];
-    const seed = hash(`${ctrl.data.game.id}:${move.ply}:${coach}:t`);
-    const t = [trajectory(r.positions[move.ply - 1], move.eval, move.color, seed), true];
+    const seed = hash(`${ctrl.data.game.id}:${move.ply}:${move.uci}:${coach}:t`);
+    const t = [trajectory(move.before, move.eval, move.color, seed), true];
     if (!GOOD.has(move.cls) && move.cls !== 'excellent' && move.cls !== 'good') return f ? [t, [f]] : [[t[0]]];
-    return [[f || remark(ctrl, r, move)], t];
+    return [[f || remark(ctrl, move)], t];
   }
 
   // ------------------------------------------------------- streaming ---
@@ -986,7 +1000,7 @@
     // The summary is shown until the user moves; then the move-by-move review.
     state.summaryPly = site.analysis?.node.ply;
     if (mode !== 'moves') stopPlaying();
-    html.classList.remove('cdc-review-normal', 'cdc-review-summary', 'cdc-review-moves');
+    html.classList.remove('cdc-review-normal', 'cdc-review-summary', 'cdc-review-moves', 'cdc-review-live');
     html.classList.add('cdc-review-' + mode);
     render(true);
   }
@@ -1191,6 +1205,13 @@
   const evalChip = e =>
     `<span class="cdc-bubble__eval${(e?.mate ?? e?.cp ?? 0) < 0 || (e?.mate === 0 && e.wp < 50) ? ' cdc-bubble__eval--black' : ''}">${esc(formatEval(e))}</span>`;
 
+  // The bubble for a judged move: icon, verdict and score, then the comment.
+  const verdict = (ctrl, move, hint) =>
+    `<div class="cdc-bubble__row">${icon(move.cls)}
+      <p class="cdc-bubble__title">${title(CLS[move.cls], move.san)}</p>
+      ${evalChip(move.eval)}</div>
+    <p class="cdc-bubble__sub">${streamHtml(hint ? [[hint]] : explanation(ctrl, move))}</p>`;
+
   function renderMoves(ctrl) {
     const r = state.review;
     const ply = ctrl.node.ply;
@@ -1204,7 +1225,6 @@
           ${evalChip(r.positions[shown.ply - 1])}</div>`;
     else if (!move) bubble = `<p class="cdc-bubble__title">${esc(T.intro)}</p>`;
     else {
-      const c = CLS[move.cls];
       const good = GOOD.has(move.cls);
       // Explain swaps the remark for the opening's name, or the move that
       // was best: the bubble has room for two lines under the title.
@@ -1215,10 +1235,7 @@
           : !good && move.bestSan
             ? T.bestWas.replace('{m}', move.bestSan)
             : '';
-      bubble = `<div class="cdc-bubble__row">${icon(move.cls)}
-          <p class="cdc-bubble__title">${title(c, move.san)}</p>
-          ${evalChip(move.eval)}</div>
-        <p class="cdc-bubble__sub">${streamHtml(hint ? [[hint]] : explanation(ctrl, r, move))}</p>`;
+      bubble = verdict(ctrl, move, hint);
     }
     const atEnd = ctrl.onMainline && ply >= ctrl.mainline.length - 1;
     const canBest = shown || (move && move.best && !GOOD.has(move.cls));
@@ -1260,6 +1277,20 @@
       <button class="cdc-btn cdc-btn--green cdc-review__open" data-cdc="summary"><span class="cdc-review__star">★</span>${esc(T.review)}</button>`;
   }
 
+  // The free analysis board: the coach judges the move on the board, over
+  // Lichess's own engine lines and moves.
+  function renderLive(ctrl) {
+    const move = judgeAt(ctrl, ctrl.path);
+    const bubble = live.error
+      ? `<p class="cdc-bubble__title">${esc(live.error)}</p>`
+      : !ctrl.path
+        ? `<p class="cdc-bubble__title">${esc(T.liveIntro)}</p>`
+        : !move
+          ? `<p class="cdc-bubble__title">${esc(T.thinking)}</p>`
+          : verdict(ctrl, move);
+    dom.panel.innerHTML = `<div class="cdc-coach">${coachAvatar()}<div class="cdc-bubble">${bubble}</div></div>`;
+  }
+
   // Eval bar, board badge / arrow / square colors, move list badges.
   function renderBoard(ctrl) {
     const r = state.review;
@@ -1267,11 +1298,13 @@
     const onMain = ctrl.onMainline;
     const orientation = ctrl.getOrientation();
     const reviewing = state.mode !== 'normal';
+    const isLive = state.mode === 'live';
 
-    const shown = bestShown(ctrl);
+    const shown = isLive ? null : bestShown(ctrl);
 
-    // Eval bar. The best move keeps the eval of the position before it.
-    const pos = shown ? r.positions[shown.ply - 1] : r && onMain ? r.positions[ply] : null;
+    // Eval bar. The best move keeps the eval of the position before it. The
+    // free board keeps Lichess's, fed by its live engine.
+    const pos = isLive ? null : shown ? r.positions[shown.ply - 1] : r && onMain ? r.positions[ply] : null;
     html.classList.toggle('cdc-evalbar-on', !!pos);
     if (pos) {
       const whiteShare = pos.wp;
@@ -1283,7 +1316,9 @@
     }
 
     // Board overlay.
-    const move = shown ? { ...shown, cls: 'best' } : r && onMain && ply > 0 && reviewing ? r.moves[ply - 1] : null;
+    const move = isLive
+      ? judgeAt(ctrl, ctrl.path)
+      : shown ? { ...shown, cls: 'best' } : r && onMain && ply > 0 && reviewing ? r.moves[ply - 1] : null;
     html.dataset.cdcCls = move ? move.cls : '';
     let overlay = '';
     if (move) {
@@ -1304,7 +1339,8 @@
     window.cdcReviewArrows = showBest ? [{ orig: move.best.slice(0, 2), dest: move.best.slice(2, 4), brush: 'best' }] : [];
 
     // Move list badges.
-    if (r) {
+    if (isLive) liveBadges(ctrl);
+    else if (r) {
       const tree = document.querySelector('main.analyse .tview2');
       const mainMoves = tree ? [...tree.querySelectorAll(':scope > move:not(.empty)')] : [];
       mainMoves.forEach((m, i) => {
@@ -1325,11 +1361,16 @@
     const ctrl = site.analysis;
     if (!ctrl || !ensureAttached(ctrl)) return;
     if (state.mode === 'summary' && ctrl.node.ply !== state.summaryPly) return setMode('moves');
-    const key = [state.mode, ctrl.node.ply, ctrl.onMainline, ctrl.getOrientation(), !!state.review, Math.round(state.progress * 100), state.error, state.explain, !!state.playing].join('|');
+    if (state.mode === 'live') pump(ctrl);
+    const key =
+      state.mode === 'live'
+        ? ['live', ctrl.path, liveDigest(judgeAt(ctrl, ctrl.path)), live.error].join('|')
+        : [state.mode, ctrl.node.ply, ctrl.onMainline, ctrl.getOrientation(), !!state.review, Math.round(state.progress * 100), state.error, state.explain, !!state.playing].join('|');
     if (force || key !== state.lastKey) {
       state.lastKey = key;
       if (state.mode === 'summary') renderSummary(ctrl);
       else if (state.mode === 'moves') renderMoves(ctrl);
+      else if (state.mode === 'live') renderLive(ctrl);
       else renderNormal(ctrl);
       startStream();
       fitBubble();
@@ -1359,7 +1400,7 @@
       localStorage.setItem('cdc-coach', coach);
       btn.dataset.coach = coach;
       // Each coach words the remarks their own way.
-      if (state.mode === 'moves') render(true);
+      if (state.mode === 'moves' || state.mode === 'live') render(true);
       return;
     }
     const last = ctrl.mainline.length - 1;
@@ -1383,13 +1424,168 @@
   dom.panel.addEventListener('click', onClick);
   dom.controls.addEventListener('click', onClick);
 
-  let lastWidth = 0;
-  window.addEventListener('resize', () => {
-    if (Math.abs(window.innerWidth - lastWidth) > 4) {
-      lastWidth = window.innerWidth;
-      render(true);
+
+  // ------------------------------------------------------------ live ---
+
+  // The free analysis board has no game to review up front: its tree grows
+  // as the user plays. So every position is analyzed once, by FEN, the one
+  // on the board first, and every move of the tree is judged from its two
+  // positions as soon as they're known.
+  const BOOK_PLIES = 30; // deeper than this, no move is "book"
+  const BOOK_GAMES = 10; // master games a position needs to be "book"
+  const live = {
+    evals: new Map(), // fen -> engine record
+    books: new Map(), // fen -> { book, name } from Lichess's masters database
+    judged: new Map(), // path -> { node, move }
+    engine: null, busy: false, bookBusy: false, noBook: false, error: null,
+  };
+
+  function changed() {
+    live.judged.clear();
+    render();
+  }
+
+  // Whether the move to `path` is a book move: every move up to it is played
+  // in master games. Undefined while that's still being looked up.
+  function bookAt(ctrl, path) {
+    let book = true;
+    for (let i = 2; i <= path.length && book; i += 2) {
+      const node = ctrl.tree.nodeAtPath(path.slice(0, i));
+      if (live.noBook || node.ply > BOOK_PLIES) return false;
+      book = live.books.get(node.fen)?.book;
     }
-  });
+    return book;
+  }
+
+  const openingAt = (ctrl, path) => {
+    for (; path; path = path.slice(0, -2)) {
+      const name = live.books.get(ctrl.tree.nodeAtPath(path).fen)?.name;
+      if (name) return name;
+    }
+    return '';
+  };
+
+  // The move to `path`, judged, or null until its positions are analyzed.
+  function judgeAt(ctrl, path) {
+    if (!path) return null;
+    const node = ctrl.tree.nodeAtPath(path);
+    if (node.id !== path.slice(-2)) return null; // a stale path
+    const hit = live.judged.get(path);
+    if (hit?.node === node) return hit.move;
+    const up = path.slice(0, -2), prev = ctrl.tree.nodeAtPath(up);
+    const a = live.evals.get(prev.fen), b = live.evals.get(node.fen), book = bookAt(ctrl, path);
+    let move = null;
+    if (a && b && book !== undefined) {
+      move = judge(prev, node, a, b, judgeAt(ctrl, up), book, ctrl.data.game.variant?.key === 'chess960');
+      move.opening = openingAt(ctrl, path);
+    }
+    live.judged.set(path, { node, move });
+    return move;
+  }
+
+  // What the bubble shows, to redraw it only when that changes.
+  const liveDigest = m => (m ? [m.cls, formatEval(m.eval), m.eval.best, m.best, m.opening, m.prevMove?.cls].join(',') : '');
+
+  const treeMoves = () => [...document.querySelectorAll('main.analyse .tview2 move[p]')];
+
+  // Positions to analyze, most urgent first: the move on the board (its
+  // position, the one before, and the one before that for a miss), the next
+  // move, the rest of the line, then everything else in the move list.
+  function wanted(ctrl) {
+    const path = ctrl.nodeList, out = [];
+    const after = [];
+    for (let n = ctrl.node.children[0]; n; n = n.children[0]) after.push(n);
+    out.push(...path.slice(-3).reverse(), ...after.slice(0, 1), ...path.slice(0, -3).reverse(), ...after.slice(1));
+    out.push(...ctrl.mainline);
+    for (const m of treeMoves()) out.push(ctrl.tree.nodeAtPath(m.getAttribute('p')));
+    return out;
+  }
+
+  // The first position along `path` not yet looked up in the masters
+  // database, while the line is still in it.
+  function bookGap(ctrl, path) {
+    for (let i = 2; i <= path.length; i += 2) {
+      const node = ctrl.tree.nodeAtPath(path.slice(0, i));
+      if (node.ply > BOOK_PLIES) return null;
+      const b = live.books.get(node.fen);
+      if (!b) return node.fen;
+      if (!b.book) return null;
+    }
+    return null;
+  }
+
+  function pump(ctrl) {
+    if (!live.busy && !live.error) {
+      const node = wanted(ctrl).find(n => !live.evals.has(n.fen));
+      if (node) analyseLive(ctrl, node.fen);
+    }
+    if (!live.bookBusy && !live.noBook) {
+      let line = ctrl.path;
+      for (let n = ctrl.node.children[0]; n; n = n.children[0]) line += n.id;
+      const paths = [line, ctrl.mainline.slice(1).map(n => n.id).join(''), ...treeMoves().map(m => m.getAttribute('p'))];
+      for (const p of paths) {
+        const fen = bookGap(ctrl, p);
+        if (fen) return lookUpBook(ctrl, fen);
+      }
+    }
+  }
+
+  async function analyseLive(ctrl, fen) {
+    live.busy = true;
+    try {
+      if (!live.engine) {
+        const engine = new Engine();
+        engine.chess960 = ctrl.data.game.variant?.key === 'chess960';
+        await engine.boot();
+        live.engine = engine;
+      }
+      live.evals.set(fen, toRecord(fen, await live.engine.analyse(fen)));
+    } catch (err) {
+      console.error('[LichessDotCom] engine failed', err);
+      live.error = T.engineError;
+    }
+    live.busy = false;
+    changed();
+  }
+
+  // Lichess's opening explorer, as its analysis board uses it. The masters
+  // database needs an account: signed out, no move is book. A lookup that
+  // hangs gives up too, or the moves waiting on it would never be judged.
+  async function lookUpBook(ctrl, fen) {
+    live.bookBusy = true;
+    try {
+      const late = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
+      const d = await Promise.race([ctrl.explorer.fetchMasterOpening(fen), late]);
+      live.books.set(fen, { book: d.white + d.draws + d.black >= BOOK_GAMES, name: d.opening?.name || '' });
+    } catch {
+      live.noBook = true;
+    }
+    live.bookBusy = false;
+    changed();
+  }
+
+  // Badges in Lichess's move list, variations included: each move carries
+  // its path in the tree.
+  function liveBadges(ctrl) {
+    for (const m of treeMoves()) {
+      const path = m.getAttribute('p');
+      const mv = judgeAt(ctrl, path);
+      const cls = mv?.cls || '';
+      const next = mv?.node.children[0];
+      const badge = !!mv && LIST_BADGES.has(cls) && !(cls === 'book' && next && bookAt(ctrl, path + next.id) === true);
+      if ((m.dataset.cdcCls || '') === cls && 'cdcBadge' in m.dataset === badge) continue;
+      if (!mv) {
+        delete m.dataset.cdcCls;
+        delete m.dataset.cdcBadge;
+        continue;
+      }
+      m.dataset.cdcCls = cls;
+      m.style.setProperty('--c', CLS[cls].color);
+      m.style.setProperty('--i', CLS[cls].img);
+      if (badge) m.dataset.cdcBadge = '';
+      else delete m.dataset.cdcBadge;
+    }
+  }
 
   // ------------------------------------------------------------ main ---
 
@@ -1443,12 +1639,29 @@
 
   function start() {
     const ctrl = site.analysis;
-    if (ctrl.synthetic || !ctrl.data?.game?.id || !ctrl.mainline || ctrl.mainline.length < 2) return;
-    if (!['standard', 'fromPosition', 'chess960'].includes(ctrl.data.game.variant?.key)) return;
-    html.classList.add('cdc-review');
-    setMode('summary');
-    setInterval(() => render(), 150);
+    if (!['standard', 'fromPosition', 'chess960'].includes(ctrl.data?.game?.variant?.key)) return;
+    if (ctrl.synthetic) {
+      if (ctrl.tree) run('live');
+      return;
+    }
+    if (!ctrl.data.game.id || !ctrl.mainline || ctrl.mainline.length < 2) return;
+    run('summary');
     analyseGame(ctrl);
+  }
+
+  // Only once the review runs: a render on a page it doesn't run on (a
+  // variant, a game without moves) would show its panel with nothing in it.
+  function run(mode) {
+    html.classList.add('cdc-review');
+    setMode(mode);
+    setInterval(() => render(), 150);
+    let lastWidth = window.innerWidth;
+    window.addEventListener('resize', () => {
+      if (Math.abs(window.innerWidth - lastWidth) > 4) {
+        lastWidth = window.innerWidth;
+        render(true);
+      }
+    });
   }
 
   const started = Date.now();

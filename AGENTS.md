@@ -44,6 +44,16 @@ is "a Chess.com user wouldn't notice they're on Lichess".
   (`:nth-of-type`), classes, or how an href ends (`a[href$='/training']`).
 - **Desktop first.** The Chess.com layout applies at ≥ 1020px. Below that,
   Lichess's mobile layout is kept, with our theme, board and pieces.
+- **Make every page playful.** A modernized page should feel fun, like
+  Chess.com's, not just re-skinned: color per section, icons on gradient
+  tiles, cards, pills, and ideally nice illustrations (Neo pieces, Lichess's
+  3D emoji, photos, little boards). Practice, simuls and the forum set the
+  tone.
+- **Only the content scrolls.** On a page that scrolls and has a side panel
+  (a side menu, a help card) and a main title or header at the top, the
+  side panel and the title stay put and only the content moves, as in an
+  app: never the whole page. Pin them with `position: sticky` (see
+  `simul.css`), or make the content its own scrolling area.
 
 ## Layout of the repo
 
@@ -52,19 +62,19 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `manifest.json` | Content scripts: CSS + `content.js` + `dashboard.js` + `ratingchart.js` (isolated world), `page.js` + `board.js` + `review.js` (page world). |
 | `img/coaches/` | The Game Review coach's faces (`coach-<n>.webp`), web-accessible so `review.css` can load them. |
 | `src/background.js` | Service worker: downloads the Chess.com sounds, caches them as base64. |
-| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, fetches a finished game's move times (and its time control, for the "New 10 min" button), the players' country flags (from their profiles), the analysis board's players (copied from the hidden game info), the home hero, coach title badges, the Swiss list's and a Swiss tournament's round progress, the hover card's rating chips and its fit in the window, the eval bar's score and the font remapping. |
+| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, fetches a finished game's move times (and its time control, for the "New 10 min" button), the players' country flags (from their profiles), the analysis board's players (copied from the hidden game info), the home hero, coach title badges, the Swiss list's and a Swiss tournament's round progress and medal ranks, the forum index's count labels, the hover card's rating chips and its fit in the window, the eval bar's score, the font remapping, and which coach (`data-cdc-coach` on `<html>`) reads a practice drill's goal. |
 | `src/dashboard.js` | Isolated world: the puzzle dashboard's theme radar, redrawn as SVG from the page's init JSON (Lichess draws it into a canvas). |
 | `src/ratingchart.js` | Isolated world: the rating history chart (profile, rating stats page), redrawn in SVG from the page's init JSON (Lichess draws it with Chart.js into a canvas): smooth curves over gradients, range pills, one chip per rating, a hover tooltip. |
 | `src/page.js` | Page world: wraps `site.sound` to play the right Chess.com sound per move, plus premove / illegal / game-start, which Lichess has no sound for. |
 | `src/board.js` | Page world: every main board's shapes redrawn Chess.com-style (right-clicked squares filled, arrows), checkmate badge and label. |
-| `src/review.js` | Page world: Game Review (engine, classification, panel, the coach's comment per move: how the evaluation moved plus one fact from the board and the engine, typed out word by word, board overlays, eval bar). |
+| `src/review.js` | Page world: Game Review (engine, classification, panel, the coach's comment per move: how the evaluation moved plus one fact from the board and the engine, typed out word by word, board overlays, eval bar). On the free analysis board (`/analysis`) the same coach judges each move as it's played, variations included, with the badges on the board and in Lichess's move list. |
 | `src/styles/theme.css` | Overrides Lichess's `--c-*` color variables, fonts, buttons. |
 | `src/styles/sidebar.css` | Lichess's top header → Chess.com's left sidebar, and the user menu (dasher) as a Chess.com menu. |
 | `src/styles/board.css` | Board, pieces, highlights, move hints, arrows, coordinates, and Lichess's eval bar drawn like the Game Review's. |
 | `src/styles/playerbar.css` | The player bars' look, shared by the game page (`.ruser`, `.rclock`) and the analysis board (`.cdc-player`, `.analyse__clock`): avatar, title, name, flag, rating, captured pieces and the clock. Each page only places them. |
 | `src/styles/game.css` | Game page (`main.round`) grid, where the player bars and clocks sit, moves, chat, and the game-over panel (Game Review button, move times). |
 | `src/styles/analysis.css` | Analysis page (`main.analyse`) grid (with the game page's player bars when there are players or clocks), engine header and lines, move list (glyph badges, comment cards) and controls. |
-| `src/styles/review.css` | Game Review panel, eval bar, board annotations. |
+| `src/styles/review.css` | Game Review panel, eval bar, board annotations, and the free analysis board's coach over Lichess's panel. |
 | `src/styles/pages.css` | Modern look for every other page (headings, side menus, tabs, tables, forms, dialogs, lobby, editor, tournaments). |
 | `src/styles/dropdowns.css` | Every dropdown as one menu style: Lichess's `.mselect`, native `<select>` (via `appearance: base-select`) and autocomplete lists. |
 | `src/styles/powertip.css` | The profile hover card (`#powerTip`, filled with `/@/<user>/mini`) as a Chess.com player card. |
@@ -78,7 +88,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/puzzle.css` | Puzzles (`main.puzzle`): from 1260px a non-scrolling grid (one side card, the eval bar left of the board, analysis-style), a status banner, chunky hint / solution / vote buttons, the themes as a list of rows, and the move buttons pinned inside the panel. |
 | `src/styles/blog.css` | Blog posts (`.ublog-post`) as Chess.com-style articles, and the blog lists. |
 | `src/styles/practice.css` | Practice (`.practice-app`, `.practice-side`) as playful lesson cards: a color per section, white icons on gradient tiles, progress pills. |
-| `src/styles/practice-run.css` | Inside a lesson (`main.analyse` + `.practice__side`): one lesson panel with the chapter list as numbered steps, the gamebook coach in a white bubble with the octopus, and a drill's goal card and status. |
+| `src/styles/practice-run.css` | Inside a lesson (`main.analyse` + `.practice__side`): one lesson panel with the chapter list as numbered steps, the gamebook coach in a white bubble with the octopus, and a drill's goal read out by the Game Review's coach in a white bubble, and its status. |
 | `src/styles/learn.css` | Learn (`#learn-app`, one app for both views): the map (`.learn--map`) in the Practice look, a color per category, white pieces on gradient tiles, star pills; inside a stage (`.learn--run`) the stage list and the goal panel as cards, the levels as pills. |
 | `src/styles/puzzles.css` | Puzzle themes (`.puzzle-themes`) and puzzles by opening (`.puzzle-openings`) in the Practice look: a color per section, theme cards, a card per opening family, opening chips; from 1020px the title and the side menu stay in view on scroll. |
 | `src/styles/dashboard.css` | Puzzle dashboard (`.puzzle-dashboard`): stat tiles, per-theme rows, and the panel around `dashboard.js`'s radar. |
@@ -86,6 +96,8 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/swiss.css` | Swiss tournaments home (`main.swiss-home`): now playing / starting soon as tournament cards (time-control tile, rounds progress bar, player chip), the explanations as point cards, a comparison card and a grid of FAQ cards. |
 | `src/styles/swiss-show.css` | A Swiss tournament (`main.swiss`), in Lichess's three columns: the info panel as a card (time-control tile, rounds progress bar, condition chips), a header with a countdown chip, the standings with a colored square per round and medal-colored leaders, the podium, the stats and player cards, and the mini boards with Chess.com clocks. |
 | `src/styles/leaderboard.css` | Players leaderboard (`/player`, `.community`) in the Practice look: a card per leaderboard with its icon white on a tile in its own color, medals for the top three, and the online players in a sticky side card with rating chips. |
+| `src/styles/simul.css` | Simuls home (`main.simul-list`) in the Practice look: a color per section (yours, open, in progress, finished), each simul a card whose tile is a stack of little boards with a Neo piece on it, a dashed "host a simul" card, the title pinned while the list scrolls, and the help as a sticky card with Fischer's photo as a polaroid and the rules as numbered steps. |
+| `src/styles/forum.css` | The forum, every page of it: the index as a card per category (a color and one of Lichess's 3D emoji each, counts as chips, the last post as a footer), a category's topics as rows with the reply count in a speech bubble, a topic's posts as cards with avatars and pill reactions, the reply box, the new topic form's warnings as tip tiles, and the search results. |
 
 There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
 
@@ -166,13 +178,20 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   the carousel's `clientWidth`, which counts padding. Inset it with a
   transparent border, not padding, or the last card is clipped.
 - **Useful page APIs.** `site.sound` is Lichess's sound player, and
-  `site.analysis` is the analysis controller (`mainline`, `node.ply`,
+  `site.analysis` is the analysis controller (`mainline`, `node.ply`, `path`,
+  `nodeList`, `tree.nodeAtPath`,
   `jumpToMain`, `getOrientation`; `jumpToMain` doesn't scroll the move list),
   and `site.analysis.chessground.state.drawable` holds the arrows (`shapes`,
   `autoShapes`, `current`), and the engine is at
   `npm/stockfish-web/sf_19_smallnet.js`. **Only the analysis page has a
   controller**: a game page exposes none, so anything that must work on both
   reads the board's DOM instead (`board.js` does).
+- **The free analysis board.** `/analysis` is `main.analyse` with
+  `site.analysis.synthetic` set and a game id of `synthetic`: no game to
+  export, and a tree that grows as the user plays. Every `move` in its move
+  list, variations included, carries its tree path in a `p` attribute
+  (`tree.nodeAtPath(p)`). Opening names come from
+  `explorer.fetchMasterOpening(fen)`, which fails with a 401 when signed out.
 - **Chessground's shapes.** They live in `cg-container > svg.cg-shapes`, one `g`
   per shape: a circle (a right-clicked square) or a line (an arrow), in square
   units from the viewBox's corner (`-4 -4 8 8`), *with the orientation already

@@ -37,6 +37,16 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addFonts);
   else addFonts();
 
+  // The coach's face on a practice drill (styles/practice-run.css): the Game
+  // Review's coach, kept by review.js under the same key, or picked at random
+  // the first time.
+  let coach = +localStorage.getItem('cdc-coach');
+  if (!(coach >= 1 && coach <= 4)) {
+    coach = 1 + Math.floor(Math.random() * 4);
+    localStorage.setItem('cdc-coach', coach);
+  }
+  document.documentElement.dataset.cdcCoach = coach;
+
   let sounds = null;
 
   const postSounds = () => {
@@ -429,6 +439,18 @@
     }
   };
 
+  // Forum index (see styles/forum.css): the categories become cards and
+  // their table header goes, so each count gets its column's name ("Topics",
+  // "Posts", translated) to show as a label. Server-rendered, so it's safe.
+  const syncForumLabels = () => {
+    for (const table of document.querySelectorAll('main.forum table.categs:not([data-cdc-labels])')) {
+      table.dataset.cdcLabels = '';
+      const names = [...(table.tHead?.rows[0]?.cells || [])].map(th => th.textContent.trim());
+      for (const row of table.tBodies[0]?.rows || [])
+        for (const td of row.cells) if (names[td.cellIndex]) td.dataset.cdcLabel = names[td.cellIndex];
+    }
+  };
+
   // Profile hover card (see styles/powertip.css): Lichess right-aligns the
   // eight ratings in fixed columns by padding the short ones with non-breaking
   // spaces ("&nbsp;&nbsp;&nbsp;?"). Our chips center their value, so the
@@ -497,6 +519,7 @@
     syncCoachTitles();
     syncSwissRounds();
     syncSwissMedals();
+    syncForumLabels();
     syncPowertip();
   }, 250);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncHero);

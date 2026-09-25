@@ -79,8 +79,7 @@
   width: var(--cdc-upt-avatar);
   height: var(--cdc-upt-avatar);
   border-radius: 8px;
-  background: #e7e5e3 url('https://www.chess.com/bundles/web/images/user-image.007dad08.svg')
-    center / cover no-repeat;
+  background: var(--cdc-avatar);
 }
 
 #powerTip .upt__info:has(.upt__info__realname)::before {
