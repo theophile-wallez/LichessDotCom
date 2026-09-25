@@ -134,7 +134,9 @@
   letter-spacing: -0.01em;
 }
 
+/* Lichess rules each section off in its gold: a quiet line instead. */
 .ublog-post .ublog-post__markup h2 {
+  border-bottom-color: var(--cdc-border) !important;
   font-size: 26px !important;
 }
 
@@ -175,6 +177,16 @@
 .ublog-post .ublog-post__markup .embed {
   overflow: hidden;
   margin: 1.2em 0 !important;
+}
+
+/* A game embed's board fills its column, but on desktop board.css draws the
+ * coordinates outside the board, as Chess.com does: room for the numbers on
+ * its left and the letters under it, or the letters run over the bottom
+ * player and the numbers are cut off. */
+@media (min-width: 1020px) {
+  body:is(.coords-in, .coords-out) .ublog-post .ublog-post__markup .lpv__board {
+    padding: 0 0 calc(1.2 * var(--cdc-coords-size) + 10px) calc(0.6 * var(--cdc-coords-size) + 16px);
+  }
 }
 
 .ublog-post .ublog-post__markup :is(ul, ol) {
@@ -448,10 +460,10 @@
 
 /* Only the posts scroll: the side menu and the title with its filters stay
  * in view, the title on the page's color, casting a soft shadow on the cards
- * only once it's stuck. Desktop only: below that, Lichess's fixed top bar
- * would cover them. */
+ * only once it's stuck. A post keeps the side menu in view too. Desktop
+ * only: below that, Lichess's fixed top bar would cover them. */
 @media (min-width: 1020px) {
-  main.page-menu:has(> .ublog-index) > .subnav {
+  main.page-menu:has(> :is(.ublog-index, .ublog-post)) > .subnav {
     position: sticky;
     top: 16px;
     align-self: start;
@@ -464,9 +476,11 @@
     top: 0;
     /* Out into the box's top padding and the gap below, so the title sits
      * where it did but the cards don't show around it once stuck; a bit
-     * wider than the grid, to cover the shadows of the cards passing under. */
-    margin: -16px -12px -8px !important;
-    padding: 16px 12px 8px !important;
+     * wider than the grid, to cover the shadows of the cards passing under,
+     * but no wider than the page's gutter (1vw, 10px at 1024), or it would
+     * run past the window's edge. */
+    margin: -16px calc(-1 * min(12px, 1vw)) -8px !important;
+    padding: 16px min(12px, 1vw) 8px !important;
     background: var(--cdc-bg-page);
   }
 
@@ -486,6 +500,17 @@
     .ublog-index .box__top::after {
       opacity: 1;
     }
+  }
+
+  /* Lichess hides the lists' titles (Recent posts, By month...) and centers
+   * their filters below 1260px, to make room on a phone. Beside the side
+   * menu there's room for both, as from 1260px: the header wraps if not. */
+  .ublog-index .box__top h1.collapsible {
+    display: flex !important;
+  }
+
+  .ublog-index .box__top :is(.filter-and-sort, .search-sort, .box__top__actions) {
+    margin: 0 !important;
   }
 }
 
@@ -529,9 +554,13 @@
   white-space: nowrap;
 }
 
-.ublog-topics__topic__posts {
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-  gap: 12px !important;
+/* One row of posts, as many of the four as fit (all of them from a tablet
+ * up, two on a phone): Lichess's grid-auto-rows: 0 folds the rest away, so
+ * no row gap, or each folded row adds one. Two classes, to outrank the post
+ * cards' own grid above. */
+.ublog-topics .ublog-topics__topic__posts {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+  gap: 0 12px !important;
 }
 
 .ublog-index .ublog-post-card--mini {
@@ -563,9 +592,5 @@
 @media (max-width: 799.98px) {
   .ublog-index.box {
     padding: 12px 12px 32px !important;
-  }
-
-  .ublog-topics__topic__posts {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }

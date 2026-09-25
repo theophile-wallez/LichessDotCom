@@ -87,6 +87,48 @@
   box-shadow: inset 0 0 0 1px var(--cdc-card-border-hover), var(--cdc-btn-grey-shadow) !important;
 }
 
+/* Only the studies scroll: the side menu and the toolbar stay in view, the
+ * toolbar on the page's color, casting a soft shadow on the cards only once
+ * it's stuck. Desktop only: below that, Lichess's fixed top bar would cover
+ * them. */
+@media (min-width: 1020px) {
+  main.page-menu:has(> .study-index) > .subnav {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+  }
+
+  .study-index .box__top {
+    container-type: scroll-state;
+    position: sticky;
+    z-index: 3;
+    top: 0;
+    /* A bit wider than the grid, to cover the shadows of the cards passing
+     * under it, but no wider than the page's gutter (1vw). */
+    margin-inline: calc(-1 * min(12px, 1vw)) !important;
+    padding-inline: min(12px, 1vw) !important;
+    background: var(--cdc-bg-page);
+  }
+
+  .study-index .box__top::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-page), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    .study-index .box__top::after {
+      opacity: 1;
+    }
+  }
+}
+
 /* ------------------------------------------------------------ grid --- */
 
 .study-index .studies {
@@ -254,6 +296,11 @@
   font-size: 96px !important;
 }
 
+/* Lichess fades the words as well, on top of our dim grey: unreadable. */
+.study-index .nostudies p {
+  opacity: 1 !important;
+}
+
 /* Lichess's mobile layout runs the list edge to edge; cards need a margin. */
 @media (max-width: 799.98px) {
   .study-index.box {
@@ -338,7 +385,11 @@
  * page whose side menu has the staff-picks link active. Each heading and its
  * list become one card, in columns: the heading is the card's top, the list
  * its body, and a column break is never allowed between them. */
+
+/* No longer a card, so nothing to clip: Lichess's overflow: hidden would make
+ * the box the sticky title's scroller, which never scrolls. */
 main.page-menu:has(.subnav a.active[href$='/staff-picks']) .page-menu__content.box {
+  overflow: visible !important;
   padding: 0 !important;
   background: transparent !important;
 }
@@ -438,6 +489,44 @@ main.page-menu:has(.subnav a.active[href$='/staff-picks']) .body > ul a::before 
 main.page-menu:has(.subnav a.active[href$='/staff-picks']) .body > ul a:hover {
   background: var(--cdc-menu-hover);
   color: #fff !important;
+}
+
+/* Only the picks scroll: the side menu and the title stay in view, as on
+ * the study lists. */
+@media (min-width: 1020px) {
+  main.page-menu:has(.subnav a.active[href$='/staff-picks']) > .subnav {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+  }
+
+  main.page-menu:has(.subnav a.active[href$='/staff-picks']) h1.box__top {
+    container-type: scroll-state;
+    position: sticky;
+    z-index: 3;
+    top: 0;
+    margin-inline: calc(-1 * min(12px, 1vw)) !important;
+    padding-inline: min(12px, 1vw) !important;
+    background: var(--cdc-bg-page);
+  }
+
+  main.page-menu:has(.subnav a.active[href$='/staff-picks']) h1.box__top::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-page), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    main.page-menu:has(.subnav a.active[href$='/staff-picks']) h1.box__top::after {
+      opacity: 1;
+    }
+  }
 }
 
 @media (max-width: 799.98px) {

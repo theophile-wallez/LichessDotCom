@@ -179,6 +179,27 @@ main.forum-topic:not(.topic-form) .box__top h1 > a:first-child {
   order: -2;
 }
 
+/* A team's board is named by a link to the team, with Lichess's group icon
+ * (the tile says it already) and the team's flair: white like any title,
+ * not a link's green. */
+main.forum-categ .box__top h1 > a:not(:first-child) {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: #fff !important;
+}
+
+main.forum-categ .box__top h1 > a:not(:first-child)::before {
+  display: none;
+}
+
+main.forum-categ .box__top h1 > a:not(:first-child) .uflair {
+  flex: none;
+  width: 1em;
+  height: 1em;
+}
+
 @keyframes cdc-forum-wobble {
   from {
     opacity: 0;
@@ -944,8 +965,47 @@ main.forum-topic .forum-post__message hr {
   border-top: 1px solid #ffffff14;
 }
 
+/* Markdown tables: Lichess leaves the cells bare, running into each other.
+ * Rows as in Lichess's lists, and a table too wide for the post scrolls
+ * inside it rather than spilling out. */
+main.forum-topic .forum-post__message table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.4;
+  scrollbar-width: thin;
+}
+
+main.forum-topic .forum-post__message :is(th, td) {
+  padding: 8px 14px;
+  border-bottom: 1px solid #ffffff14;
+  text-align: start;
+}
+
+main.forum-topic .forum-post__message th {
+  color: var(--cdc-text-dim);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+main.forum-topic .forum-post__message tbody tr:nth-child(2n) {
+  background: #ffffff05;
+}
+
 main.forum-topic .forum-post__blocked > button {
   margin: 8px 0 !important;
+}
+
+/* A game embed's board fills its column, but on desktop board.css draws the
+ * coordinates outside the board, as Chess.com does: room for the numbers on
+ * its left and the letters under it, or the letters run over the bottom
+ * player and the numbers are cut off. */
+@media (min-width: 1020px) {
+  body:is(.coords-in, .coords-out) main.forum-topic .forum-post__message .lpv__board {
+    padding: 0 0 calc(1.2 * var(--cdc-coords-size) + 10px) calc(0.6 * var(--cdc-coords-size) + 16px);
+  }
 }
 
 /* -------------------------------------------------------- reactions --- */
@@ -1335,8 +1395,12 @@ main.forum-topic.topic-form .warning strong a {
 
 /* ----------------------------------------------------------- search --- */
 
+/* As narrow as a topic, and centered like one (Lichess's search page is
+ * full width, so it would sit against the left of a wide window). */
 main.search:has(> .box__top form.search[action$='/forum/search']) {
+  width: 100%;
   max-width: 1000px;
+  margin-inline: auto !important;
 }
 
 main.search:has(> .box__top form.search[action$='/forum/search']) > .nb-results {
@@ -1467,9 +1531,10 @@ main.search .search__results .user-link:hover {
     z-index: 3;
     top: 0;
     /* A bit wider than the list, to also cover the shadows and the nudge of
-     * the cards passing under it. */
-    margin-inline: -12px !important;
-    padding: 16px 12px 12px !important;
+     * the cards passing under it, but no wider than the page's gutter (1vw,
+     * 10px at 1024), or it would run past the window's edge. */
+    margin-inline: calc(-1 * min(12px, 1vw)) !important;
+    padding: 16px min(12px, 1vw) 12px !important;
     margin-bottom: 10px !important;
     background: var(--cdc-bg-page);
   }

@@ -265,6 +265,9 @@ main.plan .plan_checkout group.radio label {
   line-height: 1.25;
   text-align: center;
   text-shadow: none !important;
+  /* "Donate as <username>": a long name wraps instead of running over the
+   * next choice. */
+  overflow-wrap: anywhere;
   transition: background-color 0.15s, color 0.15s, box-shadow 0.15s;
 }
 
@@ -334,10 +337,12 @@ main.plan .plan_checkout group.amount input:checked + label {
   color: var(--cdc-green-hover) !important;
 }
 
-/* "Other amount" is words, not a number, until an amount is entered: a
- * lower row of its own under the suggestions. */
+/* The suggestions share one row, whatever the card's width (wrapping, the
+ * last one fell alone onto a row of its own). "Other amount" is words, not
+ * a number, until an amount is entered: a lower row of its own. */
 main.plan .plan_checkout group.amount > div {
-  flex: 1 1 76px;
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 main.plan .plan_checkout group.amount .other {
@@ -596,31 +601,35 @@ main.plan .faq dd .user-link .uflair {
 /* ------------------------------------------------------ patron chips --- */
 
 /* Every patron a chip: the wings on a tile tinted with their color, the
- * name, their flair. */
+ * name, their flair. A line of text rather than a flex row: the name is a
+ * bare text node, which only a block can end in an ellipsis when it's too
+ * long for the chip (in a row it pushed the flair out, cut). */
 main.plan :is(.best_patrons, .recent-patrons) .list > div {
   min-width: 0 !important;
   padding: 0 !important;
 }
 
 main.plan :is(.best_patrons, .recent-patrons) .user-link {
-  display: flex !important;
-  align-items: center;
-  gap: 10px;
+  display: block !important;
+  overflow: hidden;
   min-width: 0;
   color: var(--cdc-text) !important;
   font-size: 14px;
   font-weight: 700;
+  line-height: 30px;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 main.plan :is(.best_patrons, .recent-patrons) .user-link .line {
   position: relative;
-  display: flex !important;
-  flex: none;
+  display: inline-flex !important;
   align-items: center;
   justify-content: center;
   width: 30px !important;
   height: 30px;
+  margin-inline-end: 10px !important;
+  vertical-align: top;
   border-radius: 8px;
   background: color-mix(in srgb, var(--cdc-paco) 16%, transparent);
   color: var(--cdc-paco) !important;
@@ -645,16 +654,17 @@ main.plan :is(.best_patrons, .recent-patrons) .user-link.online .line.patron::af
   box-shadow: 0 0 0 2px var(--cdc-bg-panel);
 }
 
+/* Lichess puts a no-break space after the title: that's its gap. */
 main.plan :is(.best_patrons, .recent-patrons) .user-link .utitle {
-  flex: none;
   margin: 0 !important;
 }
 
 main.plan :is(.best_patrons, .recent-patrons) .user-link .uflair {
-  flex: none;
   width: 20px;
   height: 20px;
   margin: 0 !important;
+  margin-inline-start: 8px !important;
+  vertical-align: middle;
 }
 
 /* ---------------------------------------------------- the celebrated --- */
@@ -806,6 +816,10 @@ main.plan .recent-patrons .list > div > .user-link:hover {
   color: #fff !important;
 }
 
+main.plan .recent-patrons .user-link {
+  line-height: 28px;
+}
+
 main.plan .recent-patrons .user-link .line {
   width: 28px !important;
   height: 28px;
@@ -908,8 +922,10 @@ main.plan .patron-style-selector__info .user-link {
 }
 
 /* One column: the pitch above the form, and the questions stacked, each
- * head still right above its answer. */
-@media (max-width: 899.98px) {
+ * head still right above its answer. On a phone, and on a narrow desktop,
+ * where the new patrons' card leaves the page too little room for two (the
+ * choices and the answers squeezed into a strip of ~160px). */
+@media (max-width: 899.98px), (min-width: 1020px) and (max-width: 1159.98px) {
   main.plan .wrapper,
   main.plan .faq {
     grid-template-columns: minmax(0, 1fr);
