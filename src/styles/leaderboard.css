@@ -413,7 +413,7 @@ html[dir='rtl'] :is(.community .leaderboards, .tournament-shields) h2 a:hover::a
   justify-content: flex-start !important;
   gap: 12px;
   margin: 0 !important;
-  padding: 0 0 18px !important;
+  padding: 0 0 10px !important;
   font-size: 28px !important;
 }
 
@@ -452,7 +452,7 @@ html[dir='rtl'] :is(.community .leaderboards, .tournament-shields) h2 a:hover::a
     /* Out into the box's top padding, and a bit wider than the grid, to
      * cover the shadows of the cards passing under it. */
     margin: -16px -12px 0 !important;
-    padding: 16px 12px 18px !important;
+    padding: 16px 12px 10px !important;
     background: var(--cdc-bg-page);
   }
 
@@ -480,6 +480,8 @@ html[dir='rtl'] :is(.community .leaderboards, .tournament-shields) h2 a:hover::a
   grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)) !important;
   gap: 14px;
   overflow: visible !important;
+  /* Room for a card lifted on hover, which would slide under the title. */
+  padding-top: 8px;
   border-radius: 0 !important;
 }
 
@@ -669,7 +671,7 @@ main.tournament-categ-shields .page-menu__content.box {
 
 main.tournament-categ-shields .box__top {
   margin: 0 !important;
-  padding: 0 0 18px !important;
+  padding: 0 0 10px !important;
 }
 
 main.tournament-categ-shields .box__top h1 {
@@ -710,7 +712,8 @@ main.tournament-categ-shields .box > ol {
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 12px;
   margin: 0;
-  padding: 0;
+  /* Room for a card lifted on hover, which would slide under the title. */
+  padding: 8px 0 0;
 }
 
 /* The shield, then the name over the date. */
@@ -832,7 +835,7 @@ main.tournament-categ-shields li:first-child .user-link {
     z-index: 3;
     top: 0;
     margin: -16px -12px 0 !important;
-    padding: 16px 12px 18px !important;
+    padding: 16px 12px 10px !important;
     background: var(--cdc-bg-page);
   }
 
