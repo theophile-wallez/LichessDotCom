@@ -959,14 +959,6 @@ main.tournament-categ-shields li:first-child .user-link {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .community__online > h2::before,
-  :is(.community .leaderboards .user-top, .tournament-leaderboards__item, .tournament-shields__item),
-  main.tournament-categ-shields .box > ol > li {
-    animation: none;
-  }
-}
-
 /* Narrower, the two columns don't fit: the leaderboards come first, and
  * the online players below them scroll in a card of their own. */
 @media (max-width: 1019.98px) {

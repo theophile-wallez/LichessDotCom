@@ -9,7 +9,6 @@
 // the page's CSP keeps out of the page world's reach.
 (() => {
   const RIG = chrome.runtime.getURL('img/coaches/rig.json');
-  const calm = matchMedia('(prefers-reduced-motion: reduce)');
   let rigs = null; // the traced features, fetched once
   let rig = null; // the mounted rig: { el, coach, face, lids, blink, meta, ... }
   const want = { coach: 0, mood: 'neutral', talking: false };
@@ -27,7 +26,7 @@
     if (!el || typeof lottie === 'undefined') return;
     if (!rig || rig.el !== el || rig.coach !== want.coach) mount(el, want.coach);
     else {
-      if (rig.ready && rig.blink.isPaused && !calm.matches) rig.blink.play();
+      if (rig.ready && rig.blink.isPaused) rig.blink.play();
       step();
     }
   }
@@ -62,8 +61,7 @@
       r.face.goToAndStop(r.meta.face.pose[r.mood], true);
       r.lids.goToAndStop(r.meta.lids.pose[r.mood], true);
       r.blink.loop = true;
-      if (calm.matches) r.blink.goToAndStop(0, true);
-      else r.blink.goToAndPlay(Math.random() * r.meta.blink[1], true);
+      r.blink.goToAndPlay(Math.random() * r.meta.blink[1], true);
       // No one to blink for once the review panel is gone.
       r.blink.addEventListener('loopComplete', () => el.isConnected || r.blink.pause());
       el.classList.add('cdc-coach__avatar--rig');
@@ -97,12 +95,6 @@
     const r = rig;
     if (!r?.ready || r.busy) return;
     const { face, lids, meta } = r;
-    if (calm.matches) {
-      r.mood = want.mood;
-      hold(face, meta.face.pose[r.mood]);
-      hold(lids, meta.lids.pose[r.mood]);
-      return;
-    }
     if (r.talking && (want.mood !== r.mood || !want.talking)) return stopTalking(r);
     if (want.mood !== r.mood) {
       const to = want.mood;
@@ -146,6 +138,4 @@
     };
     face.playSegments([now, end], true);
   }
-
-  calm.addEventListener('change', sync);
 })();

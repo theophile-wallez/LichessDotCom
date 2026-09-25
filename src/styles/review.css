@@ -683,14 +683,6 @@
     100% { opacity: 0; translate: 0 90%; }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .cdc-coach__avatar::before,
-    .cdc-coach__avatar::after,
-    .cdc-coach__face {
-      animation: none !important;
-    }
-  }
-
   .cdc-bubble {
     position: relative;
     flex: 1;

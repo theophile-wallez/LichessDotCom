@@ -140,12 +140,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .bots__list__entry {
-    animation: none;
-  }
-}
-
 /* The tile: the piece white on the card's gradient, tilting on hover. */
 .bots__list__entry::before {
   content: '';

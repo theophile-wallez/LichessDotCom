@@ -887,16 +887,6 @@ main.plan .patron-style-selector__info .user-link {
   font-weight: 700;
 }
 
-/* ---------------------------------------------------------- motion --- */
-
-@media (prefers-reduced-motion: reduce) {
-  main.plan .banner > icon,
-  main.plan .plan_checkout:not(:has(group))::before,
-  main.plan .best_patrons .list > .paginated {
-    animation: none;
-  }
-}
-
 /* ---------------------------------------------------------- mobile --- */
 
 @media (max-width: 1259.98px) {

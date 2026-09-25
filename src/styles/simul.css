@@ -511,16 +511,6 @@ main.simul-list .simul-list__help > em ~ p:nth-of-type(4) { --cdc-rule: #f5a93b;
   }
 }
 
-/* ---------------------------------------------------------- motion --- */
-
-@media (prefers-reduced-motion: reduce) {
-  main.simul-list .slist thead th:first-child::before,
-  main.simul-list .slist tr.create td::before,
-  main.simul-list .slist tbody tr:not(.create):hover::after {
-    animation: none;
-  }
-}
-
 /* ---------------------------------------------------------- mobile --- */
 
 @media (max-width: 799.98px) {

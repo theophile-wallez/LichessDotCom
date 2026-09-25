@@ -199,19 +199,17 @@ html[dir='rtl'] .racer-home .button:hover::after {
   transform: scaleX(-1) translateX(3px);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  /* Each vehicle drives in, then on hover the road rushes by. */
-  .racer-home .button .car {
-    animation: cdc-racer-drive-in 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  }
+/* Each vehicle drives in, then on hover the road rushes by. */
+.racer-home .button .car {
+  animation: cdc-racer-drive-in 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
 
-  .racer-home__create .button .car {
-    animation-delay: 0.12s;
-  }
+.racer-home__create .button .car {
+  animation-delay: 0.12s;
+}
 
-  .racer-home .button:hover::before {
-    animation: cdc-racer-road 0.35s linear infinite;
-  }
+.racer-home .button:hover::before {
+  animation: cdc-racer-road 0.35s linear infinite;
 }
 
 @keyframes cdc-racer-drive-in {
@@ -410,15 +408,13 @@ html[dir='rtl'] .racer-home .button:hover::after {
   line-height: 1;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  :is(.racer, .storm) .puz-side__start__text span::before {
-    animation: cdc-racer-beat 1.2s ease-in-out infinite;
-  }
+:is(.racer, .storm) .puz-side__start__text span::before {
+  animation: cdc-racer-beat 1.2s ease-in-out infinite;
+}
 
-  /* A solved puzzle bumps the score. */
-  :is(.racer, .storm).puz-mod-puzzle .puz-side__solved__text {
-    animation: cdc-racer-bump 0.4s ease-out;
-  }
+/* A solved puzzle bumps the score. */
+:is(.racer, .storm).puz-mod-puzzle .puz-side__solved__text {
+  animation: cdc-racer-bump 0.4s ease-out;
 }
 
 @keyframes cdc-racer-beat {
@@ -595,10 +591,8 @@ html[dir='rtl'] .racer-home .button:hover::after {
   letter-spacing: 0.08em !important;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  :is(.racer, .storm).puz-mod-move .puz-combo__counter__value {
-    color: var(--cdc-green-hover);
-  }
+:is(.racer, .storm).puz-mod-move .puz-combo__counter__value {
+  color: var(--cdc-green-hover);
 }
 
 :is(.racer, .storm) .puz-combo__bars {
@@ -835,10 +829,8 @@ html[dir='rtl'] .racer .racer__race__track::before {
   box-shadow: inset 0 0 0 1px #ffffff1f;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .racer--racing .racer__race__track::before {
-    animation: cdc-racer-lane 0.5s linear infinite;
-  }
+.racer--racing .racer__race__track::before {
+  animation: cdc-racer-lane 0.5s linear infinite;
 }
 
 @keyframes cdc-racer-lane {

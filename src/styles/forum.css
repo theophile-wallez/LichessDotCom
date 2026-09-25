@@ -1560,19 +1560,6 @@ main.search .search__results .user-link:hover {
   }
 }
 
-/* ---------------------------------------------------------- motion --- */
-
-@media (prefers-reduced-motion: reduce) {
-  main.forum table.categs tr,
-  main.forum table.topics tr,
-  main.forum-topic .forum-post,
-  main.search .search__results tr,
-  main.forum .box__top h1::before,
-  main.forum-topic .reactions button.mine img {
-    animation: none;
-  }
-}
-
 /* ---------------------------------------------------------- narrow --- */
 
 @media (max-width: 799.98px) {

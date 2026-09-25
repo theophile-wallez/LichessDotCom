@@ -309,12 +309,6 @@
     60% { transform: rotate(4deg) scale(1.02); }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    #cdc-donate:hover::before {
-      animation: none;
-    }
-  }
-
   /* ------------------------------------------------ bottom buttons --- */
 
   #top .site-buttons {
