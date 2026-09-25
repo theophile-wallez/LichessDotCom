@@ -204,56 +204,60 @@ coords {
   opacity: 1 !important;
 }
 
-/* Inside coordinates: ranks top-left of the left-hand file, files bottom-right
-   of the bottom rank, colored in the opposite square's color. */
-body.coords-in .is2d coords .coord-dark,
-body.coords-in .is2d coords.files .coord-dark {
-  color: var(--cdc-sq-light) !important;
+/* Inside coordinates, for the mobile layout only (on desktop they're always
+   outside, see below): ranks top-left of the left-hand file, files
+   bottom-right of the bottom rank, colored in the opposite square's color. */
+@media (max-width: 1019.98px) {
+  body.coords-in .is2d coords .coord-dark,
+  body.coords-in .is2d coords.files .coord-dark {
+    color: var(--cdc-sq-light) !important;
+  }
+
+  body.coords-in .is2d coords .coord-light,
+  body.coords-in .is2d coords.files .coord-light {
+    color: var(--cdc-sq-dark) !important;
+  }
+
+  /* Ranks move from the right edge (Lichess) to the left edge (Chess.com), which
+     puts every rank label on the opposite color square. */
+  body.coords-in .is2d coords.ranks .coord-dark {
+    color: var(--cdc-sq-dark) !important;
+  }
+
+  body.coords-in .is2d coords.ranks .coord-light {
+    color: var(--cdc-sq-light) !important;
+  }
+
+  body.coords-in coords.ranks {
+    left: 0 !important;
+    right: auto !important;
+    top: 0 !important;
+    width: 12.5% !important;
+    height: 100% !important;
+  }
+
+  body.coords-in coords.ranks coord {
+    transform: none !important;
+    padding: 0.25em 0 0 0.3em;
+    text-align: left;
+  }
+
+  body.coords-in coords.files {
+    bottom: 0 !important;
+    left: 0 !important;
+    height: auto !important;
+  }
+
+  /* Same inset as the ranks (0.25em from their edge), so a letter sits as far
+     from the board's bottom as a number does from its top. */
+  body.coords-in coords.files coord {
+    padding: 0 0.3em 0.25em 0 !important;
+    text-align: right;
+  }
 }
 
-body.coords-in .is2d coords .coord-light,
-body.coords-in .is2d coords.files .coord-light {
-  color: var(--cdc-sq-dark) !important;
-}
-
-/* Ranks move from the right edge (Lichess) to the left edge (Chess.com), which
-   puts every rank label on the opposite color square. */
-body.coords-in .is2d coords.ranks .coord-dark {
-  color: var(--cdc-sq-dark) !important;
-}
-
-body.coords-in .is2d coords.ranks .coord-light {
-  color: var(--cdc-sq-light) !important;
-}
-
-body.coords-in coords.ranks {
-  left: 0 !important;
-  right: auto !important;
-  top: 0 !important;
-  width: 12.5% !important;
-  height: 100% !important;
-}
-
-body.coords-in coords.ranks coord {
-  transform: none !important;
-  padding: 0.25em 0 0 0.3em;
-  text-align: left;
-}
-
-body.coords-in coords.files {
-  bottom: 0 !important;
-  left: 0 !important;
-  height: auto !important;
-}
-
-/* Same inset as the ranks (0.25em from their edge), so a letter sits as far
-   from the board's bottom as a number does from its top. */
-body.coords-in coords.files coord {
-  padding: 0 0.3em 0.25em 0 !important;
-  text-align: right;
-}
-
-/* Outside coordinates: ranks on the left, files below, in muted grey. */
+/* Outside coordinates, like Chess.com: ranks on the left, files below, in
+   muted grey. */
 body.coords-out coords coord {
   color: var(--cdc-text-dim) !important;
 }
@@ -268,6 +272,59 @@ body.coords-out coords.ranks {
    the letters get the same gap as the numbers. */
 body.coords-out coords.files {
   bottom: -21px !important;
+}
+
+/* On desktop they're always outside, as on Chess.com. Lichess swaps
+   `coords-out` for `coords-in` while its eval gauge shows (analysis,
+   puzzles), which made them jump inside the board and back from one move
+   to the next (a checkmate has no gauge). So an "inside" board is drawn the
+   way Lichess draws an "outside" one, and every layout leaves the room for
+   both (`body:is(.coords-in, .coords-out)`). */
+@media (min-width: 1020px) {
+  body:is(.coords-in, .coords-out) {
+    --cdc-coords-size: clamp(13px, 1.7vh, 16px);
+  }
+
+  body:is(.coords-in, .coords-out) coords {
+    font-size: var(--cdc-coords-size) !important;
+  }
+
+  body:is(.coords-in, .coords-out) .is2d coords coord {
+    color: var(--cdc-text-dim) !important;
+  }
+
+  body:is(.coords-in, .coords-out) coords.ranks {
+    top: 0 !important;
+    left: calc(-0.6em - 10px) !important;
+    right: auto !important;
+    width: 0.6em !important;
+    height: 100% !important;
+    text-align: center;
+  }
+
+  body:is(.coords-in, .coords-out) coords.ranks coord {
+    padding: 0 !important;
+    transform: translateY(42%) !important;
+  }
+
+  /* As far below the squares as the numbers stand left of them. */
+  body:is(.coords-in, .coords-out) coords.files {
+    top: calc(100% + 6px) !important;
+    bottom: auto !important;
+    left: 0 !important;
+    height: 1.2em !important;
+    line-height: 1.2em !important;
+    text-align: center !important;
+  }
+
+  body:is(.coords-in, .coords-out) coords.files coord {
+    padding: 0 !important;
+  }
+
+  /* What Lichess gives an "outside" board, for the files. */
+  body.coords-in .main-board {
+    margin-bottom: 12px;
+  }
 }
 
 /* -------------------------------------------------------------- eval bar --- */
