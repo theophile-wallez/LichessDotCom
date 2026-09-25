@@ -920,16 +920,33 @@
   /* ------------------------------------------------------- move list --- */
 
   /* Chess.com's compact list: 30px striped rows, badges in the gutter left of
-     the move, a small box around the current move. Comments and variations
-     are hidden, as on Chess.com (close the review to see them). */
-  html.cdc-review-moves main.analyse .tview2-column {
-    background: repeating-linear-gradient(transparent 0 30px, #2a2926 30px 60px);
+     the move, a small box around the current move. The moves played off the
+     game show as variations, as on Chess.com, but not Lichess's comments nor
+     its computer lines (close the review to see them): review.js marks the
+     lines played here `data-cdc-var`. Rows are striped per move number
+     (`data-cdc-even`, from review.js), as the cards between them have any
+     height. */
+  html.cdc-review-moves main.analyse .tview2-column > [data-cdc-even] {
+    background: #2a2926 !important;
   }
 
   /* Keep the "..." of a game starting with Black's move (second child),
-     or the columns shift by one. */
-  html.cdc-review-moves main.analyse .tview2-column > :is(interrupt, move.empty:not(:nth-child(2)), interrupt + index) {
+     or the columns shift by one, and the ones around a variation, which
+     split its move's row in two like the analysis board's. After a White
+     move, the index past the card repeats the move's number (then "...");
+     after a Black move, it's the next move's own. */
+  html.cdc-review-moves main.analyse .tview2-column > :is(
+    interrupt:not(:has(line[data-cdc-var])),
+    move.empty:not(:nth-child(2), :has(+ interrupt line[data-cdc-var]), interrupt:has(line[data-cdc-var]) + index + move.empty),
+    interrupt:not(:has(line[data-cdc-var])) + index:has(+ move.empty)
+  ),
+  html.cdc-review-moves main.analyse .tview2 interrupt :is(comment, line:not([data-cdc-var])) {
     display: none !important;
+  }
+
+  /* Its comment gone, a card doesn't take the game move's color. */
+  html.cdc-review-moves main.analyse .tview2-column > interrupt {
+    --cdc-note: #5d5b58 !important;
   }
 
   html.cdc-review-moves main.analyse .tview2-column > index {
@@ -1000,8 +1017,9 @@
   }
 
   /* The free board keeps Lichess's list, variations and all: the badge
-     goes before the move, in the flow. */
-  html.cdc-review-live main.analyse .tview2 move[data-cdc-badge] san::before {
+     goes before the move, in the flow. So does the review's in a variation. */
+  html.cdc-review-live main.analyse .tview2 move[data-cdc-badge] san::before,
+  html.cdc-review-moves main.analyse .tview2 interrupt move[data-cdc-badge] san::before {
     content: '';
     display: inline-block;
     width: 16px;
@@ -1011,7 +1029,8 @@
     background: var(--i) center / contain no-repeat;
   }
 
-  html.cdc-review-live main.analyse .tview2 move[data-cdc-badge] {
+  html.cdc-review-live main.analyse .tview2 move[data-cdc-badge],
+  html.cdc-review-moves main.analyse .tview2 interrupt move[data-cdc-badge] {
     color: var(--c) !important;
   }
 

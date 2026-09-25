@@ -12,7 +12,9 @@
 //
 // On the free analysis board (/analysis) there's no game to review: the
 // coach judges each move as it's played instead, variations included, with
-// the same badges on the board and in the move list (see "live").
+// the same badges on the board and in the move list (see "live"). The review
+// judges the same way the moves played off the game, which its move list
+// shows as variations, like Chess.com's.
 //
 // Navigation and state go through `site.analysis` (Lichess's AnalyseCtrl).
 
@@ -1088,7 +1090,7 @@
   const state = {
     mode: 'summary', review: null, progress: 0, error: null, lastKey: '',
     explain: false, playing: null, revealed: new Set(),
-    bestOf: null, // mainline ply whose best move is shown on the board
+    bestOf: null, // { path, move }: the move whose best is shown on the board
     allRows: false, // the summary's chevron is open
   };
 
@@ -1219,28 +1221,48 @@
     };
   }
 
-  // The engine's best move instead of the game's, played on the board as a
-  // (hidden) variation, like Chess.com's "Best" button.
+  // The move on the board: the game's, from the review, or one played off
+  // it, judged as it comes (see "live"). Null until then.
+  function reviewMove(ctrl) {
+    if (!state.review || !ctrl.path) return null;
+    return ctrl.onMainline ? state.review.moves[ctrl.node.ply - 1] : judgeAt(ctrl, ctrl.path);
+  }
+
+  // The engine's best move instead of the one played, played on the board
+  // as a variation, like Chess.com's "Best" button.
   function bestShown(ctrl) {
-    const m = state.bestOf && state.review?.moves[state.bestOf - 1];
+    const b = state.bestOf;
     const chess960 = ctrl.data.game.variant?.key === 'chess960';
-    if (!m || ctrl.onMainline || ctrl.node.ply !== state.bestOf) return null;
-    return normUci(ctrl.node.uci, chess960) === m.best ? m : null;
+    if (!b || ctrl.path === b.path || ctrl.path !== b.path.slice(0, -2) + ctrl.node.id) return null;
+    return normUci(ctrl.node.uci, chess960) === b.move.best ? b.move : null;
   }
 
   function showBest(ctrl) {
-    if (bestShown(ctrl)) return jump(ctrl, state.bestOf);
-    const ply = ctrl.node.ply;
-    const m = state.review?.moves[ply - 1];
+    if (bestShown(ctrl)) return goTo(ctrl, state.bestOf.path);
+    const m = reviewMove(ctrl);
     if (!m?.best || typeof ctrl.playUci !== 'function') return;
-    jump(ctrl, ply - 1);
-    state.bestOf = ply;
+    state.bestOf = { path: ctrl.path, move: m };
+    goTo(ctrl, ctrl.path.slice(0, -2));
     ctrl.playUci(m.best);
     ctrl.redraw?.();
   }
 
+  // Where the arrows lead, along the line on the board: from the best move
+  // shown, back to the move it stands for, or on to the one after that.
+  function stepPath(ctrl, dir) {
+    const from = bestShown(ctrl) ? state.bestOf.path : ctrl.path;
+    if (dir < 0) return from === ctrl.path ? (from ? from.slice(0, -2) : null) : from;
+    const next = ctrl.tree.nodeAtPath(from).children[0];
+    return next ? from + next.id : null;
+  }
+
   function jump(ctrl, ply) {
     ctrl.jumpToMain(ply);
+    ctrl.redraw?.();
+  }
+
+  function goTo(ctrl, path) {
+    ctrl.userJump(path);
     ctrl.redraw?.();
   }
 
@@ -1330,32 +1352,35 @@
   function renderMoves(ctrl) {
     const r = state.review;
     const ply = ctrl.node.ply;
-    const move = ctrl.onMainline && ply > 0 ? r?.moves[ply - 1] : null;
+    const move = reviewMove(ctrl);
     const shown = bestShown(ctrl);
     let bubble;
     if (!r) bubble = `<p class="cdc-bubble__title">${esc(T.analysing)} ${Math.round(state.progress * 100)}%</p>`;
     else if (shown)
       bubble = `<div class="cdc-bubble__row">${icon('best')}
           <p class="cdc-bubble__title">${title(CLS.best, ctrl.node.san)}</p>
-          ${evalChip(r.positions[shown.ply - 1])}</div>`;
-    else if (!move) bubble = `<p class="cdc-bubble__title">${esc(T.intro)}</p>`;
-    else {
+          ${evalChip(shown.before)}</div>`;
+    else if (!move) {
+      // Off the game, a move waits for the engine.
+      const say = ctrl.onMainline ? T.intro : live.error || T.thinking;
+      bubble = `<p class="cdc-bubble__title">${esc(say)}</p>`;
+    } else {
       const good = GOOD.has(move.cls);
       // Explain swaps the remark for the opening's name, or the move that
       // was best: the bubble has room for two lines under the title.
       const hint = !state.explain
         ? ''
         : move.cls === 'book'
-          ? state.openingName || ''
+          ? (move.opening ?? state.openingName) || ''
           : !good && move.bestSan
             ? T.bestWas.replace('{m}', mv(move.bestSan, move.color))
             : '';
       bubble = verdict(ctrl, move, hint);
     }
-    const atEnd = ctrl.onMainline && ply >= ctrl.mainline.length - 1;
+    const atEnd = !stepPath(ctrl, 1);
     const canBest = shown || (move && move.best && !GOOD.has(move.cls));
     dom.panel.innerHTML = `${header(T.review, 'summary')}
-      <div class="cdc-coach">${coachAvatar(!shown && move?.cls, ply)}<div class="cdc-bubble">${bubble}</div></div>
+      <div class="cdc-coach">${coachAvatar(!shown && move?.cls, ctrl.path)}<div class="cdc-bubble">${bubble}</div></div>
       <div class="cdc-review__nav">
         <button class="cdc-btn${state.explain ? ' cdc-btn--on' : ''}" data-cdc="explain">${svgIcon('bulb')}${esc(T.explain)}</button>
         <button class="cdc-btn${shown ? ' cdc-btn--on' : ''}" data-cdc="best" ${canBest ? '' : 'disabled'}>${svgIcon('star')}${esc(T.best)}</button>
@@ -1419,7 +1444,7 @@
 
     // Eval bar. The best move keeps the eval of the position before it. The
     // free board keeps Lichess's, fed by its live engine.
-    const pos = isLive ? null : shown ? r.positions[shown.ply - 1] : r && onMain ? r.positions[ply] : null;
+    const pos = isLive || !r ? null : shown ? shown.before : onMain ? r.positions[ply] : reviewing ? live.evals.get(ctrl.node.fen) : null;
     html.classList.toggle('cdc-evalbar-on', !!pos);
     if (pos) {
       const whiteShare = pos.wp;
@@ -1437,7 +1462,7 @@
       ? null
       : isLive
         ? judgeAt(ctrl, ctrl.path)
-        : shown ? { ...shown, cls: 'best' } : r && onMain && ply > 0 && reviewing ? r.moves[ply - 1] : null;
+        : shown ? { ...shown, cls: 'best' } : reviewing ? reviewMove(ctrl) : null;
     html.dataset.cdcCls = move ? move.cls : '';
     let overlay = '';
     if (move) {
@@ -1476,18 +1501,37 @@
         if (badge) m.dataset.cdcBadge = '';
         else delete m.dataset.cdcBadge;
       });
+      if (!tree) return;
+      // Rows striped per move number, so a variation in between doesn't
+      // shift the stripes (review.css).
+      let even = false;
+      for (const el of tree.children) {
+        if (el.tagName === 'INDEX') even = parseInt(el.textContent, 10) % 2 === 0;
+        if (el.tagName !== 'INTERRUPT' && even !== 'cdcEven' in el.dataset) mark(el, 'cdcEven', even);
+      }
+      // The variations played here show, not Lichess's computer lines.
+      for (const l of tree.querySelectorAll('interrupt line')) {
+        const p = l.querySelector('move[p]')?.getAttribute('p');
+        const own = !!p && !ctrl.tree.nodeAtPath(p)?.comp;
+        if (own !== 'cdcVar' in l.dataset) mark(l, 'cdcVar', own);
+      }
+      liveBadges(ctrl, [...tree.querySelectorAll('interrupt line[data-cdc-var] move[p]')]);
     }
   }
+
+  const mark = (el, key, on) => (on ? (el.dataset[key] = '') : delete el.dataset[key]);
 
   function render(force) {
     const ctrl = site.analysis;
     if (!ctrl || !ensureAttached(ctrl)) return;
     if (state.mode === 'summary' && ctrl.node.ply !== state.summaryPly) return setMode('moves');
-    if (state.mode === 'live') pump(ctrl);
+    // Off the game's moves, the review judges them like the free board.
+    if (state.mode === 'live' || (state.mode === 'moves' && state.review)) pump(ctrl);
     const key =
       state.mode === 'live'
         ? ['live', ctrl.path, liveDigest(judgeAt(ctrl, ctrl.path)), live.error].join('|')
-        : [state.mode, ctrl.node.ply, ctrl.onMainline, ctrl.getOrientation(), !!state.review, Math.round(state.progress * 100), state.error, state.explain, !!state.playing].join('|');
+        : [state.mode, ctrl.path, ctrl.onMainline, ctrl.getOrientation(), !!state.review, Math.round(state.progress * 100), state.error, state.explain, !!state.playing,
+            ctrl.onMainline ? '' : liveDigest(reviewMove(ctrl)), live.error].join('|');
     if (force || key !== state.lastKey) {
       state.lastKey = key;
       if (state.mode === 'summary') renderSummary(ctrl);
@@ -1534,11 +1578,10 @@
     else if (act === 'rows') state.allRows = !state.allRows;
     else if (act === 'first') jump(ctrl, 0);
     else if (act === 'last') jump(ctrl, last);
-    // Off the mainline (e.g. showing the best move): back to the game's move,
-    // or on to the next one.
-    else if (act === 'prev') jump(ctrl, ctrl.onMainline ? Math.max(0, ctrl.node.ply - 1) : Math.min(last, ctrl.node.ply));
-    else if (act === 'next') jump(ctrl, Math.min(last, ctrl.node.ply + 1));
-    else if (act === 'best') showBest(ctrl);
+    else if (act === 'prev' || act === 'next') {
+      const path = stepPath(ctrl, act === 'prev' ? -1 : 1);
+      if (path !== null) goTo(ctrl, path);
+    } else if (act === 'best') showBest(ctrl);
     else {
       // Starting the review goes to the first move.
       if (act === 'moves' && (!ctrl.onMainline || ctrl.node.ply === 0)) jump(ctrl, 1);
@@ -1716,8 +1759,8 @@
 
   // Badges in Lichess's move list, variations included: each move carries
   // its path in the tree.
-  function liveBadges(ctrl) {
-    for (const m of treeMoves()) {
+  function liveBadges(ctrl, moves = treeMoves()) {
+    for (const m of moves) {
       const path = m.getAttribute('p');
       const mv = judgeAt(ctrl, path);
       const cls = mv?.cls || '';
@@ -1784,7 +1827,19 @@
       } catch {}
     }
     state.review = classify(ctrl, positions, bookPly);
+    seedLive(ctrl, positions, bookPly);
     render(true);
+  }
+
+  // The moves played off the game are judged like the free board's: the
+  // game's positions are already analyzed, and its book moves known.
+  function seedLive(ctrl, positions, bookPly) {
+    const nodes = ctrl.mainline;
+    nodes.forEach((n, i) => live.evals.set(n.fen, positions[i]));
+    for (let i = 1; i <= bookPly && i < nodes.length; i++)
+      live.books.set(nodes[i].fen, { book: true, name: i === bookPly ? state.openingName : '', eco: '' });
+    if (nodes[bookPly + 1]) live.books.set(nodes[bookPly + 1].fen, { book: false, name: '', eco: '' });
+    live.judged.clear();
   }
 
   function start() {
