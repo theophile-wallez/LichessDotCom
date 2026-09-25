@@ -356,3 +356,69 @@ select {
   background: var(--cdc-mode-image) center / contain no-repeat !important;
   opacity: 1 !important;
 }
+
+/* -------------------------------------------------------------- tooltips --- */
+
+/* Chess.com's tooltip, in place of the browser's `title` on buttons (see
+ * content.js): a white bubble with a little arrow, above the button unless
+ * there's no room. A shortcut key ("Show threat (x)") gets a key cap. */
+.cdc-tooltip {
+  position: fixed;
+  z-index: 10000;
+  max-width: 240px;
+  padding: 6px 9px;
+  border-radius: 5px;
+  background: #fff;
+  box-shadow: 0 2px 8px #0006;
+  color: #312e2b;
+  font: 600 12px / 16px var(--cdc-font);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  translate: 0 3px;
+  transition: opacity 0.12s ease-out, translate 0.12s ease-out;
+}
+
+.cdc-tooltip[data-side='below'] {
+  translate: 0 -3px;
+}
+
+.cdc-tooltip.cdc-tooltip--on {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.cdc-tooltip::after {
+  content: '';
+  position: absolute;
+  left: var(--cdc-tooltip-arrow, 50%);
+  top: 100%;
+  border: 5px solid transparent;
+  border-top-color: #fff;
+  translate: -50% 0;
+}
+
+.cdc-tooltip[data-side='below']::after {
+  top: auto;
+  bottom: 100%;
+  border-color: transparent transparent #fff;
+}
+
+/* Lichess styles every <kbd> (light text, a border). */
+.cdc-tooltip kbd {
+  margin-left: 6px;
+  padding: 0 5px !important;
+  border: none !important;
+  border-radius: 3px !important;
+  background: #312e2b1a !important;
+  box-shadow: inset 0 -1px #312e2b33 !important;
+  color: inherit !important;
+  font: inherit !important;
+  font-size: 11px !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cdc-tooltip {
+    transition: none;
+  }
+}
