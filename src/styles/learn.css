@@ -60,6 +60,15 @@
   font-weight: 600 !important;
 }
 
+/* Only the stages scroll: the progress card stays in view. Desktop only:
+ * below 1020px Lichess's own top bar holds the top edge. */
+@media (min-width: 1020px) {
+  .learn--map .learn__side-home {
+    position: sticky;
+    top: 16px;
+  }
+}
+
 /* Chess.com's progress: a dark track with a green bar. */
 .learn__side-home .progress {
   height: 30px !important;
@@ -248,9 +257,11 @@ html[dir='rtl'] .learn-stages .stage {
   opacity: 1 !important;
 }
 
-/* Stage states. Lichess's state gradients go; not started stays neutral,
- * the next one keeps its animated border, done turns green. */
-.learn-stages .stage:is(.future, .ongoing, .done) {
+/* Stage states. Lichess's state gradients go and every card stays dark:
+ * not started stays neutral, the next one keeps its animated border, done
+ * gets a check on its tile. Not while hovered, or the hover's lighter fill
+ * would lose to this one. */
+.learn-stages .stage:is(.future, .ongoing, .done):not(:hover, .active) {
   background: var(--cdc-bg-panel) !important;
 }
 
@@ -266,11 +277,6 @@ html[dir='rtl'] .learn-stages .stage {
   --gradient-border: conic-gradient(from var(--border-angle), transparent 25%, var(--cdc-practice),
       color-mix(in srgb, var(--cdc-practice) 20%, transparent)) !important;
   border-radius: 12px !important;
-}
-
-.learn-stages .categ:not(.what_next) .stage.done {
-  border-color: #81b64c73 !important;
-  background: linear-gradient(90deg, #81b64c1f, var(--cdc-bg-panel) 60%) !important;
 }
 
 /* Done: a green check badge on the tile's corner. "What next" links are all
@@ -358,6 +364,42 @@ html[dir='rtl'] .learn-stages .stage {
 }
 
 /* ------------------------------------------------ inside a stage --- */
+
+/* Lichess sizes the board to the whole window's width, sidebar included,
+ * which pushed the goal panel past the window's edge from 1020 to about
+ * 1500px. Cap it to what the sidebar leaves: the other columns' minimum
+ * widths, the 2rem gaps, the page margins and a scrollbar. In two columns
+ * (to 1259px) the board comes first, so its ranks, drawn left of it
+ * (board.css), get a gutter: they fell under the sidebar. */
+@media (min-width: 1020px) and (max-width: 1259.29px) {
+  .learn--run {
+    --cdc-coords-l: 0px;
+
+    grid-template-columns:
+      min(
+        var(---col2-uniboard-width),
+        calc(100vw - var(--cdc-sidebar-w, 0px) - 2 * var(---main-margin, 0px) - var(--cdc-coords-l) - 290px)
+      )
+      minmax(240px, 400px) !important;
+    margin-left: var(--cdc-coords-l);
+  }
+
+  body:is(.coords-in, .coords-out) .learn--run {
+    --cdc-coords-l: calc(0.6 * var(--cdc-coords-size, 13px) + 10px);
+  }
+}
+
+@media (min-width: 1259.3px) {
+  .learn--run {
+    grid-template-columns:
+      minmax(var(---col3-uniboard-side-min, 250px), 350px)
+      min(
+        var(---col3-uniboard-width),
+        calc(100vw - var(--cdc-sidebar-w, 0px) - 2 * var(---main-margin, 0px) - 575px)
+      )
+      minmax(240px, 400px) !important;
+  }
+}
 
 /* The panel lines up with the board's top, like a lesson's, rather than
  * floating in the middle of the column. */
@@ -520,9 +562,11 @@ html[dir='rtl'] .learn-stages .stage {
   filter: brightness(0) invert(1) drop-shadow(0 1px 1px #0000004d);
 }
 
+/* The stage being played: a lighter row, like a selected menu item. Its
+ * tile carries the category's color; the row itself stays neutral. */
 .learn__side-map .stage.active {
-  background: color-mix(in srgb, var(--cdc-practice) 18%, transparent) !important;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cdc-practice) 35%, transparent);
+  background: #ffffff14 !important;
+  box-shadow: inset 0 0 0 1px #ffffff1a;
   color: #fff !important;
 }
 

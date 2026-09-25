@@ -77,6 +77,22 @@ main.page-menu:has(.puzzle-openings) .help icon::before {
   opacity: 1 !important;
 }
 
+/* Lichess writes the hint twice, for a keyboard and for a touch screen, and
+ * shows the one that fits the pointer: our display above showed both. */
+main.page-menu:has(.puzzle-openings) .help-touchscreen {
+  display: none;
+}
+
+@media (hover: none) {
+  main.page-menu:has(.puzzle-openings) .help-touchscreen {
+    display: inline-flex;
+  }
+
+  main.page-menu:has(.puzzle-openings) .help-keyboard {
+    display: none;
+  }
+}
+
 /* The sort menu opens from the end of its picker, toward the page: from its
  * start it would hang past the window, and even closed (hidden, not gone)
  * it widened the page once the box above stopped clipping. */
@@ -252,13 +268,18 @@ html[dir='rtl'] .puzzle-themes__link {
   -webkit-line-clamp: 2;
 }
 
-/* "Healthy mix": the featured card, green and larger. */
+/* "Healthy mix": the featured card, larger, on its green tile. The card
+ * itself stays dark: only the tile carries the green. */
 .puzzle-themes .puzzle-recommended .puzzle-themes__link {
   min-height: 104px;
   margin: 0 !important;
   padding-inline-start: 110px !important;
-  border-color: #81b64c73 !important;
-  background: linear-gradient(90deg, #81b64c2e, var(--cdc-bg-panel) 70%) !important;
+  /* Lichess gives this card a stronger border of its own. */
+  border-color: var(--cdc-card-border) !important;
+}
+
+.puzzle-themes .puzzle-recommended .puzzle-themes__link:hover {
+  border-color: color-mix(in srgb, var(--cdc-theme) 60%, transparent) !important;
 }
 
 .puzzle-themes .puzzle-recommended .puzzle-themes__link::before {
@@ -381,15 +402,15 @@ html[dir='rtl'] .puzzle-themes__link {
   --cdc-fam-piece: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wk.png');
 }
 
+/* The card stays dark: the family's color is on its tile and its chips'
+ * hover, not washed over the card (green or red for some families). */
 .puzzle-openings__tree__family {
   box-sizing: border-box;
   margin: 0 0 12px !important;
   padding: 14px 16px 16px;
   border: 1px solid var(--cdc-card-border);
   border-radius: 14px;
-  /* A wash of the family's color across the card, fading out. */
-  background: linear-gradient(100deg, color-mix(in srgb, var(--cdc-fam) 11%, transparent), transparent 45%),
-    var(--cdc-bg-panel);
+  background: var(--cdc-bg-panel);
 }
 
 /* Lichess indents headings by the box's side padding (50px), which we took off

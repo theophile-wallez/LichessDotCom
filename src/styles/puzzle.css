@@ -10,16 +10,54 @@
 
 /* ------------------------------------------------------------ layout --- */
 
+/* Lichess's stacked layout (1020 to 1259px: board and panel, the side under
+ * them) sizes the board to the whole window's width, sidebar included, which
+ * pushed the panel past the window's edge. Cap it to what the sidebar leaves:
+ * the panel's 240px, the eval bar's column and gaps (252px in all), the page
+ * margins and a scrollbar. The ranks stand left of the board (board.css), so
+ * the grid leaves them a gutter: they fell under the sidebar. */
+@media (min-width: 1020px) and (max-width: 1259.29px) {
+  main.puzzle {
+    --cdc-coords-l: 0px;
+
+    grid-template-columns:
+      min(
+        var(---col2-uniboard-width),
+        calc(100vw - var(--cdc-sidebar-w, 0px) - 2 * var(---main-margin, 0px) - var(--cdc-coords-l) - 270px)
+      )
+      var(---puzzle-gauge-col)
+      minmax(calc(240px - var(---puzzle-gauge-offset)), calc(400px - var(---puzzle-gauge-offset))) !important;
+    margin-left: var(--cdc-coords-l);
+  }
+
+  body:is(.coords-in, .coords-out) main.puzzle {
+    --cdc-coords-l: calc(0.6 * var(--cdc-coords-size, 13px) + 10px);
+  }
+
+  /* The files, under the board, reached into the session chips' row. */
+  body:is(.coords-in, .coords-out) main.puzzle .puzzle__session {
+    margin-top: calc(1.2 * var(--cdc-coords-size, 13px) - 10px) !important;
+  }
+
+  /* Lichess's bar is 15px wide here: too narrow for the score, which the
+     engine line above the moves shows anyway. */
+  main.puzzle .eval-gauge::after {
+    content: none !important;
+  }
+}
+
 /* Lichess sizes the board to the viewport's height and then adds the session
  * chips *under* it, so a tall window scrolls by that row. Here the board is
- * sized so that it and the chips fit. From 1260px only, like Lichess's own
- * three columns: any narrower, beside our sidebar, the board would shrink to
- * a stamp, so Lichess's stacked layout is kept (side under the board).
+ * sized so that it and the chips fit. From Lichess's own three columns only
+ * (1259.3px, not 1260px: at a zoom level landing in between, Lichess's grid
+ * would take over half-styled): any narrower, beside our sidebar, the board
+ * would shrink to a stamp, so Lichess's stacked layout is kept (side under the
+ * board).
  * The eval bar sits left of the board, as on the analysis page: its column is
  * only as wide as the gap until Lichess shows the bar (.gauge-on, once the
  * puzzle is over), but the board's size already counts it, so the board
  * doesn't shrink then. */
-@media (min-width: 1260px) {
+@media (min-width: 1259.3px) {
   main.puzzle {
     --cdc-gap: 16px;
     --cdc-side-w: clamp(250px, 19vw, 340px);
@@ -28,18 +66,20 @@
     --cdc-coords-l: 0px;
     --cdc-coords-off: 0px;
     --cdc-gauge-col: calc(var(--cdc-gap) + var(--cdc-coords-l));
+    --cdc-side-col: var(--cdc-side-w);
     --cdc-session-h: 38px;
+    --cdc-kb-h: 0px;
     --cdc-board: max(
       320px,
       min(
-        calc(100vh - 28px - var(--cdc-coords-off) - var(--cdc-session-h)),
+        calc(100vh - 28px - var(--cdc-coords-off) - var(--cdc-session-h) - var(--cdc-kb-h)),
         calc(100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-side-w) - var(--cdc-tools-w)
           - var(--cdc-gauge-w) - var(--cdc-coords-l) - 3 * var(--cdc-gap) - 48px)
       )
     );
 
     grid-template-columns:
-      var(--cdc-side-w) var(--cdc-gauge-col) var(--cdc-board) var(--cdc-gap)
+      var(--cdc-side-col) var(--cdc-gauge-col) var(--cdc-board) var(--cdc-gap)
       var(--cdc-tools-w) !important;
     grid-template-rows: var(--cdc-board) calc(var(--cdc-coords-off) + var(--cdc-session-h)) auto !important;
     grid-template-areas:
@@ -58,12 +98,35 @@
     --cdc-coords-off: calc(1.2 * var(--cdc-coords-size, 13px) + 8px);
   }
 
+  /* The bar's column grows by what the side card gives up, so the centred
+     grid keeps its width: the board and the panel stay put when the bar
+     comes in at the end of the puzzle, instead of the whole page jumping. */
   main.puzzle.gauge-on {
     --cdc-gauge-col: calc(var(--cdc-gap) + var(--cdc-gauge-w) + 8px + var(--cdc-coords-l));
+    --cdc-side-col: calc(var(--cdc-side-w) - var(--cdc-gauge-w) - 8px);
+  }
+
+  /* The keyboard-move input (a preference) gets a row under the chips: the
+     board leaves it room, so the page still fits the window. */
+  main.puzzle:has(> .keyboard-move) {
+    --cdc-kb-h: 44px;
   }
 
   main.puzzle .puzzle__board {
     grid-area: board !important;
+  }
+
+  /* Like the game and analysis pages, the page itself never scrolls: Lichess
+     keeps a bottom margin on tall windows, and its hidden hover cards sit at
+     the document's end. The side card and the move list scroll in place. */
+  html:has(main.puzzle),
+  html:has(main.puzzle) body {
+    overflow: hidden !important;
+  }
+
+  html:has(main.puzzle) body {
+    height: 100vh;
+    margin-bottom: 0 !important;
   }
 
   /* The chips in one row: a long session scrolls sideways (content.js keeps
@@ -113,7 +176,7 @@ main.puzzle .puzzle__side strong {
 
 /* Three columns: the whole side is one card, its blocks split by thin rules.
  * It scrolls inside itself if it's taller than the board, never the page. */
-@media (min-width: 1260px) {
+@media (min-width: 1259.3px) {
   main.puzzle .puzzle__side {
     display: flex !important;
     flex-direction: column;
@@ -192,6 +255,34 @@ main.puzzle .puzzle__side__metas p {
   margin: 0;
 }
 
+/* Lichess keeps each line on one row and clips the block, which cut long
+ * player names (and their rating) at the card's edge. Let them wrap: a
+ * rating pushed to a second line starts under the name, not the dot. */
+main.puzzle .puzzle__side__metas .infos {
+  white-space: normal !important;
+}
+
+main.puzzle .puzzle__side__metas .infos > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+main.puzzle .puzzle__side__metas .players .player {
+  padding-inline-start: 1.7em;
+  text-indent: -1.7em;
+}
+
+/* The indent is inherited: the title badge inside the link would take it. */
+main.puzzle .puzzle__side__metas .players .user-link {
+  white-space: normal;
+  text-indent: 0;
+}
+
+/* Rating "hidden" until solved: dim, but readable. */
+main.puzzle .puzzle__side__metas .hidden {
+  color: var(--cdc-text-dim) !important;
+}
+
 /* Your puzzle rating, big, after Chess.com's puzzle icon. */
 main.puzzle .puzzle__side__user__rating strong {
   flex-wrap: nowrap !important;
@@ -203,11 +294,23 @@ main.puzzle .puzzle__side__user__rating strong {
   letter-spacing: -0.02em;
 }
 
+/* As tall as the number. It used to shrink to a dot in a narrow card. */
 main.puzzle .puzzle__side__user__rating strong::before {
   content: '';
-  width: 44px;
-  height: 44px;
+  flex: none;
+  width: 1em;
+  height: 1em;
   background: url('https://assets-ds.chess.com/color-icons/puzzle-piece.svg') center / contain no-repeat;
+}
+
+/* In three columns the rating, its change and the icon share the side card's
+ * width, which the eval bar narrows once the puzzle is over: the size
+ * follows the card (a 4-digit rating is about 2.4em, the icon 1em, the change
+ * and the gaps 78px, the card's padding and scrollbar 56px). */
+@media (min-width: 1259.3px) {
+  main.puzzle .puzzle__side__user__rating strong {
+    font-size: clamp(24px, calc((var(--cdc-side-col) - 134px) / 3.4), 44px) !important;
+  }
 }
 
 main.puzzle .puzzle__side__user .rp {
@@ -239,6 +342,72 @@ main.puzzle .puzzle__side__theme__back:hover {
 
 main.puzzle .puzzle__side__theme > p {
   margin: 0;
+}
+
+/* A replay of failed puzzles (from the dashboard): "Replaying Fork puzzles"
+ * as the block's title, like the theme's, over Chess.com's progress bar. */
+main.puzzle .puzzle__side__replay > a {
+  margin-bottom: 10px !important;
+  color: #fff !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  transition: color 0.15s;
+}
+
+main.puzzle .puzzle__side__replay > a:hover {
+  color: var(--cdc-green-hover) !important;
+}
+
+main.puzzle .puzzle__side__replay__bar {
+  height: 30px !important;
+  border-radius: 999px !important;
+  background: #ffffff12 !important;
+  box-shadow: inset 0 1px 2px #00000066;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800 !important;
+  text-shadow: 0 1px 1px #00000066;
+}
+
+main.puzzle .puzzle__side__replay__bar::before {
+  min-width: 30px;
+  border-radius: 999px;
+  background: var(--cdc-btn-green) !important;
+  box-shadow: inset 0 1px 0 #9ccd5e;
+}
+
+/* The daily puzzle's block: a title like any theme's, not a lone box drawn
+ * in Lichess's accent inside the card. */
+main.puzzle .puzzle__side__theme--daily {
+  outline: none !important;
+}
+
+main.puzzle .puzzle__side__theme--daily a {
+  text-align: start !important;
+}
+
+/* Puzzle Streak's title: a card title that fits the side card, not Lichess's
+ * 2.2rem heading breaking over two lines. The streak keeps its gold. */
+main.puzzle .puzzle__side__streak__info h1 {
+  gap: 10px;
+  margin: 0 0 8px !important;
+  font-size: 22px !important;
+  line-height: 1.2;
+}
+
+main.puzzle .puzzle__side__streak__info h1::before {
+  font-size: 1.3em !important;
+}
+
+main.puzzle .puzzle__side__streak__info p {
+  margin: 0;
+}
+
+/* The run's score, bold like a rating. */
+main.puzzle .puzzle__side__streak__score {
+  gap: 12px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 /* The puzzle's themes: a stack of rounded rows, the name in white and the
@@ -356,6 +525,30 @@ main.puzzle .puzzle__session a.result-false {
 
 main.puzzle .puzzle__session a.current {
   box-shadow: 0 0 0 2px #fff;
+}
+
+/* The next puzzle, once this one is over: Lichess paints it in the link
+ * color, which is our green, so it read as one more solved puzzle. A grey
+ * chip with a "next" triangle, the dashboard's replay one (--cdc-play, in
+ * dashboard.css). */
+main.puzzle .puzzle__session a.session-new {
+  background: var(--cdc-btn-grey) !important;
+  box-shadow: var(--cdc-btn-grey-shadow);
+  color: var(--cdc-text) !important;
+}
+
+main.puzzle .puzzle__session a.session-new:hover {
+  background: var(--cdc-btn-grey-hover) !important;
+  color: #fff !important;
+}
+
+main.puzzle .puzzle__session a.session-new::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background: currentColor;
+  -webkit-mask: var(--cdc-play) center / contain no-repeat;
+  mask: var(--cdc-play) center / contain no-repeat;
 }
 
 /* ------------------------------------------------------ status banner --- */
@@ -520,6 +713,12 @@ main.puzzle .puzzle__feedback .view_solution:not(.skip) .button:nth-child(2) {
   --cdc-hint-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m12 1.5c5.8 0 10.5 4.7 10.5 10.5s-4.7 10.5-10.5 10.5-10.5-4.7-10.5-10.5 4.7-10.5 10.5-10.5zm-.07 12.13c4.5 0 5.57-2.53 5.57-4.23 0-3-2.5-4.57-5.17-4.57-2.3 0-4.03 1.27-4.93 2.1-.47.53-.5.93-.07 1.47l.63.77c.47.57.83.57 1.3.07.67-.6 1.83-1.4 3.17-1.4 1 0 2.07.37 2.07 1.6 0 1.07-.87 1.2-2.57 1.2h-.4c-.73 0-1 .27-1 .97v1.03c0 .73.27 1 .97 1zm.07 5.2c1.13 0 1.83-.7 1.83-1.83s-.7-1.83-1.83-1.83-1.83.7-1.83 1.83.7 1.83 1.83 1.83z'/%3E%3C/svg%3E");
 }
 
+/* The streak's "skip" comes lowercase from Lichess, which the buttons'
+ * uppercase used to hide. */
+main.puzzle .puzzle__feedback .view_solution.skip .button::first-letter {
+  text-transform: uppercase;
+}
+
 /* The hint, once shown: pressed in, not a green call to action. */
 main.puzzle .puzzle__feedback .view_solution .button:not(.button-empty) {
   background: #282725 !important;
@@ -540,6 +739,22 @@ main.puzzle .puzzle__feedback.after .complete {
   font-size: 22px;
   font-weight: 800;
   text-align: center;
+}
+
+/* Puzzle Streak's end: "Game over" as the title, not Lichess's spaced-out
+ * capitals over a rule, and the run's score under it. */
+main.puzzle .puzzle__feedback.after .complete .game-over {
+  margin: 0 0 4px !important;
+  padding: 0 !important;
+  border: none !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+
+main.puzzle .puzzle__feedback.after .complete .game-over + span {
+  color: var(--cdc-text-dim);
+  font-size: 16px;
+  font-weight: 700;
 }
 
 main.puzzle .puzzle__feedback.after .continue {
@@ -694,6 +909,12 @@ main.puzzle .tview2 move.active {
   background: #ffffff24 !important;
   color: #fff !important;
   font-weight: 700;
+}
+
+/* Move numbers in the analysis page's dim grey: Lichess's dimmer one was
+ * barely readable on the panel. */
+main.puzzle .tview2-column > index {
+  color: var(--cdc-text-dim) !important;
 }
 
 /* The engine line shown once the puzzle is over. Padding only across: the

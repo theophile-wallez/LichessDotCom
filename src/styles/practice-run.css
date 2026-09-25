@@ -12,14 +12,87 @@
  * board. Loads after analysis.css, whose `main.analyse` grid it re-shapes.
  */
 
+/* ----------------------------------------------------- lesson header --- */
+
+/* A dark header, the study's icon on a green tile: a whole green header
+   shouts next to the board. On every screen: Lichess's mobile layout paints
+   it in its primary color, which our theme makes green. */
+.practice__side__title {
+  position: relative;
+  isolation: isolate;
+  gap: 12px;
+  padding: 13px 16px !important;
+  border-bottom: 1px solid var(--cdc-card-border);
+  background: none !important;
+  box-shadow: none;
+  color: #fff !important;
+}
+
+/* The tile, behind the icon: the filter that whitens the icon would whiten
+   a background on the icon itself. */
+.practice__side__title::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  inset-inline-start: 16px;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  border-radius: 12px;
+  background: var(--cdc-btn-green);
+  box-shadow: inset 0 1px 0 #ffffff40, inset 0 -3px 0 #00000026, 0 4px 10px #00000040;
+}
+
+/* The study's own icon, drawn white on the tile. */
+.practice__side__title icon {
+  flex: 0 0 44px !important;
+  height: 44px !important;
+  margin: 0 !important;
+  background-size: 30px !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  opacity: 1 !important;
+  filter: brightness(0) invert(1) drop-shadow(0 1px 2px #0000004d);
+}
+
+.practice__side__title h1 {
+  font-size: 19px !important;
+  font-weight: 800 !important;
+  line-height: 1.2;
+}
+
+.practice__side__title em {
+  color: var(--cdc-text-dim);
+  font-size: 13px !important;
+  font-style: normal;
+  font-weight: 600;
+  opacity: 1 !important;
+}
+
+/* The drill's box title ("Practice with computer"): a quiet label rather than
+   a band in Lichess's accent, which our theme makes green. */
+main.analyse .practice-box > .title {
+  padding: 8px 14px 0 !important;
+  background: transparent !important;
+  color: var(--cdc-text-dim) !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 @media (min-width: 1020px) {
   /* --------------------------------------------------------- layout --- */
 
   main.analyse:has(.practice__side) {
     /* The panel's rows are shares of the board's height, not of the content's:
        without a definite height a `1fr` row grows to fit its content, and the
-       chapter list would push the coach off the page instead of scrolling. */
-    height: var(--cdc-board);
+       chapter list would push the coach off the page instead of scrolling.
+       A small board (a narrow window) squeezed the panel until the drill's
+       "your turn" box or the chapter list fell out of it: the panel then
+       takes up to 660px of the window's height, below the board's end. */
+    height: max(var(--cdc-board), min(100vh - var(--cdc-v-room, 56px), 660px));
     row-gap: 10px !important;
     grid-template-rows: minmax(0, 1fr) auto !important;
     grid-template-areas:
@@ -30,9 +103,12 @@
   /* A drill keeps the engine bar, the moves and Lichess's controls, with the
      goal card between the lesson card and them. `.practice-box` alone is not
      enough to recognize one: "practice with computer" puts the same box in the
-     panel of any analysis board, and that page keeps the analysis layout. */
+     panel of any analysis board, and that page keeps the analysis layout.
+     The tools never get less than the engine line and the drill's own box
+     with a verdict under it (about 190px): in a short panel the verdict
+     ("Good move", "Mistake") was cut off. The chapter list gives way. */
   main.analyse:has(.practice__side):has(.practice-box) {
-    grid-template-rows: minmax(0, 1.4fr) auto minmax(0, 1fr) var(--cdc-ctrl-h) !important;
+    grid-template-rows: minmax(0, 1fr) auto minmax(190px, 1fr) var(--cdc-ctrl-h) !important;
     grid-template-areas:
       'gauge board side'
       'gauge board goal'
@@ -52,7 +128,7 @@
   }
 
   main.analyse:has(.practice__side):has(.practice-box):has(.keyboard-move) {
-    grid-template-rows: minmax(0, 1.4fr) auto minmax(0, 1fr) var(--cdc-ctrl-h) auto !important;
+    grid-template-rows: minmax(0, 1fr) auto minmax(190px, 1fr) var(--cdc-ctrl-h) auto !important;
     grid-template-areas:
       'gauge board side'
       'gauge board goal'
@@ -88,61 +164,6 @@
     border-radius: 12px !important;
     background: var(--cdc-bg-panel) !important;
     box-shadow: none !important;
-  }
-
-  /* A dark header, the study's icon on a green tile: a whole green header
-     shouts next to the board. */
-  .practice__side__title {
-    position: relative;
-    isolation: isolate;
-    gap: 12px;
-    padding: 13px 16px !important;
-    border-bottom: 1px solid var(--cdc-card-border);
-    background: none !important;
-    box-shadow: none;
-    color: #fff !important;
-  }
-
-  /* The tile, behind the icon: the filter that whitens the icon would whiten
-     a background on the icon itself. */
-  .practice__side__title::before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    top: 50%;
-    inset-inline-start: 16px;
-    width: 44px;
-    height: 44px;
-    margin-top: -22px;
-    border-radius: 12px;
-    background: var(--cdc-btn-green);
-    box-shadow: inset 0 1px 0 #ffffff40, inset 0 -3px 0 #00000026, 0 4px 10px #00000040;
-  }
-
-  /* The study's own icon, drawn white on the tile. */
-  .practice__side__title icon {
-    flex: 0 0 44px !important;
-    height: 44px !important;
-    margin: 0 !important;
-    background-size: 30px !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    opacity: 1 !important;
-    filter: brightness(0) invert(1) drop-shadow(0 1px 2px #0000004d);
-  }
-
-  .practice__side__title h1 {
-    font-size: 19px !important;
-    font-weight: 800 !important;
-    line-height: 1.2;
-  }
-
-  .practice__side__title em {
-    color: var(--cdc-text-dim);
-    font-size: 13px !important;
-    font-style: normal;
-    font-weight: 600;
-    opacity: 1 !important;
   }
 
   .practice__side__chapters {
@@ -203,9 +224,11 @@
     transform: scale(1.1);
   }
 
+  /* The step being played: a lighter row, like a selected menu item, and
+     its number on the green badge. The row itself stays neutral. */
   .ps__chapter.active {
-    background: color-mix(in srgb, var(--cdc-green) 18%, transparent) !important;
-    box-shadow: inset 0 0 0 1px #81b64c59;
+    background: #ffffff14 !important;
+    box-shadow: inset 0 0 0 1px #ffffff1a;
   }
 
   .ps__chapter.active h3 {
@@ -283,6 +306,17 @@
     color: #312e2b;
     font-weight: 500;
     line-height: 1.5;
+  }
+
+  /* A link in a white bubble (the lesson's, the drill's): the site's green
+     is too pale on white (2.4:1), the theme's darker one reads (5.4:1). */
+  main.analyse :is(.gamebook .comment .content, .analyse__underboard .feedback) a {
+    color: var(--cdc-green-shadow) !important;
+    font-weight: 700;
+  }
+
+  main.analyse :is(.gamebook .comment .content, .analyse__underboard .feedback) a:hover {
+    text-decoration: underline;
   }
 
   /* On a lesson the bubble shares the panel with the chapter list, so a long
@@ -393,11 +427,10 @@
     font-weight: 600;
   }
 
-  /* "Good move": a green card, not a bare line of text. */
+  /* "Good move": a card with the verdict in green, not a bare line of text.
+     The card stays dark: a green one would shout next to the board. */
   main.analyse .gamebook .feedback.info.good {
-    border-color: #81b64c59;
-    background: linear-gradient(#81b64c2e, #81b64c14);
-    color: #fff;
+    color: var(--cdc-green-hover);
     font-size: 19px !important;
     font-weight: 800;
   }
@@ -687,6 +720,38 @@
       margin-top: 8px !important;
       padding-top: 8px;
     }
+
+    /* The lesson card's header and footer tighten too: two steps of the
+       list stay in view beside a drill at 640px, not one. */
+    .practice__side__title {
+      padding-block: 8px !important;
+    }
+
+    .practice__side__title::before {
+      width: 38px;
+      height: 38px;
+      margin-top: -19px;
+      border-radius: 10px;
+    }
+
+    .practice__side__title icon {
+      flex-basis: 38px !important;
+      height: 38px !important;
+      background-size: 26px !important;
+    }
+
+    .practice__side .finally {
+      padding: 6px 8px !important;
+    }
+
+    .practice__side .finally .back {
+      flex-basis: 30px !important;
+      height: 30px;
+    }
+
+    .practice__side .finally select {
+      height: 30px;
+    }
   }
 
   /* The drill's own box, at the bottom of the moves panel. Lichess underlines
@@ -698,14 +763,24 @@
     border-bottom: none !important;
   }
 
-  main.analyse .practice-box > .title {
-    padding: 8px 14px 0 !important;
-    background: transparent !important;
-    color: var(--cdc-text-dim) !important;
-    font-size: 11.5px !important;
-    font-weight: 800 !important;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+  /* A short panel leaves the tools room for the engine line and the drill's
+     box only: rather than a sliver of a move row between them, the moves go
+     until a whole row fits (from 222px, with a verdict in the box). The tools'
+     height comes from the grid row, so it can be queried. */
+  main.analyse:has(.practice__side):has(.practice-box) .analyse__tools {
+    container: cdc-drill-tools / size;
+  }
+
+  @container cdc-drill-tools (max-height: 221px) {
+    main.analyse .analyse__moves {
+      display: none !important;
+    }
+
+    /* The box then follows the engine line: the room left, kept for the
+       verdict, is under it (where the verdict comes), not a hole above. */
+    main.analyse .practice-box {
+      margin-top: 0;
+    }
   }
 
   /* Lichess's `.feedback` centers its row; the instruction reads left. */

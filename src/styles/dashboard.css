@@ -55,15 +55,24 @@ main.page-menu .page-menu__content.puzzle-dashboard {
   font-weight: 600 !important;
 }
 
-/* Lichess blows the range picker up to 2em to match its huge title. */
-.puzzle-dashboard .puzzle-dashboard__day-select.mselect {
+/* Lichess blows the range picker up to 2em to match its huge title. Its
+ * `__day-select` name only ends up in the picker's id (lila's mselect takes
+ * it as one), so the picker is found by where it sits. */
+.puzzle-dashboard .box__top .mselect {
   margin: 5px 0 0 !important;
   font-size: 1rem !important;
 }
 
-.puzzle-dashboard .puzzle-dashboard__day-select .mselect__item {
+.puzzle-dashboard .box__top .mselect__item {
   padding: 9px 14px !important;
   font-size: 14px !important;
+}
+
+/* The menu opens from the picker's end, toward the page: from its start it
+ * hung past the window, and even closed (hidden, not gone) it widened the
+ * page, now that the box doesn't clip. */
+.puzzle-dashboard .box__top .mselect__list {
+  inset-inline: auto 0 !important;
 }
 
 /* ------------------------------------------------------------ stat tiles --- */
@@ -243,7 +252,13 @@ html[dir='rtl'] .puzzle-dashboard .puzzle-dashboard__metric--win::after {
   box-shadow: inset 0 1px 0 #ffffff0f;
 }
 
+/* Lichess gives the name and description 40% of the row, which pushed the
+ * tiles under them on pages the side menu makes narrower (a long language),
+ * row by row depending on the last tile. A plain basis: they wrap together,
+ * and only when the row is really narrow. */
 .puzzle-dashboard .puzzle-dashboard__theme__meta {
+  flex: 1 1 260px !important;
+  min-width: 0;
   margin-inline-end: 0 !important;
 }
 
@@ -270,10 +285,15 @@ html[dir='rtl'] .puzzle-dashboard .puzzle-dashboard__metric--win::after {
 }
 
 /* Inside a card, the tiles are the darker layer, and smaller. Their width is
- * fixed so that rows line up whichever replay tile they end on. */
+ * fixed, and the last one (replay or all clear) is at least as wide as a
+ * "12 to replay", so that rows line up whichever tile they end on. */
 .puzzle-dashboard .puzzle-dashboard__theme .puzzle-dashboard__metrics {
   flex: 0 0 auto !important;
   justify-content: flex-end;
+}
+
+.puzzle-dashboard .puzzle-dashboard__theme .puzzle-dashboard__metric--fix {
+  min-width: 140px;
 }
 
 .puzzle-dashboard .puzzle-dashboard__theme .puzzle-dashboard__metric {
@@ -360,9 +380,10 @@ html[dir='rtl'] .puzzle-dashboard .puzzle-dashboard__metric--win::after {
 }
 
 /* The padding is the labels' room: they reach about 110px past the rim
- * sideways and two lines above and below it. */
+ * sideways, and three lines above and below it where a long theme name
+ * wraps (the bottom one spilled out of the panel). */
 .cdc-radar {
-  padding: 46px clamp(18px, 12%, 130px) 42px;
+  padding: 58px clamp(18px, 12%, 130px);
   border-radius: 12px;
   /* A vignette centred on the plot: the panel is much wider than the chart. */
   background: radial-gradient(circle at 50% 52%, #2e2d29, var(--cdc-bg-panel) 65%);
@@ -444,9 +465,10 @@ html[dir='rtl'] .puzzle-dashboard .puzzle-dashboard__metric--win::after {
   font-variant-numeric: tabular-nums;
 }
 
+/* Narrower labels here, but they still need about 72px beside the rim. */
 @media (max-width: 1100px) {
   .cdc-radar {
-    padding-inline: clamp(12px, 9%, 60px);
+    padding-inline: 72px;
   }
 
   .cdc-radar__label {
@@ -458,9 +480,37 @@ html[dir='rtl'] .puzzle-dashboard .puzzle-dashboard__metric--win::after {
   }
 }
 
+/* Phones: the labels at the side spokes reach about 85px past the rim, more
+ * than the panel had, and ran off the screen. Narrower labels, and room. */
+@media (max-width: 649.98px) {
+  .cdc-radar {
+    padding: 52px 64px;
+  }
+
+  .cdc-radar__label {
+    max-width: 9ch;
+  }
+
+  .cdc-radar__name {
+    font-size: 11px;
+  }
+
+  .cdc-radar__value {
+    font-size: 11px;
+  }
+}
+
+/* Lichess's mobile layout runs the page edge to edge: the cards get the
+ * same inset as on the other puzzle pages. */
+@media (max-width: 799.98px) {
+  main.page-menu .page-menu__content.puzzle-dashboard {
+    padding: 0 12px 24px !important;
+  }
+}
+
 /* Stacked tiles below the Chess.com breakpoint: Lichess switches its own row
  * to a column there too. */
-@media (max-width: 1019px) {
+@media (max-width: 1019.98px) {
   .puzzle-dashboard .box__top {
     flex-flow: row wrap !important;
   }

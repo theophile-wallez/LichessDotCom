@@ -16,13 +16,24 @@
 }
 
 /* Chess.com's Drills illustration (its own practice mode) instead of
- * Lichess's grey golem. Loaded from Chess.com's CDN at runtime. */
+ * Lichess's grey golem. Loaded from Chess.com's CDN at runtime. Lichess's
+ * light theme darkens the golem to near black, which would black out ours
+ * too, hence the !important. */
 .practice-side__decoration {
   content: url('https://assets-ds.chess.com/color-icons/drills.svg');
   width: 120px !important;
   opacity: 1 !important;
-  filter: drop-shadow(0 8px 16px #0006);
+  filter: drop-shadow(0 8px 16px #0006) !important;
   animation: cdc-float 4s ease-in-out infinite;
+}
+
+/* Only the lessons scroll: the progress card stays in view. Desktop only:
+ * below 1020px Lichess's own top bar holds the top edge. */
+@media (min-width: 1020px) {
+  .practice-side {
+    position: sticky;
+    top: 16px;
+  }
 }
 
 @keyframes cdc-float {
@@ -226,11 +237,11 @@ html[dir='rtl'] .practice-app .study {
   opacity: 1 !important;
 }
 
-/* Lesson states. Lichess's state gradients go; not started stays neutral,
- * in progress keeps its animated border, done turns green. */
-.practice-app .study.future,
-.practice-app .study.ongoing,
-.practice-app .study.done {
+/* Lesson states. Lichess's state gradients go and every card stays dark:
+ * not started stays neutral, in progress keeps its animated border, done
+ * gets a check on its tile. Not while hovered, or the hover's lighter fill
+ * would lose to this one. */
+.practice-app .study:is(.future, .ongoing, .done):not(:hover, .active) {
   background: var(--cdc-bg-panel) !important;
 }
 
@@ -242,11 +253,6 @@ html[dir='rtl'] .practice-app .study {
   --gradient-border: conic-gradient(from var(--border-angle), transparent 25%, var(--cdc-practice),
       color-mix(in srgb, var(--cdc-practice) 20%, transparent)) !important;
   border-radius: 12px !important;
-}
-
-.practice-app .study.done {
-  border-color: #81b64c73 !important;
-  background: linear-gradient(90deg, #81b64c1f, var(--cdc-bg-panel) 60%) !important;
 }
 
 /* Done: a green check badge on the tile's corner. */
@@ -312,8 +318,13 @@ html[dir='rtl'] .practice-app .study {
   text-shadow: none !important;
 }
 
-/* Lichess's mobile layout runs the sections edge to edge. */
+/* Lichess's mobile layout runs the sections edge to edge. The progress card
+ * on top gets the same inset, or it sat flush against the window's edge. */
 @media (max-width: 799.98px) {
+  .practice-side {
+    margin-inline: 12px !important;
+  }
+
   .practice-app {
     padding: 0 12px 24px !important;
   }
