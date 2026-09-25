@@ -1424,13 +1424,6 @@
   dom.panel.addEventListener('click', onClick);
   dom.controls.addEventListener('click', onClick);
 
-  let lastWidth = 0;
-  window.addEventListener('resize', () => {
-    if (Math.abs(window.innerWidth - lastWidth) > 4) {
-      lastWidth = window.innerWidth;
-      render(true);
-    }
-  });
 
   // ------------------------------------------------------------ live ---
 
@@ -1648,17 +1641,27 @@
     const ctrl = site.analysis;
     if (!['standard', 'fromPosition', 'chess960'].includes(ctrl.data?.game?.variant?.key)) return;
     if (ctrl.synthetic) {
-      if (!ctrl.tree) return;
-      html.classList.add('cdc-review');
-      setMode('live');
-      setInterval(() => render(), 150);
+      if (ctrl.tree) run('live');
       return;
     }
     if (!ctrl.data.game.id || !ctrl.mainline || ctrl.mainline.length < 2) return;
-    html.classList.add('cdc-review');
-    setMode('summary');
-    setInterval(() => render(), 150);
+    run('summary');
     analyseGame(ctrl);
+  }
+
+  // Only once the review runs: a render on a page it doesn't run on (a
+  // variant, a game without moves) would show its panel with nothing in it.
+  function run(mode) {
+    html.classList.add('cdc-review');
+    setMode(mode);
+    setInterval(() => render(), 150);
+    let lastWidth = window.innerWidth;
+    window.addEventListener('resize', () => {
+      if (Math.abs(window.innerWidth - lastWidth) > 4) {
+        lastWidth = window.innerWidth;
+        render(true);
+      }
+    });
   }
 
   const started = Date.now();
