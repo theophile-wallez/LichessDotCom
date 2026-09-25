@@ -50,7 +50,8 @@
         "src/styles/fide.css",
         "src/styles/bots.css",
         "src/styles/simul.css",
-        "src/styles/forum.css"
+        "src/styles/forum.css",
+        "src/styles/patron.css"
       ],
       "js": ["src/content.js", "src/dashboard.js", "src/ratingchart.js"],
       "run_at": "document_start"
