@@ -1101,6 +1101,68 @@
     color: var(--c) !important;
   }
 
+  /* ---------------------------------------------------------- opening --- */
+
+  /* The opening's name heads the move list, like Chess.com's: review.js
+     appends it to Lichess's panel (a flex column), and `order` puts it
+     under the engine, above the moves. Signed out there's no name. */
+  #cdc-opening {
+    display: none;
+  }
+
+  html.cdc-review-live.cdc-opening-on main.analyse .analyse__tools > :not(.ceval, .pv_box, #cdc-opening) {
+    order: 2;
+  }
+
+  html.cdc-review-live.cdc-opening-on main.analyse #cdc-opening {
+    order: 1;
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-sizing: border-box;
+    height: 36px;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--cdc-border);
+    background: var(--cdc-bg-panel);
+    color: var(--cdc-text);
+    font-family: var(--cdc-font);
+    font-size: 13px;
+    line-height: 1;
+  }
+
+  #cdc-opening .cdc-opening__icon {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    background: var(--i) center / contain no-repeat;
+  }
+
+  /* The ECO code as a small book-colored pill. */
+  #cdc-opening .cdc-opening__eco {
+    flex: none;
+    padding: 3px 6px;
+    border-radius: 4px;
+    background: rgba(213, 164, 125, 0.16);
+    color: #d5a47d;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+
+  #cdc-opening .cdc-opening__name {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--cdc-text-dim);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #cdc-opening .cdc-opening__name b {
+    color: var(--cdc-text-strong);
+    font-weight: 700;
+  }
+
   /* Narrow white column, black gets the rest. */
   html.cdc-review-moves main.analyse .tview2-column > move + move {
     flex: 0 0 calc(74% - 40px) !important;
