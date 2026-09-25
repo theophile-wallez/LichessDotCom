@@ -271,8 +271,11 @@
     display: none;
   }
 
+  /* Lichess makes them blocks with left-aligned text: the glyph sat left. */
   main.analyse .ceval > button {
     flex: none;
+    display: grid !important;
+    place-items: center;
     width: 32px;
     height: 32px;
     padding: 0 !important;
@@ -590,7 +593,10 @@
     font-size: 17px;
   }
 
+  /* Lichess fills an active toggle (the explorer) with its green: the icon,
+     green too, vanished. A green icon on a faint green tile instead. */
   main.analyse .analyse__controls > .fbt.active {
+    background: #81b64c26 !important;
     color: var(--cdc-green) !important;
   }
 

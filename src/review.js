@@ -34,6 +34,7 @@
         intro: 'Passons en revue cette partie !', bestWas: 'Le meilleur coup était {m}.',
         engineError: "Le moteur n'a pas pu démarrer.",
         liveIntro: 'Joue un coup, je te dirai ce que j’en pense.', thinking: 'Voyons ce coup…',
+        startPosition: 'Position de départ',
       }
     : {
         review: 'Game Review', start: 'Start Review', next: 'Next', explain: 'Explain', best: 'Best',
@@ -42,6 +43,7 @@
         intro: "Let's review this game!", bestWas: '{m} was best.',
         engineError: 'The engine failed to start.',
         liveIntro: 'Play a move and I’ll tell you what I think.', thinking: 'Let me look at this move…',
+        startPosition: 'Starting position',
       };
 
   // What the coach says while the game is analyzed, like Chess.com.
@@ -70,8 +72,31 @@
     coach = 1 + Math.floor(Math.random() * COACHES);
     localStorage.setItem('cdc-coach', coach);
   }
-  const coachAvatar = () =>
-    `<button class="cdc-coach__avatar" data-cdc="coach" data-coach="${coach}" title="${esc(T.coach)}" aria-label="${esc(T.coach)}"></button>`;
+  // The coach blinks, and its face shows the verdict (review.css): a mood
+  // per class. The face eases into it once per move, not again when the same
+  // move is re-rendered (Explain, a new coach). `at` names the move: its
+  // ply, or its path.
+  const MOODS = {
+    brilliant: 'delight', great: 'delight', best: 'happy', excellent: 'happy', good: 'calm', book: 'calm',
+    inaccuracy: 'doubt', mistake: 'worry', miss: 'worry', blunder: 'shock',
+  };
+  // Under the lids, the brows and mouth the expressions move, each over a
+  // patch of skin that hides it where it was.
+  const FACE = ['patch', 'part']
+    .flatMap(k => ['brow-l', 'brow-r', 'mouth'].map(f => `<i class="cdc-coach__${k} cdc-coach__${k}--${f}"></i>`))
+    .concat(['l', 'r'].map(s => `<i class="cdc-coach__lid cdc-coach__lid--${s}"></i>`))
+    .join('');
+  let reacted = '';
+  const coachAvatar = (cls, at) => {
+    const mood = MOODS[cls] || '';
+    const key = mood && `${at}|${cls}`;
+    const react = key && key !== reacted;
+    reacted = key;
+    // The panel is re-rendered often (every percent of the analysis): start
+    // the idle loops where the clock is, so a render doesn't reset a blink.
+    const style = `--cdc-idle:${(-(performance.now() / 1000) % 7).toFixed(2)}s${mood ? `;--cdc-mood-c:${CLS[cls].color}` : ''}`;
+    return `<button class="cdc-coach__avatar${react ? ' cdc-coach__avatar--react' : ''}" data-cdc="coach" data-coach="${coach}"${mood ? ` data-mood="${mood}"` : ''} style="${style}" title="${esc(T.coach)}" aria-label="${esc(T.coach)}"><span class="cdc-coach__face">${FACE}</span></button>`;
+  };
 
   // key, color, label, sentence ({m} = move), in Chess.com's summary order.
   const CLASSES = [
@@ -791,14 +816,18 @@
     ? { p: ['pion'], n: ['cavalier'], b: ['fou'], r: ['tour', 'f'], q: ['dame', 'f'], k: ['roi'] }
     : { p: ['pawn'], n: ['knight'], b: ['bishop'], r: ['rook'], q: ['queen'], k: ['king'] };
   const fem = t => PIECE[t][1] === 'f';
-  const the = t => (fr ? (fem(t) ? 'la ' : 'le ') : 'the ') + PIECE[t][0];
-  const one = t => (fr ? (fem(t) ? 'une ' : 'un ') : 'a ') + PIECE[t][0];
+  // Pieces, moves and squares go into the text as [[…]] tokens, which
+  // streamHtml draws as Neo pieces, move chips and bold squares: a beginner
+  // sees which piece, and whose, without reading the notation.
+  const pc = (t, c) => (c ? `[[p:${c}${t}]]` : '');
+  const name = (t, c) => pc(t, c) + PIECE[t][0];
+  const the = (t, c) => (fr ? (fem(t) ? 'la ' : 'le ') : 'the ') + name(t, c);
+  const one = (t, c) => (fr ? (fem(t) ? 'une ' : 'un ') : 'a ') + name(t, c);
+  const mv = (san, c) => `[[m:${c}:${san}]]`;
+  const sqr = s => `[[s:${s}]]`;
   const side = c => (fr ? (c === 'w' ? 'les Blancs' : 'les Noirs') : c === 'w' ? 'White' : 'Black');
   const sides = c => (fr ? (c === 'w' ? 'des Blancs' : 'des Noirs') : c === 'w' ? 'White’s' : 'Black’s');
   const cap = s => s[0].toUpperCase() + s.slice(1);
-  // Moves in text with the title's figurines (FIGURINES, drawn as .cdc-fig
-  // by streamHtml), which read the same in every language.
-  const fig = san => san.replace(/^[KQRBN]/, l => FIGURINES[l]);
 
   // White's view of an evaluation, from -4 (Black mates) to 4 (White mates).
   function level(e) {
@@ -856,9 +885,9 @@
     const before = parseFen(prev.fen).board, after = parseFen(node.fen).board;
     const eb = move.before, ea = move.eval;
     const san = move.san, dest = move.uci.slice(2, 4);
-    const best = move.bestSan ? fig(move.bestSan) : '';
+    const best = move.bestSan ? mv(move.bestSan, me) : '';
     const reply = ea.best;
-    const replySan = reply ? fig(uciToSan(node.fen, reply)) : '';
+    const replySan = reply ? mv(uciToSan(node.fen, reply), them) : '';
     const mates = (e, s) => e.mate !== undefined && e.mate * s > 0;
 
     if (san.includes('#'))
@@ -879,18 +908,22 @@
           : `${sides(them)} last move was a mistake, and ${best} would have punished it.`;
       const victim = reply && after[reply.slice(2, 4)];
       if (move.loss >= 10 && victim?.color === me && VALUES[victim.type] >= 3 && victim.type !== 'k') {
-        const at = reply.slice(2, 4);
-        if (!attackers(after, at, me).length)
+        const to = reply.slice(2, 4), at = sqr(to);
+        if (!attackers(after, to, me).length)
           return fr
-            ? `${cap(the(victim.type))} en ${at} n’est plus défendu${fem(victim.type) ? 'e' : ''} : ${replySan} ${fem(victim.type) ? 'la' : 'le'} gagne.`
-            : `The ${PIECE[victim.type][0]} on ${at} is left undefended: ${replySan} wins it.`;
-        if (Math.min(...attackers(after, at, them)) < VALUES[victim.type])
-          return fr ? `${replySan} gagne ${the(victim.type)} en ${at}.` : `${replySan} wins the ${PIECE[victim.type][0]} on ${at}.`;
+            ? `${cap(the(victim.type, me))} en ${at} n’est plus défendu${fem(victim.type) ? 'e' : ''} : ${replySan} ${fem(victim.type) ? 'la' : 'le'} gagne.`
+            : `The ${name(victim.type, me)} on ${at} is left undefended: ${replySan} wins it.`;
+        if (Math.min(...attackers(after, to, them)) < VALUES[victim.type])
+          return fr
+            ? `${cap(side(them))} répondent ${replySan} et gagnent ${the(victim.type, me)} en ${at}.`
+            : `${side(them)} answers ${replySan} and wins the ${name(victim.type, me)} on ${at}.`;
       }
       if (!best) return null;
       const taken = move.best && before[move.best.slice(2, 4)];
       if (taken && taken.color === them && taken.type !== 'p')
-        return fr ? `${best}, qui prend ${the(taken.type)}, était plus fort.` : `${best}, taking the ${PIECE[taken.type][0]}, was stronger.`;
+        return fr
+          ? `${best}, qui prend ${the(taken.type, them)}, était plus fort.`
+          : `${best}, taking the ${name(taken.type, them)}, was stronger.`;
       if (move.cls === 'inaccuracy') return fr ? `${best} était plus précis.` : `${best} was more precise.`;
       return fr ? `Il fallait jouer ${best}.` : `${best} was the better move.`;
     }
@@ -901,24 +934,28 @@
     const moved = after[dest];
     if (move.cls === 'brilliant' && moved)
       return fr
-        ? `${cap(the(moved.type))} est offert${fem(moved.type) ? 'e' : ''}, et ${side(them)} ne peuvent pas ${fem(moved.type) ? 'la' : 'le'} prendre sans risque.`
-        : `The ${PIECE[moved.type][0]} is offered, and ${side(them)} can’t safely take it.`;
+        ? `${cap(the(moved.type, me))} est offert${fem(moved.type) ? 'e' : ''}, et ${side(them)} ne peuvent pas ${fem(moved.type) ? 'la' : 'le'} prendre sans risque.`
+        : `The ${name(moved.type, me)} is offered, and ${side(them)} can’t safely take it.`;
     if (move.cls === 'great')
       return level(ea) * sign >= 2
         ? fr ? 'Tout autre coup laissait filer l’avantage.' : 'Every other move would have let the advantage slip.'
         : fr ? `Tout autre coup mettait ${side(me)} en difficulté.` : `Every other move would have left ${side(me)} worse off.`;
     const promo = san.match(/=([QRBN])/);
     if (promo)
-      return fr ? `Le pion devient ${one(promo[1].toLowerCase())}.` : `The pawn promotes to ${one(promo[1].toLowerCase())}.`;
+      return fr
+        ? `Le pion devient ${one(promo[1].toLowerCase(), me)}.`
+        : `The pawn promotes to ${one(promo[1].toLowerCase(), me)}.`;
     if (san.startsWith('O-O'))
       return fr ? 'Le roi est à l’abri, et la tour entre en jeu.' : 'The king is safe, and the rook joins the game.';
     if (san.includes('x') && moved) {
       const victim = before[dest] || { type: 'p' }; // en passant
-      if (prev.san?.includes('x') && prev.uci?.slice(2, 4) === dest) return fr ? `Il reprend en ${dest}.` : `It takes back on ${dest}.`;
+      if (prev.san?.includes('x') && prev.uci?.slice(2, 4) === dest) return fr ? `Il reprend en ${sqr(dest)}.` : `It takes back on ${sqr(dest)}.`;
       if (!attackers(before, dest, them).length)
-        return fr ? `Il gagne ${one(victim.type)} sans contrepartie.` : `It wins ${one(victim.type)} for free.`;
+        return fr ? `Il gagne ${one(victim.type, them)} sans contrepartie.` : `It wins ${one(victim.type, them)} for free.`;
       if (VALUES[victim.type] > VALUES[moved.type])
-        return fr ? `Il gagne ${one(victim.type)} contre ${one(moved.type)}.` : `It wins ${one(victim.type)} for ${one(moved.type)}.`;
+        return fr
+          ? `Il gagne ${one(victim.type, them)} contre ${one(moved.type, me)}.`
+          : `It wins ${one(victim.type, them)} for ${one(moved.type, me)}.`;
     }
     if (san.includes('+')) return fr ? `L’échec force ${side(them)} à réagir.` : `The check forces ${side(them)} to respond.`;
     if (move.cls === 'good' && best) return fr ? `${best} était un peu plus précis.` : `${best} was a little more precise.`;
@@ -947,6 +984,19 @@
   const calm = matchMedia('(prefers-reduced-motion: reduce)');
   const stream = { key: '', shown: 0, timer: 0 };
 
+  // Chess.com's Neo pieces, from its CDN like the board's.
+  const pieceImg = cp => `<img class="cdc-pc" alt="" src="https://images.chesscomfiles.com/chess-themes/pieces/neo/150/${cp}.png">`;
+  function token(kind, v) {
+    if (kind === 'p') return pieceImg(v);
+    if (kind === 's') return `<b class="cdc-sq">${v}</b>`;
+    // A move: the piece that moves, then the notation, a promotion's piece
+    // drawn too.
+    const [c, san] = [v[0], v.slice(2)];
+    const t = san.startsWith('O-O') ? 'k' : /^[KQRBN]/.test(san) ? san[0].toLowerCase() : 'p';
+    const text = san.replace(/^[KQRBN]/, '').replace(/=([QRBN])/, (_, p) => '=' + pieceImg(c + p.toLowerCase()));
+    return `<span class="cdc-mv">${pieceImg(c + t)}${text}</span>`;
+  }
+
   function streamHtml(parts) {
     const key = parts.map(p => p[0]).join('|');
     if (key !== stream.key) {
@@ -959,7 +1009,7 @@
         const words = typo(text).match(/\S+\s*/g) || [];
         const html = words
           .map(w => {
-            const word = esc(w).replace(/[♚♛♜♝♞]/g, g => `<span class="cdc-fig">${g}</span>`);
+            const word = esc(w).replace(/\[\[(\w):(.+?)\]\]/g, (_, k, v) => token(k, v));
             return `<span class="cdc-w${i++ >= stream.shown ? ' cdc-w--off' : ''}">${word}</span>`;
           })
           .join('');
@@ -1034,6 +1084,7 @@
     controls: el('div', { id: 'cdc-review-controls' }),
     bar: el('div', { id: 'cdc-evalbar' }, '<div class="cdc-evalbar__fill"></div><span class="cdc-evalbar__label"></span>'),
     overlay: el('div', { id: 'cdc-board-overlay' }),
+    opening: el('div', { id: 'cdc-opening' }),
   };
 
   function ensureAttached(ctrl) {
@@ -1233,14 +1284,14 @@
         : move.cls === 'book'
           ? state.openingName || ''
           : !good && move.bestSan
-            ? T.bestWas.replace('{m}', move.bestSan)
+            ? T.bestWas.replace('{m}', mv(move.bestSan, move.color))
             : '';
       bubble = verdict(ctrl, move, hint);
     }
     const atEnd = ctrl.onMainline && ply >= ctrl.mainline.length - 1;
     const canBest = shown || (move && move.best && !GOOD.has(move.cls));
     dom.panel.innerHTML = `${header(T.review, 'summary')}
-      <div class="cdc-coach">${coachAvatar()}<div class="cdc-bubble">${bubble}</div></div>
+      <div class="cdc-coach">${coachAvatar(!shown && move?.cls, ply)}<div class="cdc-bubble">${bubble}</div></div>
       <div class="cdc-review__nav">
         <button class="cdc-btn${state.explain ? ' cdc-btn--on' : ''}" data-cdc="explain">${svgIcon('bulb')}${esc(T.explain)}</button>
         <button class="cdc-btn${shown ? ' cdc-btn--on' : ''}" data-cdc="best" ${canBest ? '' : 'disabled'}>${svgIcon('star')}${esc(T.best)}</button>
@@ -1288,7 +1339,7 @@
         : !move
           ? `<p class="cdc-bubble__title">${esc(T.thinking)}</p>`
           : verdict(ctrl, move);
-    dom.panel.innerHTML = `<div class="cdc-coach">${coachAvatar()}<div class="cdc-bubble">${bubble}</div></div>`;
+    dom.panel.innerHTML = `<div class="cdc-coach">${coachAvatar(!live.error && move?.cls, ctrl.path)}<div class="cdc-bubble">${bubble}</div></div>`;
   }
 
   // Eval bar, board badge / arrow / square colors, move list badges.
@@ -1339,7 +1390,10 @@
     window.cdcReviewArrows = showBest ? [{ orig: move.best.slice(0, 2), dest: move.best.slice(2, 4), brush: 'best' }] : [];
 
     // Move list badges.
-    if (isLive) liveBadges(ctrl);
+    if (isLive) {
+      liveBadges(ctrl);
+      renderOpening(ctrl);
+    }
     else if (r) {
       const tree = document.querySelector('main.analyse .tview2');
       const mainMoves = tree ? [...tree.querySelectorAll(':scope > move:not(.empty)')] : [];
@@ -1457,12 +1511,14 @@
     return book;
   }
 
+  // The last named opening along `path`: a move out of the book keeps the
+  // name of the line it left.
   const openingAt = (ctrl, path) => {
     for (; path; path = path.slice(0, -2)) {
-      const name = live.books.get(ctrl.tree.nodeAtPath(path).fen)?.name;
-      if (name) return name;
+      const b = live.books.get(ctrl.tree.nodeAtPath(path).fen);
+      if (b?.name) return b;
     }
-    return '';
+    return null;
   };
 
   // The move to `path`, judged, or null until its positions are analyzed.
@@ -1477,7 +1533,7 @@
     let move = null;
     if (a && b && book !== undefined) {
       move = judge(prev, node, a, b, judgeAt(ctrl, up), book, ctrl.data.game.variant?.key === 'chess960');
-      move.opening = openingAt(ctrl, path);
+      move.opening = openingAt(ctrl, path)?.name || '';
     }
     live.judged.set(path, { node, move });
     return move;
@@ -1556,12 +1612,35 @@
     try {
       const late = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
       const d = await Promise.race([ctrl.explorer.fetchMasterOpening(fen), late]);
-      live.books.set(fen, { book: d.white + d.draws + d.black >= BOOK_GAMES, name: d.opening?.name || '' });
+      live.books.set(fen, { book: d.white + d.draws + d.black >= BOOK_GAMES, name: d.opening?.name || '', eco: d.opening?.eco || '' });
     } catch {
       live.noBook = true;
     }
     live.bookBusy = false;
     changed();
+  }
+
+  // The opening's name over Lichess's move list, like Chess.com's. It comes
+  // from the masters database, which needs an account: signed out, there's
+  // no line at all. It's ours, appended to Lichess's panel and put above
+  // the moves by review.css, so Lichess's own children never move.
+  function renderOpening(ctrl) {
+    const tools = document.querySelector('main.analyse .analyse__tools');
+    if (!tools) return;
+    if (dom.opening.parentNode !== tools) tools.appendChild(dom.opening);
+    const o = !ctrl.explorer?.isAuth?.() || live.noBook
+      ? null
+      : ctrl.path ? openingAt(ctrl, ctrl.path) : { name: window.i18n?.site?.startPosition || T.startPosition, eco: '' };
+    const key = o ? `${o.eco}|${o.name}` : '';
+    if (dom.opening.dataset.key === key) return;
+    dom.opening.dataset.key = key;
+    html.classList.toggle('cdc-opening-on', !!o);
+    if (!o) return void (dom.opening.innerHTML = '');
+    // "Ruy Lopez: Morphy Defense": the family bold, then the variation.
+    const [family, ...rest] = o.name.split(': ');
+    dom.opening.title = o.name;
+    dom.opening.style.setProperty('--i', CLS.book.img);
+    dom.opening.innerHTML = `<i class="cdc-opening__icon"></i>${o.eco ? `<span class="cdc-opening__eco">${esc(o.eco)}</span>` : ''}<span class="cdc-opening__name"><b>${esc(family)}</b>${rest.length ? `: ${esc(rest.join(': '))}` : ''}</span>`;
   }
 
   // Badges in Lichess's move list, variations included: each move carries

@@ -1,0 +1,222 @@
+/*
+ * The weekly rating distribution (/stat/rating/distribution/<perf>), redrawn
+ * in SVG by distribution.js in the look of the profile's rating chart (whose
+ * chips, grid, labels and tooltip it reuses from ratingchart.css): a column
+ * per 25 points in the rating's color, the cumulative share as a curve, your
+ * rating as a white pill on a dashed line. Lichess's canvas is hidden only
+ * once ours is in, marked by .cdc-dist-on.
+ */
+
+/* ------------------------------------------------------------ page --- */
+
+.rating-stats .desc {
+  gap: 14px;
+  margin: 0 0 4px !important;
+  color: var(--cdc-text-dim);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* The rating's icon, Chess.com's in its color (theme.css), a little smaller. */
+.rating-stats .desc::before {
+  flex: none;
+  margin: 0 !important;
+  font-size: 44px !important;
+}
+
+.rating-stats .desc strong {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ----------------------------------------------------------- chart --- */
+
+.rating-stats #rating_distribution.cdc-dist-on {
+  height: auto !important;
+  margin-top: 18px !important;
+}
+
+#rating_distribution.cdc-dist-on > canvas {
+  display: none !important;
+}
+
+.cdc-dist {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: var(--cdc-font);
+}
+
+.cdc-dist__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* A legend, not a toggle. */
+.cdc-dist__chip,
+.cdc-dist__chip:hover {
+  border-color: var(--cdc-card-border);
+  background: #ffffff08;
+  cursor: default;
+}
+
+/* As tall as the window allows, so the page doesn't scroll. */
+.cdc-dist__plot {
+  position: relative;
+  min-width: 0;
+  height: clamp(240px, 100vh - 330px, 760px);
+}
+
+.cdc-dist__svg {
+  display: block;
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  touch-action: pan-y;
+}
+
+.cdc-dist__base {
+  stroke: #ffffff26;
+  stroke-dasharray: none;
+}
+
+.cdc-dist__slabel {
+  fill: var(--cdc-text-dim);
+  font: 600 11px var(--cdc-font);
+  font-variant-numeric: tabular-nums;
+  dominant-baseline: middle;
+}
+
+.cdc-dist__bar {
+  fill: url(#cdc-dist-g);
+  transition: opacity 0.2s, filter 0.2s;
+}
+
+/* The players rated above you (or above the column under the pointer). */
+.cdc-dist__bar--dim {
+  opacity: 0.32;
+}
+
+.cdc-dist__bar--on {
+  opacity: 1;
+  filter: brightness(1.3);
+}
+
+.cdc-dist__cumul {
+  fill: none;
+  stroke: #f1f1f0;
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.cdc-dist__mline {
+  stroke: var(--c);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  pointer-events: none;
+}
+
+.cdc-dist__dot {
+  fill: #f1f1f0;
+  stroke: var(--cdc-bg-panel);
+  stroke-width: 2.5;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+.cdc-dist__svg--hover .cdc-dist__dot {
+  opacity: 1;
+}
+
+/* A marker's pill: who, and the rating. */
+.cdc-dist__marks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cdc-dist__mark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 2px 6px #00000059;
+  color: var(--cdc-bg-panel);
+  font: 700 12px/1 var(--cdc-font);
+  white-space: nowrap;
+}
+
+/* The player you came from: a dark pill, yours stays the bright one. */
+.cdc-dist__mark--other {
+  border: 1px solid #ffffff2e;
+  background: var(--cdc-bg-raised);
+  color: #fff;
+}
+
+.cdc-dist__mark strong {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.cdc-dist__tip {
+  min-width: 170px;
+}
+
+/* ------------------------------------------------------------ intro --- */
+
+/* The columns rise one after the other, left to right; the curve draws
+ * itself over them, then the markers drop in. */
+.cdc-dist__svg--intro .cdc-dist__bar {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: cdc-dist-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--k) * 7ms);
+}
+
+.cdc-dist__svg--intro .cdc-dist__cumul {
+  stroke-dasharray: 1;
+  animation: cdc-dist-draw 1.1s cubic-bezier(0.45, 0, 0.2, 1) 0.25s both;
+}
+
+.cdc-dist__svg--intro .cdc-dist__mline,
+.cdc-dist--intro .cdc-dist__mark {
+  animation: cdc-dist-drop 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.8s both;
+}
+
+@keyframes cdc-dist-rise {
+  from { transform: scaleY(0); }
+  to { transform: none; }
+}
+
+@keyframes cdc-dist-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes cdc-dist-drop {
+  from { opacity: 0; translate: 0 -6px; }
+  to { opacity: 1; translate: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cdc-dist__bar,
+  .cdc-dist__cumul,
+  .cdc-dist__mline,
+  .cdc-dist__mark,
+  .cdc-dist__dot {
+    transition: none !important;
+    animation: none !important;
+  }
+}
