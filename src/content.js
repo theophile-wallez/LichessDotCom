@@ -37,6 +37,16 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addFonts);
   else addFonts();
 
+  // The coach's face on a practice drill (styles/practice-run.css): the Game
+  // Review's coach, kept by review.js under the same key, or picked at random
+  // the first time.
+  let coach = +localStorage.getItem('cdc-coach');
+  if (!(coach >= 1 && coach <= 4)) {
+    coach = 1 + Math.floor(Math.random() * 4);
+    localStorage.setItem('cdc-coach', coach);
+  }
+  document.documentElement.dataset.cdcCoach = coach;
+
   let sounds = null;
 
   const postSounds = () => {
