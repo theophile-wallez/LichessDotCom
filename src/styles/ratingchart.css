@@ -70,11 +70,11 @@
   border-radius: 7px;
   background: var(--cdc-bg-raised);
   box-shadow: 0 1px 2px #00000059, inset 0 1px 0 #ffffff14;
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), width 0.35s cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 
 .cdc-rchart__thumb--still {
-  transition: none;
+  transition: none !important;
 }
 
 .cdc-rchart__ranges button {
@@ -87,7 +87,7 @@
   cursor: pointer;
   font: 700 12px/1 var(--cdc-font);
   letter-spacing: 0.03em;
-  transition: background-color 0.15s, color 0.15s;
+  transition: background-color 0.15s, color 0.15s !important;
 }
 
 .cdc-rchart__ranges button:hover {
@@ -111,7 +111,7 @@
   color: var(--cdc-text);
   cursor: pointer;
   font: 600 13px/1 var(--cdc-font);
-  transition: background-color 0.15s, border-color 0.15s, opacity 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, opacity 0.15s !important;
 }
 
 .cdc-rchart__chip:hover {
@@ -205,7 +205,7 @@
  * (a new scale, the same samples) morphs them into place. */
 .cdc-rchart__line,
 .cdc-rchart__area {
-  transition: d 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s;
+  transition: d 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s !important;
 }
 
 .cdc-rchart__line {
@@ -222,7 +222,7 @@
 }
 
 .cdc-rchart__series--hidden path {
-  transition: opacity 0.3s;
+  transition: opacity 0.3s !important;
 }
 
 /* A new range: the curves and their fills are revealed together, left to
@@ -249,7 +249,7 @@
 .cdc-rchart__hover {
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s !important;
 }
 
 .cdc-rchart__svg--hover .cdc-rchart__hover {
@@ -289,7 +289,7 @@
   backdrop-filter: blur(14px) saturate(1.5);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.15s, transform 0.12s ease-out;
+  transition: opacity 0.15s, transform 0.12s ease-out !important;
 }
 
 .cdc-rchart__tip--on {

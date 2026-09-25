@@ -355,7 +355,7 @@
   font-weight: 700;
   line-height: 1;
   text-shadow: none !important;
-  transition: background 0.15s;
+  transition: background 0.15s !important;
 }
 
 #powerTip .upt__actions .btn-rack__btn:hover {

@@ -492,7 +492,7 @@
     height: 14px;
     background: linear-gradient(var(--cdc-bg-page), transparent);
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s !important;
     pointer-events: none;
   }
 
@@ -527,7 +527,7 @@
   border: 1px solid var(--cdc-card-border);
   border-radius: 10px;
   background: var(--cdc-bg-panel);
-  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s !important;
 }
 
 .ublog-topics__topic:hover {

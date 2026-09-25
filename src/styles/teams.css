@@ -84,7 +84,7 @@ html[dir='rtl'] main.team-list .box__top .search input {
     height: 14px;
     background: linear-gradient(var(--cdc-bg-page), transparent);
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s !important;
     pointer-events: none;
   }
 
@@ -135,7 +135,7 @@ main.team-list .slist tbody tr:nth-child(2n) {
   border: 1px solid var(--cdc-card-border);
   border-radius: 10px;
   background: var(--cdc-bg-panel) !important;
-  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s !important;
 }
 
 html[dir='rtl'] main.team-list .slist tbody tr {

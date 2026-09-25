@@ -44,7 +44,7 @@
   text-shadow: none !important;
   white-space: nowrap;
   user-select: none;
-  transition: background-color 0.15s;
+  transition: background-color 0.15s !important;
 }
 
 #friend_box .friend_box_title:hover {
@@ -92,7 +92,7 @@
   border: solid var(--cdc-text-dim);
   border-width: 2px 2px 0 0;
   transform: translateY(2px) rotate(-45deg);
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease !important;
 }
 
 #friend_box:has(.content_wrap:not(.none)) .friend_box_title::after {
@@ -117,10 +117,6 @@
   #friend_box .content_wrap:not(.none) {
     animation: none;
   }
-
-  #friend_box .friend_box_title::after {
-    transition: none;
-  }
 }
 
 #friend_box .content {
@@ -136,7 +132,7 @@
   align-items: center;
   gap: 6px;
   border-radius: 6px;
-  transition: background-color 0.15s;
+  transition: background-color 0.15s !important;
 }
 
 #friend_box .content > div:hover {
@@ -185,7 +181,7 @@
   border-radius: 50%;
   background: var(--cdc-green);
   font-size: 0;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s !important;
 }
 
 #friend_box .content > div:hover a.user-link .line {
@@ -210,7 +206,7 @@
   box-shadow: var(--cdc-btn-grey-shadow);
   color: var(--cdc-text-dim) !important;
   font-size: 14px;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, color 0.15s !important;
 }
 
 #friend_box .content a.tv:hover {

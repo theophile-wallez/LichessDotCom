@@ -112,7 +112,7 @@ main.swiss .swiss__meta > a.text[href^='/team/'] {
   color: #fff !important;
   font-size: 13px;
   font-weight: 700;
-  transition: background-color 0.15s;
+  transition: background-color 0.15s !important;
 }
 
 main.swiss .swiss__meta > a.text[href^='/team/']:hover {
@@ -608,7 +608,7 @@ main.swiss .schedule-next-round input {
     height: 14px;
     background: linear-gradient(var(--cdc-bg-panel), transparent);
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s !important;
     pointer-events: none;
   }
 
@@ -642,7 +642,7 @@ main.swiss .swiss__controls .pager .fbt {
   padding: 0 8px !important;
   border-radius: 6px;
   color: var(--cdc-text) !important;
-  transition: background-color 0.15s, color 0.15s;
+  transition: background-color 0.15s, color 0.15s !important;
 }
 
 main.swiss .swiss__controls .pager .fbt:hover:not(:disabled, .disabled) {
@@ -859,7 +859,7 @@ main.swiss .swiss__standing .pairings div > * {
   font-size: var(--cdc-cell-font);
   font-weight: 800;
   line-height: 1;
-  transition: filter 0.15s, box-shadow 0.15s;
+  transition: filter 0.15s, box-shadow 0.15s !important;
 }
 
 /* Desktop, up to 20 squares: one line, the squares shrinking as one when
@@ -1055,7 +1055,7 @@ main.swiss .swiss__stats__links a {
   color: var(--cdc-text) !important;
   font-size: 13px;
   font-weight: 600;
-  transition: background-color 0.15s, color 0.15s;
+  transition: background-color 0.15s, color 0.15s !important;
 }
 
 main.swiss .swiss__stats__links a:hover {
@@ -1232,7 +1232,7 @@ main.swiss .swiss__board {
   border-radius: 10px !important;
   background: var(--cdc-bg-panel) !important;
   box-shadow: none !important;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s !important;
 }
 
 main.swiss .swiss__board:hover {

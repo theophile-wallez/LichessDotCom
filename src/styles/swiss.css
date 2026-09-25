@@ -120,7 +120,7 @@ main.swiss-home .swisses tbody tr {
   border: 1px solid var(--cdc-card-border);
   border-radius: 10px;
   background: var(--cdc-bg-panel) !important;
-  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s !important;
 }
 
 main.swiss-home .swisses tbody tr:hover {

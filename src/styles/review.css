@@ -208,7 +208,7 @@
     background: transparent;
     color: var(--cdc-text-dim);
     cursor: pointer;
-    transition: background-color 0.15s, color 0.15s;
+    transition: background-color 0.15s, color 0.15s !important;
   }
 
   .cdc-review__back svg,
@@ -535,7 +535,7 @@
     background: transparent;
     cursor: pointer;
     transform-origin: 50% 100%;
-    transition: transform 0.15s;
+    transition: transform 0.15s !important;
   }
 
   .cdc-coach__avatar:hover {
@@ -1273,7 +1273,7 @@
     right: 0;
     bottom: 0;
     background: #fff;
-    transition: height 0.3s ease;
+    transition: height 0.3s ease !important;
   }
 
   .cdc-evalbar--flip .cdc-evalbar__fill {

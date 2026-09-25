@@ -382,7 +382,7 @@ html[dir='rtl'] :is(.relay-index, .relay-calendar) .box__top .search input {
     height: 14px;
     background: linear-gradient(var(--cdc-bg-page), transparent);
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s !important;
     pointer-events: none;
   }
 

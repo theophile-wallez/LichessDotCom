@@ -268,7 +268,7 @@ main.plan .plan_checkout group.radio label {
   /* "Donate as <username>": a long name wraps instead of running over the
    * next choice. */
   overflow-wrap: anywhere;
-  transition: background-color 0.15s, color 0.15s, box-shadow 0.15s;
+  transition: background-color 0.15s, color 0.15s, box-shadow 0.15s !important;
 }
 
 main.plan .plan_checkout group.radio input:not(:disabled) + label:hover {
@@ -325,7 +325,7 @@ main.plan .plan_checkout group.amount label {
   font-size: 20px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s, box-shadow 0.15s;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s, box-shadow 0.15s !important;
 }
 
 main.plan .plan_checkout group.amount input:not(:checked) + label:hover {
@@ -704,7 +704,7 @@ main.plan .best_patrons .list > .paginated {
   background: var(--cdc-bg-panel);
   animation: cdc-plan-in 0.35s ease-out both;
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s, background-color 0.15s,
-    box-shadow 0.15s;
+    box-shadow 0.15s !important;
 }
 
 main.plan .best_patrons .list > .paginated:hover {
@@ -808,7 +808,7 @@ main.plan .recent-patrons .list {
 main.plan .recent-patrons .list > div > .user-link {
   padding: 5px 8px;
   border-radius: 8px;
-  transition: background-color 0.15s;
+  transition: background-color 0.15s !important;
 }
 
 main.plan .recent-patrons .list > div > .user-link:hover {
@@ -859,7 +859,7 @@ main.plan .pss__color {
   border-radius: 12px !important;
   background: var(--cdc-bg-raised) !important;
   font-family: var(--cdc-font) !important;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s !important;
 }
 
 main.plan .pss__color--selectable:hover {
@@ -894,18 +894,6 @@ main.plan .patron-style-selector__info .user-link {
   main.plan .plan_checkout:not(:has(group))::before,
   main.plan .best_patrons .list > .paginated {
     animation: none;
-  }
-
-  main.plan .best_patrons .list > .paginated,
-  main.plan .plan_checkout group.amount label,
-  main.plan .pss__color {
-    transition: none;
-  }
-
-  main.plan .best_patrons .list > .paginated:hover,
-  main.plan .plan_checkout group.amount input:not(:checked) + label:hover,
-  main.plan .pss__color--selectable:hover {
-    transform: none;
   }
 }
 

@@ -333,7 +333,7 @@ main.puzzle .puzzle__side__theme__back {
   color: #fff !important;
   font-size: 17px !important;
   font-weight: 800;
-  transition: color 0.15s;
+  transition: color 0.15s !important;
 }
 
 main.puzzle .puzzle__side__theme__back:hover {
@@ -351,7 +351,7 @@ main.puzzle .puzzle__side__replay > a {
   color: #fff !important;
   font-size: 17px !important;
   font-weight: 800 !important;
-  transition: color 0.15s;
+  transition: color 0.15s !important;
 }
 
 main.puzzle .puzzle__side__replay > a:hover {
@@ -432,7 +432,7 @@ main.puzzle .puzzle__themes__list__entry {
   padding: 0 6px 0 12px;
   border-radius: 8px;
   background: #ffffff0a !important;
-  transition: background 0.15s;
+  transition: background 0.15s !important;
 }
 
 main.puzzle .puzzle__themes__list__entry:hover {
@@ -475,7 +475,7 @@ main.puzzle .puzzle__themes__vote {
   background: #ffffff0d;
   color: var(--cdc-text-dim) !important;
   font-size: 12px;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, color 0.15s !important;
 }
 
 main.puzzle .puzzle__themes__vote.vote-up:is(:hover, .active) {
@@ -496,7 +496,7 @@ main.puzzle .puzzle__themes__selector {
 main.puzzle .puzzle__themes__study {
   color: var(--cdc-text-dim) !important;
   font-size: 12px;
-  transition: color 0.15s;
+  transition: color 0.15s !important;
 }
 
 main.puzzle .puzzle__themes__study:hover {
@@ -557,7 +557,7 @@ main.puzzle .puzzle__feedback {
   margin: 10px;
   border-radius: 12px;
   background: var(--cdc-bg-raised) !important;
-  transition: background 0.2s;
+  transition: background 0.2s !important;
 }
 
 /* The heading at the top and the buttons at the bottom, so the banner

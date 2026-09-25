@@ -48,7 +48,20 @@ is "a Chess.com user wouldn't notice they're on Lichess".
   Chess.com's, not just re-skinned: color per section, icons on gradient
   tiles, cards, pills, and ideally nice illustrations (Neo pieces, Lichess's
   3D emoji, photos, little boards). Practice, simuls and the forum set the
-  tone.
+  tone. Every side menu (`.subnav`) gets an icon per link on a tile tinted
+  in its own color: add the menu to the shared rule in `pages.css`, then set
+  `--cdc-nav-icon` and `--cdc-nav-color` per link in the page's CSS.
+- **Hover feels the same everywhere.** A hovered card lifts, and the icon
+  tile on it (or on a menu link) hops: `rotate(-6deg) scale(1.08)` on cards,
+  `translateY(-2px) rotate(-8deg) scale(1.08)` on menu links, both with
+  `transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)`. Reuse
+  these values rather than inventing new ones. **Reduced motion keeps hover
+  feedback:** under `prefers-reduced-motion` only our `animation`s
+  (entrances, loops) and the charts' morphs turn off. A
+  transition answers the user's own mouse, so it always runs; never set
+  `transform: none` or `transition: none` on a hover under that query. (A
+  transition that stays but a transform that goes gave a jump, then no
+  tilt at all, on a Chrome that reports reduced motion.)
 - **Only the content scrolls.** On a page that scrolls and has a side panel
   (a side menu, a help card) and a main title or header at the top, the
   side panel and the title stay put and only the content moves, as in an
@@ -284,6 +297,13 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
 - **The page's background.** Lichess draws a few things behind the page with
   a negative z-index (the game page's clock faces). `theme.css` paints the
   page's color on `html` and leaves `body` clear: painting `body` hid them.
+- **Lichess kills every transition under reduced motion**, with
+  `*, :before, :after { transition: none !important; animation: none
+  !important }` in its site CSS. So **every `transition` we declare is
+  `!important`** (our selectors are more specific than `*`, so they win);
+  our `animation`s aren't, so Lichess's rule turns them off for us. A
+  `transition: none` that turns one of ours off in some state (e.g. the
+  rating chart's `--still` pill) must be `!important` too.
 - **Lichess's light theme.** An anonymous visitor on a light OS gets
   Lichess's light theme (`html.light`), and so does headless Chrome. Our
   variables override its colors, but its own `.light …` rules still apply
@@ -339,7 +359,10 @@ which must survive our theme. Chess.com's CDN rejects the `HeadlessChrome`
 user agent, so override it to a normal Chrome UA for every request, or images
 will look broken when they aren't.
 Headless Chrome also reports `prefers-reduced-motion: reduce`, which makes
-Lichess turn animations off; emulate `no-preference` to check animations. It
+Lichess turn animations off; emulate `no-preference` to check animations,
+and check hover under `reduce` too (the user's own Chrome reports it): it
+must ease in the same way. Sample a transition frame by frame in the page
+(`requestAnimationFrame`), not with one round trip per sample. It
 reports a light color scheme too (emulate `dark` as well, see "Lichess's
 light theme"), and Playwright hides the scrollbars in headless mode
 (`ignoreDefaultArgs: ['--hide-scrollbars']` brings them back): a layout that

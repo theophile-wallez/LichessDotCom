@@ -160,7 +160,7 @@ html.transp::before {
   text-shadow: 0 1px 1px #00000033 !important;
   box-shadow: var(--cdc-btn-green-shadow) !important;
   filter: none !important;
-  transition: filter 0.1s, transform 0.1s;
+  transition: filter 0.1s, transform 0.1s !important;
 }
 
 .button:not(.disabled):hover {
@@ -387,7 +387,7 @@ select {
   pointer-events: none;
   opacity: 0;
   translate: 0 3px;
-  transition: opacity 0.12s ease-out, translate 0.12s ease-out;
+  transition: opacity 0.12s ease-out, translate 0.12s ease-out !important;
 }
 
 .cdc-tooltip[data-side='below'] {
@@ -426,10 +426,4 @@ select {
   color: inherit !important;
   font: inherit !important;
   font-size: 11px !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cdc-tooltip {
-    transition: none;
-  }
 }

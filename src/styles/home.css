@@ -325,7 +325,7 @@
     border-radius: 0 !important;
     background: none !important;
     box-shadow: none !important;
-    transition: transform 0.15s;
+    transition: transform 0.15s !important;
   }
 
   main.lobby .lobby__blog .ublog-post-card:hover {
@@ -340,7 +340,7 @@
     grid-area: 1 / 1 / 2 / -1;
     border-radius: 10px !important;
     box-shadow: 0 0 0 1px var(--cdc-card-border);
-    transition: filter 0.15s;
+    transition: filter 0.15s !important;
   }
 
   main.lobby .lobby__blog .ublog-post-card:hover .ublog-post-card__image {
@@ -609,7 +609,7 @@
     border: solid currentColor;
     border-width: 2px 2px 0 0;
     transform: rotate(45deg);
-    transition: transform 0.15s;
+    transition: transform 0.15s !important;
   }
 
   main.lobby .lpool[data-id='custom']:hover::after {
@@ -715,7 +715,7 @@
     font-weight: 700 !important;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    transition: color 0.15s;
+    transition: color 0.15s !important;
   }
 
   main.lobby .daily-feed__update__day:hover {
@@ -778,7 +778,7 @@
     font-size: 13px;
     line-height: 1.4 !important;
     text-shadow: none !important;
-    transition: background 0.15s;
+    transition: background 0.15s !important;
   }
 
   main.lobby .lobby__streams .stream:hover {
@@ -832,7 +832,7 @@
     font-size: 13px !important;
     font-weight: 700 !important;
     text-align: center;
-    transition: background 0.15s;
+    transition: background 0.15s !important;
   }
 
   main.lobby .lobby__streams .more:hover {
@@ -914,7 +914,7 @@
     background: none !important;
     box-shadow: none !important;
     text-shadow: none !important;
-    transition: background 0.15s;
+    transition: background 0.15s !important;
   }
 
   main.lobby .lobby__tournaments-simuls .lobby__box__top:hover {
@@ -951,7 +951,7 @@
     color: #fff !important;
     font-size: 13px;
     font-weight: 700;
-    transition: background 0.15s;
+    transition: background 0.15s !important;
   }
 
   main.lobby .lobby__box__top:hover .more {
@@ -970,7 +970,7 @@
 
   main.lobby .lobby__tournaments-simuls tr {
     background: none !important;
-    transition: background 0.15s;
+    transition: background 0.15s !important;
   }
 
   main.lobby .lobby__tournaments-simuls tr:hover {
@@ -1029,7 +1029,7 @@
     border-radius: 16px !important;
     background: var(--cdc-bg-panel) !important;
     box-shadow: inset 0 1px 0 #ffffff0d, 0 10px 28px #00000033 !important;
-    transition: transform 0.15s, background 0.15s;
+    transition: transform 0.15s, background 0.15s !important;
   }
 
   main.lobby .lobby__support-link:hover {
@@ -1086,7 +1086,7 @@
     border: solid var(--cdc-text-dim);
     border-width: 2.5px 2.5px 0 0;
     transform: rotate(45deg);
-    transition: transform 0.15s, border-color 0.15s;
+    transition: transform 0.15s, border-color 0.15s !important;
   }
 
   main.lobby .lobby__support-link:hover::after {

@@ -340,7 +340,7 @@ body .is2d coords {
   overflow: hidden;
   border-radius: 3px !important;
   background: linear-gradient(to bottom, #403d39 var(--eval-percent), #fff var(--eval-percent)) !important;
-  transition: --eval-percent 0.3s ease;
+  transition: --eval-percent 0.3s ease !important;
 }
 
 .eval-gauge.reverse {
