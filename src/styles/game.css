@@ -113,12 +113,23 @@
     --cdc-off: calc(var(--cdc-coords-off) - var(--cdc-inset-b, 0px));
   }
 
+  /* The countdown to the first move goes under the name, where the captured
+     pieces go, as there are none yet. Centered in the bar, it covered the
+     rating and ran into the clock. */
   main.round .expiration {
-    justify-self: center;
+    justify-self: start;
     align-self: start;
-    margin-top: calc(var(--cdc-off) + 14px) !important;
-    padding: 0 10px;
+    height: 18px;
+    margin: calc(var(--cdc-off) + 30px) 0 0 calc(50px + var(--cdc-inset-l, 0px)) !important;
+    padding: 0 8px;
     border-radius: 4px !important;
+    font-size: 12px !important;
+    line-height: 18px !important;
+    white-space: nowrap;
+  }
+
+  main.round .expiration strong {
+    font-size: 13px !important;
   }
 
   /* ------------------------------------------------------------ clocks --- */
@@ -137,6 +148,25 @@
 
   main.round .rclock .bar {
     display: none !important;
+  }
+
+  /* Lichess puts its extras after the clock (the tournament rank, "give
+     more time", berserk): before it, the clock stays flush with the board's
+     right edge. The name leaves them room (playerbar.css). */
+  main.round .rclock > :not(.time, .bar) {
+    order: -1;
+  }
+
+  main.round:has(.rclock-top > :not(.time, .bar)) .ruser-top,
+  main.round:has(.rclock-bottom > :not(.time, .bar)) .ruser-bottom {
+    --cdc-clock-room: 212px;
+  }
+
+  /* Streamer mode (board menu) shifts the bottom clock down a board's height,
+     for Lichess's own layout: here that pushed it out of its bar and off the
+     screen. */
+  main.round--streamer .rclock-bottom {
+    transform: none !important;
   }
 
   /* ----------------------------------------------------------- move list --- */
@@ -239,12 +269,14 @@
     color: var(--cdc-text-dim);
   }
 
-  /* Navigation buttons sit at the bottom of the panel on Chess.com. */
+  /* Navigation buttons sit at the bottom of the panel on Chess.com, even
+     before the first move, when a message stands in for the moves. */
   main.round :is(i5d, rm6) bo3 {
     order: 99 !important;
     display: flex !important;
     flex: none !important;
     gap: 6px;
+    margin-top: auto !important;
     padding: 8px !important;
     background: transparent !important;
     box-shadow: none !important;
@@ -265,6 +297,13 @@
   main.round :is(i5d, rm6) bo3 .fbt:hover:not(.disabled) {
     background: var(--cdc-btn-grey-hover) !important;
     color: #fff !important;
+  }
+
+  /* The analysis button's slot while the game is on: an empty space, not an
+     empty button. */
+  main.round :is(i5d, rm6) bo3 .noop {
+    background: none !important;
+    box-shadow: none !important;
   }
 
   /* ------------------------------------------------------------ controls --- */
@@ -386,11 +425,6 @@
     min-width: 0;
   }
 
-  main.round .rcontrols .follow-up .rematch-decline {
-    order: 1;
-    flex: none;
-  }
-
   /* Game Review: Lichess's analysis-board link, which is always last (a
      tournament link or "view rematch" comes first). It opens the analysis
      page, where the review (review.js) starts by itself. */
@@ -462,10 +496,13 @@
   main.round .rcontrols .follow-up :is(.rematch, .new-opponent, .cdc-new-game) {
     display: flex !important;
     align-items: center;
-    /* Too long for the button: keep the icon, clip the end. */
+    /* Too long for the button (a narrow panel, a long translation): keep
+       the icon, and the label wraps rather than losing its end. */
     justify-content: safe center;
     font-size: 15px !important;
     font-weight: 600;
+    line-height: 1.15 !important;
+    white-space: normal;
   }
 
   main.round .rcontrols .follow-up :is(.rematch, .new-opponent, .cdc-new-game)::before {
@@ -498,10 +535,50 @@
     font-size: 15px;
   }
 
-  /* The opponent offers a rematch: it turns green, the one to click. */
+  /* The opponent offers a rematch: it turns green, the one to click, hover
+     included. */
   main.round .rcontrols .follow-up .rematch.glowing {
     background: var(--cdc-btn-green) !important;
     box-shadow: var(--cdc-btn-green-shadow) !important;
+  }
+
+  main.round .rcontrols .follow-up .rematch.glowing:hover:not(.disabled, :disabled) {
+    background: var(--cdc-btn-green-hover) !important;
+  }
+
+  /* Lichess turns the glowing button's ::before, our icon, into a pulsing
+     overlay: keep it an icon. */
+  main.round .rcontrols .follow-up .rematch.glowing::before {
+    position: static;
+    opacity: 1;
+    animation: none;
+  }
+
+  /* The way to decline it: Lichess hangs a tab off the panel's right edge,
+     which here would stick out of it. It becomes a small button after
+     Rematch. */
+  main.round .rcontrols .follow-up .rematch-decline {
+    position: static !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    order: 2;
+    flex: none;
+    width: 44px !important;
+    height: 48px !important;
+    padding: 0;
+    border-radius: 6px !important;
+    opacity: 1 !important;
+    background: var(--cdc-btn-grey) !important;
+    box-shadow: var(--cdc-btn-grey-shadow) !important;
+    color: var(--c-bad) !important;
+    font-size: 18px;
+  }
+
+  main.round .rcontrols .follow-up .rematch-decline:hover {
+    background: var(--cdc-btn-red) !important;
+    box-shadow: var(--cdc-btn-red-shadow) !important;
+    color: #fff !important;
   }
 
   /* ---------------------------------------------------------------- chat --- */
@@ -612,13 +689,135 @@
     background: var(--cdc-bg-panel);
   }
 
-  /* No chat (e.g. games against the computer): show the game info there. */
+  /* No chat (e.g. games against the computer): show the game info there,
+     down to the panel's bottom like the chat (Lichess spaces it below). */
   main.round:not(:has(.mchat)) .round__side > .game__meta {
     display: block !important;
     grid-area: chat !important;
-    margin-top: 0 !important;
+    margin: 0 !important;
     border-top: 1px solid var(--cdc-border);
     border-radius: 0 0 6px 6px;
     overflow-y: auto;
+  }
+
+  /* --------------------------------------------------------- crazyhouse --- */
+
+  /* The pieces in hand stand in a strip right of the board, as on
+     Chess.com: the top player's down from the board's top edge, the bottom
+     player's up from its bottom edge. A cell is 3/4 of a square, so both
+     strips fit beside the board, half a square apart. Lichess names their
+     areas `mat-top` and `mat-bot`, which this grid doesn't have: left
+     there, they'd land in tracks of their own, out of sight. */
+  main.round:has(.pocket) {
+    --cdc-pocket-gap: 8px;
+    --cdc-pocket-sq: calc(var(--cdc-board) * 0.09375);
+    --cdc-board: max(
+      320px,
+      min(
+        calc(100vh - 32px - 2 * var(--cdc-bar) - var(--cdc-coords-off)),
+        calc(
+          (100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-panel-w) - var(--cdc-gap) - var(--cdc-pocket-gap) - 48px) /
+            1.09375
+        )
+      )
+    );
+
+    grid-template-columns:
+      var(--cdc-board)
+      calc(var(--cdc-pocket-gap) + var(--cdc-pocket-sq) + var(--cdc-gap))
+      var(--cdc-panel-w) !important;
+    grid-template-areas:
+      'user-top .      moves'
+      'board    pocket moves'
+      'board    pocket controls'
+      'board    pocket chat'
+      'user-bot .      chat' !important;
+    column-gap: 0 !important;
+  }
+
+  main.round .pocket {
+    grid-area: pocket !important;
+    flex-direction: column;
+    width: var(--cdc-pocket-sq) !important;
+    margin: 0 0 0 var(--cdc-pocket-gap) !important;
+    overflow: hidden;
+    border-radius: 4px !important;
+    background: var(--cdc-bg-panel) !important;
+    box-shadow: none !important;
+  }
+
+  main.round .pocket-top {
+    align-self: start;
+    margin-top: var(--cdc-inset-t, 0px) !important;
+  }
+
+  main.round .pocket-bottom {
+    align-self: end;
+    margin-bottom: var(--cdc-inset-b, 0px) !important;
+  }
+
+  main.round .pocket-c1 {
+    flex: none !important;
+    max-width: none !important;
+  }
+
+  /* Lichess's hover is a light grey, for its grey strip. */
+  main.round .pocket.usable piece:hover {
+    background-color: #ffffff1a !important;
+  }
+
+  /* --------------------------------------------------------------- zen --- */
+
+  /* Zen mode (the board menu, or "z"): Lichess hides all but the board,
+     the clocks and the controls, the site's navigation included, and leaves
+     its own way out in the top left corner. The rules above would bring
+     them all back. */
+  body.zenable.zen {
+    --cdc-sidebar-w: 0px;
+  }
+
+  body.zenable.zen #top,
+  body.zenable.zen main.round :is(.ruser, .cdc-captured, .mchat, .round__side),
+  body.zenable.zen main.round :is(i5d, rm6) :is(qZM, i5z, Z7yx, kwdb) {
+    display: none !important;
+  }
+
+  body.zenable.zen main.round :is(i5d, rm6) :is(aPp, l4x) {
+    background: none !important;
+  }
+}
+
+/* Zen mode's way home is Lichess's logo, drawn dark for its light theme:
+   ours is dark whatever the theme. */
+html.light #zenzone .zen-home {
+  filter: invert(1);
+}
+
+/* Below 1020px Lichess's own layout stays, with our theme. */
+@media (max-width: 1019.98px) {
+  /* The captured pieces belong to the desktop player bars. */
+  main.round > .cdc-captured {
+    display: none !important;
+  }
+}
+
+/* Lichess draws each clock's face behind the clock (`z-index: -1`), and
+   from 800px only lifts the bottom clock in front of the page, whose
+   background theme.css paints: the top clock vanished behind it. */
+@media (min-width: 799.3px) and (max-width: 1019.98px), (max-width: 1019.98px) and (orientation: landscape) {
+  main.round .rclock-top {
+    z-index: 0;
+  }
+}
+
+/* Lichess's light theme lights the phone's move strip up with fixed colors,
+   under our white moves. */
+@media (max-width: 799.29px) and (orientation: portrait) {
+  html.light main.round :is(i5d, rm6) :is(aPp, l4x) {
+    box-shadow: inset 0 4px 16px #0006 !important;
+  }
+
+  html.light main.round :is(i5d, rm6) :is(Z7yx, kwdb):is(.a1t, .active, :hover) {
+    background: var(--c-bg-zebra) !important;
   }
 }

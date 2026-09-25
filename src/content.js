@@ -104,21 +104,29 @@
   // Chess.com-style captured pieces under each player's name: the opponent's
   // pieces that are no longer on the board, grouped by type, plus the lead.
   const START = { pawn: 8, knight: 2, bishop: 2, rook: 2, queen: 1 };
+  // Variants that start with other pieces, per color. Crazyhouse shows none:
+  // taken pieces change sides into the pockets, which show them.
+  const VARIANT_START = {
+    racingKings: { white: { ...START, pawn: 0 }, black: { ...START, pawn: 0 } },
+    horde: { white: { pawn: 36, knight: 0, bishop: 0, rook: 0, queen: 0 }, black: START },
+  };
   const VALUE = { pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9 };
   const LETTER = { pawn: 'p', knight: 'n', bishop: 'b', rook: 'r', queen: 'q' };
   const PIECES = 'https://images.chesscomfiles.com/chess-themes/pieces/neo/150/';
   const captured = { top: null, bottom: null };
   let lastCaptured = '';
 
-  const capturedHtml = (color, missing, lead) =>
+  const group = (color, letter, n) => {
+    const piece = `<img src="${PIECES}${color[0]}${letter}.png" alt="" draggable="false">`;
+    return `<div class="cdc-captured__group">${piece.repeat(n)}</div>`;
+  };
+  const capturedHtml = (color, missing, lead, checks = 0) =>
     Object.keys(START)
       .filter(role => missing[role] > 0)
-      .map(role => {
-        const img = `${PIECES}${color[0]}${LETTER[role]}.png`;
-        const piece = `<img src="${img}" alt="" draggable="false">`;
-        return `<div class="cdc-captured__group">${piece.repeat(missing[role])}</div>`;
-      })
-      .join('') + (lead > 0 ? `<span class="cdc-captured__score">+${lead}</span>` : '');
+      .map(role => group(color, LETTER[role], missing[role]))
+      .join('') +
+    (checks > 0 ? group(color, 'k', checks) : '') +
+    (lead > 0 ? `<span class="cdc-captured__score">+${lead}</span>` : '');
 
   const syncCaptured = () => {
     const main = document.querySelector('main.round, main.analyse');
@@ -137,13 +145,23 @@
     }
     const bottomColor = wrap.classList.contains('orientation-black') ? 'black' : 'white';
     const topColor = bottomColor === 'white' ? 'black' : 'white';
+    // The game page says the variant on its app, the analysis board on main.
+    const variant = /\bvariant-(\w+)/.exec(main.querySelector('.round__app')?.className || main.className)?.[1];
+    const start = color => VARIANT_START[variant]?.[color] || START;
     // A player shows the pieces of the other color that are gone.
     const missing = color =>
-      Object.fromEntries(Object.keys(START).map(r => [r, Math.max(0, START[r] - (onBoard[color][r] || 0))]));
-    const html = {
-      top: capturedHtml(bottomColor, missing(bottomColor), material[topColor] - material[bottomColor]),
-      bottom: capturedHtml(topColor, missing(topColor), material[bottomColor] - material[topColor]),
-    };
+      Object.fromEntries(Object.keys(START).map(r => [r, Math.max(0, start(color)[r] - (onBoard[color][r] || 0))]));
+    // Three-check: Lichess counts the checks a side gave as kings in its
+    // material difference, which the bars hide. Kings of the other color,
+    // like the pieces taken.
+    const checks = side => (variant === 'threeCheck' ? main.querySelectorAll(`.material-${side} mpiece.king`).length : 0);
+    const html =
+      variant === 'crazyhouse'
+        ? { top: '', bottom: '' }
+        : {
+            top: capturedHtml(bottomColor, missing(bottomColor), material[topColor] - material[bottomColor], checks('top')),
+            bottom: capturedHtml(topColor, missing(topColor), material[bottomColor] - material[topColor], checks('bottom')),
+          };
     for (const side of ['top', 'bottom']) {
       if (!captured[side] || captured[side].parentNode !== main) {
         captured[side] = document.createElement('div');
@@ -219,10 +237,16 @@
   // Lichess's round data has no clock history, so it comes from the export.
   // The move list is snabbdom's: only attributes are added, and they're put
   // back whenever it re-renders.
-  const times = { id: null, spent: null, tries: 0, loading: false };
+  const times = { id: null, spent: null, clock: null, tries: 0, loading: false, at: 0 };
   const formatSpent = cs => {
     const s = cs / 100;
     return s < 60 ? s.toFixed(1) + 's' : `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+  };
+  // The game's id. TV plays its games at /tv/<channel>, so the path won't
+  // do: the analysis button (there once a game is over) links to the game.
+  const gameId = () => {
+    const link = document.querySelector('main.round :is(i5d, rm6) a.analysis')?.getAttribute('href');
+    return /^\/([A-Za-z0-9]{8})/.exec(link || location.pathname)?.[1] || null;
   };
   const loadTimes = async id => {
     times.loading = true;
@@ -230,28 +254,34 @@
       const res = await fetch(`/game/export/${id}?moves=false&clocks=true&evals=false&opening=false`, {
         headers: { Accept: 'application/json' },
       });
+      if (!res.ok) throw new Error(res.status);
       const game = await res.json();
+      if (times.id !== id) return;
       const clocks = game.clocks || [];
       const initial = (game.clock?.initial || 0) * 100, inc = (game.clock?.increment || 0) * 100;
       times.clock = game.clock || null;
       // Lichess's clock only starts after each side's first move.
       times.spent = clocks.map((c, i) => Math.max(0, i < 2 ? initial - c : clocks[i - 2] + inc - c));
     } catch {
-      times.spent = [];
+      // Tried again below.
+    } finally {
+      times.loading = false;
+      times.at = Date.now();
     }
-    times.loading = false;
   };
   const syncMoveTimes = () => {
     const result = document.querySelector('main.round .result-wrap');
     const list = result?.parentElement;
-    if (!list) return;
-    const id = location.pathname.slice(1, 9);
-    if (times.id !== id) Object.assign(times, { id, spent: null, clock: null, tries: 0 });
+    const id = list && gameId();
+    if (!id) return;
+    if (times.id !== id) Object.assign(times, { id, spent: null, clock: null, tries: 0, at: 0 });
     // The list starts with a move number; the moves are the other tag.
     const indexTag = list.firstElementChild?.tagName;
     const moves = [...list.children].filter(m => m.tagName !== indexTag && m !== result && !m.classList.contains('empty'));
-    // Right after the game ends, the export can lag the last move: retry.
-    if (!times.loading && (!times.spent || (times.spent.length < moves.length && times.spent.length && times.tries < 5))) {
+    // Right after the game ends, the export can fail or lag the last move:
+    // try again, a second apart. A game without a clock has no times.
+    const missing = !times.spent || (times.clock && times.spent.length < moves.length);
+    if (missing && !times.loading && times.tries < 5 && Date.now() - times.at > 1000) {
       times.tries++;
       loadTimes(id);
     }
@@ -272,10 +302,15 @@
   // opponent" for lobby and pool games; otherwise add a button doing what it
   // does, a lobby seek like this game (`/?hook_like=<id>`). Either one gets
   // the time control as its label. The clock comes with the move times.
+  // Short, as Chess.com's: it gets half a narrow panel. Where it has to wrap,
+  // the time control stays in one piece: no-break spaces, and a word joiner
+  // after the bar, which lines may otherwise break after.
   const newGameLabel = clock => {
     const min = +(clock.initial / 60).toFixed(2);
-    const tc = clock.increment ? `${min} | ${clock.increment}` : clock.initial < 60 ? `${clock.initial} s` : `${min} min`;
-    return (document.documentElement.lang || '').startsWith('fr') ? `Nouvelle en ${tc}` : `New ${tc}`;
+    const tc = (clock.increment ? `${min} | ${clock.increment}` : clock.initial < 60 ? `${clock.initial} s` : `${min} min`)
+      .replace(/ /g, '\u00a0')
+      .replace('|', '|\u2060');
+    return (document.documentElement.lang || '').startsWith('fr') ? `Nouvelle ${tc}` : `New ${tc}`;
   };
   const syncNewGame = () => {
     const follow = document.querySelector('main.round .rcontrols .follow-up');

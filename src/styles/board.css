@@ -256,22 +256,14 @@ coords {
   }
 }
 
-/* Outside coordinates, like Chess.com: ranks on the left, files below, in
-   muted grey. */
-body.coords-out coords coord {
-  color: var(--cdc-text-dim) !important;
-}
-
-body.coords-out coords.ranks {
-  left: -16px !important;
-  right: auto !important;
-}
-
-/* Lichess tucks the files right under the board (`bottom: -15px` for a 17px
-   line, so the letters touch the squares) while the ranks stand clear of it:
-   the letters get the same gap as the numbers. */
-body.coords-out coords.files {
-  bottom: -21px !important;
+/* Below 1020px, "outside" coordinates stay where Lichess puts them: right of
+   the board and under it where there's room (in the theme's dim page color),
+   inside it on a phone held upright, where the board takes the whole width.
+   Moved to the board's left, they fell off the screen. Inside, Lichess colors
+   them from its board theme's variables: the green board's colors. */
+body .is2d coords {
+  ---cg-ccw: var(--cdc-sq-light) !important;
+  ---cg-ccb: var(--cdc-sq-dark) !important;
 }
 
 /* On desktop they're always outside, as on Chess.com. Lichess swaps

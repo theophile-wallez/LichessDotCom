@@ -19,9 +19,13 @@
     position: relative;
     justify-self: start;
     align-self: start;
+    box-sizing: border-box;
     display: flex !important;
     align-items: center;
     gap: 5px;
+    /* Clear of the clock (140px and a gap, more with the game page's clock
+       extras): a name too long for the bar ends in an ellipsis. */
+    max-width: calc(100% - var(--cdc-inset-l, 0px) - var(--cdc-inset-r, 0px) - var(--cdc-clock-room, 152px));
     height: 20px;
     margin: calc(var(--cdc-off) + 8px) 0 0 var(--cdc-inset-l, 0px) !important;
     padding: 0 0 0 50px !important;
@@ -49,10 +53,19 @@
 
   :is(main.round .ruser, main.analyse > .cdc-player) a,
   :is(main.round .ruser, main.analyse > .cdc-player) name {
-    flex: none !important;
+    flex: 0 1 auto !important;
+    min-width: 0;
+    overflow: hidden;
     font-weight: 700;
     color: var(--cdc-text-strong) !important;
     letter-spacing: 0 !important;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* What follows the name keeps its size. */
+  :is(main.round .ruser, main.analyse > .cdc-player) > :not(a, name) {
+    flex: none;
   }
 
   :is(main.round .ruser, main.analyse > .cdc-player) .utitle,
