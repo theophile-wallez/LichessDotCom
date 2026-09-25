@@ -100,6 +100,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/teams.css` | Team lists (`main.team-list`) as a grid of club cards with avatar tiles. |
 | `src/styles/study.css` | Study lists (`.study-index`) as a grid of study cards, the compact list view, the toolbar, topics and staff picks. |
 | `src/styles/friends.css` | Player lists (following, blocks, favourite opponents) as Chess.com friend cards with avatars and an online dot. |
+| `src/styles/friendbox.css` | The online friends box (`#friend_box`, bottom right, signed in only) as a Chess.com dock: a tab on the window's bottom edge with a green dot and a chevron, opening into rows with an avatar, the online dot on its corner, the title badge and a round TV button while they play. |
 | `src/styles/puzzle.css` | Puzzles (`main.puzzle`): from 1260px a non-scrolling grid (one side card, the eval bar left of the board, analysis-style), a status banner, chunky hint / solution / vote buttons, the themes as a list of rows, and the move buttons pinned inside the panel. |
 | `src/styles/blog.css` | Blog posts (`.ublog-post`) as Chess.com-style articles, and the blog lists. |
 | `src/styles/practice.css` | Practice (`.practice-app`, `.practice-side`) as playful lesson cards: a color per section, white icons on gradient tiles, progress pills. |
