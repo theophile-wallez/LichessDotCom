@@ -63,10 +63,11 @@
   }
   document.documentElement.dataset.cdcCoach = coach;
 
-  // The FIDE players' rank (styles/fide.css) counts the rows on the page, so a
-  // list opened on a later page (/fide?page=3) starts from that page's first
-  // player, at 30 a page, and hands out no medals.
-  const fidePage = location.pathname.endsWith('/fide') && +new URLSearchParams(location.search).get('page');
+  // The FIDE players' and federations' rank (styles/fide.css) counts the rows
+  // on the page, so a list opened on a later page (/fide?page=3) starts from
+  // that page's first row, at 30 a page, and hands out no medals.
+  const fidePage =
+    /\/fide(\/federation)?$/.test(location.pathname) && +new URLSearchParams(location.search).get('page');
   if (fidePage > 1) {
     document.documentElement.dataset.cdcFideSkip = (fidePage - 1) * 30;
     document.documentElement.style.setProperty('--cdc-fide-skip', (fidePage - 1) * 30);

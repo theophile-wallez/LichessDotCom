@@ -52,6 +52,7 @@ h3 {
   font-size: 15px;
   font-weight: 600;
   text-shadow: none !important;
+  transition: background-color 0.18s ease-out, color 0.18s ease-out !important;
 }
 
 .subnav a:hover {
@@ -67,6 +68,135 @@ h3 {
 
 .subnav a.active::after {
   display: none !important;
+}
+
+/* The community menu (leaderboard, rating stats, bots…), the broadcasts'
+ * (also the FIDE pages'), the puzzles' and the account settings': each link gets Chess.com's color
+ * icon (or one of Lichess's 3D emoji) on a tile tinted in its own color, which hops on hover. Each page's
+ * CSS sets `--cdc-nav-icon` and `--cdc-nav-color` per link, told apart by
+ * how the hrefs end, as Lichess localizes them. */
+.subnav:has(a[href$='/player/bots'], a[href$='/broadcast/calendar'], a[href$='/training/themes'], a[href$='/account/kid']) a {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 14px 7px 8px !important;
+}
+
+.subnav:has(a[href$='/player/bots'], a[href$='/broadcast/calendar'], a[href$='/training/themes'], a[href$='/account/kid']) a::before {
+  content: '';
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background:
+    var(--cdc-nav-icon, none) center / 24px 24px no-repeat,
+    color-mix(in srgb, var(--cdc-nav-color, #fff) 16%, transparent);
+  box-shadow: inset 0 1px #ffffff14;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s, box-shadow 0.2s !important;
+}
+
+.subnav:has(a[href$='/player/bots'], a[href$='/broadcast/calendar'], a[href$='/training/themes'], a[href$='/account/kid']) a:hover::before {
+  transform: translateY(-2px) rotate(-8deg) scale(1.08);
+}
+
+.subnav:has(a[href$='/player/bots'], a[href$='/broadcast/calendar'], a[href$='/training/themes'], a[href$='/account/kid']) a.active::before {
+  background-color: color-mix(in srgb, var(--cdc-nav-color, #fff) 32%, transparent);
+  box-shadow: inset 0 1px #ffffff26, 0 0 0 1px color-mix(in srgb, var(--cdc-nav-color, #fff) 45%, transparent);
+}
+
+/* The account settings' menu has no Chess.com icon to borrow (a bell, a
+ * key, a lock…): Lichess's own 3D emoji instead. */
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/profile'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.memo.webp');
+  --cdc-nav-color: #1baaf0;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/display'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/activity.artist-palette.webp');
+  --cdc-nav-color: #fa742c;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/chess-clock'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.stopwatch.webp');
+  --cdc-nav-color: #f7c631;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/game-behavior'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/activity.joystick.webp');
+  --cdc-nav-color: #8a6fd8;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/privacy'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/smileys.see-no-evil-monkey.webp');
+  --cdc-nav-color: #c8915b;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/notification'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.bell.webp');
+  --cdc-nav-color: #f7c631;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/kid'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.teddy-bear.webp');
+  --cdc-nav-color: #e27ba8;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/username'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/symbols.name-badge.webp');
+  --cdc-nav-color: #e25555;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/coach/edit'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/people.teacher.webp');
+  --cdc-nav-color: #26c2a3;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/passwd'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.key.webp');
+  --cdc-nav-color: #f7c631;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/email'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.incoming-envelope.webp');
+  --cdc-nav-color: #1baaf0;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/twofactor'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.mobile-phone-with-arrow.webp');
+  --cdc-nav-color: #26c2a3;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/oauth/token'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/activity.admission-tickets.webp');
+  --cdc-nav-color: #8a6fd8;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/security'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.shield.webp');
+  --cdc-nav-color: #81b64c;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/network'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.satellite-antenna.webp');
+  --cdc-nav-color: #1baaf0;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/dgt'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/activity.chess.webp');
+  --cdc-nav-color: #9aa3ad;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/close'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.door.webp');
+  --cdc-nav-color: #e25555;
+}
+
+/* Lichess's separators are blank gaps: a faint rule instead. */
+.subnav:has(a[href$='/player/bots'], a[href$='/broadcast/calendar'], a[href$='/training/themes'], a[href$='/account/kid']) .sep {
+  height: 1px;
+  margin: 8px 14px !important;
+  background: var(--cdc-border);
 }
 
 /* ----------------------------------------------------------------- tabs --- */
@@ -578,7 +708,7 @@ dialog .help th p {
   border-radius: 7px;
   background: transparent;
   font-size: 14px;
-  transition: background-color 0.15s, color 0.15s;
+  transition: background-color 0.15s, color 0.15s !important;
 }
 
 .game-setup .time-control-tabs .tabs-horiz button:hover {
@@ -638,7 +768,7 @@ dialog .help th p {
   margin-top: -6px;
   border-radius: 50% !important;
   box-shadow: 0 1px 3px #00000080;
-  transition: box-shadow 0.15s;
+  transition: box-shadow 0.15s !important;
 }
 
 .game-setup input.range:hover::-webkit-slider-thumb {
@@ -660,7 +790,7 @@ dialog .help th p {
   border-radius: 8px !important;
   font-size: 14px !important;
   font-variant-numeric: tabular-nums;
-  transition: background-color 0.15s, box-shadow 0.15s;
+  transition: background-color 0.15s, box-shadow 0.15s !important;
 }
 
 .game-setup .time-control-tabs .time-panel .presets .preset-btn.active {
@@ -687,7 +817,7 @@ dialog .help th p {
   color: var(--cdc-text-dim);
   font-size: 14px;
   font-weight: 700;
-  transition: background-color 0.15s, color 0.15s;
+  transition: background-color 0.15s, color 0.15s !important;
 }
 
 .game-setup group.radio label:not(.disabled):hover {
@@ -734,7 +864,7 @@ dialog .help th p {
   font-size: 11px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  transition: color 0.15s;
+  transition: color 0.15s !important;
 }
 
 .game-setup group.radio input:checked + label[for^='sf_level_']::after {
@@ -838,7 +968,7 @@ dialog .help th p {
   border: none !important;
   border-radius: 10px !important;
   background: var(--cdc-bg-raised) !important;
-  transition: background-color 0.15s, box-shadow 0.15s;
+  transition: background-color 0.15s, box-shadow 0.15s !important;
 }
 
 .game-setup .color-cards label.card-radio:hover {
@@ -951,35 +1081,12 @@ input.range::-webkit-slider-thumb {
   font-weight: 700;
 }
 
-/* Puzzle Storm and a Puzzle Racer race: Lichess sizes the board to the
- * whole window's width, sidebar included, which pushed the side panel past
- * the window's edge wherever the width, not the height, limits the board.
- * Cap it to what the sidebar leaves: the panel's 240px and the gap, the page
- * margins, a scrollbar, and a gutter for the ranks, which board.css draws
- * left of the board (they fell under the sidebar). */
-@media (min-width: 1020px) {
-  main > :is(.storm--play, .racer) {
-    --cdc-coords-l: 0px;
-
-    grid-template-columns:
-      min(
-        var(---col2-uniboard-width),
-        calc(100vw - var(--cdc-sidebar-w, 0px) - 2 * var(---main-margin, 0px) - var(--cdc-coords-l) - 275px)
-      )
-      minmax(240px, 400px) !important;
-    margin-left: var(--cdc-coords-l);
-  }
-
-  body:is(.coords-in, .coords-out) main > :is(.storm--play, .racer) {
-    --cdc-coords-l: calc(0.6 * var(--cdc-coords-size, 13px) + 10px);
-  }
-}
-
-/* The coordinate trainer (/training/coordinate), the same way, in Lichess's
- * two columns (board, then the explanation) and its three (the settings
- * first): from 1020px the explanation and Start button hung past the
- * window's edge by up to 50px. Its board shows coordinates only when asked
- * to ("Show coordinates"): then the ranks get their gutter. */
+/* The coordinate trainer (/training/coordinate), sized as storm.css sizes
+ * Puzzle Storm's board, in Lichess's two columns (board, then the
+ * explanation) and its three (the settings first): from 1020px the
+ * explanation and Start button hung past the window's edge by up to 50px.
+ * Its board shows coordinates only when asked to ("Show coordinates"):
+ * then the ranks get their gutter. */
 @media (min-width: 1020px) {
   main#trainer > .trainer {
     --cdc-coords-l: 0px;
@@ -1021,18 +1128,6 @@ input.range::-webkit-slider-thumb {
  * a narrow panel instead of pushing it out of the card. */
 .racer .copy-me__target {
   min-width: 0;
-}
-
-/* The end of a storm run: the score on a dark card like the stats beside
- * it, the number in green. Lichess fills the card with its "good" color,
- * which is our green: a whole green card next to the green Play again. */
-.storm--end__score {
-  background: var(--cdc-bg-panel) !important;
-  color: var(--cdc-text-dim) !important;
-}
-
-.storm--end__score__number {
-  color: var(--cdc-green-hover);
 }
 
 /* --------------------------------------------------------- board editor --- */
@@ -1153,7 +1248,7 @@ input.range::-webkit-slider-thumb {
   box-shadow: none !important;
   letter-spacing: normal !important;
   text-shadow: none !important;
-  transition: background-color 0.15s;
+  transition: background-color 0.15s !important;
 }
 
 .tsht:hover {
@@ -1241,7 +1336,7 @@ input.range::-webkit-slider-thumb {
   font-weight: 700;
   letter-spacing: normal !important;
   text-shadow: none !important;
-  transition: background-color 0.15s;
+  transition: background-color 0.15s !important;
 }
 
 #tournament-calendar .tournament:hover {
@@ -1356,7 +1451,7 @@ input.range::-webkit-slider-thumb {
     height: 14px;
     background: linear-gradient(var(--cdc-bg-panel), transparent);
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s !important;
     pointer-events: none;
   }
 

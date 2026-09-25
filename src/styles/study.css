@@ -118,7 +118,7 @@
     height: 14px;
     background: linear-gradient(var(--cdc-bg-page), transparent);
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s !important;
     pointer-events: none;
   }
 
@@ -364,7 +364,7 @@
   color: var(--cdc-text) !important;
   font-size: 14px;
   font-weight: 600;
-  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s !important;
 }
 
 .study-topics .topic-list a:hover {
@@ -467,7 +467,7 @@ main.page-menu:has(.subnav a.active[href$='/staff-picks']) .body > ul a {
   font-size: 14px;
   font-weight: 600;
   line-height: 1.35;
-  transition: background-color 0.1s, color 0.1s;
+  transition: background-color 0.1s, color 0.1s !important;
 }
 
 main.page-menu:has(.subnav a.active[href$='/staff-picks']) .body > ul a::before {
@@ -518,7 +518,7 @@ main.page-menu:has(.subnav a.active[href$='/staff-picks']) .body > ul a:hover {
     height: 14px;
     background: linear-gradient(var(--cdc-bg-page), transparent);
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s !important;
     pointer-events: none;
   }
 

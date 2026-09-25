@@ -204,7 +204,7 @@ main.analyse .practice-box > .title {
     color: var(--cdc-text-dim) !important;
     font-size: 13px !important;
     font-weight: 800;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
   }
 
   .ps__chapter .status:not(.done)::before {
@@ -653,7 +653,7 @@ main.analyse .practice-box > .title {
     font-size: 14px;
     font-weight: 600;
     opacity: 1 !important;
-    transition: background-color 0.15s;
+    transition: background-color 0.15s !important;
   }
 
   main.analyse .analyse__underboard .feedback:is(.win, .fail):hover {
@@ -913,10 +913,6 @@ main.analyse .practice-box > .title {
 
     main.analyse:has(.practice__side):has(.practice-box) .analyse__underboard .feedback {
       animation: none !important;
-    }
-
-    .ps__chapter:hover .status {
-      transform: none;
     }
   }
 }

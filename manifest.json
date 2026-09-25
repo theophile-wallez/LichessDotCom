@@ -36,6 +36,7 @@
         "src/styles/teams.css",
         "src/styles/study.css",
         "src/styles/friends.css",
+        "src/styles/friendbox.css",
         "src/styles/puzzle.css",
         "src/styles/blog.css",
         "src/styles/practice.css",
@@ -51,7 +52,9 @@
         "src/styles/bots.css",
         "src/styles/simul.css",
         "src/styles/forum.css",
-        "src/styles/patron.css"
+        "src/styles/patron.css",
+        "src/styles/racer.css",
+        "src/styles/storm.css"
       ],
       "js": ["src/content.js", "src/dashboard.js", "src/ratingchart.js", "lib/lottie_light.min.js", "src/coach-lottie.js", "src/coach.js"],
       "run_at": "document_start"

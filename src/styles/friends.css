@@ -44,7 +44,7 @@ main.box.page-small:has(
     box-shadow: var(--cdc-btn-grey-shadow);
     color: #fff !important;
     font-size: 15px;
-    transition: background 0.15s;
+    transition: background 0.15s !important;
   }
 
   & > .box__top h1 > a[data-icon]:hover {
@@ -87,7 +87,7 @@ main.box.page-small:has(
     border: 1px solid #ffffff14;
     border-radius: 10px;
     background: #ffffff06 !important;
-    transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+    transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s !important;
   }
 
   & > table.slist > tbody > tr:hover {

@@ -5,6 +5,13 @@
  * is sorted by in white. The sort links become pills with the time-control
  * icons. The title, the search and the column pills stay in view while the
  * rows scroll.
+ *
+ * The federations (/fide/federation, .fide-federations) are the same kind of
+ * ranking: a row card per federation, its rank, a big round flag, the
+ * player count and the three top-10 ratings, classical (the order) in white.
+ * A federation's own page (.fide-federation) gets a pinned header with its
+ * flag, and its three rank cards as stat cards, each time control a white
+ * icon on a tile of its color.
  */
 
 /* ------------------------------------------------------------ page --- */
@@ -26,7 +33,7 @@
   padding: 0 !important;
 }
 
-.fide-players > .box__top > h1 {
+:is(.fide-players, .fide-federations) > .box__top > h1 {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -37,13 +44,19 @@
   letter-spacing: normal !important;
 }
 
-/* Chess.com's globe: the players of every federation. */
-.fide-players > .box__top > h1::before {
+/* Chess.com's globe: the players of every federation, and the federations
+ * themselves. */
+:is(.fide-players, .fide-federations) > .box__top > h1::before {
   content: '';
   flex: none;
   width: 36px;
   height: 36px;
   background: url('https://assets-ds.chess.com/color-icons/globe.svg') center / contain no-repeat;
+}
+
+.fide-federations > .box__top > h1::before {
+  width: 40px;
+  height: 40px;
 }
 
 .fide-players__search-form {
@@ -125,7 +138,7 @@
   color: var(--cdc-text-dim) !important;
   font-weight: 700;
   white-space: nowrap;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, color 0.15s !important;
 }
 
 .fide-players-table thead th > a[href]:hover {
@@ -188,7 +201,7 @@
   font-size: 15px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  transition: background 0.15s;
+  transition: background 0.15s !important;
 }
 
 .fide-players-table tbody tr.paginated > td:first-child {
@@ -248,7 +261,7 @@
   border-radius: 6px !important;
   object-fit: cover;
   box-shadow: 0 0 0 1px #ffffff14, 0 2px 6px #0000004d;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 .fide-players-table tbody tr:hover .fide-players__photo {
@@ -319,15 +332,387 @@
 }
 
 /* Gold, silver and bronze for the top three. */
-html:not([data-cdc-fide-skip]) .fide-players-table tbody tr.paginated:nth-child(-n + 3) {
+html:not([data-cdc-fide-skip]) :is(.fide-players-table, .fide-federations .slist) tbody tr.paginated:nth-child(-n + 3) {
   --cdc-medal-shadow: inset 0 1px 0 #ffffff59, inset 0 -2px 0 #00000026, 0 2px 6px #00000040;
   --cdc-medal-text: #fff;
   --cdc-medal-text-shadow: 0 1px 1px #00000073;
 }
 
-html:not([data-cdc-fide-skip]) .fide-players-table tbody tr.paginated:nth-child(1) { --cdc-medal: linear-gradient(145deg, #fad541, #d8a31a); }
-html:not([data-cdc-fide-skip]) .fide-players-table tbody tr.paginated:nth-child(2) { --cdc-medal: linear-gradient(145deg, #d9dde3, #9aa3ad); }
-html:not([data-cdc-fide-skip]) .fide-players-table tbody tr.paginated:nth-child(3) { --cdc-medal: linear-gradient(145deg, #e0a06a, #b06a35); }
+html:not([data-cdc-fide-skip]) :is(.fide-players-table, .fide-federations .slist) tbody tr.paginated:nth-child(1) { --cdc-medal: linear-gradient(145deg, #fad541, #d8a31a); }
+html:not([data-cdc-fide-skip]) :is(.fide-players-table, .fide-federations .slist) tbody tr.paginated:nth-child(2) { --cdc-medal: linear-gradient(145deg, #d9dde3, #9aa3ad); }
+html:not([data-cdc-fide-skip]) :is(.fide-players-table, .fide-federations .slist) tbody tr.paginated:nth-child(3) { --cdc-medal: linear-gradient(145deg, #e0a06a, #b06a35); }
+
+/* ------------------------------------------------------ federations --- */
+
+/* The federations' ranking: a row card per federation, as the players'. */
+.fide-federations.page-menu__content.box {
+  padding: 0 0 40px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.fide-federations > .box__top {
+  align-items: center !important;
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.fide-federations .slist {
+  width: 100%;
+  border: none !important;
+  border-collapse: separate !important;
+  border-spacing: 0 6px;
+  margin-top: -6px;
+  counter-reset: cdc-fide var(--cdc-fide-skip, 0);
+}
+
+.fide-federations .slist thead {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.fide-federations .slist thead th {
+  padding: 0 10px 8px !important;
+  border: none !important;
+  background: var(--cdc-bg-page);
+  color: var(--cdc-text-dim) !important;
+  font-size: 13px !important;
+  font-weight: 700;
+  text-align: center;
+  text-transform: none;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.fide-federations .slist thead th:first-child {
+  padding-inline-start: 0 !important;
+  text-align: start;
+}
+
+.fide-federations .slist :is(th, td):not(:first-child) {
+  width: 1%;
+  text-align: center !important;
+}
+
+/* The player count's people, and each rating's time-control icon in the
+ * colors of the players' list (classical gets rapid's clock, in teal). */
+.fide-federations .slist thead th:nth-child(2)::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-inline-end: 6px;
+  background: url('https://lichess1.org/assets/flair/img/people.busts-in-silhouette.webp') center / contain no-repeat;
+  vertical-align: -3px;
+}
+
+.fide-federations .slist thead th:is(:nth-child(3), :nth-child(4), :nth-child(5)) {
+  --cdc-mode-icon: var(--cdc-mode-rapid);
+  --cdc-mode-color: #2dd4bf;
+}
+
+.fide-federations .slist thead th:nth-child(4) {
+  --cdc-mode-color: #81b64c;
+}
+
+.fide-federations .slist thead th:nth-child(5) {
+  --cdc-mode-icon: var(--cdc-mode-blitz);
+  --cdc-mode-color: #fad541;
+}
+
+.fide-federations .slist thead th:is(:nth-child(3), :nth-child(4), :nth-child(5))::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-inline-end: 6px;
+  background: var(--cdc-mode-color);
+  -webkit-mask: var(--cdc-mode-icon) center / contain no-repeat;
+  mask: var(--cdc-mode-icon) center / contain no-repeat;
+  vertical-align: -2px;
+}
+
+/* The whole card opens the federation: its link covers the row. */
+.fide-federations .slist tbody tr.paginated {
+  counter-increment: cdc-fide;
+  position: relative;
+  background: none !important;
+}
+
+.fide-federations .slist tbody tr.paginated > td {
+  padding: 10px 14px !important;
+  border: none !important;
+  background: var(--cdc-bg-panel);
+  color: var(--cdc-text-dim);
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  transition: background 0.15s !important;
+}
+
+.fide-federations .slist tbody tr.paginated > td:first-child {
+  padding-inline-start: 14px !important;
+  border-start-start-radius: 10px;
+  border-end-start-radius: 10px;
+}
+
+.fide-federations .slist tbody tr.paginated > td:last-child {
+  padding-inline-end: 18px !important;
+  border-start-end-radius: 10px;
+  border-end-end-radius: 10px;
+}
+
+.fide-federations .slist tbody tr.paginated:hover > td {
+  background: var(--cdc-card-hover);
+}
+
+/* The two other ratings in the page's text color, classical (the order)
+ * standing out. */
+.fide-federations .slist tbody td:is(:nth-child(4), :nth-child(5)) {
+  color: var(--cdc-text);
+}
+
+.fide-federations .slist tbody td:nth-child(3) {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.fide-federations .slist tbody td:first-child a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  color: #fff !important;
+  font-size: 16px;
+  font-weight: 800 !important;
+}
+
+.fide-federations .slist tbody td:first-child a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+}
+
+.fide-federations .slist tbody tr:hover td:first-child a {
+  color: var(--cdc-green-hover) !important;
+}
+
+/* The rank, medals for the top three (the players' list's). */
+.fide-federations .slist tbody td:first-child a::before {
+  content: counter(cdc-fide);
+  flex: none;
+  display: grid;
+  place-items: center;
+  min-width: 30px;
+  height: 30px;
+  margin-inline-end: -2px;
+  border-radius: 999px;
+  background: var(--cdc-medal, transparent);
+  box-shadow: var(--cdc-medal-shadow, none);
+  color: var(--cdc-medal-text, var(--cdc-text-dim));
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-shadow: var(--cdc-medal-text-shadow, none);
+}
+
+/* The flag, big and round, with a sheen; it bounces when its card is
+ * hovered. */
+.fide-federations .slist tbody td:first-child .flag {
+  flex: none;
+  width: 40px !important;
+  height: 40px !important;
+  margin: 0 !important;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #ffffff1a, 0 3px 8px #00000066;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.fide-federations .slist tbody tr:hover td:first-child .flag {
+  transform: scale(1.1) rotate(-8deg);
+}
+
+.fide-federations .slist tbody tr.pager th {
+  padding: 12px 0 !important;
+  border: none !important;
+}
+
+.fide-federations .slist tbody tr.pager a {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 8px;
+  background: var(--cdc-btn-grey);
+  box-shadow: var(--cdc-btn-grey-shadow);
+  color: #fff !important;
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------- federation --- */
+
+/* A federation's page: its big round flag, name and player count as a
+ * header, then its rank in each time control. */
+.fide-federation.page-menu__content.box {
+  padding: 0 0 40px !important;
+}
+
+.fide-federation__head {
+  gap: 18px !important;
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.fide-federation__head .flag {
+  flex: none;
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 3px #ffffff1a, 0 6px 16px #00000073;
+}
+
+.fide-federation__head h1 {
+  margin: 0 !important;
+  color: #fff;
+  font-size: 30px !important;
+  font-weight: 800 !important;
+  letter-spacing: normal !important;
+  line-height: 1.15;
+}
+
+.fide-federation__head p {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 0;
+  padding: 3px 12px 3px 8px;
+  border-radius: 999px;
+  background: var(--cdc-bg-raised);
+  color: var(--cdc-text);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.fide-federation__head p::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  background: url('https://lichess1.org/assets/flair/img/people.busts-in-silhouette.webp') center / contain no-repeat;
+}
+
+/* A stat card per time control: its icon white on a tile of its color, then
+ * the rank, the top-10 rating and the player count as big numbers over
+ * their labels. */
+.fide-federation__cards {
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)) !important;
+  gap: 14px !important;
+  margin: 8px 0 24px !important;
+  padding: 0 !important;
+  font-size: 16px !important;
+}
+
+.fide-federation__card {
+  --cdc-fc: #2dd4bf;
+  --cdc-fc-2: #14a38f;
+  --cdc-fc-icon: var(--cdc-mode-rapid);
+  position: relative;
+  gap: 18px !important;
+  padding: 20px !important;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 12px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.fide-federation__card:nth-child(2) {
+  --cdc-fc: #95c85a;
+  --cdc-fc-2: #5d9948;
+}
+
+.fide-federation__card:nth-child(3) {
+  --cdc-fc: #fad541;
+  --cdc-fc-2: #d8a31a;
+  --cdc-fc-icon: var(--cdc-mode-blitz);
+}
+
+/* The tile behind the icon: the icon is a mask, which would clip it. */
+.fide-federation__card::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  inset-inline-start: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, var(--cdc-fc), var(--cdc-fc-2));
+  box-shadow: inset 0 1px 0 #ffffff40, inset 0 -3px 0 #00000026, 0 4px 10px #00000040;
+}
+
+.fide-federation__card em {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 44px;
+  color: #fff !important;
+  font-family: var(--cdc-font) !important;
+  font-size: 19px;
+  font-style: normal;
+  font-weight: 800 !important;
+  text-transform: none !important;
+}
+
+/* Doubled class: theme.css masks the rapid glyph from an :is() list, whose
+ * specificity is its most specific entry's. */
+.fide-federation__cards .fide-federation__card em::before {
+  content: '' !important;
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin: 0 !important;
+  background: #fff !important;
+  -webkit-mask: var(--cdc-fc-icon) center / 52% no-repeat !important;
+  mask: var(--cdc-fc-icon) center / 52% no-repeat !important;
+  filter: drop-shadow(0 1px 1px #00000040);
+  opacity: 1 !important;
+}
+
+.fide-federation__card > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.fide-federation__card p {
+  flex-direction: column-reverse !important;
+  align-items: flex-start !important;
+  justify-content: flex-end !important;
+  gap: 2px;
+  min-width: 0;
+  margin: 0 !important;
+  color: var(--cdc-text-dim) !important;
+  font-size: 12px !important;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.fide-federation__card strong {
+  color: #fff !important;
+  font-size: 22px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.fide-federation__card p:first-child strong::before {
+  content: '#';
+  color: var(--cdc-text-dim);
+  font-weight: 700;
+}
 
 /* ------------------------------------------------------------ pager --- */
 
@@ -391,6 +776,51 @@ html:not([data-cdc-fide-skip]) .fide-players-table tbody tr.paginated:nth-child(
     background: var(--cdc-bg-page);
   }
 
+  /* The federations' title and column heads, and a federation's header,
+   * pinned the same way. */
+  .fide-federations.page-menu__content.box,
+  .fide-federation.page-menu__content.box {
+    overflow: visible !important;
+  }
+
+  :is(.fide-federations, .fide-federation) > .box__top {
+    container-type: scroll-state;
+    position: sticky;
+    z-index: 3;
+    top: 0;
+    height: 84px;
+    background: var(--cdc-bg-page);
+  }
+
+  .fide-federation > .box__top {
+    height: 104px;
+  }
+
+  .fide-federations .slist thead th {
+    container-type: scroll-state;
+    position: sticky;
+    z-index: 2;
+    top: 84px;
+  }
+
+  :is(.fide-federations .slist thead th, .fide-federation > .box__top)::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-page), transparent);
+    opacity: 0;
+    transition: opacity 0.2s !important;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    :is(.fide-federations .slist thead th, .fide-federation > .box__top)::after {
+      opacity: 1;
+    }
+  }
+
   .fide-players__search-form__input {
     width: 260px;
   }
@@ -412,7 +842,7 @@ html:not([data-cdc-fide-skip]) .fide-players-table tbody tr.paginated:nth-child(
     height: 14px;
     background: linear-gradient(var(--cdc-bg-page), transparent);
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s !important;
     pointer-events: none;
   }
 
@@ -448,10 +878,16 @@ html:not([data-cdc-fide-skip]) .fide-players-table tbody tr.paginated:nth-child(
     height: 40px !important;
   }
 
-  /* A federation's rank cards, three across: at Lichess's big size, a
-   * "Classical" in capitals runs out of its card. */
-  .fide-federation__cards {
-    font-size: 1.5em !important;
+  .fide-federations .slist :is(th, td):not(:first-child) {
+    padding-inline: 6px !important;
+  }
+
+  .fide-federation__card > div {
+    gap: 4px;
+  }
+
+  .fide-federation__card strong {
+    font-size: 19px;
   }
 }
 
@@ -460,8 +896,51 @@ html:not([data-cdc-fide-skip]) .fide-players-table tbody tr.paginated:nth-child(
  * wrapper is as wide as 100vw, scrollbar included, which would widen the
  * page's one column: no minimum, and the table scrolls inside it. */
 @media (max-width: 799.98px) {
-  .fide-players.page-menu__content.box {
+  :is(.fide-players, .fide-federations, .fide-federation).page-menu__content.box {
     min-width: 0;
     padding: 12px 12px 32px !important;
+  }
+}
+
+/* Phones: the player count goes, so the names keep their room. */
+@media (max-width: 559.98px) {
+  .fide-federations .slist :is(th, td):nth-child(2) {
+    display: none;
+  }
+
+  .fide-federations .slist :is(th, td):not(:first-child) {
+    padding-inline: 4px !important;
+  }
+
+  .fide-federations .slist thead th {
+    font-size: 12px !important;
+  }
+
+  .fide-federations .slist tbody tr.paginated > td {
+    font-size: 14px;
+  }
+
+  .fide-federations .slist tbody tr.paginated > td:first-child {
+    padding-inline-start: 8px !important;
+  }
+
+  .fide-federations .slist tbody tr.paginated > td:last-child {
+    padding-inline-end: 10px !important;
+  }
+
+  .fide-federations .slist tbody td:first-child a {
+    gap: 8px;
+    font-size: 14px;
+  }
+
+  .fide-federations .slist tbody td:first-child a::before {
+    min-width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+
+  .fide-federations .slist tbody td:first-child .flag {
+    width: 28px !important;
+    height: 28px !important;
   }
 }

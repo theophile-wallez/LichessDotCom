@@ -1,0 +1,219 @@
+/*
+ * The online friends box (#friend_box, bottom right, signed in only) as a
+ * Chess.com dock: a tab docked to the window's bottom edge that opens into
+ * a list of friend rows.
+ *
+ *   +-------------------------------+
+ *   | •  1 friend online         ^  |
+ *   |-------------------------------|
+ *   | [avatar] GM Name        [tv]  |
+ *   +-------------------------------+
+ *
+ * Lichess renders .friend_box_title (the toggle) and .content_wrap, which it
+ * toggles with .none; each friend is a div holding a user link (its
+ * icon.line is the online mark) and, while they play, a TV link. Lichess
+ * only shows the box when the top nav is visible and the window tall, so
+ * its display is left alone.
+ */
+
+#friend_box {
+  inset-inline-end: 16px !important;
+  width: 240px;
+  border: 1px solid var(--cdc-menu-border) !important;
+  border-bottom: none !important;
+  border-radius: 10px 10px 0 0 !important;
+  background: var(--cdc-menu-bg) !important;
+  box-shadow: 0 -4px 24px #00000066, 0 -1px 4px #00000040;
+  color: var(--cdc-text);
+  font-family: var(--cdc-font);
+  font-size: 14px !important;
+}
+
+/* ------------------------------------------------------------ title --- */
+
+/* Not a flexbox: the count and the words are separate nodes, which a gap
+ * would push apart. */
+#friend_box .friend_box_title {
+  position: relative;
+  padding: 10px 38px 10px 14px !important;
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--cdc-text) !important;
+  font-weight: 600;
+  text-shadow: none !important;
+  white-space: nowrap;
+  user-select: none;
+  transition: background-color 0.15s !important;
+}
+
+#friend_box .friend_box_title:hover {
+  background: var(--cdc-menu-hover) !important;
+}
+
+#friend_box .friend_box_title strong {
+  color: var(--cdc-text-strong);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Before the first count, Lichess shows an up triangle in the number's
+ * place: the chevron already says "open me". */
+#friend_box .friend_box_title [data-icon] {
+  display: none;
+}
+
+/* A dot: green with a halo when someone is online, grey otherwise. */
+#friend_box .friend_box_title::before {
+  content: '';
+  display: inline-block;
+  margin-inline-end: 10px;
+  vertical-align: 1px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cdc-font-dimmer);
+}
+
+#friend_box:has(.list > div) .friend_box_title::before {
+  background: var(--cdc-green);
+  box-shadow: 0 0 0 3px #81b64c33;
+}
+
+/* The chevron, pointing up while closed, down while open. */
+#friend_box .friend_box_title::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  inset-inline-end: 16px;
+  width: 7px;
+  height: 7px;
+  margin-top: -4px;
+  border: solid var(--cdc-text-dim);
+  border-width: 2px 2px 0 0;
+  transform: translateY(2px) rotate(-45deg);
+  transition: transform 0.2s ease !important;
+}
+
+#friend_box:has(.content_wrap:not(.none)) .friend_box_title::after {
+  transform: translateY(-2px) rotate(135deg);
+}
+
+/* ------------------------------------------------------------- list --- */
+
+#friend_box .content_wrap:not(.none) {
+  border-top: 1px solid var(--cdc-menu-border);
+  animation: cdc-friend-box-in 0.18s ease-out;
+}
+
+@keyframes cdc-friend-box-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #friend_box .content_wrap:not(.none) {
+    animation: none;
+  }
+}
+
+#friend_box .content {
+  max-height: min(60vh, 420px) !important;
+  padding: 6px;
+}
+
+#friend_box .content:empty {
+  display: none;
+}
+
+#friend_box .content > div {
+  align-items: center;
+  gap: 6px;
+  border-radius: 6px;
+  transition: background-color 0.15s !important;
+}
+
+#friend_box .content > div:hover {
+  background: var(--cdc-menu-hover) !important;
+}
+
+/* A block, not a flexbox, so a long name still ends in an ellipsis. */
+#friend_box .content a.user-link {
+  position: relative;
+  flex: 1 1 auto !important;
+  min-width: 0;
+  max-width: none !important;
+  padding: 6px 8px !important;
+  line-height: 28px;
+  color: var(--cdc-text-strong) !important;
+  font-weight: 600;
+}
+
+#friend_box .content a.user-link:hover {
+  color: var(--cdc-green-hover) !important;
+}
+
+/* Lichess has no profile pictures: Chess.com's default avatar. */
+#friend_box .content a.user-link::before {
+  content: '';
+  display: inline-block;
+  margin-inline-end: 10px;
+  vertical-align: top;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: var(--cdc-avatar);
+}
+
+/* The online mark (a line, or a patron's wings) becomes a dot on the
+ * avatar's corner. */
+#friend_box .content a.user-link .line {
+  position: absolute;
+  top: 26px;
+  inset-inline-start: 28px;
+  box-sizing: border-box;
+  width: 12px;
+  height: 12px;
+  margin: 0 !important;
+  border: 2px solid var(--cdc-menu-bg);
+  border-radius: 50%;
+  background: var(--cdc-green);
+  font-size: 0;
+  transition: border-color 0.15s !important;
+}
+
+#friend_box .content > div:hover a.user-link .line {
+  border-color: #464441;
+}
+
+#friend_box .content a.user-link .line::before {
+  display: none;
+}
+
+/* Playing: a round grey button that opens their game. */
+#friend_box .content a.tv {
+  display: grid !important;
+  flex: none !important;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-inline-end: 6px;
+  padding: 0 !important;
+  border-radius: 50%;
+  background: var(--cdc-btn-grey);
+  box-shadow: var(--cdc-btn-grey-shadow);
+  color: var(--cdc-text-dim) !important;
+  font-size: 14px;
+  transition: background 0.15s, color 0.15s !important;
+}
+
+#friend_box .content a.tv:hover {
+  background: var(--cdc-btn-grey-hover);
+  color: var(--cdc-green-hover) !important;
+}
+
+#friend_box .content a.tv::before {
+  margin: 0 !important;
+}

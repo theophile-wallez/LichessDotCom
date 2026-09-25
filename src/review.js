@@ -1040,7 +1040,7 @@
   }
 
   // After a render: drop what doesn't fit, then carry on typing. Clamped
-  // lines overflow by a whole line; a move chip's piece pokes a few pixels
+  // lines overflow by a whole line; a move chip pokes a pixel or so
   // out of the last line, which isn't a reason to drop anything.
   function startStream() {
     const sub = dom.panel.querySelector('.cdc-bubble__sub');

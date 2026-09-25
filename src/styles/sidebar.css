@@ -505,7 +505,7 @@
   font-size: 15px;
   font-weight: 600;
   opacity: 1 !important;
-  transition: background-color 0.1s;
+  transition: background-color 0.1s !important;
 }
 
 #dasher_app :is(.links a, .links button, .subs .sub, .zen button):hover {
@@ -648,7 +648,7 @@
   color: var(--cdc-text) !important;
   font-size: 14px;
   font-weight: 600;
-  transition: background-color 0.1s;
+  transition: background-color 0.1s !important;
 }
 
 /* The current choice is white with a green check, not filled: a fill would

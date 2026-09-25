@@ -1,0 +1,1003 @@
+/*
+ * Puzzle Racer, the home (/racer, main.racer-home) and a race
+ * (/racer/<id>, .racer). The home's two ways in are cards, each a little
+ * race scene: a sky in its own color, a road with a finish line, and
+ * Lichess's own vehicle (its racer-car font) that boosts down the road on
+ * hover. In a race the side panel, the clock, the combo and the track below
+ * the board get Chess.com's look: bold white numbers instead of the storm
+ * font, pills, a green combo bar, and lanes of asphalt with a finish line.
+ * Puzzle Storm is built from the same pieces (the side panel, the clock,
+ * the combo, the puzzles played), so those rules are shared with `.storm`;
+ * storm.css adds what is its own.
+ */
+
+/* ------------------------------------------------------------ home --- */
+
+main.racer-home {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 22px 16px;
+  padding: 8px 0 32px !important;
+  background: none !important;
+  overflow: visible !important;
+}
+
+main.racer-home > h1.box__top {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 14px;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #fff;
+  font-size: 30px !important;
+  font-weight: 800 !important;
+  letter-spacing: normal !important;
+}
+
+main.racer-home > h1.box__top::before {
+  content: '';
+  flex: none;
+  width: 40px;
+  height: 40px;
+  background: url('https://assets-ds.chess.com/color-icons/battle.svg') center / contain no-repeat;
+}
+
+/* "About Puzzle Racer", as a pill beside the title. */
+.racer-home__about {
+  grid-area: 1 / 2;
+  margin: 0 !important;
+}
+
+.racer-home__about a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  border-radius: 999px;
+  background: var(--cdc-bg-raised);
+  color: var(--cdc-text) !important;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background 0.15s, color 0.15s !important;
+}
+
+.racer-home__about a::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  background: url('https://assets-ds.chess.com/color-icons/lessons.svg') center / contain no-repeat;
+}
+
+.racer-home__about a:hover {
+  background: var(--cdc-bg-raised-hover);
+  color: #fff !important;
+}
+
+.racer-home__buttons {
+  grid-column: 1 / -1;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 0 !important;
+}
+
+.racer-home form {
+  width: auto !important;
+  margin: 0 !important;
+}
+
+/* ---- a card: a race scene over its name --- */
+
+/* A color per way in: blue for the public race (the bus), orange for a race
+ * with friends (the race car). */
+.racer-home .button {
+  --cdc-race: #45a3f5;
+  --cdc-race-2: #2474c9;
+  /* As tall as the window leaves, so the page is filled but never scrolls. */
+  --cdc-scene-h: clamp(190px, calc(100vh - 300px), 420px);
+
+  position: relative;
+  display: flex !important;
+  flex-flow: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  padding: 0 16px 22px !important;
+  border: 1px solid var(--cdc-card-border) !important;
+  border-radius: 12px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: none !important;
+  color: #fff !important;
+  font-size: 20px !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s, background 0.15s !important;
+}
+
+.racer-home__create .button {
+  --cdc-race: #f5a93b;
+  --cdc-race-2: #d2671c;
+}
+
+.racer-home .button:not(.disabled):hover {
+  border-color: var(--cdc-card-border-hover) !important;
+  background: var(--cdc-card-hover) !important;
+  box-shadow: var(--cdc-card-shadow-hover) !important;
+  transform: translateY(-2px);
+}
+
+/* The scene: a sky in the card's color with a sun and two clouds, hills,
+ * the road's shoulder, the road with its dashed middle line, and a checkered
+ * finish line. */
+.racer-home .button::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--cdc-scene-h);
+  background:
+    repeating-linear-gradient(90deg, #ffffffb3 0 26px, transparent 26px 52px) 0 calc(100% - 22px) / 52px 3px repeat-x,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='48'%3E%3Cpath fill='%231b1a18' d='M0 0h16v48H0z'/%3E%3Cpath fill='%23fff' d='M0 0h8v8H0zM8 8h8v8H8zM0 16h8v8H0zM8 24h8v8H8zM0 32h8v8H0zM8 40h8v8H8z'/%3E%3C/svg%3E") right 44px bottom / 16px 48px no-repeat,
+    linear-gradient(#ffffff38, #ffffff38) 0 calc(100% - 48px) / 100% 3px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpath fill='%23000' fill-opacity='.14' d='M0 60V40q30-30 60-6t60-4 60-4 60 14v20z'/%3E%3C/svg%3E") 0 calc(100% - 51px) / 240px 60px repeat-x,
+    linear-gradient(#3b3936, #2b2a27) bottom / 100% 48px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 110 52'%3E%3Cg fill='%23fff' fill-opacity='.8'%3E%3Ccircle cx='32' cy='32' r='17'/%3E%3Ccircle cx='56' cy='24' r='23'/%3E%3Ccircle cx='80' cy='33' r='16'/%3E%3Crect x='14' y='30' width='82' height='22' rx='11'/%3E%3C/g%3E%3C/svg%3E") 12% 22% / 110px auto no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 110 52'%3E%3Cg fill='%23fff' fill-opacity='.8'%3E%3Ccircle cx='32' cy='32' r='17'/%3E%3Ccircle cx='56' cy='24' r='23'/%3E%3Ccircle cx='80' cy='33' r='16'/%3E%3Crect x='14' y='30' width='82' height='22' rx='11'/%3E%3C/g%3E%3C/svg%3E") 58% 10% / 70px auto no-repeat,
+    radial-gradient(circle at 84% 24%, #fff6 0 22px, #fff2 23px 40px, transparent 41px),
+    linear-gradient(160deg, var(--cdc-race), var(--cdc-race-2));
+}
+
+/* Lichess's vehicle, white on the road: the bus or the race car. Only as
+ * wide as itself, so Lichess's boost flame, on hover, comes out of its back. */
+.racer-home .button .car {
+  display: flex !important;
+  align-items: flex-end;
+  height: var(--cdc-scene-h);
+  margin: 0 !important;
+  padding-bottom: 5px;
+  color: #fff;
+  font-size: calc(var(--cdc-scene-h) * 0.55) !important;
+  line-height: 0.62 !important;
+  text-shadow: 0 6px 10px #0000004d;
+}
+
+/* The name, and an arrow that points the way. */
+.racer-home .button::after {
+  content: '';
+  position: absolute;
+  right: 18px;
+  bottom: 22px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E") center / 16px no-repeat,
+    var(--cdc-btn-green);
+  box-shadow: var(--cdc-btn-green-shadow);
+  transition: transform 0.15s !important;
+}
+
+html[dir='rtl'] .racer-home .button::after {
+  right: auto;
+  left: 18px;
+  transform: scaleX(-1);
+}
+
+.racer-home .button:hover::after {
+  transform: translateX(3px);
+}
+
+/* Lichess's boost flame, in fire colors. */
+.racer-home .button:hover .car::before {
+  color: #ffc53d;
+  text-shadow: 0 0 12px #ff8a00;
+}
+
+html[dir='rtl'] .racer-home .button:hover::after {
+  transform: scaleX(-1) translateX(3px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Each vehicle drives in, then on hover the road rushes by. */
+  .racer-home .button .car {
+    animation: cdc-racer-drive-in 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  .racer-home__create .button .car {
+    animation-delay: 0.12s;
+  }
+
+  .racer-home .button:hover::before {
+    animation: cdc-racer-road 0.35s linear infinite;
+  }
+}
+
+@keyframes cdc-racer-drive-in {
+  from {
+    opacity: 0;
+    translate: -60% 0;
+  }
+}
+
+@keyframes cdc-racer-road {
+  to {
+    background-position: -52px calc(100% - 22px), right 44px bottom, 0 calc(100% - 48px), 0 calc(100% - 51px), bottom,
+      12% 22%, 58% 10%, 0 0, 0 0;
+  }
+}
+
+@media (max-width: 799.29px) {
+  main.racer-home {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 8px 10px 24px !important;
+  }
+
+  .racer-home__about {
+    grid-area: auto;
+  }
+
+  .racer-home__buttons {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .racer-home .button {
+    --cdc-scene-h: 170px;
+  }
+}
+
+/* ------------------------------------------------------------ race --- */
+
+/* Your vehicle and its color, read from your lane (always the first), for
+ * the side panel's tile. */
+.racer {
+  --cdc-car: #a42eff;
+  --cdc-car-glyph: '0';
+  --cdc-lane-h: 34px;
+  --cdc-lanes: 1;
+}
+
+.racer:has(.racer__race__track--me .car-1) { --cdc-car: #5757ff; }
+.racer:has(.racer__race__track--me .car-2) { --cdc-car: #1f9d3a; }
+.racer:has(.racer__race__track--me .car-3) { --cdc-car: #d23b3b; }
+.racer:has(.racer__race__track--me .car-4) { --cdc-car: #ec7a51; }
+.racer:has(.racer__race__track--me .car-5) { --cdc-car: #8fbf2a; }
+.racer:has(.racer__race__track--me .car-6) { --cdc-car: #ff5a1f; }
+.racer:has(.racer__race__track--me .car-7) { --cdc-car: #2e8b57; }
+.racer:has(.racer__race__track--me .car-8) { --cdc-car: #daa520; }
+.racer:has(.racer__race__track--me .car-9) { --cdc-car: #d27e1e; }
+
+.racer:has(.racer__race__track--me .vehicle1) { --cdc-car-glyph: '1'; }
+.racer:has(.racer__race__track--me .vehicle2) { --cdc-car-glyph: '2'; }
+.racer:has(.racer__race__track--me .vehicle3) { --cdc-car-glyph: '3'; }
+
+/* How many lanes, so the board leaves the track room (up to ten racers). */
+.racer:has(.racer__race__track:nth-child(2)) { --cdc-lanes: 2; }
+.racer:has(.racer__race__track:nth-child(3)) { --cdc-lanes: 3; }
+.racer:has(.racer__race__track:nth-child(4)) { --cdc-lanes: 4; }
+.racer:has(.racer__race__track:nth-child(5)) { --cdc-lanes: 5; }
+.racer:has(.racer__race__track:nth-child(6)) { --cdc-lanes: 6; }
+.racer:has(.racer__race__track:nth-child(7)) { --cdc-lanes: 7; }
+.racer:has(.racer__race__track:nth-child(8)) { --cdc-lanes: 8; }
+.racer:has(.racer__race__track:nth-child(9)) { --cdc-lanes: 9; }
+.racer:has(.racer__race__track:nth-child(10)) { --cdc-lanes: 10; }
+
+/* Lichess sizes the board to the whole window's width, sidebar included,
+ * and to its height as if the track weren't under it: with a few racers the
+ * page scrolled. Cap it to what the sidebar leaves (the panel's 240px and
+ * the gap, the margins, a scrollbar, a gutter for the ranks) and to what
+ * the track leaves below (with the page's margins and the gap Lichess keeps
+ * for the puzzles played, an empty row until the race ends). */
+@media (min-width: 1020px) {
+  main > .racer {
+    --cdc-coords-l: 0px;
+    --cdc-race-h: calc(var(--cdc-lanes) * (var(--cdc-lane-h) + 5px) + 15px);
+
+    grid-template-columns:
+      min(
+        var(---col2-uniboard-width),
+        calc(100vw - var(--cdc-sidebar-w, 0px) - 2 * var(---main-margin, 0px) - var(--cdc-coords-l) - 275px),
+        calc(100vh - 80px - var(---block-gap, 16px) - var(--cdc-race-h) - var(--cdc-coords-off, 0px))
+      )
+      minmax(240px, 400px) !important;
+    margin-left: var(--cdc-coords-l);
+  }
+
+  body:is(.coords-in, .coords-out) main > .racer {
+    --cdc-coords-l: calc(0.6 * var(--cdc-coords-size, 13px) + 10px);
+  }
+}
+
+/* Lichess sizes the track's row to its own inline height, which our taller
+ * lanes outgrow: let the row follow its content. */
+@media (min-width: 799.3px), (orientation: landscape) {
+  main > .racer {
+    grid-template-rows: auto auto !important;
+  }
+}
+
+/* ---- side panel --- */
+
+:is(.racer, .storm) .puz-side {
+  justify-content: flex-start !important;
+  gap: 20px;
+  padding: 20px !important;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: none !important;
+}
+
+:is(.racer, .storm) .puz-side__top {
+  flex: none !important;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Your vehicle, white on a tile in its color. */
+.racer .puz-side__top::before {
+  content: var(--cdc-car-glyph) !important;
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  justify-content: center;
+  width: 64px !important;
+  height: 64px !important;
+  margin: 0 !important;
+  padding-bottom: 17px;
+  box-sizing: border-box;
+  border-radius: 14px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--cdc-car) 65%, #fff), var(--cdc-car)) !important;
+  box-shadow: inset 0 1px 0 #ffffff4d, inset 0 -2px 0 #0000002e;
+  color: #fff;
+  font: 400 52px / 0.5 racer-car;
+  text-shadow: 0 2px 4px #0000004d;
+}
+
+:is(.racer, .storm) .puz-side__start {
+  margin: 0 !important;
+  color: inherit !important;
+}
+
+:is(.racer, .storm) .puz-side__start__text {
+  align-items: flex-start;
+  gap: 6px;
+}
+
+:is(.racer, .storm) .puz-side__start__text strong {
+  color: #fff;
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  line-height: 1.1;
+}
+
+/* "Waiting to start", "Spectating": a pill with a beating dot. */
+:is(.racer, .storm) .puz-side__start__text span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 11px 4px 9px;
+  border-radius: 999px;
+  background: #e3aa2424;
+  color: var(--c-brag);
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: normal !important;
+}
+
+:is(.racer, .storm) .puz-side__start__text span::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* The score: a big white number. */
+:is(.racer, .storm) .puz-side__solved {
+  text-align: start;
+}
+
+:is(.racer, .storm) .puz-side__solved__text {
+  margin: 0 !important;
+  color: #fff !important;
+  font-family: var(--cdc-font) !important;
+  font-size: 60px !important;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :is(.racer, .storm) .puz-side__start__text span::before {
+    animation: cdc-racer-beat 1.2s ease-in-out infinite;
+  }
+
+  /* A solved puzzle bumps the score. */
+  :is(.racer, .storm).puz-mod-puzzle .puz-side__solved__text {
+    animation: cdc-racer-bump 0.4s ease-out;
+  }
+}
+
+@keyframes cdc-racer-beat {
+  50% {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
+}
+
+@keyframes cdc-racer-bump {
+  30% {
+    color: var(--cdc-green-hover);
+    transform: scale(1.15);
+  }
+}
+
+:is(.racer, .storm) .puz-side__solved {
+  text-shadow: none !important;
+}
+
+/* ---- before the start --- */
+
+.racer .racer__pre__message {
+  display: flex;
+  flex-flow: column;
+  gap: 14px;
+}
+
+.racer .puz-side__link p,
+.racer .racer__pre__message__text p {
+  margin: 0 0 8px;
+  color: var(--cdc-text-dim);
+  font-size: 14px;
+}
+
+.racer .puz-side__start .button,
+.racer .puz-side__join .button {
+  width: 100%;
+  margin: 0 !important;
+  padding: 16px !important;
+  font-size: 20px !important;
+}
+
+/* "You play the white pieces": a chip with a pawn of that color. */
+.racer .racer__pre__message__pov {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  margin: 0 !important;
+  padding: 6px 12px 6px 8px;
+  border-radius: 999px;
+  background: var(--cdc-bg-raised);
+  color: var(--cdc-text) !important;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.racer .racer__pre__message__pov::before {
+  content: '';
+  width: 28px;
+  height: 28px;
+  margin: -4px -2px -4px -4px;
+  background: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wp.png') center / contain no-repeat;
+}
+
+.racer:has(.cg-wrap.orientation-black) .racer__pre__message__pov::before {
+  background-image: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bp.png');
+}
+
+/* ---- clock and skip --- */
+
+.racer .racer__spectating {
+  display: flex;
+  flex-flow: column;
+  gap: 16px;
+}
+
+:is(.racer, .storm) .puz-clock {
+  align-items: center;
+  gap: 12px;
+  margin-block: auto;
+}
+
+/* Chess.com's running clock: white, the digits dark and bold. */
+:is(.racer, .storm) .puz-clock__time {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 !important;
+  padding: 6px 16px 6px 12px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 6px #0000004d;
+  color: #262421 !important;
+  font-family: var(--cdc-font) !important;
+  font-size: 34px !important;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+:is(.racer, .storm) .puz-clock__time::before {
+  content: '';
+  width: 24px;
+  height: 24px;
+  background: url('https://assets-ds.chess.com/color-icons/time-clock.svg') center / contain no-repeat;
+}
+
+.racer__spectating .puz-clock__time {
+  font-size: 26px !important;
+}
+
+/* Skip: a red button, Lichess's gear stick beside its name. */
+.racer .racer__skip {
+  flex-flow: row !important;
+  gap: 8px;
+  padding: 10px 16px !important;
+  font-size: 15px !important;
+}
+
+.racer .racer__skip::before {
+  width: 22px !important;
+  height: 22px !important;
+  margin: 0 !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  filter: brightness(0) invert(1);
+}
+
+/* ---- combo --- */
+
+:is(.racer, .storm) .puz-side__table {
+  flex: none !important;
+  gap: 8px;
+  margin-top: auto;
+}
+
+:is(.racer, .storm) .puz-side__control {
+  height: auto !important;
+  margin: 0 !important;
+}
+
+:is(.racer, .storm) .puz-side__control .button {
+  padding: 8px 14px !important;
+}
+
+:is(.racer, .storm) .puz-combo {
+  align-items: center;
+  gap: 14px;
+}
+
+:is(.racer, .storm) .puz-combo__counter {
+  align-items: center;
+  min-width: 52px;
+}
+
+:is(.racer, .storm) .puz-combo__counter__value {
+  width: auto !important;
+  margin: 0 !important;
+  color: #fff;
+  font-family: var(--cdc-font) !important;
+  font-size: 34px !important;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1 !important;
+}
+
+:is(.racer, .storm) .puz-combo__counter__combo {
+  color: var(--cdc-text-dim) !important;
+  font-family: var(--cdc-font) !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :is(.racer, .storm).puz-mod-move .puz-combo__counter__value {
+    color: var(--cdc-green-hover);
+  }
+}
+
+:is(.racer, .storm) .puz-combo__bars {
+  gap: 8px;
+  margin: 0 !important;
+}
+
+/* The bar: a rounded groove filled with Chess.com's green. */
+:is(.racer, .storm) .puz-combo__bar {
+  flex: 0 0 16px !important;
+  border: none !important;
+  border-radius: 999px !important;
+  background: #1a1917 !important;
+  box-shadow: inset 0 1px 3px #00000080;
+  overflow: hidden;
+}
+
+:is(.racer, .storm) .puz-combo__bar__in {
+  border-radius: 999px !important;
+  background: var(--cdc-btn-green) !important;
+  box-shadow: inset 0 1px 0 #ffffff4d, 0 0 12px #81b64c99 !important;
+}
+
+:is(.racer, .storm) .puz-combo__bar__in-full {
+  border-radius: 999px !important;
+  background: var(--cdc-green-hover) !important;
+}
+
+/* The bonus levels: pills instead of skewed tabs. */
+:is(.racer, .storm) .puz-combo__levels {
+  gap: 6px;
+  margin: 0 !important;
+}
+
+:is(.racer, .storm) .puz-combo__level {
+  flex: 1 1 0 !important;
+  height: 24px !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 999px !important;
+  background: var(--cdc-bg-raised) !important;
+  box-shadow: none !important;
+  color: var(--cdc-text-dim) !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  line-height: 24px !important;
+  transform: none !important;
+}
+
+:is(.racer, .storm) .puz-combo__level span {
+  transform: none !important;
+}
+
+:is(.racer, .storm) .puz-combo__level.active {
+  background: var(--cdc-btn-green) !important;
+  box-shadow: var(--cdc-btn-green-shadow) !important;
+  color: #fff !important;
+}
+
+/* ---- after the race --- */
+
+.racer .racer__post {
+  display: flex;
+  flex-flow: column;
+  gap: 14px;
+}
+
+.racer .racer__post h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* A checkered flag before "Race complete!". */
+.racer .racer__post h2::before {
+  content: '';
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  background: conic-gradient(#fff 25%, #1b1a18 0 50%, #fff 0 75%, #1b1a18 0) 0 0 / 12px 12px;
+  box-shadow: 0 0 0 1px #ffffff40;
+}
+
+/* "Your rank: 1/2", on a gold pill with a trophy. */
+.racer .race__post__rank {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  padding: 6px 14px 6px 8px;
+  border-radius: 999px;
+  background: linear-gradient(#f5c451, #d9951f);
+  box-shadow: inset 0 1px 0 #ffffff66, 0 1px 4px #0000005c;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  text-shadow: 0 1px 1px #0000004d;
+}
+
+.racer .race__post__rank::before {
+  content: '';
+  width: 22px;
+  height: 22px;
+  background: url('https://assets-ds.chess.com/color-icons/trophies.svg') center / contain no-repeat;
+}
+
+.racer .racer__post__next {
+  display: flex;
+  flex-flow: column;
+  gap: 10px;
+}
+
+.racer .button-navaway,
+.racer .racer__post__next__button {
+  width: 100%;
+  margin: 0 !important;
+  padding: 14px !important;
+  font-size: 18px !important;
+}
+
+.racer .racer__post__next__new {
+  margin: 0 !important;
+}
+
+/* ---- countdown --- */
+
+.racer .racer__countdown {
+  gap: 24px;
+  padding: 24px 32px !important;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 18px !important;
+  background: #262522eb !important;
+  box-shadow: 0 16px 40px #000000b3 !important;
+  backdrop-filter: blur(6px);
+}
+
+.racer .racer__countdown__lights {
+  gap: 10px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 10px;
+  border-radius: 999px !important;
+  background: #151412 !important;
+  box-shadow: inset 0 2px 6px #000;
+}
+
+.racer .racer__countdown__lights light {
+  margin: 0 !important;
+}
+
+.racer .racer__countdown__lights light.green {
+  background: var(--cdc-green-hover) !important;
+}
+
+.racer .racer__countdown__seconds {
+  min-width: 1.2ch;
+  justify-content: center;
+  margin: 0 !important;
+  color: #fff !important;
+  font-family: var(--cdc-font) !important;
+  font-size: 110px !important;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* ---- the track --- */
+
+/* A card of lanes, each its own strip of road: a dashed line down the
+ * middle that rushes by while racing, a finish line just before the
+ * scores. */
+.racer .racer__race {
+  height: auto !important;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: none !important;
+}
+
+.racer .racer__race::before {
+  display: none;
+}
+
+.racer .racer__race__tracks {
+  position: relative !important;
+  display: flex;
+  flex-flow: column;
+  gap: 5px;
+  padding: 7px 10px 8px !important;
+}
+
+.racer .racer__race__track {
+  height: var(--cdc-lane-h) !important;
+}
+
+.racer .racer__race__track::before,
+.racer .racer__race__track::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+}
+
+.racer .racer__race__track::before {
+  inset: 0 -140px 0 0;
+  border-radius: 6px;
+  background:
+    repeating-linear-gradient(90deg, #ffffff24 0 18px, transparent 18px 40px) 0 100% / 40px 2px repeat-x,
+    linear-gradient(#34322f, #2c2b28);
+}
+
+html[dir='rtl'] .racer .racer__race__track::before {
+  inset: 0 0 0 -140px;
+}
+
+.racer .racer__race__track::after {
+  top: 0;
+  bottom: 0;
+  inset-inline-end: -88px;
+  width: 10px;
+  background: conic-gradient(#fff 25%, #1b1a18 0 50%, #fff 0 75%, #1b1a18 0) 0 0 / 10px 10px;
+  opacity: 0.85;
+}
+
+.racer .racer__race__track--me::before {
+  background:
+    repeating-linear-gradient(90deg, #ffffff38 0 18px, transparent 18px 40px) 0 100% / 40px 2px repeat-x,
+    linear-gradient(#45423e, #393733);
+  box-shadow: inset 0 0 0 1px #ffffff1f;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .racer--racing .racer__race__track::before {
+    animation: cdc-racer-lane 0.5s linear infinite;
+  }
+}
+
+@keyframes cdc-racer-lane {
+  to {
+    background-position: -40px 100%, 0 0;
+  }
+}
+
+.racer .racer__race__player {
+  padding-inline-start: 4px;
+}
+
+.racer .racer__race__player__car {
+  flex-basis: 3.4rem !important;
+  font-size: 3.4rem !important;
+  translate: 0 3px;
+  text-shadow: 0 2px 3px #00000080 !important;
+}
+
+/* Lichess's boost flame, in fire colors rather than the car's. */
+.racer .racer__race__track--boost .racer__race__player__car::before {
+  color: #ffc53d;
+  text-shadow: 0 0 8px #ff8a00;
+}
+
+.racer .racer__race__player__name {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.racer .racer__race__player :is(.user-link, anonymous) {
+  color: var(--cdc-text) !important;
+}
+
+.racer .racer__race__track--me .racer__race__player :is(.user-link, anonymous) {
+  color: var(--c-brag) !important;
+}
+
+/* The score: a chip, gold for the leader. */
+.racer .racer__race__score {
+  top: 4px !important;
+  justify-content: center !important;
+  width: 46px !important;
+  height: calc(var(--cdc-lane-h) - 8px) !important;
+  padding: 0 !important;
+  border-radius: 6px;
+  background: #0000006b !important;
+  color: #fff !important;
+  font-family: var(--cdc-font) !important;
+  font-size: 14px !important;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.racer .racer__race__track--first .racer__race__score {
+  background: linear-gradient(#f5c451, #d9951f) !important;
+  box-shadow: inset 0 1px 0 #ffffff66;
+  text-shadow: 0 1px 1px #0000004d;
+}
+
+/* ---- puzzles played --- */
+
+/* After the race, below the fold: a card per puzzle, its board rounded and
+ * its time on a pill in the result's color. */
+:is(.racer, .storm) .puz-history {
+  padding: 20px !important;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px !important;
+  background: var(--cdc-bg-panel) !important;
+}
+
+:is(.racer, .storm) .puz-history .box__top {
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin: 0 0 16px !important;
+  padding: 0 !important;
+}
+
+:is(.racer, .storm) .puz-history .box__top h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+:is(.racer, .storm) .puz-history .box__top__actions {
+  gap: 8px;
+}
+
+/* The filters, as pills: grey, green when on. */
+:is(.racer, .storm) .puz-history__filter {
+  padding: 7px 14px !important;
+  border-radius: 999px !important;
+  background: var(--cdc-btn-grey) !important;
+  box-shadow: var(--cdc-btn-grey-shadow) !important;
+  color: var(--cdc-text) !important;
+  font-size: 13px !important;
+}
+
+:is(.racer, .storm) .puz-history__filter.active {
+  background: var(--cdc-btn-green) !important;
+  box-shadow: var(--cdc-btn-green-shadow) !important;
+  color: #fff !important;
+}
+
+:is(.racer, .storm) .puz-history__rounds {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+  gap: 12px;
+}
+
+:is(.racer, .storm) .puz-history__round {
+  padding: 8px !important;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px;
+  background: var(--cdc-bg-panel-dark);
+  transition: border-color 0.15s, transform 0.15s !important;
+}
+
+:is(.racer, .storm) .puz-history__round:hover {
+  border-color: var(--cdc-card-border-hover);
+  transform: translateY(-2px);
+}
+
+:is(.racer, .storm) .puz-history__round cg-container {
+  outline: none !important;
+}
+
+:is(.racer, .storm) .puz-history__round cg-board {
+  border-radius: 6px;
+}
+
+:is(.racer, .storm) .puz-history__round__meta {
+  padding-top: 8px !important;
+}
+
+:is(.racer, .storm) .puz-history :is(good, bad, unfinished) {
+  gap: 4px;
+  padding: 2px 9px 2px 6px;
+  border-radius: 999px !important;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+:is(.racer, .storm) .puz-history good {
+  background: #81b64c26;
+  color: var(--cdc-green-hover) !important;
+}
+
+:is(.racer, .storm) .puz-history bad {
+  background: #e0282826;
+  color: #f0645a !important;
+}
+
+:is(.racer, .storm) .puz-history unfinished {
+  background: var(--cdc-bg-raised);
+}
+
+:is(.racer, .storm) .puz-history__round__result rating {
+  color: var(--cdc-text-dim) !important;
+  font-size: 12px !important;
+  font-weight: 700;
+}
