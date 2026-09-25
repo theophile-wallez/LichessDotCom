@@ -1,0 +1,387 @@
+/*
+ * FIDE players (/fide, .fide-players) as Chess.com's top players: every
+ * player a row card with a rank (medals for the top three), a rounded
+ * photo, the title badge, name and flag, then the ratings, the one the list
+ * is sorted by in white. The sort links become pills with the time-control
+ * icons. The title, the search and the column pills stay in view while the
+ * rows scroll.
+ */
+
+/* ------------------------------------------------------------ page --- */
+
+.fide-players.page-menu__content.box {
+  padding: 0 0 40px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.fide-players > .box__top {
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  box-sizing: border-box;
+  height: 84px;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.fide-players > .box__top > h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 !important;
+  color: #fff;
+  font-size: 28px !important;
+  font-weight: 800 !important;
+  letter-spacing: normal !important;
+}
+
+/* Chess.com's globe: the players of every federation. */
+.fide-players > .box__top > h1::before {
+  content: '';
+  flex: none;
+  width: 36px;
+  height: 36px;
+  background: url('https://assets-ds.chess.com/color-icons/globe.svg') center / contain no-repeat;
+}
+
+.fide-players__search-form {
+  display: flex;
+}
+
+.fide-players__search-form__input {
+  width: 260px;
+  height: 40px;
+  box-sizing: border-box;
+}
+
+.fide-players__search-form .button {
+  height: 40px;
+  padding: 0 16px !important;
+}
+
+/* ----------------------------------------------------------- table --- */
+
+.fide-players-table.slist {
+  border: none !important;
+  border-collapse: separate !important;
+  border-spacing: 0 6px;
+  margin-top: -6px;
+  /* Past the pages before this one, when the list opens on a later page
+   * (set by content.js). */
+  counter-reset: cdc-fide var(--cdc-fide-skip, 0);
+}
+
+.fide-players-table thead {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.fide-players-table thead th {
+  padding: 0 10px 8px !important;
+  border: none !important;
+  background: var(--cdc-bg-page);
+  color: var(--cdc-text-dim) !important;
+  font-size: 13px !important;
+  font-weight: 700;
+  text-transform: none;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.fide-players-table thead th:first-child {
+  padding-inline-start: 0 !important;
+  text-align: start;
+}
+
+.fide-players-table thead th:not(:first-child),
+.fide-players-table td:not(:first-child) {
+  width: 1%;
+  text-align: center !important;
+}
+
+/* The sort links as pills, the active one lit up. */
+.fide-players-table thead th > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: transparent !important;
+  color: var(--cdc-text-dim) !important;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.fide-players-table thead th > a[href]:hover {
+  background: var(--cdc-bg-raised) !important;
+  color: #fff !important;
+}
+
+.fide-players-table thead th > a.active {
+  background: var(--cdc-bg-raised) !important;
+  box-shadow: inset 0 1px 0 #ffffff14;
+  color: #fff !important;
+}
+
+/* Each rating's time-control icon, in its color. Chess.com has no classical
+ * clock: it gets rapid's, in the rating chart's classical color, so the two
+ * columns side by side still read apart. */
+.fide-players-table thead th:is(:nth-child(2), :nth-child(3), :nth-child(4)) {
+  --cdc-mode-icon: var(--cdc-mode-rapid);
+  --cdc-mode-color: #2dd4bf;
+}
+
+.fide-players-table thead th:nth-child(3) {
+  --cdc-mode-color: #81b64c;
+}
+
+.fide-players-table thead th:nth-child(4) {
+  --cdc-mode-icon: var(--cdc-mode-blitz);
+  --cdc-mode-color: #fad541;
+}
+
+.fide-players-table thead th:is(:nth-child(2), :nth-child(3), :nth-child(4)) > :is(a, span)::before,
+.fide-players-table:not(.fide-players-table--sortable) thead th:is(:nth-child(2), :nth-child(3), :nth-child(4))::before {
+  content: '';
+  flex: none;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background: var(--cdc-mode-color);
+  -webkit-mask: var(--cdc-mode-icon) center / contain no-repeat;
+  mask: var(--cdc-mode-icon) center / contain no-repeat;
+  vertical-align: -2px;
+}
+
+.fide-players-table:not(.fide-players-table--sortable) thead th::before {
+  margin-inline-end: 6px;
+}
+
+/* ------------------------------------------------------------ rows --- */
+
+.fide-players-table tbody tr.paginated {
+  counter-increment: cdc-fide;
+  background: none !important;
+}
+
+.fide-players-table tbody tr.paginated > td {
+  padding: 10px !important;
+  border: none !important;
+  background: var(--cdc-bg-panel);
+  color: var(--cdc-text);
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  transition: background 0.15s;
+}
+
+.fide-players-table tbody tr.paginated > td:first-child {
+  padding-inline-start: 14px !important;
+  border-start-start-radius: 10px;
+  border-end-start-radius: 10px;
+}
+
+.fide-players-table tbody tr.paginated > td:last-child {
+  padding-inline-end: 18px !important;
+  border-start-end-radius: 10px;
+  border-end-end-radius: 10px;
+}
+
+.fide-players-table tbody tr.paginated:hover > td {
+  background: var(--cdc-card-hover);
+}
+
+/* A rating FIDE doesn't have. */
+.fide-players-table tbody td:empty::before {
+  content: '–';
+  color: var(--cdc-text-dim);
+  font-weight: 400;
+}
+
+/* The column the list is sorted by stands out; age stays in the back. */
+.fide-players-table tbody tr.paginated > td:last-child {
+  color: var(--cdc-text-dim);
+  font-weight: 400;
+}
+
+.fide-players-table:has(thead th:nth-child(2) > a.active) tbody td:nth-child(2),
+.fide-players-table:has(thead th:nth-child(3) > a.active) tbody td:nth-child(3),
+.fide-players-table:has(thead th:nth-child(4) > a.active) tbody td:nth-child(4),
+.fide-players-table:has(thead th:nth-child(5) > a.active) tbody td:nth-child(5) {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+/* ----------------------------------------------------------- player --- */
+
+.fide-players-table .player-intro {
+  gap: 14px;
+  min-width: 0;
+}
+
+.fide-players-table .player-intro__photo {
+  flex: none;
+  display: block;
+  line-height: 0;
+}
+
+.fide-players-table .fide-players__photo {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 6px !important;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px #ffffff14, 0 2px 6px #0000004d;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fide-players-table tbody tr:hover .fide-players__photo {
+  transform: scale(1.06);
+}
+
+/* No photo: Chess.com's default avatar instead of Lichess's grey face. */
+.fide-players-table .fide-players__photo--fallback {
+  object-position: -9999px 0;
+  background: var(--cdc-avatar);
+}
+
+.fide-players-table .player-intro__info {
+  gap: 3px;
+  min-width: 0;
+}
+
+.fide-players-table .player-intro__name {
+  overflow: hidden;
+  color: #fff !important;
+  font-size: 15px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fide-players-table .player-intro__name:hover {
+  color: var(--cdc-green-hover) !important;
+}
+
+.fide-players-table .player-intro__fed {
+  gap: 6px;
+  color: var(--cdc-text-dim);
+  font-family: var(--cdc-font) !important;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.fide-players-table .player-intro__fed .flag {
+  width: 18px !important;
+  height: auto !important;
+  margin: 0 !important;
+  border-radius: 2px;
+}
+
+/* ------------------------------------------------------------ rank --- */
+
+/* The rank, when the list is ranked: sorted by a rating (not by name or
+ * age, nor a search's matches). Rows added by the infinite scroll land in
+ * the same tbody, so the count carries on. */
+.fide-players-table--sortable:has(thead th:is(:nth-child(2), :nth-child(3), :nth-child(4)) > a.active)
+  .player-intro::before {
+  content: counter(cdc-fide);
+  flex: none;
+  display: grid;
+  place-items: center;
+  min-width: 30px;
+  height: 30px;
+  margin-inline-end: -2px;
+  border-radius: 999px;
+  background: var(--cdc-medal, transparent);
+  box-shadow: var(--cdc-medal-shadow, none);
+  color: var(--cdc-medal-text, var(--cdc-text-dim));
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-shadow: var(--cdc-medal-text-shadow, none);
+}
+
+/* Gold, silver and bronze for the top three. */
+html:not([data-cdc-fide-skip]) .fide-players-table tbody tr.paginated:nth-child(-n + 3) {
+  --cdc-medal-shadow: inset 0 1px 0 #ffffff59, inset 0 -2px 0 #00000026, 0 2px 6px #00000040;
+  --cdc-medal-text: #fff;
+  --cdc-medal-text-shadow: 0 1px 1px #00000073;
+}
+
+html:not([data-cdc-fide-skip]) .fide-players-table tbody tr.paginated:nth-child(1) { --cdc-medal: linear-gradient(145deg, #fad541, #d8a31a); }
+html:not([data-cdc-fide-skip]) .fide-players-table tbody tr.paginated:nth-child(2) { --cdc-medal: linear-gradient(145deg, #d9dde3, #9aa3ad); }
+html:not([data-cdc-fide-skip]) .fide-players-table tbody tr.paginated:nth-child(3) { --cdc-medal: linear-gradient(145deg, #e0a06a, #b06a35); }
+
+/* ------------------------------------------------------------ pager --- */
+
+/* The "Next" link the infinite scroll works from, if it's ever shown. */
+.fide-players-table tbody tr.pager th {
+  padding: 12px 0 !important;
+  border: none !important;
+}
+
+.fide-players-table tbody tr.pager a {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 8px;
+  background: var(--cdc-btn-grey);
+  box-shadow: var(--cdc-btn-grey-shadow);
+  color: #fff !important;
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------- pinned --- */
+
+/* Only the rows scroll: the side menu, the title and the column pills stay
+ * in view, on the page's color, the pills casting a soft shadow on the rows
+ * only once they're stuck. Desktop only: below that, Lichess's fixed top
+ * bar would cover them. */
+@media (min-width: 1020px) {
+  main.page-menu:has(> .fide-players) > .subnav {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+  }
+
+  /* Lichess's box and table wrapper clip, which would make them the
+   * scrollers, and a scroller that never scrolls doesn't stick anything. */
+  .fide-players.page-menu__content.box,
+  .fide-players .slist-wrapper {
+    max-width: none !important;
+    overflow: visible !important;
+  }
+
+  .fide-players > .box__top {
+    position: sticky;
+    z-index: 3;
+    top: 0;
+    background: var(--cdc-bg-page);
+  }
+
+  .fide-players-table thead th {
+    container-type: scroll-state;
+    position: sticky;
+    z-index: 2;
+    top: 84px;
+  }
+
+  .fide-players-table thead th::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-page), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    .fide-players-table thead th::after {
+      opacity: 1;
+    }
+  }
+}
