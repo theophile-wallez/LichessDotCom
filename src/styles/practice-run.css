@@ -901,18 +901,4 @@ main.analyse .practice-box > .title {
   main.analyse:has(.practice__side):has(.practice-box) .analyse__tools {
     border-radius: 12px !important;
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    main.analyse .gamebook .mascot {
-      animation: none !important;
-    }
-
-    main.analyse .gamebook .feedback.act.com span {
-      animation: none !important;
-    }
-
-    main.analyse:has(.practice__side):has(.practice-box) .analyse__underboard .feedback {
-      animation: none !important;
-    }
-  }
 }

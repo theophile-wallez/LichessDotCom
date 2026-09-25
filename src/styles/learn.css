@@ -224,15 +224,6 @@ html[dir='rtl'] .learn-stages .stage {
   transform: rotate(-6deg) scale(1.08);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .learn-stages .stage,
-  .learn-stages .stage::before,
-  .learn-stages .stage img,
-  .learn__side-home img.decoration {
-    animation: none !important;
-  }
-}
-
 .learn-stages .stage h3 {
   margin: 0 !important;
   color: #fff;

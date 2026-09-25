@@ -61,7 +61,7 @@
     },
     {
       "matches": ["https://lichess.org/*"],
-      "js": ["src/page.js", "src/board.js", "src/review.js", "src/distribution.js"],
+      "js": ["src/motion.js", "src/page.js", "src/board.js", "src/review.js", "src/distribution.js"],
       "run_at": "document_start",
       "world": "MAIN"
     }

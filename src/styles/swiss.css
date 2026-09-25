@@ -94,12 +94,6 @@ main.swiss-home .swisses:nth-of-type(1) thead th::before {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  main.swiss-home .swisses:nth-of-type(1) thead th::before {
-    animation: none;
-  }
-}
-
 main.swiss-home .swisses tbody {
   display: flex;
   flex-direction: column;

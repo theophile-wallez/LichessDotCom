@@ -326,15 +326,3 @@
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .cdc-rchart__line,
-  .cdc-rchart__area,
-  .cdc-rchart__wipe,
-  .cdc-rchart__thumb,
-  .cdc-rchart__tip,
-  .cdc-rchart__hover {
-    transition: none !important;
-    animation: none !important;
-  }
-}

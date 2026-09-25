@@ -224,12 +224,6 @@ html[dir='rtl'] :is(.relay-index, .relay-calendar) .box__top .search input {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .relay-card__live::before {
-    animation: none;
-  }
-}
-
 .relay-card__crowd {
   margin-inline-start: 4px;
   padding-inline-start: 8px;

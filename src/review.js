@@ -998,7 +998,6 @@
   // The comment is typed out word by word, like a chat reply. Every word is
   // laid out from the start, hidden until its turn, so the bubble has its
   // final size at once and stays put while the text comes in.
-  const calm = matchMedia('(prefers-reduced-motion: reduce)');
   // `dropped`: the droppable sentence didn't fit and stays out of every
   // redraw of this comment, so `shown` keeps counting the same words.
   const stream = { key: '', shown: 0, timer: 0, dropped: false };
@@ -1020,7 +1019,7 @@
     const key = parts.map(p => p[0]).join('|');
     if (key !== stream.key) {
       stream.key = key;
-      stream.shown = calm.matches ? Infinity : 0;
+      stream.shown = 0;
       stream.dropped = false;
     }
     let i = 0;

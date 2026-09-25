@@ -205,15 +205,6 @@ html[dir='rtl'] .practice-app .study {
   transform: rotate(-6deg) scale(1.08);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .practice-app .study,
-  .practice-app .study::before,
-  .practice-app .study icon,
-  .practice-side__decoration {
-    animation: none !important;
-  }
-}
-
 .practice-app .study h3 {
   margin: 0 !important;
   color: #fff;

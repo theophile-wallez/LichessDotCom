@@ -113,12 +113,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  #friend_box .content_wrap:not(.none) {
-    animation: none;
-  }
-}
-
 #friend_box .content {
   max-height: min(60vh, 420px) !important;
   padding: 6px;
