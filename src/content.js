@@ -566,6 +566,23 @@
     }
   };
 
+  // Lichess TV (see styles/tv.css): the channels' column scrolls on its
+  // own, so the channel on air is scrolled into view, once it has a height.
+  // Below 1260px it shows the tiles alone: each one's name and champion go
+  // in its tooltip. Server-rendered, and TV reloads for its next game.
+  const syncTvChannels = () => {
+    const list = document.querySelector('main.tv-single .subnav__inner:not([data-cdc-tv])');
+    if (!list?.clientHeight) return;
+    list.dataset.cdcTv = '';
+    for (const a of list.querySelectorAll('a.tv-channel')) {
+      const name = a.querySelector('strong')?.textContent.trim();
+      const champion = a.querySelector('.champion')?.textContent.replace(/\s+/g, ' ').trim();
+      if (name) a.dataset.cdcTip = champion ? `${name} · ${champion}` : name;
+    }
+    const active = list.querySelector('a.tv-channel.active');
+    if (active) list.scrollTop = active.offsetTop - (list.clientHeight - active.offsetHeight) / 2;
+  };
+
   // Forum index (see styles/forum.css): the categories become cards and
   // their table header goes, so each count gets its column's name ("Topics",
   // "Posts", translated) to show as a label. Server-rendered, so it's safe.
@@ -663,7 +680,9 @@
     tooltip.classList.add('cdc-tooltip--on');
   };
   document.addEventListener('mouseover', e => {
-    const el = e.target.closest?.('main button:is([title], [data-cdc-tip])');
+    let el = e.target.closest?.('main :is(button:is([title], [data-cdc-tip]), a.tv-channel[data-cdc-tip])');
+    // TV's channels only need theirs while their names are hidden (tv.css).
+    if (el?.matches('a') && !matchMedia('(max-width: 1259.98px)').matches) el = null;
     if (el === tooltipFor) return;
     hideTooltip();
     if (!el) return;
@@ -700,6 +719,7 @@
     syncSwissMedals();
     syncSwissFocus();
     syncForumLabels();
+    syncTvChannels();
     syncPowertip();
     syncTooltip();
   }, 250);
