@@ -45,6 +45,7 @@
         "src/styles/dashboard.css",
         "src/styles/broadcast.css",
         "src/styles/swiss.css",
+        "src/styles/swiss-show.css",
         "src/styles/leaderboard.css",
         "src/styles/fide.css",
         "src/styles/bots.css",

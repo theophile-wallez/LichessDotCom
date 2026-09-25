@@ -332,7 +332,12 @@
 
 /* ---------------------------------------------------------- header --- */
 
+/* No longer a card, so nothing to clip: Lichess's overflow: hidden would cut
+ * the post cards' hover shadow and keyboard focus ring at the box's edges,
+ * and would make the box the sticky title's scroller (a scroller that never
+ * scrolls sticks nothing). */
 .ublog-index.box {
+  overflow: visible !important;
   gap: 16px !important;
   padding: 16px 0 40px !important;
   background: transparent !important;
@@ -450,12 +455,6 @@
     position: sticky;
     top: 16px;
     align-self: start;
-  }
-
-  /* Lichess's box clips (overflow: hidden), which would make it the title's
-   * scroller, and a scroller that never scrolls doesn't stick anything. */
-  .ublog-index.box {
-    overflow: visible !important;
   }
 
   .ublog-index .box__top {

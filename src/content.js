@@ -433,14 +433,44 @@
     }
   };
 
-  // Swiss tournaments home (see styles/swiss.css): a running tournament's
-  // rounds ("5/10 rounds", digits in every language) as a progress bar. The
-  // page is server-rendered, so styling Lichess's span is safe.
+  // Swiss tournaments (see styles/swiss.css, swiss-show.css): a tournament's
+  // rounds ("5/10 rounds", digits in every language) as a progress bar, on
+  // the home's cards and in a tournament's info panel, where the bar spans
+  // the paragraph around the count. Both are server-rendered, so styling
+  // Lichess's elements is safe. A tournament's page rewrites its count in
+  // place when a round starts, so the count read last is kept, not a flag.
   const syncSwissRounds = () => {
-    for (const rounds of document.querySelectorAll('.swiss-home .swisses .rounds:not([data-cdc-rounds])')) {
-      rounds.dataset.cdcRounds = '';
-      const m = rounds.textContent.match(/(\d+)\s*\/\s*(\d+)/);
-      if (m && +m[2]) rounds.style.setProperty('--cdc-progress', Math.min(100, (100 * m[1]) / m[2]) + '%');
+    const counts = document.querySelectorAll('.swiss-home .swisses .rounds, main.swiss .swiss__meta__round');
+    for (const rounds of counts) {
+      const text = rounds.textContent;
+      if (rounds.dataset.cdcRounds === text) continue;
+      rounds.dataset.cdcRounds = text;
+      const m = text.match(/(\d+)\s*\/\s*(\d+)/);
+      const bar = rounds.matches('.swiss__meta__round') ? rounds.parentElement : rounds;
+      if (m && +m[2]) bar.style.setProperty('--cdc-progress', Math.min(100, (100 * m[1]) / m[2]) + '%');
+    }
+  };
+
+  // A Swiss tournament from 1260px (see styles/swiss-show.css): the page
+  // doesn't scroll, its middle column does. Page keys act on the focused
+  // scroller, so the column takes the focus once, unless something has it.
+  const syncSwissFocus = () => {
+    const column = document.querySelector('main.swiss .swiss__main:not([tabindex])');
+    if (!column || !matchMedia('(min-width: 1260px)').matches) return;
+    column.tabIndex = -1;
+    if (document.activeElement === document.body) column.focus({ preventScroll: true });
+  };
+
+  // A Swiss tournament's standings (see styles/swiss-show.css): the leaders'
+  // ranks in medal colors. CSS can't tell which page of the standings it's
+  // on (the pager's buttons go while searching), so the rank's own text
+  // says. Rows are keyed by player and re-ranked live, hence every tick.
+  const syncSwissMedals = () => {
+    for (const rank of document.querySelectorAll('main.swiss .swiss__standing td.rank')) {
+      const text = rank.textContent.trim();
+      const medal = text === '1' || text === '2' || text === '3' ? text : null;
+      if (medal && rank.dataset.cdcMedal !== medal) rank.dataset.cdcMedal = medal;
+      else if (!medal && 'cdcMedal' in rank.dataset) delete rank.dataset.cdcMedal;
     }
   };
 
@@ -575,6 +605,8 @@
     syncHero();
     syncCoachTitles();
     syncSwissRounds();
+    syncSwissMedals();
+    syncSwissFocus();
     syncForumLabels();
     syncPowertip();
     syncTooltip();

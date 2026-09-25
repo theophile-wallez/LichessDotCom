@@ -9,7 +9,10 @@
 
 /* ---------------------------------------------------------- header --- */
 
+/* No longer a card, so nothing to clip: Lichess's overflow: hidden would cut
+ * the headings' dot rings and the cards' hover shadows at the page edge. */
 main.page-menu:has(.puzzle-themes) .page-menu__content.box {
+  overflow: visible !important;
   padding: 0 !important;
   background: transparent !important;
 }
@@ -72,6 +75,13 @@ main.page-menu:has(.puzzle-openings) .help {
 main.page-menu:has(.puzzle-openings) .help icon::before {
   color: var(--cdc-green) !important;
   opacity: 1 !important;
+}
+
+/* The sort menu opens from the end of its picker, toward the page: from its
+ * start it would hang past the window, and even closed (hidden, not gone)
+ * it widened the page once the box above stopped clipping. */
+main.page-menu:has(.puzzle-openings) .box__top .mselect__list {
+  inset-inline: auto 0 !important;
 }
 
 /* ------------------------------------------------------- sections --- */
@@ -524,6 +534,68 @@ html[dir='rtl'] .puzzle-themes__link {
   .puzzle-openings__tree__family h2:has(a:hover)::before,
   .puzzle-openings__link:hover {
     transform: none !important;
+  }
+}
+
+/* ------------------------------------------------------ on scroll --- */
+
+/* Only the lists scroll: the side menu and the title stay in view, the title
+ * on the page's color, casting a soft shadow on the cards only once it's
+ * stuck (as simul.css does). Desktop only: below 1020px Lichess's own top bar
+ * holds the top edge. The openings page's title row carries the sort picker,
+ * so the whole row sticks. */
+@media (min-width: 1020px) {
+  /* A bit wider than the column, to also cover the headings' dot rings as
+   * they pass under; no more, the gap to the side menu is 10px. */
+  main.page-menu:has(.puzzle-themes) :is(h1.box__top, .box__top:has(> h1)) {
+    container-type: scroll-state;
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    margin-inline: -8px !important;
+    padding-inline: 8px !important;
+    background: var(--cdc-bg-page);
+  }
+
+  /* In RTL Lichess leaves no gap before the menu, so only the free side. */
+  html[dir='rtl'] main.page-menu:has(.puzzle-themes) :is(h1.box__top, .box__top:has(> h1)) {
+    margin-inline-start: 0 !important;
+    padding-inline-start: 0 !important;
+  }
+
+  main.page-menu:has(.puzzle-themes) :is(h1.box__top, .box__top:has(> h1))::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-page), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    main.page-menu:has(.puzzle-themes) :is(h1.box__top, .box__top:has(> h1))::after {
+      opacity: 1;
+    }
+  }
+
+  /* The row is its own stacking context, which would sink the open sort
+   * menu's click-away mask under the sidebar (z-index 106). */
+  main.page-menu:has(.puzzle-themes) .box__top:has(.mselect__toggle:checked) {
+    z-index: 107;
+  }
+
+  /* Whatever the browser scrolls to (keyboard focus, a #link) stops below
+   * the title, which is up to 101px tall where it wraps. */
+  html:has(main.page-menu .puzzle-themes) {
+    scroll-padding-top: 112px;
+  }
+
+  main.page-menu:has(.puzzle-themes) .page-menu__menu {
+    position: sticky;
+    top: 16px;
   }
 }
 

@@ -1,0 +1,1343 @@
+/*
+ * A Swiss tournament's page (main.swiss), in the Swiss home's card look:
+ * the info panel as a card (the time control on a tile, the rounds as a
+ * progress bar from content.js), the standings with each round's result as
+ * a colored square, the podium, the stats and the boards as cards. Lichess
+ * keeps its three-column grid (side, main, table), in which only the middle
+ * column scrolls. The main part is snabbdom's, the side is server-rendered.
+ */
+
+/* ------------------------------------------------------------ side --- */
+
+main.swiss .swiss__meta {
+  display: flex;
+  flex-direction: column;
+  padding: 18px !important;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: none !important;
+  color: var(--cdc-text);
+}
+
+/* Time control, rounds and pause between rounds, beside the mode tile. The
+   glyph is a mask (or, for some variants, a picture), so the tile under it
+   is the section's own background. */
+main.swiss .swiss__meta section[data-icon]:first-child {
+  gap: 0;
+  margin-bottom: 12px !important;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='52'%3E%3Crect width='52' height='52' rx='12' fill='%233c3a37'/%3E%3C/svg%3E") no-repeat left center / 52px 52px;
+  color: var(--cdc-text-dim);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+html[dir='rtl'] main.swiss .swiss__meta section[data-icon]:first-child {
+  background-position: right center;
+}
+
+main.swiss .swiss__meta section[data-icon]:first-child::before {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin: 0 !important;
+  margin-inline: 11px 25px !important;
+  font-size: 30px !important;
+}
+
+main.swiss .swiss__meta section[data-icon]:first-child > div {
+  flex: 1;
+  min-width: 0;
+}
+
+main.swiss .swiss__meta section[data-icon]:first-child p:first-child {
+  margin-bottom: 3px !important;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+main.swiss .swiss__meta__round {
+  color: var(--cdc-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+main.swiss .swiss__meta section[data-icon]:first-child p + p {
+  margin-bottom: 4px !important;
+}
+
+main.swiss .swiss__meta section[data-icon]:first-child p + p a {
+  color: var(--cdc-text-dim) !important;
+}
+
+/* The rounds as a progress bar (content.js sets the share on the paragraph),
+   the whole width of the text column. */
+main.swiss .swiss__meta p[style*='--cdc-progress']::after {
+  content: '';
+  display: block;
+  height: 4px;
+  margin-top: 6px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--cdc-green) var(--cdc-progress), #ffffff14 0);
+}
+
+html[dir='rtl'] main.swiss .swiss__meta p[style*='--cdc-progress']::after {
+  background: linear-gradient(to left, var(--cdc-green) var(--cdc-progress), #ffffff14 0);
+}
+
+main.swiss .swiss__meta .description {
+  margin-bottom: 12px !important;
+  color: var(--cdc-text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+main.swiss .swiss__meta .description a {
+  color: var(--cdc-green) !important;
+}
+
+/* The team as a chip. */
+main.swiss .swiss__meta > a.text[href^='/team/'] {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+  max-width: 100%;
+  margin-bottom: 12px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--cdc-bg-raised);
+  color: #fff !important;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background-color 0.15s;
+}
+
+main.swiss .swiss__meta > a.text[href^='/team/']:hover {
+  background: var(--cdc-bg-raised-hover);
+}
+
+main.swiss .swiss__meta > a.text[href^='/team/']::before {
+  margin: 0 !important;
+  color: var(--cdc-text-dim);
+}
+
+main.swiss .swiss__meta > a.text[href^='/team/'] .uflair {
+  width: 1.3em;
+  height: 1.3em;
+}
+
+/* Entry requirements: one row each, Lichess's ✓ / ✘ when signed in. */
+main.swiss .swiss__meta section.conditions {
+  margin-bottom: 12px !important;
+}
+
+main.swiss .swiss__meta section.conditions::before {
+  display: none;
+}
+
+main.swiss .swiss__meta section.conditions > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+main.swiss .swiss__meta section.conditions p:not(.condition) {
+  color: var(--cdc-text-dim);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+main.swiss .swiss__meta section.conditions .condition {
+  padding: 7px 12px;
+  border-radius: 6px;
+  background: var(--cdc-bg-raised);
+  color: var(--cdc-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+main.swiss .swiss__meta section.conditions .condition.accepted {
+  color: var(--cdc-green) !important;
+}
+
+main.swiss .swiss__meta section.conditions .condition.refused {
+  color: #fa412d !important;
+}
+
+/* Creator and start date: a quiet footer. */
+main.swiss .swiss__meta > small {
+  padding-top: 12px;
+  border-top: 1px solid var(--cdc-card-border);
+  color: var(--cdc-text-dim);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+main.swiss .swiss__meta > small .user-link {
+  color: #fff !important;
+  font-weight: 700;
+}
+
+main.swiss .swiss__meta > br {
+  display: none;
+}
+
+main.swiss .swiss__meta > small {
+  margin: 0 !important;
+}
+
+main.swiss .swiss__meta > time {
+  margin-top: 3px;
+  color: var(--cdc-text-dim);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------ chat --- */
+
+main.swiss .swiss__side .mchat {
+  overflow: hidden;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: none !important;
+}
+
+main.swiss .mchat__tabs {
+  border-bottom: 1px solid var(--cdc-card-border);
+  background: transparent !important;
+}
+
+main.swiss .mchat__tab {
+  padding: 10px 14px !important;
+  background: transparent !important;
+  color: #fff !important;
+  font-family: var(--cdc-font) !important;
+  font-size: 14px;
+  font-weight: 700 !important;
+}
+
+main.swiss .mchat__content {
+  background: transparent !important;
+}
+
+main.swiss .mchat__messages {
+  padding: 6px 0;
+  font-size: 13px !important;
+}
+
+main.swiss .mchat__messages li {
+  padding: 3px 14px !important;
+  color: var(--cdc-text);
+}
+
+main.swiss .mchat__messages .user-link {
+  color: #fff !important;
+  font-weight: 700;
+  letter-spacing: 0 !important;
+}
+
+main.swiss .mchat__say {
+  box-sizing: border-box;
+  width: calc(100% - 16px);
+  margin: 6px 8px 8px;
+  padding: 9px 12px !important;
+  border: none !important;
+  border-radius: 6px !important;
+  outline: none !important;
+  background: var(--cdc-bg-raised) !important;
+  color: #fff !important;
+  font-size: 14px;
+}
+
+main.swiss .chat__members {
+  color: var(--cdc-text-dim);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------ main --- */
+
+/* Clipped to its corners with clip-path, not overflow: an overflow would
+   become the scroller of the sticky header (see "only the list scrolls"). */
+main.swiss .swiss__main > .box {
+  position: relative;
+  overflow: visible !important;
+  clip-path: inset(0 round 10px);
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: none !important;
+}
+
+main.swiss .swiss__main__header {
+  gap: 14px;
+  min-height: 0 !important;
+  padding: 20px 24px !important;
+}
+
+/* Chess.com's trophy in place of Lichess's glyph, as the other pages'
+   titles carry their Chess.com icon. */
+main.swiss .swiss__main__header > icon.img {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  margin: 0 !important;
+  background: url('https://assets-ds.chess.com/color-icons/trophies.svg') center / contain no-repeat;
+}
+
+main.swiss .swiss__main__header > icon.img::before {
+  content: none !important;
+}
+
+/* Finished: the podium has the trophies, the title stands alone. */
+main.swiss .swiss__main-finished .swiss__main__header > icon.img {
+  display: none;
+}
+
+main.swiss .swiss__main-finished .swiss__main__header {
+  padding-bottom: 8px !important;
+}
+
+/* A long name takes two lines, then an ellipsis. Not nowrap: below 800px
+   Lichess's grid has one auto column, which the title would widen. */
+main.swiss .swiss__main__header h1 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  min-width: 0;
+  overflow: hidden;
+  color: #fff;
+  font-family: var(--cdc-font) !important;
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+/* Below 500px Lichess hides the podium, which carried the space under a
+   finished title. */
+@media (max-width: 499.29px) {
+  main.swiss .swiss__main-finished .swiss__main__header {
+    padding-bottom: 20px !important;
+  }
+}
+
+/* Lichess's mobile layout: the title takes the tile's room, and a third
+   line, so that a usual name fits whole. */
+@media (max-width: 799.98px) {
+  main.swiss .swiss__main__header > icon.img {
+    display: none;
+  }
+
+  main.swiss .swiss__main__header h1 {
+    -webkit-line-clamp: 3;
+    font-size: 22px !important;
+  }
+}
+
+/* Countdown to the start or the next round, and the ongoing games: a chip
+   against the end of the header, its label above the number. */
+main.swiss .swiss__main__header :is(.clock, .ongoing) {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--cdc-bg-raised);
+  text-align: end;
+}
+
+main.swiss .swiss__main__header .shy {
+  order: -1;
+  opacity: 1 !important;
+  color: var(--cdc-text-dim);
+  font-size: 11px !important;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.2 !important;
+}
+
+main.swiss .swiss__main__header :is(.time, .nb) {
+  margin: 0 !important;
+  color: #fff !important;
+  font-family: var(--cdc-font) !important;
+  font-size: 22px !important;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+main.swiss .swiss__main__header .ongoing .nb {
+  color: var(--cdc-green) !important;
+}
+
+main.swiss .swiss__main__header .clock > time.shy {
+  order: 0;
+  color: #fff;
+  font-size: 15px !important;
+  font-weight: 800;
+  text-transform: none;
+}
+
+/* The pull quote while waiting: a quiet card below the entrants. */
+main.swiss blockquote.pull-quote {
+  margin: 24px auto !important;
+  padding: 16px 20px !important;
+  border: none !important;
+  border-radius: 10px;
+  background: var(--cdc-bg-panel-dark);
+}
+
+main.swiss blockquote.pull-quote p {
+  margin: 0 !important;
+  border: none !important;
+  color: var(--cdc-text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+main.swiss blockquote.pull-quote p::after {
+  display: none;
+}
+
+main.swiss blockquote.pull-quote footer {
+  margin-top: 8px;
+  color: var(--cdc-text-dim);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Signed-in notices: "you are playing" as a green button, "stand by" dim. */
+main.swiss .swiss__ur-playing {
+  margin: 0 24px 16px !important;
+  padding: 14px !important;
+  border: none !important;
+  border-radius: 8px !important;
+  background: var(--cdc-btn-green) !important;
+  box-shadow: var(--cdc-btn-green-shadow) !important;
+  color: #fff !important;
+  font-size: 17px !important;
+  font-weight: 800;
+  text-shadow: 0 1px 0 #0000004d;
+}
+
+main.swiss .swiss__ur-playing:hover {
+  background: var(--cdc-btn-green-hover) !important;
+}
+
+main.swiss .swiss__notice {
+  margin: 0 24px 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--cdc-bg-raised);
+  color: var(--cdc-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* The director's "schedule the next round" field, a row like the notice.
+   Still to fill in (.required): a green edge, not Lichess's green band. */
+main.swiss .schedule-next-round {
+  margin: 0 24px 16px;
+  padding: 10px 14px !important;
+  border-radius: 8px;
+  background: var(--cdc-bg-raised) !important;
+}
+
+main.swiss .schedule-next-round.required {
+  box-shadow: inset 3px 0 0 var(--cdc-green);
+}
+
+html[dir='rtl'] main.swiss .schedule-next-round.required {
+  box-shadow: inset -3px 0 0 var(--cdc-green);
+}
+
+main.swiss .schedule-next-round input {
+  padding: 8px 12px;
+  border: none !important;
+  border-radius: 6px;
+  background: var(--cdc-bg-panel) !important;
+  color: #fff !important;
+  font-size: 14px;
+}
+
+/* Only the list scrolls: from 1260px, where Lichess sets the three columns
+   side by side, the middle one scrolls on its own and the page doesn't, so
+   the info panel, the chat and the right column stay in view. Lichess's
+   first row is a window tall, so the side column couldn't stick instead.
+   The scroller runs 12px into the gaps (15px) so the cards' shadows aren't
+   cut; the title stays at its top, casting a soft shadow once stuck. */
+@media (min-width: 1260px) {
+  /* As on the game page: Lichess's hidden hover cards sit at the document's
+     end and would still leave the page a little to scroll. */
+  html:has(main.swiss),
+  html:has(main.swiss) body {
+    overflow: hidden !important;
+  }
+
+  /* Every column fits the window, scrolling in place when it's too short.
+     The spectators under the chat get what Lichess's first row leaves of
+     the window (about 60px). */
+  main.swiss .swiss__side {
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  main.swiss .chat__members {
+    max-height: calc(var(---site-header-height) + var(---site-header-margin) + var(---sticky-gap) + 3rem - 32px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  /* content.js focuses the column, so the page keys scroll it. */
+  main.swiss .swiss__main:focus {
+    outline: none;
+  }
+
+  main.swiss .swiss__main {
+    align-self: start;
+    max-height: calc(100vh - 32px);
+    margin-inline: -12px;
+    padding: 0 12px 16px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-padding-top: 120px;
+    scrollbar-color: #ffffff26 transparent;
+    scrollbar-width: thin;
+  }
+
+  main.swiss :is(.swiss__table, .swiss__stats) {
+    max-height: calc(100vh - 32px);
+    overflow-y: auto !important;
+    scrollbar-width: thin;
+  }
+
+  /* The card steps aside (display: contents), so the title sticks over the
+     whole column, the boards below the card included: a sticky element
+     can't leave its parent. The card is drawn by its pieces instead: the
+     panel color and side lines on each, the title rounding its top and the
+     last piece its bottom. The confetti then covers the column. */
+  main.swiss .swiss__main {
+    position: relative;
+  }
+
+  main.swiss .swiss__main > .box {
+    display: contents;
+  }
+
+  main.swiss .swiss__main > .box > :not(.podium-wrap),
+  main.swiss .podium-wrap > :is(.swiss__main__header, .podium) {
+    background-color: var(--cdc-bg-panel);
+    box-shadow: inset 1px 0 var(--cdc-card-border), inset -1px 0 var(--cdc-card-border);
+  }
+
+  main.swiss .swiss__main > .box .swiss__controls {
+    box-shadow: inset 1px 0 var(--cdc-card-border), inset -1px 0 var(--cdc-card-border) !important;
+  }
+
+  main.swiss .swiss__main > .box > :last-child {
+    box-shadow: inset 1px 0 var(--cdc-card-border), inset -1px 0 var(--cdc-card-border), inset 0 -1px var(--cdc-card-border);
+    clip-path: inset(0 round 0 0 10px 10px);
+  }
+
+  /* Rows inside the card run edge to edge, as the controls do: side
+     margins would show the page between the pieces. */
+  main.swiss :is(.swiss__ur-playing, .swiss__notice, .schedule-next-round) {
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  /* The rows keep their own fill and the director's green edge over the
+     card's panel color. */
+  main.swiss .swiss__main > .box > .swiss__notice {
+    background-color: var(--cdc-bg-raised);
+  }
+
+  main.swiss .swiss__main > .box > .schedule-next-round.required {
+    box-shadow: inset 3px 0 var(--cdc-green), inset -1px 0 var(--cdc-card-border);
+  }
+
+  html[dir='rtl'] main.swiss .swiss__main > .box > .schedule-next-round.required {
+    box-shadow: inset -3px 0 var(--cdc-green), inset 1px 0 var(--cdc-card-border);
+  }
+
+  /* Its own stacking level under the title: the player search's list
+     (z-index 113) would otherwise pass over the title on scroll. */
+  main.swiss .swiss__controls {
+    z-index: 1;
+  }
+
+  main.swiss blockquote.pull-quote {
+    width: auto;
+    margin: 0 !important;
+    padding: 12px 24px 28px !important;
+    border-radius: 0;
+    background: var(--cdc-bg-panel);
+  }
+
+  main.swiss blockquote.pull-quote :is(p, footer) {
+    max-width: 420px;
+    margin-inline: auto !important;
+  }
+
+  main.swiss .swiss__main__header {
+    container-type: scroll-state;
+    position: sticky !important;
+    top: 0;
+    z-index: 2;
+    border-radius: 10px 10px 0 0;
+    background: var(--cdc-bg-panel);
+    /* The page color behind the rounded corners, where the boards passing
+       under would show; above the title it falls outside the scroller. */
+    box-shadow: 0 -10px 0 var(--cdc-bg-page), inset 0 1px var(--cdc-card-border), inset 1px 0 var(--cdc-card-border), inset -1px 0 var(--cdc-card-border) !important;
+  }
+
+  main.swiss .swiss__main__header::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-panel), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    main.swiss .swiss__main__header::after {
+      opacity: 1;
+    }
+  }
+}
+
+/* -------------------------------------------------------- controls --- */
+
+main.swiss .swiss__controls {
+  gap: 8px;
+  padding: 8px 12px !important;
+  border-block: 1px solid var(--cdc-card-border) !important;
+  background: var(--cdc-bg-panel-dark) !important;
+  box-shadow: none !important;
+}
+
+main.swiss .swiss__controls .pager {
+  gap: 4px;
+}
+
+main.swiss .swiss__controls .pager .fbt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 32px;
+  padding: 0 8px !important;
+  border-radius: 6px;
+  color: var(--cdc-text) !important;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+main.swiss .swiss__controls .pager .fbt:hover:not(:disabled, .disabled) {
+  background: var(--cdc-bg-raised) !important;
+  color: #fff !important;
+}
+
+main.swiss .swiss__controls .pager .fbt:disabled {
+  opacity: 0.35;
+}
+
+main.swiss .swiss__controls .pager .page {
+  margin: 0 6px !important;
+  color: var(--cdc-text-dim);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+main.swiss .swiss__controls .pager input {
+  height: 32px !important;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: var(--cdc-bg-raised) !important;
+  color: #fff;
+  font-size: 14px;
+}
+
+/* Join (or sign in, or join the team) as Chess.com's green button,
+   withdraw as a grey one. */
+main.swiss .swiss__controls > .fbt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px !important;
+  border-radius: 6px;
+  background: var(--cdc-btn-grey) !important;
+  box-shadow: var(--cdc-btn-grey-shadow);
+  color: #fff !important;
+  font-family: var(--cdc-font);
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: none !important;
+}
+
+main.swiss .swiss__controls > .fbt:hover {
+  background: var(--cdc-btn-grey-hover) !important;
+}
+
+main.swiss .swiss__controls > .fbt.highlight {
+  background: var(--cdc-btn-green) !important;
+  box-shadow: var(--cdc-btn-green-shadow);
+  text-shadow: 0 1px 0 #0000004d;
+}
+
+main.swiss .swiss__controls > .fbt.highlight:hover {
+  background: var(--cdc-btn-green-hover) !important;
+}
+
+main.swiss .swiss__controls > .fbt::before {
+  margin: 0 !important;
+  font-size: 13px;
+}
+
+/* ------------------------------------------------------- standings --- */
+
+/* A round's square: its full size, and the size it starts shrinking from.
+   Lichess's .long / .xlong count the rounds played, but every row draws a
+   square per round, played or not, so the sizes count the squares. Up to
+   20 a row keeps one line on desktop (see below); past 20 it wraps, so the
+   squares keep one size there rather than growing on the last line. */
+main.swiss .swiss__standing {
+  --cdc-cell: 24px;
+  --cdc-cell-min: 15px;
+  --cdc-cell-gap: 3px;
+  --cdc-cell-font: 11px;
+  border: none !important;
+}
+
+main.swiss .swiss__standing:has(.pairings div > :nth-child(11)) {
+  --cdc-cell: 20px;
+  --cdc-cell-min: 11px;
+  --cdc-cell-gap: 2px;
+  --cdc-cell-font: 10px;
+}
+
+main.swiss .swiss__standing:has(.pairings div > :nth-child(17)) {
+  --cdc-cell-min: 9px;
+  --cdc-cell-gap: 1px;
+  --cdc-cell-font: 8px;
+}
+
+main.swiss .swiss__standing:has(.pairings div > :nth-child(21)) {
+  --cdc-cell: 13px;
+  --cdc-cell-min: 13px;
+  --cdc-cell-gap: 2px;
+  --cdc-cell-font: 10px;
+}
+
+main.swiss .swiss__standing tbody tr,
+main.swiss .swiss__standing tbody tr:nth-child(2n) {
+  background: transparent !important;
+  box-shadow: inset 0 -1px 0 var(--cdc-card-border);
+}
+
+main.swiss .swiss__standing:not(.created, .loading) tbody tr:hover {
+  background: var(--cdc-card-hover) !important;
+}
+
+/* Me: a green bar at the start. The player whose card is open: lifted. */
+main.swiss .swiss__standing tr.me td:first-child {
+  background: none !important;
+  box-shadow: inset 4px 0 0 var(--cdc-green);
+}
+
+html[dir='rtl'] main.swiss .swiss__standing tr.me td:first-child {
+  box-shadow: inset -4px 0 0 var(--cdc-green);
+}
+
+main.swiss .swiss__standing tbody tr.active {
+  background: var(--cdc-bg-raised) !important;
+}
+
+main.swiss .swiss__standing tr.active td:last-child {
+  background: none !important;
+}
+
+main.swiss .swiss__standing td {
+  padding-block: 10px !important;
+  border: none !important;
+}
+
+main.swiss .swiss__standing td.rank {
+  min-width: 20px;
+  padding-inline: 12px 6px !important;
+  color: var(--cdc-text-dim);
+  font-family: var(--cdc-font) !important;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* The leaders in medal colors (content.js marks ranks 1 to 3), once a game
+   has a result: before that, the order is only the rating seeds. */
+main.swiss .swiss__standing:not(.created):has(.pairings :is(.win, .loss, .draw)) td.rank[data-cdc-medal='1'] {
+  color: #e3aa24;
+}
+
+main.swiss .swiss__standing:not(.created):has(.pairings :is(.win, .loss, .draw)) td.rank[data-cdc-medal='2'] {
+  color: #b7b7b7;
+}
+
+main.swiss .swiss__standing:not(.created):has(.pairings :is(.win, .loss, .draw)) td.rank[data-cdc-medal='3'] {
+  color: #d0844b;
+}
+
+main.swiss .swiss__standing td.rank icon {
+  opacity: 1 !important;
+  color: var(--cdc-text-dim);
+  font-size: 12px !important;
+}
+
+/* The rating on its own line under the name; the name keeps a patron's
+   wings (an <icon> before it) on its line. */
+main.swiss .swiss__standing .player .user-link {
+  display: block;
+  letter-spacing: 0 !important;
+}
+
+main.swiss .swiss__standing .player .name {
+  max-width: 140px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+main.swiss .swiss__standing .player .name .uflair {
+  width: 1.2em;
+  height: 1.2em;
+  margin-inline-start: 3px;
+}
+
+main.swiss .swiss__standing .player .rating {
+  display: block;
+  margin-top: 1px;
+  padding: 0 !important;
+  color: var(--cdc-text-dim);
+  font-size: 12px !important;
+  font-style: normal !important;
+  font-weight: 600;
+}
+
+/* One square per round: green won, red lost, grey drawn, outlined while
+   playing; byes, late joins and absences plain; future rounds empty. */
+main.swiss .swiss__standing .pairings div {
+  gap: var(--cdc-cell-gap);
+  align-items: center !important;
+  min-height: 0 !important;
+  padding-inline: 6px 4px;
+}
+
+/* A square grows to its full size when the row has room, and only wraps
+   once they're all at their smallest. */
+main.swiss .swiss__standing .pairings div > * {
+  flex: 1 1 var(--cdc-cell-min) !important;
+  max-width: var(--cdc-cell);
+  aspect-ratio: 1;
+  border: none !important;
+  border-radius: 4px;
+  background: #ffffff0a;
+  color: var(--cdc-text-dim) !important;
+  font-family: var(--cdc-font);
+  font-size: var(--cdc-cell-font);
+  font-weight: 800;
+  line-height: 1;
+  transition: filter 0.15s, box-shadow 0.15s;
+}
+
+/* Desktop, up to 20 squares: one line, the squares shrinking as one when
+   even their start size doesn't fit (the narrowest standings, 500px). */
+@media (min-width: 800px) {
+  main.swiss .swiss__standing:not(:has(.pairings div > :nth-child(21))) .pairings div {
+    flex-wrap: nowrap !important;
+  }
+
+  main.swiss .swiss__standing:not(:has(.pairings div > :nth-child(21))) .pairings div > * {
+    min-width: 0;
+  }
+}
+
+/* Lichess's mobile layout leaves too little room for one line: the squares
+   wrap, all at the same size. */
+@media (max-width: 799.98px) {
+  main.swiss .swiss__standing .pairings div > * {
+    flex-grow: 0 !important;
+  }
+}
+
+main.swiss .swiss__standing .pairings .win {
+  background: var(--cdc-green) !important;
+  color: #fff !important;
+}
+
+main.swiss .swiss__standing .pairings .loss {
+  background: #d64742 !important;
+  color: #fff !important;
+}
+
+main.swiss .swiss__standing .pairings .draw {
+  background: #8b8987 !important;
+  color: #fff !important;
+}
+
+main.swiss .swiss__standing .pairings .ongoing {
+  background: transparent !important;
+  box-shadow: inset 0 0 0 2px var(--cdc-green);
+  color: var(--cdc-green) !important;
+}
+
+main.swiss .swiss__standing .pairings :is(bye, late) {
+  background: var(--cdc-bg-raised);
+  color: var(--cdc-text) !important;
+}
+
+main.swiss .swiss__standing .pairings a:hover {
+  filter: brightness(1.15);
+}
+
+main.swiss .swiss__standing td.points {
+  padding-inline: 8px !important;
+  color: #fff;
+  font-family: var(--cdc-font) !important;
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+main.swiss .swiss__standing td.tieBreak {
+  padding-inline: 6px 14px !important;
+  color: var(--cdc-text-dim);
+  font-family: var(--cdc-font) !important;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------- podium --- */
+
+/* The wrapper around the finished title and the podium steps aside, so the
+   title is the card's own child and can stay in view over the whole card.
+   Its confetti then covers the card (positioned), its glow goes on the
+   podium. */
+main.swiss .podium-wrap {
+  display: contents;
+}
+
+main.swiss .podium {
+  padding-bottom: 20px;
+  background: radial-gradient(ellipse 60% 70% at 50% 45%, #e3aa2414, transparent 70%);
+}
+
+/* Lichess's weight and tight tracking stay: the podium's widths are made
+   for them. A disqualified player (.lame) stays Lichess's, struck through. */
+main.swiss .podium .user-link {
+  display: block;
+  margin-top: 4px;
+  overflow: hidden;
+  color: #fff !important;
+  font-family: var(--cdc-font);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+main.swiss .podium .user-link .uflair {
+  width: 1em;
+  height: 1em;
+  margin-inline-start: 3px;
+}
+
+main.swiss .podium .stats {
+  border-spacing: 0 2px;
+  font-size: 12px !important;
+}
+
+main.swiss .podium .first .stats {
+  font-size: 14px !important;
+}
+
+main.swiss .podium .stats th {
+  padding: 0 !important;
+  color: var(--cdc-text-dim);
+  font-weight: 600;
+  letter-spacing: 0 !important;
+}
+
+main.swiss .podium .stats td {
+  padding-inline-start: 14px !important;
+  color: #fff;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ----------------------------------------------------------- stats --- */
+
+main.swiss .swiss__stats {
+  padding: 20px !important;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: none !important;
+}
+
+main.swiss .swiss__stats h2 {
+  margin: 0 0 12px !important;
+  color: #fff;
+  font-family: var(--cdc-font) !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  text-align: start !important;
+}
+
+main.swiss .swiss__stats table {
+  width: 100%;
+  margin: 0 !important;
+  border-collapse: collapse;
+}
+
+main.swiss .swiss__stats tr {
+  box-shadow: inset 0 -1px 0 var(--cdc-card-border);
+}
+
+main.swiss .swiss__stats th {
+  padding: 9px 0;
+  color: var(--cdc-text-dim);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: start;
+}
+
+main.swiss .swiss__stats td {
+  padding: 9px 0 !important;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800 !important;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4 !important;
+}
+
+/* The round list as a grey button, the downloads as a list of rows. */
+main.swiss .swiss__stats__links {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  margin: 16px 0 0 !important;
+}
+
+main.swiss .swiss__stats__links br {
+  display: none;
+}
+
+main.swiss .swiss__stats__links a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 !important;
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: var(--cdc-text) !important;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+main.swiss .swiss__stats__links a:hover {
+  background: var(--cdc-bg-raised);
+  color: #fff !important;
+}
+
+main.swiss .swiss__stats__links a::before {
+  margin: 0 !important;
+  color: var(--cdc-text-dim);
+}
+
+main.swiss .swiss__stats__links a:first-child {
+  justify-content: center;
+  margin-bottom: 10px !important;
+  padding: 10px;
+  background: var(--cdc-btn-grey);
+  box-shadow: var(--cdc-btn-grey-shadow);
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+main.swiss .swiss__stats__links a:first-child:hover {
+  background: var(--cdc-btn-grey-hover);
+}
+
+/* -------------------------------------------------------- the player --- */
+
+/* A standing row's card: name and numbers, then their games by round. */
+main.swiss .swiss__player-info {
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: none !important;
+}
+
+main.swiss .swiss__player-info .close {
+  top: 12px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  opacity: 1 !important;
+  color: var(--cdc-text-dim) !important;
+  font-size: 12px;
+}
+
+html:not([dir='rtl']) main.swiss .swiss__player-info .close {
+  right: 12px !important;
+}
+
+html[dir='rtl'] main.swiss .swiss__player-info .close {
+  left: 12px !important;
+}
+
+main.swiss .swiss__player-info .close:hover {
+  background: var(--cdc-bg-raised);
+  color: #fff !important;
+}
+
+main.swiss .swiss__player-info .stats h2 {
+  padding-block: 16px 14px !important;
+  padding-inline: 20px 48px !important;
+  border-bottom: 1px solid var(--cdc-card-border) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #fff;
+  font-family: var(--cdc-font) !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+}
+
+main.swiss .swiss__player-info .stats h2 .rank {
+  color: var(--cdc-text-dim);
+}
+
+main.swiss .swiss__player-info .stats h2 .user-link {
+  color: #fff !important;
+}
+
+main.swiss .swiss__player-info .stats h2 .rating {
+  color: var(--cdc-text-dim);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+main.swiss .swiss__player-info .stats table {
+  width: calc(100% - 40px);
+  margin: 8px 20px 12px !important;
+  border-collapse: collapse;
+}
+
+main.swiss .swiss__player-info .stats tr {
+  box-shadow: inset 0 -1px 0 var(--cdc-card-border);
+}
+
+main.swiss .swiss__player-info .stats th {
+  padding: 7px 0;
+  color: var(--cdc-text-dim);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: start;
+}
+
+main.swiss .swiss__player-info .stats td {
+  padding: 7px 0 !important;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800 !important;
+  font-variant-numeric: tabular-nums;
+}
+
+main.swiss .swiss__player-info .sublist {
+  border-collapse: collapse;
+}
+
+main.swiss .swiss__player-info .sublist tr,
+main.swiss .swiss__player-info .sublist tr:nth-child(odd) {
+  background: transparent !important;
+  box-shadow: inset 0 -1px 0 var(--cdc-card-border);
+}
+
+main.swiss .swiss__player-info .sublist tr:hover {
+  background: var(--cdc-card-hover) !important;
+}
+
+main.swiss .swiss__player-info .sublist :is(th, td) {
+  padding: 7px 6px !important;
+  color: var(--cdc-text);
+  font-size: 13px;
+}
+
+main.swiss .swiss__player-info .sublist th {
+  padding-inline-start: 20px !important;
+  border: none !important;
+  color: var(--cdc-text-dim);
+  font-weight: 700;
+}
+
+main.swiss .swiss__player-info .sublist td:last-child {
+  padding-inline-end: 20px !important;
+  color: #fff;
+  font-weight: 800;
+  text-align: end;
+}
+
+main.swiss .swiss__player-info .sublist tr.win td:last-child {
+  color: var(--cdc-green);
+}
+
+main.swiss .swiss__player-info .sublist tr.loss td:last-child {
+  color: #fa412d;
+}
+
+main.swiss .swiss__player-info .sublist .outcome {
+  color: var(--cdc-text-dim);
+  font-style: italic;
+}
+
+/* ---------------------------------------------------------- boards --- */
+
+/* Each game as a card: the players' bars around the board, the clock as
+   Chess.com's, light for White and dark for Black, bright while it runs. */
+/* Isolated: chessground's pieces carry z-indexes, which would otherwise
+   paint over the sticky title as the boards pass under it. */
+main.swiss .swiss__board {
+  container-type: inline-size;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 10px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+main.swiss .swiss__board:hover {
+  border-color: var(--cdc-card-border-hover);
+  box-shadow: var(--cdc-card-shadow-hover) !important;
+}
+
+main.swiss .swiss__boards {
+  gap: 12px !important;
+}
+
+main.swiss .swiss__board .mini-game__player {
+  gap: 8px;
+  padding: 7px 10px !important;
+  font-size: 13px;
+}
+
+main.swiss .swiss__board .mini-game__user {
+  flex: 1;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+main.swiss .swiss__board .mini-game__user strong {
+  flex: none;
+  margin: 0 !important;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--cdc-bg-raised);
+  color: var(--cdc-text-dim);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+main.swiss .swiss__board .mini-game__user .user-link {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
+  color: #fff !important;
+  font-weight: 700;
+}
+
+/* A Latin name in a right-to-left page is cut at its own end. */
+main.swiss .swiss__board .mini-game__user .name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  unicode-bidi: plaintext;
+  white-space: nowrap;
+}
+
+/* A small board has room for the name or the rating: the name wins. */
+@container (max-width: 260px) {
+  main.swiss .swiss__board .mini-game__user .rating {
+    display: none;
+  }
+}
+
+main.swiss .swiss__board .mini-game__user .name .uflair {
+  width: 1.1em;
+  height: 1.1em;
+  margin-inline-start: 3px;
+  vertical-align: -0.2em;
+}
+
+main.swiss .swiss__board .mini-game__user .rating {
+  flex: none;
+  color: var(--cdc-text-dim);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+main.swiss .swiss__board :is(.mini-game__clock, .mini-game__result) {
+  flex: none;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: var(--cdc-font);
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+main.swiss .swiss__board .mini-game__clock--white {
+  background: #989795;
+  color: #312e2b99 !important;
+}
+
+main.swiss .swiss__board .mini-game__clock--white.clock--run {
+  background: #fff;
+  color: #312e2b !important;
+}
+
+main.swiss .swiss__board .mini-game__clock--black {
+  background: #2b2926;
+  color: #82807d !important;
+}
+
+main.swiss .swiss__board .mini-game__clock--black.clock--run {
+  background: #1c1b19;
+  color: #fff !important;
+}
+
+main.swiss .swiss__board .mini-game__result {
+  background: var(--cdc-bg-raised);
+  color: #fff;
+}

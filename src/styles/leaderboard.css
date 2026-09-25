@@ -19,7 +19,11 @@
 
 /* ------------------------------------------------------------ page --- */
 
+/* No longer a card, so nothing to clip: Lichess's overflow: hidden would cut
+ * the cards' hover lift and shadow at the box's edges, and would make the box
+ * the online card's scroll container, so that card never stuck. */
 .community.page-menu__content.box {
+  overflow: visible !important;
   gap: 24px !important;
   padding: 16px 0 40px !important;
   background: transparent !important;

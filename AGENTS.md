@@ -74,7 +74,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `manifest.json` | Content scripts: CSS + `content.js` + `dashboard.js` + `ratingchart.js` (isolated world), `page.js` + `board.js` + `review.js` + `distribution.js` (page world). |
 | `img/coaches/` | The Game Review coach's faces (`coach-<n>.webp`), web-accessible so `review.css` can load them. |
 | `src/background.js` | Service worker: downloads the Chess.com sounds, caches them as base64. |
-| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, fetches a finished game's move times (and its time control, for the "New 10 min" button), the players' country flags (from their profiles), the analysis board's players (copied from the hidden game info), the home hero, coach title badges, the Swiss list's round progress, the forum index's count labels, the hover card's rating chips and its fit in the window, the eval bar's score, the font remapping, the FIDE list's rank offset on a later page, and which coach (`data-cdc-coach` on `<html>`) reads a practice drill's goal, and the sidebar's Donate item (copied from the flyout's, as Lichess's own lone link is missing for patrons and on game pages). |
+| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, fetches a finished game's move times (and its time control, for the "New 10 min" button), the players' country flags (from their profiles), the analysis board's players (copied from the hidden game info), the home hero, coach title badges, the Swiss list's and a Swiss tournament's round progress and medal ranks, the forum index's count labels, the hover card's rating chips and its fit in the window, the eval bar's score, the font remapping, the FIDE list's rank offset on a later page, and which coach (`data-cdc-coach` on `<html>`) reads a practice drill's goal, and the sidebar's Donate item (copied from the flyout's, as Lichess's own lone link is missing for patrons and on game pages). |
 | `src/dashboard.js` | Isolated world: the puzzle dashboard's theme radar, redrawn as SVG from the page's init JSON (Lichess draws it into a canvas). |
 | `src/ratingchart.js` | Isolated world: the rating history chart (profile, rating stats page), redrawn in SVG from the page's init JSON (Lichess draws it with Chart.js into a canvas): smooth curves over gradients, range pills, one chip per rating, a hover tooltip. |
 | `src/distribution.js` | Page world: the weekly rating distribution (`/stat/rating/distribution/<perf>`), redrawn in SVG from the page's init JSON (Lichess draws it with Chart.js into a canvas): a rounded column per 25 points in the rating's color, the cumulative curve, pills for your rating and the player you came from, a hover tooltip. Page world for Lichess's translated labels (`i18n.site`). |
@@ -105,10 +105,11 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/practice.css` | Practice (`.practice-app`, `.practice-side`) as playful lesson cards: a color per section, white icons on gradient tiles, progress pills. |
 | `src/styles/practice-run.css` | Inside a lesson (`main.analyse` + `.practice__side`): one lesson panel with the chapter list as numbered steps, the gamebook coach in a white bubble with the octopus, and a drill's goal read out by the Game Review's coach in a white bubble, and its status. |
 | `src/styles/learn.css` | Learn (`#learn-app`, one app for both views): the map (`.learn--map`) in the Practice look, a color per category, white pieces on gradient tiles, star pills; inside a stage (`.learn--run`) the stage list and the goal panel as cards, the levels as pills. |
-| `src/styles/puzzles.css` | Puzzle themes (`.puzzle-themes`) and puzzles by opening (`.puzzle-openings`) in the Practice look: a color per section, theme cards, a card per opening family, opening chips. |
+| `src/styles/puzzles.css` | Puzzle themes (`.puzzle-themes`) and puzzles by opening (`.puzzle-openings`) in the Practice look: a color per section, theme cards, a card per opening family, opening chips; from 1020px the title and the side menu stay in view on scroll. |
 | `src/styles/dashboard.css` | Puzzle dashboard (`.puzzle-dashboard`): stat tiles, per-theme rows, and the panel around `dashboard.js`'s radar. |
 | `src/styles/broadcast.css` | Broadcasts (`.relay-index` lists, calendar, FIDE pages, info pages) as event cards with a LIVE pill. |
 | `src/styles/swiss.css` | Swiss tournaments home (`main.swiss-home`): now playing / starting soon as tournament cards (time-control tile, rounds progress bar, player chip), the explanations as point cards, a comparison card and a grid of FAQ cards. |
+| `src/styles/swiss-show.css` | A Swiss tournament (`main.swiss`), in Lichess's three columns: the info panel as a card (time-control tile, rounds progress bar, condition chips), a header with a countdown chip, the standings with a colored square per round and medal-colored leaders, the podium, the stats and player cards, and the mini boards with Chess.com clocks. From 1260px the page doesn't scroll: only the middle column does, its title pinned. |
 | `src/styles/leaderboard.css` | Players leaderboard (`/player`, `.community`) in the Practice look: a card per leaderboard with its icon white on a tile in its own color, medals for the top three, and the online players in a sticky side card with rating chips. Tournament winners (`/tournament/leaderboard`, `.tournament-leaderboards`) reuse the same cards, with a gold / silver / bronze cup per yearly / monthly / weekly winner, the tournament as a pill, and the side menu and title pinned while the cards scroll. Tournament shields (`/tournament/shields`, `.tournament-shields`) are the same cards with a shield-shaped tile (colored by how the category link ends, as the header has no icon) and a gold mini-shield for the current holder; a shield's history (`/tournament/shields/<perf>`, `main.tournament-categ-shields`) is a grid of gold shield cards, the holder's across the top. The side menu these pages share (leaderboard, rating stats, tournament winners and shields, bots, FIDE players) gives each link Chess.com's color icon on a tile tinted in its own color. |
 | `src/styles/fide.css` | FIDE players (`/fide`, `.fide-players`) as Chess.com's top players: a row card per player with a rank (medals for the top three, only when sorted by a rating; `content.js` offsets it when the list opens on a later `?page=`), a rounded photo (Chess.com's avatar when FIDE has none), title badge, name and flag, the sorted-by rating in white, and the sort links as pills with time-control icons. The side menu, the title with the search and the column pills stay put while the rows scroll. |
 | `src/styles/bots.css` | Online bots (`/player/bots`, `.bots`) as bot cards: a Neo piece white on a gradient tile (gold for the featured bots, otherwise a color and a piece per card), a green dot when online, ratings as chips, a clipped bio and a green Play button. Each section's title stays in view over its own cards. |
@@ -243,6 +244,20 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   `bits.dropdownOverflow` decides how many action buttons fit by adding them
   until `.user-actions`'s `offsetWidth` grows, so **don't change that element's
   flex sizing** — only what's inside it.
+- **A box made transparent still clips.** Lichess's `.box` (and boxes like
+  `.lobby__side`) carry `overflow: hidden` for their rounded corners. Once our
+  CSS drops their background, that clip cuts what the cards inside draw past
+  their edges — hover shadows, focus rings, dot halos — and it makes the box
+  the scroll container of any `position: sticky` inside it, which then never
+  sticks. Add `overflow: visible !important` with the transparent background.
+  Then check for a closed `.mselect__list`: hidden but still laid out, it can
+  widen the page once nothing clips it (anchor it with `inset-inline: auto 0`).
+- **A page that must not scroll.** Lichess's hidden hover cards (`#powerTip`,
+  `#miniGame`) sit at the document's end and leave about 40px to scroll, so a
+  layout that fits the window still needs `html, body { overflow: hidden }`
+  (as `game.css` and `swiss-show.css` do), with every column scrolling in
+  place. A `sticky` title can't leave its parent: to pin it over more than
+  its card, make the card `display: contents` and draw it from its pieces.
 
 ## Testing
 

@@ -14,7 +14,10 @@
 
 /* ---------------------------------------------------------- header --- */
 
+/* No longer a card, so nothing to clip: Lichess's overflow: hidden would cut
+ * the team cards' hover shadow at the box's edges. */
 main.team-list .page-menu__content.box {
+  overflow: visible !important;
   padding: 0 !important;
   background: transparent !important;
 }
