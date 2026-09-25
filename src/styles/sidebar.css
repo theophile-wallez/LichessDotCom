@@ -44,10 +44,6 @@
     align-items: stretch !important;
   }
 
-  #top .site-title-nav__donate {
-    display: none !important;
-  }
-
   #main-wrap {
     margin-left: var(--cdc-sidebar-w) !important;
     margin-top: 0 !important;
@@ -253,6 +249,68 @@
   #topnav div a[href$='/editor']               { --cdc-sub-icon: url('https://assets-ds.chess.com/color-icons/board-2x2-calculated.svg'); }
   #topnav div a[href$='/paste']                { --cdc-sub-icon: url('https://assets-ds.chess.com/color-icons/board-archive.svg'); }
   #topnav div a[href$='/games/search']         { --cdc-sub-icon: url('https://assets-ds.chess.com/color-icons/board-4x4-brown.svg'); }
+
+  /* ----------------------------------------------------------- donate --- */
+
+  /* Lichess puts Donate in the Play flyout on mobile and as a lone link after
+     the nav on desktop: make that link a sidebar item of its own, right under
+     Tools, with a heart that beats on hover. */
+  #topnav div a.community-patron {
+    display: none !important;
+  }
+
+  #top .site-title-nav__donate {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-start !important;
+    gap: 10px;
+    height: 44px !important;
+    margin: 0 !important;
+    padding: 0 10px 0 12px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1 !important;
+    text-transform: none !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: var(--cdc-text) !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+  }
+
+  #top .site-title-nav__donate::before {
+    content: '';
+    flex: none;
+    width: 28px;
+    height: 28px;
+    background: url('https://assets-ds.chess.com/color-icons/heart-red.svg') center / contain no-repeat;
+  }
+
+  #top .site-title-nav__donate:hover {
+    background: #00000033 !important;
+    color: #fff !important;
+  }
+
+  #top .site-title-nav__donate:hover::before {
+    animation: cdc-heartbeat 0.9s ease-in-out infinite;
+  }
+
+  @keyframes cdc-heartbeat {
+    0%, 60%, 100% { transform: scale(1); }
+    15% { transform: scale(1.2); }
+    30% { transform: scale(1.05); }
+    45% { transform: scale(1.15); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #top .site-title-nav__donate:hover::before {
+      animation: none;
+    }
+  }
 
   /* ------------------------------------------------ bottom buttons --- */
 

@@ -12,6 +12,9 @@
  * tile shaped as a shield, and each shield's history
  * (/tournament/shields/<perf>, main.tournament-categ-shields) is a cabinet
  * of gold shields, the current holder's on top.
+ *
+ * The side menu these pages share (with the rating stats, the bots and the
+ * FIDE players) gives each link Chess.com's color icon on a tinted tile.
  */
 
 /* ------------------------------------------------------------ page --- */
@@ -858,6 +861,78 @@ main.tournament-categ-shields li:first-child .user-link {
   }
 }
 
+/* ---------------------------------------------------- community menu --- */
+
+/* The side menu shared by these pages, the rating stats, the bots and the
+ * FIDE players: each link gets Chess.com's color icon on a tile tinted in
+ * its own color, which hops on hover. Told apart by how the hrefs end, as
+ * Lichess localizes them. */
+.subnav:has(a[href$='/player/bots']) a {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 14px 7px 8px !important;
+}
+
+.subnav:has(a[href$='/player/bots']) a::before {
+  content: '';
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background:
+    var(--cdc-nav-icon) center / 24px 24px no-repeat,
+    color-mix(in srgb, var(--cdc-nav-color, #fff) 16%, transparent);
+  box-shadow: inset 0 1px #ffffff14;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s;
+}
+
+.subnav:has(a[href$='/player/bots']) a:hover::before {
+  transform: translateY(-2px) rotate(-8deg) scale(1.08);
+}
+
+.subnav:has(a[href$='/player/bots']) a.active::before {
+  background-color: color-mix(in srgb, var(--cdc-nav-color, #fff) 32%, transparent);
+  box-shadow: inset 0 1px #ffffff26, 0 0 0 1px color-mix(in srgb, var(--cdc-nav-color, #fff) 45%, transparent);
+}
+
+.subnav a[href$='/player'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/leaderboard.svg');
+  --cdc-nav-color: #f7c631;
+}
+
+.subnav a[href*='/stat/rating/distribution'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/rating-stats.svg');
+  --cdc-nav-color: #1baaf0;
+}
+
+.subnav a[href$='/tournament/leaderboard'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/trophies.svg');
+  --cdc-nav-color: #fa742c;
+}
+
+.subnav a[href$='/tournament/shields'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/shield.svg');
+  --cdc-nav-color: #81b64c;
+}
+
+.subnav a[href$='/player/bots'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/device-bot.svg');
+  --cdc-nav-color: #8a6fd8;
+}
+
+.subnav:has(a[href$='/player/bots']) a[href*='/fide'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/globe.svg');
+  --cdc-nav-color: #26c2a3;
+}
+
+/* Lichess's separators are blank gaps: a faint rule instead. */
+.subnav:has(a[href$='/player/bots']) .sep {
+  height: 1px;
+  margin: 8px 14px !important;
+  background: var(--cdc-border);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .community__online > h2::before,
   :is(.community .leaderboards .user-top, .tournament-leaderboards__item, .tournament-shields__item),
@@ -869,7 +944,8 @@ main.tournament-categ-shields li:first-child .user-link {
   :is(.community .leaderboards, .tournament-leaderboards) h2::before,
   :is(.community .leaderboards, .tournament-leaderboards) h2::after,
   .shield-trophy,
-  main.tournament-categ-shields .box > ol > li {
+  main.tournament-categ-shields .box > ol > li,
+  .subnav:has(a[href$='/player/bots']) a::before {
     transition: none;
   }
 
