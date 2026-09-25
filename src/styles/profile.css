@@ -134,8 +134,7 @@
   width: var(--cdc-pf-avatar);
   height: var(--cdc-pf-avatar);
   border-radius: 12px;
-  background: #e7e5e3 url('https://www.chess.com/bundles/web/images/user-image.007dad08.svg') center / cover
-    no-repeat;
+  background: var(--cdc-avatar);
   box-shadow: 0 0 0 1px #ffffff1a, 0 4px 12px #00000040;
 }
 

@@ -358,7 +358,7 @@
     width: 56px;
     height: 56px;
     border-radius: 6px;
-    background: #e7e5e3 url('https://www.chess.com/bundles/web/images/user-image.007dad08.svg') center / cover;
+    background: var(--cdc-avatar);
   }
 
   .cdc-acc {

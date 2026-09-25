@@ -40,8 +40,7 @@
     height: 40px;
     border-radius: 3px;
     /* Chess.com's default avatar. */
-    background: #e7e5e3 url('https://www.chess.com/bundles/web/images/user-image.007dad08.svg')
-      center / cover no-repeat;
+    background: var(--cdc-avatar);
   }
 
   :is(main.round .ruser, main.analyse > .cdc-player) .line {

@@ -711,7 +711,7 @@ main.forum-topic .forum-post::before {
   width: 48px;
   height: 48px;
   border-radius: 8px;
-  background: #e7e5e3 url('https://www.chess.com/bundles/web/images/user-image.007dad08.svg') center / cover no-repeat;
+  background: var(--cdc-avatar);
 }
 
 /* The topic's author: a ring in the category's color. */

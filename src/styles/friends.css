@@ -98,8 +98,7 @@ main.box.page-small:has(> table.slist-invert > tbody > tr > td:first-child > .us
     width: 44px;
     height: 44px;
     border-radius: 6px;
-    background: #e7e5e3 url('https://www.chess.com/bundles/web/images/user-image.007dad08.svg')
-      center / cover no-repeat;
+    background: var(--cdc-avatar);
     transform: translateY(-50%);
   }
 
