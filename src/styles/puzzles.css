@@ -626,3 +626,49 @@ html[dir='rtl'] .puzzle-themes__link {
     padding: 0 12px 24px !important;
   }
 }
+
+/* ------------------------------------------------------------ menu --- */
+
+/* The puzzles' side menu, on these pages, the dashboard and the history:
+ * each link's icon and tile color (the tiles are in pages.css). The
+ * dashboard's links carry its period (`/training/dashboard/30/strengths`). */
+
+.subnav:has(a[href$='/training/themes']) a[href$='/training'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/puzzle-piece.svg');
+  --cdc-nav-color: #fa742c;
+}
+
+.subnav:has(a[href$='/training/themes']) a[href$='/training/themes'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/board-stack-green.svg');
+  --cdc-nav-color: #81b64c;
+}
+
+.subnav:has(a[href$='/training/themes']) a[href$='/training/openings'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/book-open-knight.svg');
+  --cdc-nav-color: #c8915b;
+}
+
+.subnav:has(a[href$='/training/themes']) a[href$='/dashboard'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/rating-stats.svg');
+  --cdc-nav-color: #1baaf0;
+}
+
+.subnav:has(a[href$='/training/themes']) a[href$='/improvementAreas'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/game-practice.svg');
+  --cdc-nav-color: #e25555;
+}
+
+.subnav:has(a[href$='/training/themes']) a[href$='/strengths'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/training.svg');
+  --cdc-nav-color: #8a6fd8;
+}
+
+.subnav:has(a[href$='/training/themes']) a[href$='/training/history'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/board-archive.svg');
+  --cdc-nav-color: #f7c631;
+}
+
+.subnav:has(a[href$='/training/themes']) a[href*='/training/of-player'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/magnifier-analysis.svg');
+  --cdc-nav-color: #26c2a3;
+}

@@ -69,6 +69,141 @@ h3 {
   display: none !important;
 }
 
+/* The community menu (leaderboard, rating stats, bots…), the broadcasts'
+ * (also the FIDE pages'), the puzzles' and the account settings': each link gets Chess.com's color
+ * icon (or one of Lichess's 3D emoji) on a tile tinted in its own color, which hops on hover. Each page's
+ * CSS sets `--cdc-nav-icon` and `--cdc-nav-color` per link, told apart by
+ * how the hrefs end, as Lichess localizes them. */
+.subnav:has(a[href$='/player/bots'], a[href$='/broadcast/calendar'], a[href$='/training/themes'], a[href$='/account/kid']) a {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 14px 7px 8px !important;
+}
+
+.subnav:has(a[href$='/player/bots'], a[href$='/broadcast/calendar'], a[href$='/training/themes'], a[href$='/account/kid']) a::before {
+  content: '';
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background:
+    var(--cdc-nav-icon, none) center / 24px 24px no-repeat,
+    color-mix(in srgb, var(--cdc-nav-color, #fff) 16%, transparent);
+  box-shadow: inset 0 1px #ffffff14;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s;
+}
+
+.subnav:has(a[href$='/player/bots'], a[href$='/broadcast/calendar'], a[href$='/training/themes'], a[href$='/account/kid']) a:hover::before {
+  transform: translateY(-2px) rotate(-8deg) scale(1.08);
+}
+
+.subnav:has(a[href$='/player/bots'], a[href$='/broadcast/calendar'], a[href$='/training/themes'], a[href$='/account/kid']) a.active::before {
+  background-color: color-mix(in srgb, var(--cdc-nav-color, #fff) 32%, transparent);
+  box-shadow: inset 0 1px #ffffff26, 0 0 0 1px color-mix(in srgb, var(--cdc-nav-color, #fff) 45%, transparent);
+}
+
+/* The account settings' menu has no Chess.com icon to borrow (a bell, a
+ * key, a lock…): Lichess's own 3D emoji instead. */
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/profile'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.memo.webp');
+  --cdc-nav-color: #1baaf0;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/display'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/activity.artist-palette.webp');
+  --cdc-nav-color: #fa742c;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/chess-clock'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.stopwatch.webp');
+  --cdc-nav-color: #f7c631;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/game-behavior'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/activity.joystick.webp');
+  --cdc-nav-color: #8a6fd8;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/privacy'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/smileys.see-no-evil-monkey.webp');
+  --cdc-nav-color: #c8915b;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/notification'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.bell.webp');
+  --cdc-nav-color: #f7c631;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/kid'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.teddy-bear.webp');
+  --cdc-nav-color: #e27ba8;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/username'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/symbols.name-badge.webp');
+  --cdc-nav-color: #e25555;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/coach/edit'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/people.teacher.webp');
+  --cdc-nav-color: #26c2a3;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/passwd'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.key.webp');
+  --cdc-nav-color: #f7c631;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/email'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.incoming-envelope.webp');
+  --cdc-nav-color: #1baaf0;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/twofactor'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.mobile-phone-with-arrow.webp');
+  --cdc-nav-color: #26c2a3;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/oauth/token'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/activity.admission-tickets.webp');
+  --cdc-nav-color: #8a6fd8;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/security'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.shield.webp');
+  --cdc-nav-color: #81b64c;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/network'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.satellite-antenna.webp');
+  --cdc-nav-color: #1baaf0;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/dgt'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/activity.chess.webp');
+  --cdc-nav-color: #9aa3ad;
+}
+
+.subnav:has(a[href$='/account/kid']) a[href$='/account/close'] {
+  --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.door.webp');
+  --cdc-nav-color: #e25555;
+}
+
+/* Lichess's separators are blank gaps: a faint rule instead. */
+.subnav:has(a[href$='/player/bots'], a[href$='/broadcast/calendar'], a[href$='/training/themes'], a[href$='/account/kid']) .sep {
+  height: 1px;
+  margin: 8px 14px !important;
+  background: var(--cdc-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .subnav:has(a[href$='/player/bots'], a[href$='/broadcast/calendar'], a[href$='/training/themes'], a[href$='/account/kid']) a::before {
+    transition: none;
+  }
+}
+
 /* ----------------------------------------------------------------- tabs --- */
 
 .tabs-horiz {
