@@ -504,7 +504,7 @@ main.swiss .schedule-next-round input {
 
   main.swiss .swiss__main {
     align-self: start;
-    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
     margin-inline: -12px;
     padding: 0 12px 16px;
     overflow-y: auto;
@@ -515,7 +515,7 @@ main.swiss .schedule-next-round input {
   }
 
   main.swiss :is(.swiss__table, .swiss__stats) {
-    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
     overflow-y: auto !important;
     scrollbar-width: thin;
   }

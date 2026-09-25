@@ -92,7 +92,7 @@ main.analyse .practice-box > .title {
        A small board (a narrow window) squeezed the panel until the drill's
        "your turn" box or the chapter list fell out of it: the panel then
        takes up to 660px of the window's height, below the board's end. */
-    height: max(var(--cdc-board), min(100vh - var(--cdc-v-room, 56px), 660px));
+    height: max(var(--cdc-board), min(100dvh - var(--cdc-v-room, 56px), 660px));
     row-gap: 10px !important;
     grid-template-rows: minmax(0, 1fr) auto !important;
     grid-template-areas:

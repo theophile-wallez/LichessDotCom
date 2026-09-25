@@ -831,7 +831,7 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
     position: sticky;
     top: 12px;
     align-self: start;
-    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
     margin: -4px;
     padding: 4px;
     overflow-y: auto;

@@ -97,7 +97,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/motion.js` | Page world, first: motion is never reduced. Reduced-motion queries answer as if the user asked for nothing, in `matchMedia` and in Lichess's sheets (each one loaded again with CORS, its rules rewritten, the original switched off). |
 | `src/page.js` | Page world: wraps `site.sound` to play the right Chess.com sound per move, plus premove / illegal / game-start, which Lichess has no sound for. |
 | `src/board.js` | Page world: every main board's shapes redrawn Chess.com-style (right-clicked squares filled, arrows), checkmate badge and label. |
-| `src/review.js` | Page world: Game Review (engine, classification, panel, the coach's comment per move: how the evaluation moved plus one fact from the board and the engine, its pieces drawn as Neo pieces and its moves as chips, typed out word by word, board overlays, eval bar), and Chess.com's game rating under the summary's counts: the rating each side played at and a verdict per phase (opening, tactics, strategy, endgame, by Lichess's own divider), from `RATING_MODEL`. On the free analysis board (`/analysis`) the same coach judges each move as it's played, variations included, with the badges on the board and in Lichess's move list, and, signed in, the opening's name (from the masters explorer) over the move list. |
+| `src/review.js` | Page world: Game Review (engine, classification, panel, the coach's comment per move: how the evaluation moved plus one fact from the board and the engine, its pieces drawn as Neo pieces and its moves as chips, typed out word by word, board overlays, eval bar), and Chess.com's game rating under the summary's counts: the rating each side played at and a verdict per phase (opening, tactics, strategy, endgame, by Lichess's own divider), from `RATING_MODEL`. A move played off the game shows in the review's move list as a variation (Lichess's comments and computer lines stay hidden) and is judged like the game's, badge, best-move arrow and eval bar included. On the free analysis board (`/analysis`) the same coach judges each move as it's played, variations included, with the badges on the board and in Lichess's move list, and, signed in, the opening's name (from the masters explorer) over the move list. |
 | `src/styles/theme.css` | Overrides Lichess's `--c-*` color variables, fonts, buttons. |
 | `src/styles/sidebar.css` | Lichess's top header → Chess.com's left sidebar, and the user menu (dasher) as a Chess.com menu. |
 | `src/styles/board.css` | Board, pieces, highlights, move hints, arrows, coordinates, and Lichess's eval bar drawn like the Game Review's. |
@@ -306,6 +306,15 @@ coaches' rig is traced by a script that only runs when a portrait changes.
   the window's right edge, their ranks under the sidebar. Cap the board's
   column by what the sidebar leaves (`100vw - var(--cdc-sidebar-w)`, the
   page's margins, the side panel) and give the ranks their gutter.
+- **The board's resize handle.** `cg-resize` sets `---zoom` (0–100) on
+  `body`, which Lichess's CSS turns into `---board-scale` (25% to 100%) and
+  saves as a pref. That pref may date from Lichess's layout (it made boards
+  tiny), so ours ignore it: the board takes all the room it's given until
+  dragged, and `content.js` keeps the dragged size under `cdc-board-zoom`,
+  as `--cdc-zoom`. A layout that sizes its own board multiplies by
+  `var(--cdc-board-scale, 1)` (board.css), or the handle does nothing. And size it
+  with `dvh`, not `vh`: on a Meta Quest or a phone `100vh` is taller than
+  what the browser shows, and the board ran off the bottom.
 - **Pinned titles.** A sticky title widened by negative inline margins, to
   cover the cards' shadows passing under it, runs past the window at 1024px,
   where the page's gutter is only ~10px. Widen it with side box-shadows in
