@@ -107,14 +107,15 @@ html[dir='rtl'] :is(.relay-index, .relay-calendar) .box__top .search input {
 
 /* ------------------------------------------------------------ grid --- */
 
+/* Never wider than the list, however narrow the screen. */
 .relay-cards {
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)) !important;
   gap: 14px !important;
   margin-bottom: 14px !important;
 }
 
 .relay-cards--tier-best {
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)) !important;
+  grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr)) !important;
 }
 
 /* ------------------------------------------------------------ card --- */
@@ -292,4 +293,92 @@ html[dir='rtl'] :is(.relay-index, .relay-calendar) .box__top .search input {
   :is(.relay-index, .relay-calendar) .page-menu__content.box {
     padding: 0 12px 24px !important;
   }
+}
+
+/* ---------------------------------------------------------- pinned --- */
+
+/* Only the lists scroll: the side menu (the FIDE pages and the broadcast
+ * help share it) and the title with the search stay in view, the title on
+ * the page's color, casting a soft shadow on the cards only once it's stuck.
+ * Desktop only: below that, Lichess's fixed top bar would cover them. */
+@media (min-width: 1020px) {
+  main.page-menu > .subnav:has(a[href$='/broadcast/calendar']) {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+  }
+
+  /* Wider than the grid by side shadows, to cover the cards' own shadows
+   * passing under it. */
+  :is(.relay-index, .relay-calendar) .page-menu__content.box > .box__top {
+    container-type: scroll-state;
+    position: sticky;
+    z-index: 3;
+    top: 0;
+    background: var(--cdc-bg-page);
+    box-shadow: -12px 0 var(--cdc-bg-page), 12px 0 var(--cdc-bg-page);
+  }
+
+  :is(.relay-index, .relay-calendar) .page-menu__content.box > .box__top::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-page), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    :is(.relay-index, .relay-calendar) .page-menu__content.box > .box__top::after {
+      opacity: 1;
+    }
+  }
+}
+
+/* ------------------------------------------------------- tour page --- */
+
+/* A broadcast's own page (overview, boards, players, teams) is an analysis
+ * page without a board: its two parts, the tour and the side (round list,
+ * chat), are areas the analysis layout (analysis.css) doesn't have, and it
+ * scrolls. So it gets Lichess's two columns back, fluid beside the sidebar
+ * (Lichess's own widths count the whole window), and the page scrolls. */
+@media (min-width: 1020px) {
+  html:has(main.analyse.has-relay-tour) {
+    overflow: visible !important;
+  }
+
+  html:has(main.analyse.has-relay-tour) body {
+    height: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  main.analyse.is-relay.has-relay-tour {
+    grid-template-columns: minmax(0, 1fr) var(---block-gap, 15px) minmax(250px, 350px) !important;
+    grid-template-rows: auto !important;
+    grid-template-areas: 'relay-tour . side' !important;
+    justify-content: stretch !important;
+    margin-top: 0 !important;
+  }
+}
+
+@media (min-width: 1260px) {
+  main.analyse.is-relay.has-relay-tour {
+    grid-template-columns: minmax(250px, 350px) var(---block-gap, 15px) minmax(0, 1fr) !important;
+    grid-template-areas: 'side . relay-tour' !important;
+  }
+}
+
+/* The round's games beside it: the one under the pointer or on the board
+ * is a lighter row, its green kept for the edge and the number, as on a
+ * round's page (analysis.css). Lichess tinted the whole row green. */
+main.analyse.has-relay-tour .relay-tour__side .relay-game:hover {
+  background: #ffffff0f !important;
+}
+
+main.analyse.has-relay-tour .relay-tour__side .relay-game--current {
+  background: #ffffff14 !important;
 }

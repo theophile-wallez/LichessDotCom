@@ -19,9 +19,12 @@
   box-shadow: none !important;
 }
 
+/* The "about bots" pill wraps under the title when both don't fit (a long
+ * title in some languages), rather than widening the page. */
 .bots__categ > .box__top {
-  flex-wrap: nowrap !important;
+  flex-wrap: wrap !important;
   align-items: center !important;
+  gap: 8px 16px !important;
   margin: 0 !important;
   padding: 16px 0 4px !important;
 }
@@ -303,11 +306,11 @@
     z-index: 3;
     top: 0;
     /* A bit wider than the grid, to cover the shadows of the cards passing
-     * under it. */
-    margin-inline: -12px !important;
-    padding-inline: 12px !important;
+     * under it: by side shadows, which unlike margins don't widen the page
+     * past a narrow window. */
     padding-bottom: 14px !important;
     background: var(--cdc-bg-page);
+    box-shadow: -12px 0 var(--cdc-bg-page), 12px 0 var(--cdc-bg-page);
   }
 
   .bots__categ > .box__top::after {
@@ -326,5 +329,17 @@
     .bots__categ > .box__top::after {
       opacity: 1;
     }
+  }
+}
+
+/* Lichess's mobile layout runs the page edge to edge: keep the titles and
+ * the cards off the screen's sides, as on the leaderboards. */
+@media (max-width: 799.98px) {
+  .bots.page-menu__content {
+    min-width: 0;
+  }
+
+  .bots__categ.box {
+    padding-inline: 12px !important;
   }
 }

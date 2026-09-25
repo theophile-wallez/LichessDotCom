@@ -130,7 +130,7 @@ main.simul-list .slist thead:has(+ tbody:not(:last-child) > tr:first-child:not(.
 
 main.simul-list .slist tbody {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(270px, 100%), 1fr));
   gap: 14px;
   margin: 16px 0 36px;
 }
@@ -486,10 +486,10 @@ main.simul-list .simul-list__help > em ~ p:nth-of-type(4) { --cdc-rule: #f5a93b;
     z-index: 3;
     top: 0;
     /* A bit wider than the list, to also cover the section markers' halos
-     * and the shadows of the cards passing under it. */
-    margin-inline: -12px !important;
-    padding-inline: 12px !important;
+     * and the shadows of the cards passing under it: by side shadows, which
+     * unlike margins don't widen the page past a narrow window. */
     background: var(--cdc-bg-page);
+    box-shadow: -12px 0 var(--cdc-bg-page), 12px 0 var(--cdc-bg-page);
   }
 
   main.simul-list h1.box__top::after {

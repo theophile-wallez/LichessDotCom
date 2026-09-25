@@ -15,11 +15,13 @@
   box-shadow: none !important;
 }
 
+/* One row on desktop, a fixed height the pinned column pills sit under (see
+ * "pinned"). Below that the search wraps under the title, as Lichess's does:
+ * one row would widen the page. */
 .fide-players > .box__top {
-  flex-wrap: nowrap !important;
   align-items: center !important;
+  gap: 10px 16px;
   box-sizing: border-box;
-  height: 84px;
   margin: 0 !important;
   padding: 0 !important;
 }
@@ -49,7 +51,6 @@
 }
 
 .fide-players__search-form__input {
-  width: 260px;
   height: 40px;
   box-sizing: border-box;
 }
@@ -60,6 +61,13 @@
 }
 
 /* ----------------------------------------------------------- table --- */
+
+/* A federation's page lists the same rows, which are cards in the box's own
+ * color: off the box, on the page's color, as on the list. */
+.fide-federation.page-menu__content.box {
+  background: transparent !important;
+  box-shadow: none !important;
+}
 
 .fide-players-table.slist {
   border: none !important;
@@ -79,7 +87,6 @@
 .fide-players-table thead th {
   padding: 0 10px 8px !important;
   border: none !important;
-  background: var(--cdc-bg-page);
   color: var(--cdc-text-dim) !important;
   font-size: 13px !important;
   font-weight: 700;
@@ -88,13 +95,21 @@
   vertical-align: bottom;
 }
 
-.fide-players-table thead th:first-child {
+/* The column layout is the FIDE list's and a federation's (name, the three
+ * ratings, age): a broadcast's players tab (in .relay-tour) reuses the
+ * table with other columns (pin, rank, player, rating, score, games), and
+ * keeps Lichess's there. */
+:is(.fide-players, .fide-federation) .fide-players-table thead th {
+  background: var(--cdc-bg-page);
+}
+
+:is(.fide-players, .fide-federation) .fide-players-table thead th:first-child {
   padding-inline-start: 0 !important;
   text-align: start;
 }
 
-.fide-players-table thead th:not(:first-child),
-.fide-players-table td:not(:first-child) {
+:is(.fide-players, .fide-federation) .fide-players-table thead th:not(:first-child),
+:is(.fide-players, .fide-federation) .fide-players-table td:not(:first-child) {
   width: 1%;
   text-align: center !important;
 }
@@ -127,22 +142,22 @@
 /* Each rating's time-control icon, in its color. Chess.com has no classical
  * clock: it gets rapid's, in the rating chart's classical color, so the two
  * columns side by side still read apart. */
-.fide-players-table thead th:is(:nth-child(2), :nth-child(3), :nth-child(4)) {
+:is(.fide-players, .fide-federation) .fide-players-table thead th:is(:nth-child(2), :nth-child(3), :nth-child(4)) {
   --cdc-mode-icon: var(--cdc-mode-rapid);
   --cdc-mode-color: #2dd4bf;
 }
 
-.fide-players-table thead th:nth-child(3) {
+:is(.fide-players, .fide-federation) .fide-players-table thead th:nth-child(3) {
   --cdc-mode-color: #81b64c;
 }
 
-.fide-players-table thead th:nth-child(4) {
+:is(.fide-players, .fide-federation) .fide-players-table thead th:nth-child(4) {
   --cdc-mode-icon: var(--cdc-mode-blitz);
   --cdc-mode-color: #fad541;
 }
 
-.fide-players-table thead th:is(:nth-child(2), :nth-child(3), :nth-child(4)) > :is(a, span)::before,
-.fide-players-table:not(.fide-players-table--sortable) thead th:is(:nth-child(2), :nth-child(3), :nth-child(4))::before {
+:is(.fide-players, .fide-federation) .fide-players-table thead th:is(:nth-child(2), :nth-child(3), :nth-child(4)) > :is(a, span)::before,
+:is(.fide-players, .fide-federation) .fide-players-table:not(.fide-players-table--sortable) thead th:is(:nth-child(2), :nth-child(3), :nth-child(4))::before {
   content: '';
   flex: none;
   display: inline-block;
@@ -154,7 +169,7 @@
   vertical-align: -2px;
 }
 
-.fide-players-table:not(.fide-players-table--sortable) thead th::before {
+:is(.fide-players, .fide-federation) .fide-players-table:not(.fide-players-table--sortable) thead th::before {
   margin-inline-end: 6px;
 }
 
@@ -353,21 +368,43 @@ html:not([data-cdc-fide-skip]) .fide-players-table tbody tr.paginated:nth-child(
     overflow: visible !important;
   }
 
+  /* So the table, which no longer scrolls sideways, always fits: the name
+   * takes what the ratings leave and a long one ends in "…", rather than
+   * widening the page past the window (and under the sidebar). */
+  :is(.fide-players, .fide-federation) .fide-players-table .player-intro__info {
+    flex: 1 1 0;
+    width: 0;
+  }
+
+  :is(.fide-players, .fide-federation) .fide-players-table .player-intro__fed {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .fide-players > .box__top {
+    flex-wrap: nowrap !important;
     position: sticky;
     z-index: 3;
     top: 0;
+    height: 84px;
     background: var(--cdc-bg-page);
   }
 
-  .fide-players-table thead th {
+  .fide-players__search-form__input {
+    width: 260px;
+  }
+
+  /* The list's own table only: a federation's keeps Lichess's scrolling
+   * wrapper, which would hold the pills 84px down, over the rows. */
+  .fide-players .fide-players-table thead th {
     container-type: scroll-state;
     position: sticky;
     z-index: 2;
     top: 84px;
   }
 
-  .fide-players-table thead th::after {
+  .fide-players .fide-players-table thead th::after {
     content: '';
     position: absolute;
     top: 100%;
@@ -380,8 +417,51 @@ html:not([data-cdc-fide-skip]) .fide-players-table tbody tr.paginated:nth-child(
   }
 
   @container scroll-state(stuck: top) {
-    .fide-players-table thead th::after {
+    .fide-players .fide-players-table thead th::after {
       opacity: 1;
     }
+  }
+}
+
+/* The narrowest desktops: beside the sidebar and the side menu, tighter
+ * pills, cells and photos leave the names their room. */
+@media (min-width: 1020px) and (max-width: 1199.98px) {
+  :is(.fide-players, .fide-federation) .fide-players-table thead th {
+    padding-inline: 6px !important;
+  }
+
+  :is(.fide-players, .fide-federation) .fide-players-table thead th > a {
+    gap: 5px;
+    padding-inline: 9px;
+  }
+
+  :is(.fide-players, .fide-federation) .fide-players-table tbody tr.paginated > td:not(:first-child) {
+    padding-inline: 6px !important;
+  }
+
+  :is(.fide-players, .fide-federation) .fide-players-table tbody tr.paginated > td:last-child {
+    padding-inline-end: 12px !important;
+  }
+
+  :is(.fide-players, .fide-federation) .fide-players-table .fide-players__photo {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  /* A federation's rank cards, three across: at Lichess's big size, a
+   * "Classical" in capitals runs out of its card. */
+  .fide-federation__cards {
+    font-size: 1.5em !important;
+  }
+}
+
+/* Lichess's mobile layout runs the page edge to edge: keep the title and
+ * the rows off the screen's sides, as on the leaderboards. Its table
+ * wrapper is as wide as 100vw, scrollbar included, which would widen the
+ * page's one column: no minimum, and the table scrolls inside it. */
+@media (max-width: 799.98px) {
+  .fide-players.page-menu__content.box {
+    min-width: 0;
+    padding: 12px 12px 32px !important;
   }
 }

@@ -1108,6 +1108,21 @@ input.range::-webkit-slider-thumb {
   background: #ffffff0d !important;
 }
 
+/* Only the content scrolls: the side column (links, winners, the coming
+ * tournaments) stays in view beside the schedule and the lists, scrolling
+ * in place as it's taller than the window, rather than leaving the page a
+ * long empty end. Desktop only: below that it goes under the lists. */
+@media (min-width: 1020px) {
+  main.tour-home > .tour-home__side {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}
+
 .tour-chart__inner {
   border-top: none !important;
   scrollbar-width: thin;
@@ -1126,13 +1141,14 @@ input.range::-webkit-slider-thumb {
   font-weight: 800;
 }
 
-/* Tournament tiles: dark cards tinted by their kind, with a colored edge and
- * icon, instead of Lichess's saturated blocks and grain texture. */
+/* Tournament tiles: dark cards, their kind's color on an edge and the icon
+ * (a card is never filled with a color), instead of Lichess's saturated
+ * blocks and grain texture. */
 .tsht {
   --cdc-tsht: #6f6d6a;
   border-inline-start: 3px solid var(--cdc-tsht) !important;
   border-radius: 8px !important;
-  background: color-mix(in srgb, var(--cdc-tsht) 26%, var(--cdc-bg-panel)) !important;
+  background: var(--cdc-bg-raised) !important;
   background-image: none !important;
   box-shadow: none !important;
   letter-spacing: normal !important;
@@ -1141,7 +1157,7 @@ input.range::-webkit-slider-thumb {
 }
 
 .tsht:hover {
-  background: color-mix(in srgb, var(--cdc-tsht) 38%, var(--cdc-bg-panel)) !important;
+  background: var(--cdc-bg-raised-hover) !important;
   filter: none !important;
 }
 
@@ -1204,6 +1220,65 @@ input.range::-webkit-slider-thumb {
 
 .tsht-user-created {
   --cdc-tsht: #5d9948;
+}
+
+/* The tournament calendar (/tournament/calendar) draws the same tournaments
+ * as bars: the same tiles. Its dates hang left of the box, in Lichess's page
+ * margin, where the sidebar sits: the calendar leaves them room. */
+@media (min-width: 1020px) {
+  #tournament-calendar {
+    padding-inline-start: 58px;
+  }
+}
+
+#tournament-calendar .tournament {
+  --cdc-tsht: #6f6d6a;
+  border-inline-start: 3px solid var(--cdc-tsht);
+  border-radius: 6px !important;
+  background: var(--cdc-bg-raised) !important;
+  box-shadow: none !important;
+  color: #fff !important;
+  font-weight: 700;
+  letter-spacing: normal !important;
+  text-shadow: none !important;
+  transition: background-color 0.15s;
+}
+
+#tournament-calendar .tournament:hover {
+  background: var(--cdc-bg-raised-hover) !important;
+}
+
+#tournament-calendar .tournament .icon {
+  color: color-mix(in srgb, var(--cdc-tsht) 70%, #fff);
+}
+
+#tournament-calendar .tournament .icon::before {
+  --cdc-mode-color: currentColor;
+}
+
+#tournament-calendar .tournament.weekly {
+  --cdc-tsht: #e58f2a;
+}
+
+#tournament-calendar .tournament.monthly {
+  --cdc-tsht: #e0513a;
+}
+
+#tournament-calendar .tournament:is(.yearly, .weekend, .unique) {
+  --cdc-tsht: #e3aa24;
+}
+
+#tournament-calendar .tournament.marathon {
+  --cdc-tsht: #9b7fd8;
+}
+
+#tournament-calendar .tournament.shield {
+  --cdc-tsht: #7f9aa8;
+}
+
+#tournament-calendar date {
+  color: var(--cdc-text-dim);
+  font-weight: 700;
 }
 
 /* Tournament lists: no spaced-out names. */
