@@ -244,6 +244,20 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   `bits.dropdownOverflow` decides how many action buttons fit by adding them
   until `.user-actions`'s `offsetWidth` grows, so **don't change that element's
   flex sizing** — only what's inside it.
+- **A box made transparent still clips.** Lichess's `.box` (and boxes like
+  `.lobby__side`) carry `overflow: hidden` for their rounded corners. Once our
+  CSS drops their background, that clip cuts what the cards inside draw past
+  their edges — hover shadows, focus rings, dot halos — and it makes the box
+  the scroll container of any `position: sticky` inside it, which then never
+  sticks. Add `overflow: visible !important` with the transparent background.
+  Then check for a closed `.mselect__list`: hidden but still laid out, it can
+  widen the page once nothing clips it (anchor it with `inset-inline: auto 0`).
+- **A page that must not scroll.** Lichess's hidden hover cards (`#powerTip`,
+  `#miniGame`) sit at the document's end and leave about 40px to scroll, so a
+  layout that fits the window still needs `html, body { overflow: hidden }`
+  (as `game.css` and `swiss-show.css` do), with every column scrolling in
+  place. A `sticky` title can't leave its parent: to pin it over more than
+  its card, make the card `display: contents` and draw it from its pieces.
 
 ## Testing
 
