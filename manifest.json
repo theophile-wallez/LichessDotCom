@@ -53,7 +53,7 @@
         "src/styles/forum.css",
         "src/styles/patron.css"
       ],
-      "js": ["src/content.js", "src/dashboard.js", "src/ratingchart.js"],
+      "js": ["src/content.js", "src/dashboard.js", "src/ratingchart.js", "lib/lottie_light.min.js", "src/coach-lottie.js", "src/coach.js"],
       "run_at": "document_start"
     },
     {

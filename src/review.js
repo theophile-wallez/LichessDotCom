@@ -72,30 +72,47 @@
     coach = 1 + Math.floor(Math.random() * COACHES);
     localStorage.setItem('cdc-coach', coach);
   }
-  // The coach blinks, and its face shows the verdict (review.css): a mood
-  // per class. The face eases into it once per move, not again when the same
-  // move is re-rendered (Explain, a new coach). `at` names the move: its
-  // ply, or its path.
+  // The coach's face shows the verdict: a mood per class, played by
+  // coach.js (the isolated world, where the extension's files are in reach)
+  // with the rig of coach-lottie.js, which also has the coach talk while the
+  // comment types out. Its marks over the head (review.css) pop up once per
+  // move, not again when the same move is re-rendered (Explain, a new
+  // coach). `at` names the move: its ply, or its path.
   const MOODS = {
-    brilliant: 'delight', great: 'delight', best: 'happy', excellent: 'happy', good: 'calm', book: 'calm',
+    brilliant: 'delight', great: 'delight', best: 'happy', excellent: 'happy',
     inaccuracy: 'doubt', mistake: 'worry', miss: 'worry', blunder: 'shock',
   };
-  // Under the lids, the brows and mouth the expressions move, each over a
-  // patch of skin that hides it where it was.
-  const FACE = ['patch', 'part']
-    .flatMap(k => ['brow-l', 'brow-r', 'mouth'].map(f => `<i class="cdc-coach__${k} cdc-coach__${k}--${f}"></i>`))
-    .concat(['l', 'r'].map(s => `<i class="cdc-coach__lid cdc-coach__lid--${s}"></i>`))
-    .join('');
   let reacted = '';
   const coachAvatar = (cls, at) => {
     const mood = MOODS[cls] || '';
     const key = mood && `${at}|${cls}`;
     const react = key && key !== reacted;
     reacted = key;
-    // The panel is re-rendered often (every percent of the analysis): start
-    // the idle loops where the clock is, so a render doesn't reset a blink.
-    const style = `--cdc-idle:${(-(performance.now() / 1000) % 7).toFixed(2)}s${mood ? `;--cdc-mood-c:${CLS[cls].color}` : ''}`;
-    return `<button class="cdc-coach__avatar${react ? ' cdc-coach__avatar--react' : ''}" data-cdc="coach" data-coach="${coach}"${mood ? ` data-mood="${mood}"` : ''} style="${style}" title="${esc(T.coach)}" aria-label="${esc(T.coach)}"><span class="cdc-coach__face">${FACE}</span></button>`;
+    return `<button class="cdc-coach__avatar${react ? ' cdc-coach__avatar--react' : ''}" data-cdc="coach" data-coach="${coach}" data-mood="${mood || 'neutral'}"${mood ? ` style="--cdc-mood-c:${CLS[cls].color}"` : ''} title="${esc(T.coach)}" aria-label="${esc(T.coach)}"><span class="cdc-coach__face"></span></button>`;
+  };
+  // The panel is re-rendered on every change (every percent of the analysis
+  // even), but the coach is one element, kept: a new render only hands it
+  // the new mood, so its animation carries on instead of starting over.
+  let avatar = null;
+  function keepAvatar() {
+    const fresh = dom.panel.querySelector('.cdc-coach__avatar');
+    if (!fresh) return;
+    if (avatar && avatar !== fresh) {
+      for (const a of ['data-coach', 'data-mood', 'style'])
+        if (fresh.hasAttribute(a)) avatar.setAttribute(a, fresh.getAttribute(a));
+        else avatar.removeAttribute(a);
+      avatar.classList.remove('cdc-coach__avatar--react');
+      if (fresh.classList.contains('cdc-coach__avatar--react')) {
+        void avatar.offsetWidth; // restart the marks' animation
+        avatar.classList.add('cdc-coach__avatar--react');
+      }
+      fresh.replaceWith(avatar);
+    } else avatar = fresh;
+    tellCoach();
+  }
+  const tellCoach = () => {
+    if (avatar?.isConnected)
+      window.postMessage({ cdc: 'coach', coach: +avatar.dataset.coach, mood: avatar.dataset.mood, talking: !!stream.timer }, '*');
   };
 
   // key, color, label, sentence ({m} = move), in Chess.com's summary order.
@@ -1035,7 +1052,10 @@
       // The words typed so far, without it: the ones still on show.
       if (stream.shown !== Infinity) stream.shown = sub.querySelectorAll('.cdc-w:not(.cdc-w--off)').length;
     }
-    if (stream.shown < sub.querySelectorAll('.cdc-w').length && !stream.timer) stream.timer = setInterval(tickStream, 35);
+    if (stream.shown < sub.querySelectorAll('.cdc-w').length && !stream.timer) {
+      stream.timer = setInterval(tickStream, 35);
+      tellCoach();
+    }
   }
 
   function tickStream() {
@@ -1045,6 +1065,7 @@
     if (stream.shown >= words.length) {
       clearInterval(stream.timer);
       stream.timer = 0;
+      tellCoach();
     }
   }
 
@@ -1466,6 +1487,7 @@
       else if (state.mode === 'moves') renderMoves(ctrl);
       else if (state.mode === 'live') renderLive(ctrl);
       else renderNormal(ctrl);
+      keepAvatar();
       startStream();
       fitBubble();
     }
@@ -1493,6 +1515,7 @@
       coach = (coach % COACHES) + 1;
       localStorage.setItem('cdc-coach', coach);
       btn.dataset.coach = coach;
+      tellCoach();
       // Each coach words the remarks their own way.
       if (state.mode === 'moves' || state.mode === 'live') render(true);
       return;
