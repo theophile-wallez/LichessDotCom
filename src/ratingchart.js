@@ -4,7 +4,8 @@
 // Lichess draws it with Chart.js into a <canvas>, with a noUiSlider under it:
 // a bitmap, so CSS can't touch its colors or curves. The ratings it charts are
 // the page module's JSON (`{data: [{name, points: [[y, m, d, rating], …]}, …]}`,
-// plus `singlePerfName` on a stats page), so read those and draw our own chart
+// plus `singlePerfName` on a stats page, which passes it inline in its
+// loadEsm call rather than in #page-init-data), so read those and draw our own chart
 // in SVG instead, like dashboard.js does for the puzzle radar: smooth curves
 // over a gradient, a guide line and a tooltip on hover, range pills, and one
 // chip per rating (its current value and the change over the range; a click
@@ -412,6 +413,36 @@
     if (initData) initObserver.disconnect();
   });
 
+  // A stats page hands the module its data in the call itself instead:
+  // loadEsm('chart.ratingHistory',{init:{data:[…],singlePerfName:'Blitz'}}),
+  // a JS object around a JSON array. The script stays in the page.
+  const inlineInit = () => {
+    for (const script of document.querySelectorAll('script:not([src])')) {
+      const text = script.textContent;
+      const at = text.indexOf("'chart.ratingHistory'");
+      const key = at < 0 ? -1 : text.indexOf('data:', at);
+      const open = key < 0 ? -1 : text.indexOf('[', key);
+      if (open < 0) continue;
+      // The array ends at its matching bracket; the names are strings.
+      let depth = 0, str = false, end = -1;
+      for (let k = open; k < text.length && end < 0; k++) {
+        const c = text[k];
+        if (str) {
+          if (c === '\\') k++;
+          else if (c === '"') str = false;
+        } else if (c === '"') str = true;
+        else if (c === '[') depth++;
+        else if (c === ']' && !--depth) end = k;
+      }
+      try {
+        const data = JSON.parse(text.slice(open, end + 1));
+        const name = /singlePerfName:\s*'((?:[^'\\]|\\.)*)'/.exec(text.slice(end))?.[1];
+        return { data, singlePerfName: name?.replace(/\\(.)/g, '$1') };
+      } catch {}
+    }
+    return null;
+  };
+
   const boot = () => {
     initObserver.disconnect();
     // The outer container is the card; Lichess's own chart is the inner one.
@@ -421,7 +452,14 @@
       json = host && initData ? JSON.parse(initData.textContent) : null;
     } catch {}
     initData = null;
-    const series = json && parseSeries(json);
+    let series = json && parseSeries(json);
+    if (host && !series?.length) {
+      const inline = inlineInit();
+      series = inline && parseSeries(inline);
+    }
+    // Nothing to draw (a rating never played): Lichess hides its chart but
+    // keeps its box, an empty gap the chart's height. Ours drops the box.
+    if (series?.length === 0) host.classList.add('cdc-rchart-none');
     if (!series?.length || host.querySelector('.cdc-rchart')) return;
     mount(host, series);
   };

@@ -153,11 +153,13 @@
 }
 
 /* The country keeps to one line next to the name, whatever the name's length:
-   Lichess wraps it (flex-flow: row wrap) under its own flag instead. */
+   Lichess wraps it (flex-flow: row wrap) under its own flag instead. Short of
+   room, the country's name gives way first, down to its flag, and only then
+   the player's name. */
 #powerTip .upt__info__top__flag {
-  flex: 0 1 auto;
+  flex: 0 1000 auto;
   flex-wrap: nowrap;
-  min-width: 0;
+  min-width: 18px;
   margin: 0 !important;
   color: var(--cdc-text-dim) !important;
   font-size: 12px !important;

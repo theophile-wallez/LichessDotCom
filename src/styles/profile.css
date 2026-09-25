@@ -84,15 +84,28 @@
   }
 }
 
-/* Lichess runs the mobile layout edge to edge; our cards need a margin. */
+/* Lichess runs the mobile layout edge to edge; our cards need a margin.
+ * Its box clips, which also kept the box from sizing to its widest line:
+ * unclipped (below), a forum post's excerpt in the activity feed, which
+ * never wraps, held the page 400px wider than a phone. */
 @media (max-width: 1019.98px) {
   main.page-menu:has(.user-show) {
     padding: 0 12px 24px;
   }
+
+  main.page-menu > .page-menu__content.user-show {
+    min-width: 0;
+  }
 }
 
-/* The box is only a wrapper now: each block is its own card, spaced apart. */
+/* The box is only a wrapper now: each block is its own card, spaced apart.
+ * It holds the hero's sizes, shared by the header and the social bar, which
+ * lines its counters up with the name. */
 .page-menu__content.box.user-show {
+  --cdc-pf-avatar: 96px;
+  --cdc-pf-pad: 24px;
+  --cdc-pf-gap: 20px;
+
   min-height: 0 !important;
   padding: 0 !important;
   border: none !important;
@@ -106,15 +119,15 @@
 
 /* ------------------------------------------------------------------ hero --- */
 
+/* The name keeps its whole width; the awards take the rest of the row and
+ * wrap onto more lines rather than squeeze it (sixteen trophies cut
+ * "penguingim1" to "penguin" at 1024px). */
 .user-show > .box__top.user-show__header {
-  --cdc-pf-avatar: 96px;
-  --cdc-pf-pad: 24px;
-
   position: relative;
   display: grid !important;
-  grid-template-columns: var(--cdc-pf-avatar) minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 4px 20px;
+  grid-template-columns: var(--cdc-pf-avatar) minmax(0, max-content) minmax(0, 1fr);
+  align-items: start;
+  gap: 4px var(--cdc-pf-gap);
   box-sizing: border-box;
   padding: var(--cdc-pf-pad) var(--cdc-pf-pad) 20px !important;
   border: 1px solid var(--cdc-card-border);
@@ -153,11 +166,15 @@
   background: var(--cdc-green);
 }
 
+/* Level with the avatar's middle, however many rows the awards take. A name
+ * too long for a phone ends in an ellipsis rather than mid-letter. */
 .user-show > .user-show__header h1 {
   grid-column: 2;
-  margin: 0 !important;
+  grid-row: 1;
+  margin: calc((var(--cdc-pf-avatar) - 1.2em) / 2) 0 0 !important;
   font-size: 30px !important;
   line-height: 1.2;
+  text-overflow: ellipsis;
 }
 
 .user-show > .user-show__header h1 .user-link {
@@ -216,6 +233,8 @@
 .user-show > .user-show__header .trophies {
   position: static !important;
   grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
   align-self: start;
   display: flex;
   flex-flow: row wrap;
@@ -315,6 +334,88 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
   text-shadow: 0 0 4px #000 !important;
 }
 
+/* Narrower than the Chess.com layout, the awards get a row of their own
+ * under the name: beside it they left the name no room at all. The avatar
+ * spans both rows, which share its height when they're shorter than it, so
+ * the name and one row of awards sit centered against it. */
+@media (max-width: 1019.98px) {
+  .user-show > .box__top.user-show__header {
+    grid-template-columns: var(--cdc-pf-avatar) minmax(0, 1fr);
+  }
+
+  .user-show > .user-show__header::before {
+    grid-row: 1 / span 2;
+  }
+
+  .user-show > .user-show__header h1 {
+    align-self: end;
+    margin: 0 !important;
+  }
+
+  .user-show > .user-show__header .trophies {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    justify-content: flex-start;
+    max-width: none;
+  }
+}
+
+/* A phone: a smaller avatar, name and award tiles, six of them to a row. */
+@media (max-width: 599.98px) {
+  .page-menu__content.box.user-show {
+    --cdc-pf-avatar: 64px;
+    --cdc-pf-pad: 16px;
+    --cdc-pf-gap: 14px;
+  }
+
+  .user-show > .user-show__header h1 {
+    font-size: 22px !important;
+  }
+
+  .user-show > .user-show__header h1 .utitle {
+    margin-inline-end: 4px;
+    font-size: 12px;
+    vertical-align: 3px;
+  }
+
+  .user-show > .user-show__header h1 .uflair {
+    width: 22px;
+    height: 22px;
+    margin-inline-start: 6px;
+    vertical-align: -3px;
+  }
+
+  .user-show > .user-show__header h1 .line.patron {
+    margin-inline-end: 6px;
+    font-size: 17px;
+  }
+
+  .user-show > .user-show__header .trophies :is(.trophy, .shield-trophy, .combo-trophy) {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 8px;
+    background-size: 22px !important;
+    font-size: 19px !important;
+  }
+
+  .user-show > .user-show__header .trophies :is(.trophy, .shield-trophy, .combo-trophy) img {
+    height: 26px !important;
+    max-width: 30px;
+  }
+
+  .user-show > .user-show__header .trophies :is(.shield-trophy, .revol_trophy) {
+    font-size: 13px !important;
+    line-height: 34px !important;
+  }
+
+  .user-show > .user-show__header:has(.online)::after {
+    width: 18px;
+    height: 18px;
+    border-width: 3px;
+  }
+}
+
 /* --------------------------------------------------- counters and actions --- */
 
 /* The hero's footer bar: the counters indented under the name, the action
@@ -324,11 +425,36 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
 .user-show > .user-show__social {
   gap: 16px !important;
   box-sizing: border-box;
-  padding: 0 20px 18px calc(96px + 44px);
+  padding: 0 20px 18px calc(var(--cdc-pf-pad) + var(--cdc-pf-avatar) + var(--cdc-pf-gap));
   border: 1px solid var(--cdc-card-border);
   border-top: none;
   border-radius: 0 0 14px 14px;
   background: var(--cdc-bg-panel) !important;
+}
+
+/* A phone has no room for the counters and the buttons side by side (the
+ * counters ran under the menu): the counters take the first row, the
+ * actions the next, which Lichess's overflow menu then fills. */
+@media (max-width: 599.98px) {
+  .user-show > .user-show__social {
+    flex-wrap: wrap !important;
+    row-gap: 14px !important;
+    padding-inline: var(--cdc-pf-pad) !important;
+  }
+
+  .user-show > .user-show__social .number-menu {
+    flex: 1 1 100% !important;
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .user-show > .user-show__social .number-menu:empty {
+    display: none;
+  }
+
+  .user-show > .user-show__social .user-actions {
+    justify-content: flex-start !important;
+  }
 }
 
 .user-show > .user-show__social .number-menu {
@@ -425,20 +551,28 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
   opacity: 1;
 }
 
-/* Following someone is the page's call to action, as on the hover card. */
-.user-show > .user-show__social .user-actions .relation-button:not([href*='/unfollow'], [href*='/unblock']) {
+/* Following someone is the page's call to action, as on the hover card.
+ * Only the follow link: Block is a relation button in the same rack, and
+ * must not look like the thing to press. (/rel/ routes aren't localized.) */
+.user-show > .user-show__social .user-actions .relation-button[href*='/rel/follow/'] {
   background: var(--cdc-btn-green) !important;
   box-shadow: var(--cdc-btn-green-shadow) !important;
   color: #fff !important;
   text-shadow: 0 1px 1px #00000033 !important;
 }
 
-.user-show
-  > .user-show__social
-  .user-actions
-  .relation-button:not([href*='/unfollow'], [href*='/unblock']):hover {
+.user-show > .user-show__social .user-actions .relation-button[href*='/rel/follow/']:hover {
   background: var(--cdc-btn-green-hover) !important;
   color: #fff !important;
+}
+
+/* "More ▾" is a link inside a rack button of its own (div.dropdown): only
+ * the link is drawn as a button, or it showed as one button inside another. */
+.user-show > .user-show__social .user-actions .menu-container .dropdown.btn-rack__btn,
+.user-show > .user-show__social .user-actions .menu-container .dropdown.btn-rack__btn:hover {
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
 }
 
 /* "More ▾", and the hamburger it becomes when nothing fits. */
@@ -565,10 +699,11 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
     transform: translateY(-2px);
   }
 
-  /* The page you are on (a perf-stat page): a green ring. */
+  /* The page you are on (a perf-stat page): a green ring on a card that
+   * stays dark, as every card does. */
   .side.sub-ratings a.active {
     border-color: var(--cdc-green) !important;
-    background: #81b64c1f !important;
+    background: var(--cdc-card-hover) !important;
   }
 
   .side.sub-ratings a.empty {
@@ -621,11 +756,16 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
     letter-spacing: -0.02em;
   }
 
-  /* The rating change since yesterday, as Chess.com's arrow and number. */
+  /* The rating change since yesterday, as Chess.com's arrow and number. A
+   * drop in the rating chart's red: Lichess's darker one read at 2.9:1. */
   .side.sub-ratings rating .rp {
     font-size: 12px;
     font-weight: 800;
     vertical-align: 4px;
+  }
+
+  .side.sub-ratings rating bad.rp {
+    color: #ff7769;
   }
 
   .side.sub-ratings rating good.rp:not([data-icon])::before {
@@ -682,6 +822,58 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
     margin-inline-end: 20px;
   }
 
+  /* There, only the stats scroll: the list stays in view beside them,
+   * scrolling in place when it's taller than the window (18 cards for a
+   * player of every variant, which made the page twice as long as its
+   * stats), and the title stays over them. The padding leaves the cards'
+   * hover lift room inside the scroller. */
+  main.page-menu:has(> .perf-stat) > .page-menu__menu {
+    position: sticky;
+    top: 12px;
+    align-self: start;
+    max-height: calc(100vh - 24px);
+    margin: -4px;
+    padding: 4px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  /* The box clipped its corners, which would also stop the title sticking. */
+  main.page-menu > .page-menu__content.perf-stat {
+    overflow: visible !important;
+  }
+
+  main.page-menu > .perf-stat > .box__top {
+    container-type: scroll-state;
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    border-radius: 7px 7px 0 0;
+    background: var(--cdc-bg-panel);
+  }
+
+  main.page-menu > .perf-stat > .box__top::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-panel), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    main.page-menu > .perf-stat > .box__top::after {
+      opacity: 1;
+    }
+  }
+
+  html:has(main.page-menu > .perf-stat) {
+    scroll-padding-top: 110px;
+  }
+
   /* On the profile it is a full-width strip under the hero. */
   main.page-menu:has(.user-show) .side.sub-ratings {
     display: grid !important;
@@ -718,19 +910,20 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
   border: none !important;
 }
 
-/* No chart (an anonymous visitor gets none, nor does a brand-new account):
- * one card, whose stats spread over the width the chart would have taken. */
-.user-show > #us_profile:not(:has(> .rating-history-container)) {
+/* No chart (an anonymous visitor gets none, nor does a brand-new account, and
+ * ratingchart.js drops one with nothing to draw): one card, whose stats
+ * spread over the width the chart would have taken. */
+.user-show > #us_profile:not(:has(> .rating-history-container:not(.cdc-rchart-none))) {
   grid-template-columns: minmax(0, 1fr);
 }
 
-.user-show > #us_profile:not(:has(> .rating-history-container)) .stats {
+.user-show > #us_profile:not(:has(> .rating-history-container:not(.cdc-rchart-none))) .stats {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 9px 24px;
 }
 
-.user-show > #us_profile:not(:has(> .rating-history-container)) .stats > .col2 {
+.user-show > #us_profile:not(:has(> .rating-history-container:not(.cdc-rchart-none))) .stats > .col2 {
   grid-column: 1 / -1;
 }
 
@@ -861,6 +1054,26 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
   margin: 0 !important;
 }
 
+/* Narrower, the chart needs the whole width, so the about card goes under
+ * it, its stats spread as when there is no chart. Side by side, the chart
+ * had 466px at 1024 (its chips on three rows), and 10px on a phone, where
+ * the fixed about column also pushed the page wider than the window. */
+@media (max-width: 1259.98px) {
+  .user-show > #us_profile {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .user-show > #us_profile .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 9px 24px;
+  }
+
+  .user-show > #us_profile .stats > .col2 {
+    grid-column: 1 / -1;
+  }
+}
+
 .user-show > #us_profile .stats > :is(p, div, a):not(.col2) {
   display: flex;
   align-items: center;
@@ -982,19 +1195,20 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
   color: var(--cdc-text-strong) !important;
 }
 
-/* Chess Insights, at the foot of the about card. */
+/* Chess Insights, at the foot of the about card: the card stays dark, the
+ * green is the icon's. */
 .user-show > #us_profile .insight,
 .user-show > #us_profile .tutor-link {
   gap: 14px;
   padding: 14px 18px !important;
   border-top: 1px solid var(--cdc-border) !important;
-  background: #81b64c14 !important;
+  background: transparent !important;
   color: var(--cdc-text) !important;
   transition: background-color 0.15s;
 }
 
 .user-show > #us_profile .insight:hover {
-  background: #81b64c33 !important;
+  background: #ffffff0a !important;
   color: var(--cdc-text) !important;
 }
 
@@ -1131,6 +1345,12 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
   overflow: hidden;
 }
 
+/* A visitor who isn't signed in gets the feed empty: no card for it, where
+ * an empty one showed as a stray bar under the tabs. */
+.user-show > .angle-content:has(> .activity:empty) {
+  display: none;
+}
+
 /* ---------------------------------------------------------- activity --- */
 
 /* Lichess draws the feed as a timeline: a rule down the left with each
@@ -1209,8 +1429,11 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
   line-height: 1 !important;
 }
 
+/* The text takes the rest of the row, however long: sized to its own width
+ * first, a long line (a tournament's name, a forum post) wrapped the whole
+ * text under its icon. */
 .user-show .activity .entry > :is(div, a) {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   min-width: 0;
   max-width: none !important;
 }
@@ -1299,6 +1522,15 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
   background: #d64742;
 }
 
+/* A phone has no room for the score beside the text: it goes under it. */
+@media (max-width: 599.98px) {
+  .user-show .activity .entry > score {
+    flex: 1 0 100%;
+    justify-content: flex-end;
+    padding-inline-start: 0;
+  }
+}
+
 /* ------------------------------------------------------------- games --- */
 
 /* The games tab's own filters (all / rated / wins / losses / draws), on the
@@ -1353,6 +1585,22 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
 .user-show .angle-content > #games .nm-item.active strong,
 .user-show .angle-content > #games .nm-item:hover strong {
   color: var(--cdc-text-strong);
+}
+
+/* A phone fits the five usual filters on one row, instead of four and a
+ * lone one under them. */
+@media (max-width: 599.98px) {
+  .user-show .angle-content > #games .nm-item,
+  .user-show .angle-content > #games .nm-item.active {
+    min-width: 56px;
+    padding: 7px 4px !important;
+    font-size: 10px !important;
+    letter-spacing: 0.02em;
+  }
+
+  .user-show .angle-content > #games .nm-item strong {
+    font-size: 15px !important;
+  }
 }
 
 .user-show .search__result {
@@ -1463,9 +1711,16 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
   text-align: start !important;
 }
 
+/* A name too long for its half of the row (on a phone) ends in "…" instead
+ * of running under the swords or past the card's edge. */
 .user-show .game-row .versus .player a {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
   color: var(--cdc-text-strong) !important;
   font-size: 14px;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
 }
 
 .user-show .game-row .versus .player a:hover {

@@ -59,6 +59,53 @@ html[dir='rtl'] main.team-list .box__top .search input {
   background-position: calc(100% - 12px) center !important;
 }
 
+/* Only the cards scroll: the side menu and the title bar (with the search)
+ * stay in view, the bar on the page's color, casting a soft shadow on the
+ * cards only once it's stuck (as simul.css does). Desktop only: below
+ * 1020px Lichess's own top bar holds the top edge. */
+@media (min-width: 1020px) {
+  /* A bit wider than the grid, to also cover the shadows of the cards
+   * passing under it; no more, the gap to the side menu is 10px. */
+  main.team-list .box__top {
+    container-type: scroll-state;
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    margin-inline: -8px !important;
+    padding-inline: 8px !important;
+    background: var(--cdc-bg-page);
+  }
+
+  main.team-list .box__top::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-page), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    main.team-list .box__top::after {
+      opacity: 1;
+    }
+  }
+
+  main.team-list .page-menu__menu {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+  }
+
+  /* Whatever the browser scrolls to (keyboard focus) stops below the bar. */
+  html:has(main.team-list) {
+    scroll-padding-top: 90px;
+  }
+}
+
 /* ------------------------------------------------------------ grid --- */
 
 main.team-list table.slist {

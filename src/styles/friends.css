@@ -12,7 +12,12 @@
  * seen. The rows become cards; the online dot moves onto the avatar.
  */
 
-main.box.page-small:has(> table.slist-invert > tbody > tr > td:first-child > .user-link) {
+/* Also an empty list: one row, one cell ("None"), which gets the same header
+ * and an empty-state card instead of Lichess's strip. */
+main.box.page-small:has(
+    > table.slist-invert > tbody > tr > td:first-child > .user-link,
+    > table.slist-invert > tbody > tr:only-child > td:only-child
+  ) {
   /* ------------------------------------------------------- header --- */
 
   & > .box__top {
@@ -67,11 +72,13 @@ main.box.page-small:has(> table.slist-invert > tbody > tr > td:first-child > .us
 
   /* --------------------------------------------------------- card --- */
 
+  /* The rating and the games count keep their width; the last cell (last
+   * seen) takes the rest, so on a phone it's the one that ends in "…". */
   & > table.slist > tbody > tr,
   & > table.slist > tbody > tr:nth-child(n) {
     position: relative;
     display: grid;
-    grid-template-columns: repeat(3, auto) minmax(0, 1fr);
+    grid-template-columns: auto auto minmax(0, 1fr);
     align-content: center;
     row-gap: 3px;
     box-sizing: border-box;
@@ -124,6 +131,10 @@ main.box.page-small:has(> table.slist-invert > tbody > tr > td:first-child > .us
 
   & > table.slist > tbody > tr > td:empty {
     display: none;
+  }
+
+  & > table.slist > tbody > tr > td:last-child:not(:first-child) {
+    grid-column-end: -1;
   }
 
   & > table.slist > tbody > tr > td:not(:first-child, :empty) ~ td:not(:empty)::before {
@@ -212,5 +223,22 @@ main.box.page-small:has(> table.slist-invert > tbody > tr > td:first-child > .us
 
   & > table.slist > tbody > tr.pager::before {
     display: none;
+  }
+
+  /* Nobody in the list: a quiet card, no avatar. */
+  & > table.slist > tbody > tr:only-child:has(> td:only-child) {
+    display: block;
+    min-height: 0;
+    padding: 28px 16px;
+    text-align: center;
+  }
+
+  & > table.slist > tbody > tr:only-child:has(> td:only-child)::before {
+    display: none;
+  }
+
+  & > table.slist > tbody > tr:only-child > td:only-child {
+    font-size: 15px;
+    text-align: center;
   }
 }

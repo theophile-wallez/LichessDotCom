@@ -13,8 +13,11 @@
 
 /* ---------------------------------------------------------- layout --- */
 
+/* The directory only: a coach's own page (main.coach-show) is a
+ * coach-full-page too, and keeps Lichess's layout. Given this one, its
+ * header was squeezed into 518px at 1024px, the coach's details cut off. */
 @media (min-width: 1020px) {
-  main.coach-full-page {
+  main.coach-list.coach-full-page {
     grid-template-columns: minmax(0, 1fr) 280px !important;
     grid-template-areas: 'main side' !important;
     gap: 24px !important;
@@ -22,21 +25,22 @@
     margin: 8px 0 40px;
   }
 
-  main.coach-full-page .coach-side {
+  /* Level with the first row of cards, below the title bar (72px tall),
+   * and still level with the cards once the bar is stuck over them. */
+  main.coach-list .coach-side {
     position: sticky;
-    top: 24px;
-    /* Level with the first row of cards, below the title bar. */
+    top: 72px;
     margin: 72px 0 0 !important;
   }
 }
 
 /* Lichess's mobile layout runs the list edge to edge; cards need a margin. */
 @media (max-width: 1019.98px) {
-  main.coach-full-page {
+  main.coach-list.coach-full-page {
     padding: 0 12px 24px;
   }
 
-  main.coach-full-page .coach-side {
+  main.coach-list .coach-side {
     margin: 24px 0 0 !important;
   }
 }
@@ -82,6 +86,75 @@
 
 .coach-list .mselect__label {
   padding: 8px 12px 8px 14px !important;
+}
+
+/* The filters sit at the end of the title bar, so their menus open from
+ * their end, toward the page: from their start, the countries' ran past the
+ * window, and even closed (hidden, not gone) it widened the page now that
+ * the box doesn't clip. Up to 800px included, Lichess centers the open menu
+ * on the screen, so at 800px only the closed one is anchored. */
+@media (min-width: 800px) {
+  .coach-list__main .box__top .mselect__toggle:not(:checked) ~ .mselect__list {
+    inset-inline: auto 0 !important;
+  }
+}
+
+@media (min-width: 800.02px) {
+  .coach-list__main .box__top .mselect__list {
+    inset-inline: auto 0 !important;
+  }
+
+  /* Except the first: opened from its end, it ran over the sidebar at
+   * 1024px. From its start, it opens over the other filters. */
+  .coach-list__main .box__top .mselect:first-child .mselect__list {
+    inset-inline: 0 auto !important;
+  }
+}
+
+/* Only the cards scroll: the title bar (and its filters) stays in view, on
+ * the page's color, casting a soft shadow on the cards only once it's stuck
+ * (as simul.css does), and the side card stays level with the cards under
+ * it. Desktop only: below 1020px Lichess's own top bar holds the top edge. */
+@media (min-width: 1020px) {
+  /* A bit wider than the list, to also cover the shadows of the cards
+   * passing under it: by side shadows, which don't widen the page. */
+  .coach-list__main .box__top {
+    container-type: scroll-state;
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: var(--cdc-bg-page);
+    box-shadow: -12px 0 var(--cdc-bg-page), 12px 0 var(--cdc-bg-page);
+  }
+
+  .coach-list__main .box__top::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-page), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    .coach-list__main .box__top::after {
+      opacity: 1;
+    }
+  }
+
+  /* The bar is its own stacking context, which would sink an open filter
+   * menu's click-away mask under the sidebar (z-index 106). */
+  .coach-list__main .box__top:has(.mselect__toggle:checked) {
+    z-index: 107;
+  }
+
+  /* Whatever the browser scrolls to (keyboard focus) stops below the bar. */
+  html:has(main.coach-list) {
+    scroll-padding-top: 90px;
+  }
 }
 
 /* ------------------------------------------------------------ side --- */

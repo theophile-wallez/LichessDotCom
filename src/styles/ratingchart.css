@@ -11,6 +11,11 @@
   display: none !important;
 }
 
+/* No history to draw (a rating never played): no empty box either. */
+.rating-history-container.cdc-rchart-none {
+  display: none !important;
+}
+
 /* The stats page's container isn't a card of its own, as the profile's is. */
 .perf-stat > .rating-history-container.cdc-rchart-on {
   height: auto !important;
@@ -160,9 +165,13 @@
 
 /* ------------------------------------------------------------ plot --- */
 
+/* The SVG is drawn at the plot's width, so its width must never feed back
+ * into the plot's: from a column too narrow for it (the profile on a phone)
+ * it held the whole page wider than the window. */
 .cdc-rchart__plot {
   position: relative;
   min-width: 0;
+  contain: inline-size;
 }
 
 .cdc-rchart__svg {
