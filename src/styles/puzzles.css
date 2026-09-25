@@ -539,20 +539,46 @@ html[dir='rtl'] .puzzle-themes__link {
 
 /* ------------------------------------------------------ on scroll --- */
 
-/* The title and the side menu stay in view while the lists scroll, the
- * title on the page's own color so the cards slide under it. Only beside our
- * fixed sidebar: below 1020px Lichess's own top bar holds the top edge. The
- * openings page's title row carries the sort picker, so the whole row sticks.
- */
+/* Only the lists scroll: the side menu and the title stay in view, the title
+ * on the page's color, casting a soft shadow on the cards only once it's
+ * stuck (as simul.css does). Desktop only: below 1020px Lichess's own top bar
+ * holds the top edge. The openings page's title row carries the sort picker,
+ * so the whole row sticks. */
 @media (min-width: 1020px) {
-  /* The page color runs a little past the column on both sides, over the
-   * headings' dot rings as they pass under (the gap to the menu is 10px). */
+  /* A bit wider than the column, to also cover the headings' dot rings as
+   * they pass under; no more, the gap to the side menu is 10px. */
   main.page-menu:has(.puzzle-themes) :is(h1.box__top, .box__top:has(> h1)) {
+    container-type: scroll-state;
     position: sticky;
     top: 0;
     z-index: 3;
+    margin-inline: -8px !important;
+    padding-inline: 8px !important;
     background: var(--cdc-bg-page);
-    box-shadow: -8px 0 0 var(--cdc-bg-page), 8px 0 0 var(--cdc-bg-page);
+  }
+
+  /* In RTL Lichess leaves no gap before the menu, so only the free side. */
+  html[dir='rtl'] main.page-menu:has(.puzzle-themes) :is(h1.box__top, .box__top:has(> h1)) {
+    margin-inline-start: 0 !important;
+    padding-inline-start: 0 !important;
+  }
+
+  main.page-menu:has(.puzzle-themes) :is(h1.box__top, .box__top:has(> h1))::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-page), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    main.page-menu:has(.puzzle-themes) :is(h1.box__top, .box__top:has(> h1))::after {
+      opacity: 1;
+    }
   }
 
   /* The row is its own stacking context, which would sink the open sort

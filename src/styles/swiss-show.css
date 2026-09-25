@@ -3,8 +3,8 @@
  * the info panel as a card (the time control on a tile, the rounds as a
  * progress bar from content.js), the standings with each round's result as
  * a colored square, the podium, the stats and the boards as cards. Lichess
- * keeps its three-column grid (side, main, table); only the pieces change.
- * The main part is snabbdom's, the side is server-rendered.
+ * keeps its three-column grid (side, main, table), in which only the middle
+ * column scrolls. The main part is snabbdom's, the side is server-rendered.
  */
 
 /* ------------------------------------------------------------ side --- */
@@ -262,8 +262,12 @@ main.swiss .chat__members {
 
 /* ------------------------------------------------------------ main --- */
 
+/* Clipped to its corners with clip-path, not overflow: an overflow would
+   become the scroller of the sticky header (see "only the list scrolls"). */
 main.swiss .swiss__main > .box {
-  overflow: hidden;
+  position: relative;
+  overflow: visible !important;
+  clip-path: inset(0 round 10px);
   border: 1px solid var(--cdc-card-border);
   border-radius: 10px !important;
   background: var(--cdc-bg-panel) !important;
@@ -276,22 +280,18 @@ main.swiss .swiss__main__header {
   padding: 20px 24px !important;
 }
 
-/* The trophy on a tile, gold like the podium's. */
+/* Chess.com's trophy in place of Lichess's glyph, as the other pages'
+   titles carry their Chess.com icon. */
 main.swiss .swiss__main__header > icon.img {
-  display: flex;
   flex: none;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   margin: 0 !important;
-  border-radius: 12px;
-  background: var(--cdc-bg-raised);
-  color: #e3aa24;
+  background: url('https://assets-ds.chess.com/color-icons/trophies.svg') center / contain no-repeat;
 }
 
 main.swiss .swiss__main__header > icon.img::before {
-  font-size: 28px !important;
+  content: none !important;
 }
 
 /* Finished: the podium has the trophies, the title stands alone. */
@@ -317,6 +317,14 @@ main.swiss .swiss__main__header h1 {
   font-weight: 800 !important;
   line-height: 1.2;
   overflow-wrap: anywhere;
+}
+
+/* Below 500px Lichess hides the podium, which carried the space under a
+   finished title. */
+@media (max-width: 499.29px) {
+  main.swiss .swiss__main-finished .swiss__main__header {
+    padding-bottom: 20px !important;
+  }
 }
 
 /* Lichess's mobile layout: the title takes the tile's room, and a third
@@ -458,6 +466,157 @@ main.swiss .schedule-next-round input {
   background: var(--cdc-bg-panel) !important;
   color: #fff !important;
   font-size: 14px;
+}
+
+/* Only the list scrolls: from 1260px, where Lichess sets the three columns
+   side by side, the middle one scrolls on its own and the page doesn't, so
+   the info panel, the chat and the right column stay in view. Lichess's
+   first row is a window tall, so the side column couldn't stick instead.
+   The scroller runs 12px into the gaps (15px) so the cards' shadows aren't
+   cut; the title stays at its top, casting a soft shadow once stuck. */
+@media (min-width: 1260px) {
+  /* As on the game page: Lichess's hidden hover cards sit at the document's
+     end and would still leave the page a little to scroll. */
+  html:has(main.swiss),
+  html:has(main.swiss) body {
+    overflow: hidden !important;
+  }
+
+  /* Every column fits the window, scrolling in place when it's too short.
+     The spectators under the chat get what Lichess's first row leaves of
+     the window (about 60px). */
+  main.swiss .swiss__side {
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  main.swiss .chat__members {
+    max-height: calc(var(---site-header-height) + var(---site-header-margin) + var(---sticky-gap) + 3rem - 32px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  /* content.js focuses the column, so the page keys scroll it. */
+  main.swiss .swiss__main:focus {
+    outline: none;
+  }
+
+  main.swiss .swiss__main {
+    align-self: start;
+    max-height: calc(100vh - 32px);
+    margin-inline: -12px;
+    padding: 0 12px 16px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-padding-top: 120px;
+    scrollbar-color: #ffffff26 transparent;
+    scrollbar-width: thin;
+  }
+
+  main.swiss :is(.swiss__table, .swiss__stats) {
+    max-height: calc(100vh - 32px);
+    overflow-y: auto !important;
+    scrollbar-width: thin;
+  }
+
+  /* The card steps aside (display: contents), so the title sticks over the
+     whole column, the boards below the card included: a sticky element
+     can't leave its parent. The card is drawn by its pieces instead: the
+     panel color and side lines on each, the title rounding its top and the
+     last piece its bottom. The confetti then covers the column. */
+  main.swiss .swiss__main {
+    position: relative;
+  }
+
+  main.swiss .swiss__main > .box {
+    display: contents;
+  }
+
+  main.swiss .swiss__main > .box > :not(.podium-wrap),
+  main.swiss .podium-wrap > :is(.swiss__main__header, .podium) {
+    background-color: var(--cdc-bg-panel);
+    box-shadow: inset 1px 0 var(--cdc-card-border), inset -1px 0 var(--cdc-card-border);
+  }
+
+  main.swiss .swiss__main > .box .swiss__controls {
+    box-shadow: inset 1px 0 var(--cdc-card-border), inset -1px 0 var(--cdc-card-border) !important;
+  }
+
+  main.swiss .swiss__main > .box > :last-child {
+    box-shadow: inset 1px 0 var(--cdc-card-border), inset -1px 0 var(--cdc-card-border), inset 0 -1px var(--cdc-card-border);
+    clip-path: inset(0 round 0 0 10px 10px);
+  }
+
+  /* Rows inside the card run edge to edge, as the controls do: side
+     margins would show the page between the pieces. */
+  main.swiss :is(.swiss__ur-playing, .swiss__notice, .schedule-next-round) {
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  /* The rows keep their own fill and the director's green edge over the
+     card's panel color. */
+  main.swiss .swiss__main > .box > .swiss__notice {
+    background-color: var(--cdc-bg-raised);
+  }
+
+  main.swiss .swiss__main > .box > .schedule-next-round.required {
+    box-shadow: inset 3px 0 var(--cdc-green), inset -1px 0 var(--cdc-card-border);
+  }
+
+  html[dir='rtl'] main.swiss .swiss__main > .box > .schedule-next-round.required {
+    box-shadow: inset -3px 0 var(--cdc-green), inset 1px 0 var(--cdc-card-border);
+  }
+
+  /* Its own stacking level under the title: the player search's list
+     (z-index 113) would otherwise pass over the title on scroll. */
+  main.swiss .swiss__controls {
+    z-index: 1;
+  }
+
+  main.swiss blockquote.pull-quote {
+    width: auto;
+    margin: 0 !important;
+    padding: 12px 24px 28px !important;
+    border-radius: 0;
+    background: var(--cdc-bg-panel);
+  }
+
+  main.swiss blockquote.pull-quote :is(p, footer) {
+    max-width: 420px;
+    margin-inline: auto !important;
+  }
+
+  main.swiss .swiss__main__header {
+    container-type: scroll-state;
+    position: sticky !important;
+    top: 0;
+    z-index: 2;
+    border-radius: 10px 10px 0 0;
+    background: var(--cdc-bg-panel);
+    /* The page color behind the rounded corners, where the boards passing
+       under would show; above the title it falls outside the scroller. */
+    box-shadow: 0 -10px 0 var(--cdc-bg-page), inset 0 1px var(--cdc-card-border), inset 1px 0 var(--cdc-card-border), inset -1px 0 var(--cdc-card-border) !important;
+  }
+
+  main.swiss .swiss__main__header::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-panel), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    main.swiss .swiss__main__header::after {
+      opacity: 1;
+    }
+  }
 }
 
 /* -------------------------------------------------------- controls --- */
@@ -773,9 +932,17 @@ main.swiss .swiss__standing td.tieBreak {
 
 /* ---------------------------------------------------------- podium --- */
 
+/* The wrapper around the finished title and the podium steps aside, so the
+   title is the card's own child and can stay in view over the whole card.
+   Its confetti then covers the card (positioned), its glow goes on the
+   podium. */
 main.swiss .podium-wrap {
-  padding-bottom: 20px !important;
-  background: radial-gradient(ellipse 60% 70% at 50% 60%, #e3aa2414, transparent 70%);
+  display: contents;
+}
+
+main.swiss .podium {
+  padding-bottom: 20px;
+  background: radial-gradient(ellipse 60% 70% at 50% 45%, #e3aa2414, transparent 70%);
 }
 
 /* Lichess's weight and tight tracking stay: the podium's widths are made
@@ -1055,8 +1222,11 @@ main.swiss .swiss__player-info .sublist .outcome {
 
 /* Each game as a card: the players' bars around the board, the clock as
    Chess.com's, light for White and dark for Black, bright while it runs. */
+/* Isolated: chessground's pieces carry z-indexes, which would otherwise
+   paint over the sticky title as the boards pass under it. */
 main.swiss .swiss__board {
   container-type: inline-size;
+  isolation: isolate;
   overflow: hidden;
   border: 1px solid var(--cdc-card-border);
   border-radius: 10px !important;

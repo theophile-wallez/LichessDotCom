@@ -426,6 +426,16 @@
     }
   };
 
+  // A Swiss tournament from 1260px (see styles/swiss-show.css): the page
+  // doesn't scroll, its middle column does. Page keys act on the focused
+  // scroller, so the column takes the focus once, unless something has it.
+  const syncSwissFocus = () => {
+    const column = document.querySelector('main.swiss .swiss__main:not([tabindex])');
+    if (!column || !matchMedia('(min-width: 1260px)').matches) return;
+    column.tabIndex = -1;
+    if (document.activeElement === document.body) column.focus({ preventScroll: true });
+  };
+
   // A Swiss tournament's standings (see styles/swiss-show.css): the leaders'
   // ranks in medal colors. CSS can't tell which page of the standings it's
   // on (the pager's buttons go while searching), so the rank's own text
@@ -519,6 +529,7 @@
     syncCoachTitles();
     syncSwissRounds();
     syncSwissMedals();
+    syncSwissFocus();
     syncForumLabels();
     syncPowertip();
   }, 250);
