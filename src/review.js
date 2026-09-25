@@ -34,7 +34,7 @@
         intro: 'Passons en revue cette partie !', bestWas: 'Le meilleur coup était {m}.',
         engineError: "Le moteur n'a pas pu démarrer.",
         liveIntro: 'Joue un coup, je te dirai ce que j’en pense.', thinking: 'Voyons ce coup…',
-        startPosition: 'Position de départ',
+        startPosition: 'Position de départ', more: 'Voir tous les coups', less: 'Voir moins',
       }
     : {
         review: 'Game Review', start: 'Start Review', next: 'Next', explain: 'Explain', best: 'Best',
@@ -43,7 +43,7 @@
         intro: "Let's review this game!", bestWas: '{m} was best.',
         engineError: 'The engine failed to start.',
         liveIntro: 'Play a move and I’ll tell you what I think.', thinking: 'Let me look at this move…',
-        startPosition: 'Starting position',
+        startPosition: 'Starting position', more: 'Show all moves', less: 'Show less',
       };
 
   // What the coach says while the game is analyzed, like Chess.com.
@@ -135,6 +135,9 @@
     fr
       ? `${n} ${{ brilliant: n > 1 ? 'coups brillants' : 'coup brillant', great: n > 1 ? 'excellents coups' : 'excellent coup', best: n > 1 ? 'meilleurs coups' : 'meilleur coup' }[key]}`
       : `${n} ${CLS[key].label}`;
+  // The summary's rows before its chevron is opened, like Chess.com: the
+  // standouts and the errors. A brilliant move joins them when there is one.
+  const SUMMARY_ROWS = new Set(['great', 'best', 'excellent', 'mistake', 'miss', 'blunder']);
   const GRAPH_DOTS = new Set(['brilliant', 'great', 'inaccuracy', 'mistake', 'miss', 'blunder']);
   // Move list badges; book only on the last book move, like Chess.com.
   const LIST_BADGES = new Set([...GRAPH_DOTS, 'book']);
@@ -1087,6 +1090,7 @@
     mode: 'summary', review: null, progress: 0, error: null, lastKey: '',
     explain: false, playing: null, revealed: new Set(),
     bestOf: null, // mainline ply whose best move is shown on the board
+    allRows: false, // the summary's chevron is open
   };
 
   function setMode(mode) {
@@ -1267,12 +1271,16 @@
     const pct = Math.round(state.progress * 100);
     const say = state.error ? esc(state.error) : loading ? esc(QUOTE) : esc(T.intro);
     const acc = c => (r?.accuracy[c] == null ? '&nbsp;' : r.accuracy[c].toFixed(1));
-    const rows = CLASSES.map(
+    const brilliant = r && (r.counts.w.brilliant || r.counts.b.brilliant);
+    const rows = CLASSES.filter(c => state.allRows || SUMMARY_ROWS.has(c.key) || (c.key === 'brilliant' && brilliant)).map(
       c => `<tr><td class="cdc-t-label">${esc(c.label)}</td>
         <td class="cdc-t-num" style="color:${c.color}">${r?.counts.w[c.key] || 0}</td>
         <td class="cdc-t-icon">${icon(c.key)}</td>
         <td class="cdc-t-num" style="color:${c.color}">${r?.counts.b[c.key] || 0}</td></tr>`,
     ).join('');
+    const more = state.allRows ? T.less : T.more;
+    const toggle = `<tr class="cdc-t-more"><td colspan="4"><button class="cdc-review__more${state.allRows ? ' cdc-review__more--open' : ''}" data-cdc="rows" title="${esc(more)}" aria-label="${esc(more)}" aria-expanded="${state.allRows}">${headIcon('M6 9l6 6 6-6')}</button></td></tr>
+      <tr class="cdc-t-sep"><td colspan="4"></td></tr>`;
     // Only the classification rows scroll: they're a table of their own, with
     // the same fixed columns as the one above so the two line up.
     const cols = '<colgroup><col class="cdc-t-c-label"><col><col class="cdc-t-c-icon"><col></colgroup>';
@@ -1291,7 +1299,7 @@
         </table>
       </div>
       <div class="cdc-review__body">
-        <table class="cdc-review__table${loading ? ' cdc-review__table--loading' : ''}">${cols}${rows}</table>
+        <table class="cdc-review__table${loading ? ' cdc-review__table--loading' : ''}">${cols}${rows}${toggle}</table>
       </div>
       <div class="cdc-review__foot"><button class="cdc-btn cdc-btn--green" data-cdc="moves" ${r ? '' : 'disabled'}>${esc(T.start)}</button></div>`;
     const g = dom.panel.querySelector('.cdc-summary-graph');
@@ -1524,6 +1532,7 @@
     if (act !== 'play') stopPlaying();
     if (act === 'play') togglePlay(ctrl);
     else if (act === 'explain') state.explain = !state.explain;
+    else if (act === 'rows') state.allRows = !state.allRows;
     else if (act === 'first') jump(ctrl, 0);
     else if (act === 'last') jump(ctrl, last);
     // Off the mainline (e.g. showing the best move): back to the game's move,

@@ -391,6 +391,40 @@
     border-bottom: 1px solid var(--cdc-border);
   }
 
+  /* The chevron under the rows opens the rest of them, as on Chess.com. */
+  .cdc-t-more td {
+    padding: 2px 0 0 !important;
+  }
+
+  .cdc-review__more {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: none;
+    color: #ffffff80;
+    cursor: pointer;
+    transition: color 0.15s, background-color 0.15s !important;
+  }
+
+  .cdc-review__more:hover {
+    background: #ffffff14;
+    color: #fff;
+  }
+
+  .cdc-review__more svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .cdc-review__more--open svg {
+    transform: rotate(180deg);
+  }
+
   .cdc-avatar {
     display: inline-block;
     width: 56px;
