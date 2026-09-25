@@ -568,6 +568,30 @@
     overflow: hidden;
   }
 
+  /* Pieces in the comment are Neo pieces, moves chips led by the piece that
+   * moves, squares bold. The negative margins keep the pieces from pushing
+   * the lines apart. */
+  .cdc-pc {
+    display: inline-block;
+    width: 1.45em;
+    height: 1.45em;
+    margin: -0.25em 0.1em -0.2em 0;
+    vertical-align: -0.35em;
+  }
+
+  .cdc-mv {
+    display: inline-block;
+    padding: 0 0.3em 0 0.1em;
+    border-radius: 6px;
+    background: #ebeae8;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .cdc-sq {
+    font-weight: 700;
+  }
+
   /* The comment is typed out word by word (review.js): each word keeps its
    * place while hidden, and fades in when its turn comes. */
   .cdc-w--off {
