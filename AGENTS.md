@@ -76,7 +76,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/background.js` | Service worker: downloads the Chess.com sounds, caches them as base64. |
 | `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, fetches a finished game's move times (and its time control, for the "New 10 min" button), the players' country flags (from their profiles), the analysis board's players (copied from the hidden game info), the home hero, coach title badges, the Swiss list's and a Swiss tournament's round progress and medal ranks, the forum index's count labels, the hover card's rating chips and its fit in the window, the eval bar's score, the font remapping, the FIDE list's rank offset on a later page, and which coach (`data-cdc-coach` on `<html>`) reads a practice drill's goal, and the sidebar's Donate item (copied from the flyout's, as Lichess's own lone link is missing for patrons and on game pages). |
 | `src/dashboard.js` | Isolated world: the puzzle dashboard's theme radar, redrawn as SVG from the page's init JSON (Lichess draws it into a canvas). |
-| `src/ratingchart.js` | Isolated world: the rating history chart (profile, rating stats page), redrawn in SVG from the page's init JSON (Lichess draws it with Chart.js into a canvas): smooth curves over gradients, range pills, one chip per rating, a hover tooltip. |
+| `src/ratingchart.js` | Isolated world: the rating history chart (profile, rating stats page), redrawn in SVG from the page's init JSON, or the stats page's `loadEsm` call (Lichess draws it with Chart.js into a canvas): smooth curves over gradients, range pills, one chip per rating, a hover tooltip. |
 | `src/distribution.js` | Page world: the weekly rating distribution (`/stat/rating/distribution/<perf>`), redrawn in SVG from the page's init JSON (Lichess draws it with Chart.js into a canvas): a rounded column per 25 points in the rating's color, the cumulative curve, pills for your rating and the player you came from, a hover tooltip. Page world for Lichess's translated labels (`i18n.site`). |
 | `src/page.js` | Page world: wraps `site.sound` to play the right Chess.com sound per move, plus premove / illegal / game-start, which Lichess has no sound for. |
 | `src/board.js` | Page world: every main board's shapes redrawn Chess.com-style (right-clicked squares filled, arrows), checkmate badge and label. |
@@ -85,11 +85,11 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/sidebar.css` | Lichess's top header → Chess.com's left sidebar, and the user menu (dasher) as a Chess.com menu. |
 | `src/styles/board.css` | Board, pieces, highlights, move hints, arrows, coordinates, and Lichess's eval bar drawn like the Game Review's. |
 | `src/styles/playerbar.css` | The player bars' look, shared by the game page (`.ruser`, `.rclock`) and the analysis board (`.cdc-player`, `.analyse__clock`): avatar, title, name, flag, rating, captured pieces and the clock. Each page only places them. |
-| `src/styles/game.css` | Game page (`main.round`) grid, where the player bars and clocks sit, moves, chat, and the game-over panel (Game Review button, move times). |
-| `src/styles/analysis.css` | Analysis page (`main.analyse`) grid (with the game page's player bars when there are players or clocks), engine header and lines, move list (glyph badges, comment cards) and controls. |
-| `src/styles/explorer.css` | The opening explorer (`.explorer-box`) as Chess.com's: the databases as pill tabs, the opening on a card behind a green book tile, roomy move rows with a rounded white / draw / black bar, the games with a colored square per player and a result pill, and the settings as grey / green buttons. Open, it takes most of the analysis panel. |
+| `src/styles/game.css` | Game page (`main.round`) grid, where the player bars and clocks sit, moves, chat, and the game-over panel (Game Review button, move times); crazyhouse's pockets in a strip right of the board, and zen mode. |
+| `src/styles/analysis.css` | Analysis page (`main.analyse`) grid (with the game page's player bars when there are players or clocks), engine header and lines, move list (glyph badges, comment cards) and controls; a study's chapters and a broadcast round's games in the panel's last row. |
+| `src/styles/explorer.css` | The opening explorer (`.explorer-box`) as Chess.com's: the databases as pill tabs, the opening on a card behind a green book tile, roomy move rows with a rounded white / draw / black bar, the games with a colored square per player and a result pill, and the settings as grey / green buttons. Open, it takes what it needs, up to 40% of the analysis panel. |
 | `src/styles/review.css` | Game Review panel, eval bar, board annotations, and the free analysis board's coach over Lichess's panel. The coach is alive: it blinks (a skin-colored lid over each eye) and its face shows each verdict: the portrait's own brows and mouth, clipped out and moved over a skin patch (raised, knit, a grin, a smirk, a frown, a drawn "O"), all placed per portrait in percents of the image, plus a mark over the head. |
-| `src/styles/pages.css` | Modern look for every other page (headings, side menus, tabs, tables, forms, dialogs, lobby, editor, tournaments). |
+| `src/styles/pages.css` | Modern look for every other page (headings, side menus, tabs, tables, forms, dialogs, lobby, editor, tournaments), the puzzle modes (Storm, Racer, the coordinate trainer) sized beside the sidebar, and Lichess's static pages (about, FAQ, variants, streamers…) with their side menu and title pinned. |
 | `src/styles/dropdowns.css` | Every dropdown as one menu style: Lichess's `.mselect`, native `<select>` (via `appearance: base-select`) and autocomplete lists. |
 | `src/styles/powertip.css` | The profile hover card (`#powerTip`, filled with `/@/<user>/mini`) as a Chess.com player card. |
 | `src/styles/profile.css` | Player profile (`main.page-menu` + `.user-show`) as a Chess.com member page: a hero card (avatar, name, awards, counters, actions), the side ratings as a full-width strip of rating cards, the about card and rating chart, pill tabs, the activity timeline and the game rows. |
@@ -107,7 +107,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/learn.css` | Learn (`#learn-app`, one app for both views): the map (`.learn--map`) in the Practice look, a color per category, white pieces on gradient tiles, star pills; inside a stage (`.learn--run`) the stage list and the goal panel as cards, the levels as pills. |
 | `src/styles/puzzles.css` | Puzzle themes (`.puzzle-themes`) and puzzles by opening (`.puzzle-openings`) in the Practice look: a color per section, theme cards, a card per opening family, opening chips; from 1020px the title and the side menu stay in view on scroll. |
 | `src/styles/dashboard.css` | Puzzle dashboard (`.puzzle-dashboard`): stat tiles, per-theme rows, and the panel around `dashboard.js`'s radar. |
-| `src/styles/broadcast.css` | Broadcasts (`.relay-index` lists, calendar, FIDE pages, info pages) as event cards with a LIVE pill. |
+| `src/styles/broadcast.css` | Broadcasts (`.relay-index` lists, calendar, FIDE pages, info pages) as event cards with a LIVE pill, and a broadcast's own page (`main.analyse.has-relay-tour`, no board) in two columns beside the sidebar. |
 | `src/styles/swiss.css` | Swiss tournaments home (`main.swiss-home`): now playing / starting soon as tournament cards (time-control tile, rounds progress bar, player chip), the explanations as point cards, a comparison card and a grid of FAQ cards. |
 | `src/styles/swiss-show.css` | A Swiss tournament (`main.swiss`), in Lichess's three columns: the info panel as a card (time-control tile, rounds progress bar, condition chips), a header with a countdown chip, the standings with a colored square per round and medal-colored leaders, the podium, the stats and player cards, and the mini boards with Chess.com clocks. From 1260px the page doesn't scroll: only the middle column does, its title pinned. |
 | `src/styles/leaderboard.css` | Players leaderboard (`/player`, `.community`) in the Practice look: a card per leaderboard with its icon white on a tile in its own color, medals for the top three, and the online players in a sticky side card with rating chips. Tournament winners (`/tournament/leaderboard`, `.tournament-leaderboards`) reuse the same cards, with a gold / silver / bronze cup per yearly / monthly / weekly winner, the tournament as a pill, and the side menu and title pinned while the cards scroll. Tournament shields (`/tournament/shields`, `.tournament-shields`) are the same cards with a shield-shaped tile (colored by how the category link ends, as the header has no icon) and a gold mini-shield for the current holder; a shield's history (`/tournament/shields/<perf>`, `main.tournament-categ-shields`) is a grid of gold shield cards, the holder's across the top. The side menu these pages share (leaderboard, rating stats, tournament winners and shields, bots, FIDE players) gives each link Chess.com's color icon on a tile tinted in its own color. |
@@ -145,6 +145,8 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   `--cdc-coords-size`; a layout leaves them room under
   `body:is(.coords-in, .coords-out)` (a gutter left of the board for the
   ranks, `--cdc-coords-off` under it for the files). Only `coords-no` has none.
+  Below 1020px they stay where Lichess puts them: moved left of the board,
+  they fell off a phone's screen.
 - **Board inset.** Chessground shrinks the board to whole pixels per square,
   so `cg-container` sits a few px inside its wrapper. `content.js` measures it
   into `--cdc-inset-{t,r,b,l}`; use those to align anything with the squares.
@@ -237,7 +239,9 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   hover.
 - **`<script id="page-init-data">`.** Whatever data a page hands its JS module
   (the game, the puzzle dashboard's radar…) is inlined there as JSON, *not* in
-  the `loadEsm(…)` call — and Lichess removes the element once its module has
+  the `loadEsm(…)` call — with exceptions: the rating stats page still passes
+  its chart's data inside `loadEsm('chart.ratingHistory', …)`, which
+  `ratingchart.js` reads too. Lichess removes the element once its module has
   read it. Grab it while the page parses (a `MutationObserver` from
   `document_start`); keeping the node is enough, its text stays readable after
   Lichess takes it out of the document.
@@ -266,6 +270,41 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   (as `game.css` and `swiss-show.css` do), with every column scrolling in
   place. A `sticky` title can't leave its parent: to pin it over more than
   its card, make the card `display: contents` and draw it from its pieces.
+- **Boards sized to the window.** Lichess sizes its boards from the whole
+  window's width (`---col2-uniboard-width`…), as if there were no sidebar:
+  Storm, Racer, the coordinate trainer, Learn and the puzzle page ran past
+  the window's right edge, their ranks under the sidebar. Cap the board's
+  column by what the sidebar leaves (`100vw - var(--cdc-sidebar-w)`, the
+  page's margins, the side panel) and give the ranks their gutter.
+- **Pinned titles.** A sticky title widened by negative inline margins, to
+  cover the cards' shadows passing under it, runs past the window at 1024px,
+  where the page's gutter is only ~10px. Widen it with side box-shadows in
+  the page's color instead: they don't widen the page.
+- **The page's background.** Lichess draws a few things behind the page with
+  a negative z-index (the game page's clock faces). `theme.css` paints the
+  page's color on `html` and leaves `body` clear: painting `body` hid them.
+- **Lichess's light theme.** An anonymous visitor on a light OS gets
+  Lichess's light theme (`html.light`), and so does headless Chrome. Our
+  variables override its colors, but its own `.light …` rules still apply
+  here and there (a light strip, a darkened illustration): check both themes.
+- **800px exactly.** Lichess's phone menu (`.mselect`) applies up to
+  `max-width: 800px`, so a desktop rule from `min-width: 800px` applies at
+  800 as well: start those at `800.02px`.
+- **Variants.** Crazyhouse's pockets sit in grid areas `mat-top` /
+  `mat-bot`, which the game grid must place (`game.css`). Three-check's
+  checks are kings in Lichess's `.material`, which our player bars hide
+  (`content.js` adds them to the captured pieces). Racing Kings and Horde
+  start with other pieces than the standard set.
+- **Zen mode** (`body.zenable.zen`) hides all but the board, the clocks and
+  the controls, the sidebar included, and our `!important` layout rules
+  bring them back unless they yield to it (`game.css`).
+- **TV.** `/tv` and `/tv/<channel>` show a game whose id isn't in the URL:
+  take it from the move list's analysis link.
+- **A `main.analyse` without a board.** A broadcast's own page (overview,
+  boards, players) is `main.analyse.is-relay.has-relay-tour`: the analysis
+  layout must leave it alone (`broadcast.css` gives it its two columns back).
+- **Picker names.** lila puts a picker's name in its `mselect`'s id
+  (`#…__day-select`), not in its class.
 
 ## Testing
 
@@ -291,12 +330,19 @@ before ours, and strip the shell's CSP `<meta>` or the stand-in scripts are
 blocked. Have the page measure itself and read the numbers back with
 `--dump-dom`: overflow is easier to check in numbers than in a screenshot.
 
-Check at 1366×640, 1600×900 and 1920×1080: nothing overflows, the page doesn't
-scroll, and bars and the eval bar line up with the board. Chess.com's CDN
-rejects the `HeadlessChrome` user agent, so override it to a normal Chrome UA
-for every request, or images will look broken when they aren't.
+Check at 1024×768, 1366×640, 1600×900, 1920×1080 and 2560×1440: nothing
+overflows, the page doesn't scroll, and bars and the eval bar line up with the
+board. Check both sides of each breakpoint the page's CSS uses (1019 / 1020,
+1259 / 1260, 800 / 801), and 390 and 800 wide for Lichess's mobile layout,
+which must survive our theme. Chess.com's CDN rejects the `HeadlessChrome`
+user agent, so override it to a normal Chrome UA for every request, or images
+will look broken when they aren't.
 Headless Chrome also reports `prefers-reduced-motion: reduce`, which makes
-Lichess turn animations off; emulate `no-preference` to check animations.
+Lichess turn animations off; emulate `no-preference` to check animations. It
+reports a light color scheme too (emulate `dark` as well, see "Lichess's
+light theme"), and Playwright hides the scrollbars in headless mode
+(`ignoreDefaultArgs: ['--hide-scrollbars']` brings them back): a layout that
+only fits without a scrollbar looks fine there, not in a real Chrome.
 
 Before committing, syntax-check every JS file (e.g. `new Function(src)` in the
 browser) and parse `manifest.json`. Finally, load the extension unpacked in
