@@ -409,6 +409,18 @@
     }
   };
 
+  // Forum index (see styles/forum.css): the categories become cards and
+  // their table header goes, so each count gets its column's name ("Topics",
+  // "Posts", translated) to show as a label. Server-rendered, so it's safe.
+  const syncForumLabels = () => {
+    for (const table of document.querySelectorAll('main.forum table.categs:not([data-cdc-labels])')) {
+      table.dataset.cdcLabels = '';
+      const names = [...(table.tHead?.rows[0]?.cells || [])].map(th => th.textContent.trim());
+      for (const row of table.tBodies[0]?.rows || [])
+        for (const td of row.cells) if (names[td.cellIndex]) td.dataset.cdcLabel = names[td.cellIndex];
+    }
+  };
+
   // Profile hover card (see styles/powertip.css): Lichess right-aligns the
   // eight ratings in fixed columns by padding the short ones with non-breaking
   // spaces ("&nbsp;&nbsp;&nbsp;?"). Our chips center their value, so the
@@ -476,6 +488,7 @@
     syncHero();
     syncCoachTitles();
     syncSwissRounds();
+    syncForumLabels();
     syncPowertip();
   }, 250);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncHero);
