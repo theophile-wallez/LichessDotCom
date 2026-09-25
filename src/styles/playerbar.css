@@ -104,25 +104,77 @@
     pointer-events: none;
   }
 
-  .cdc-captured__group {
-    display: flex;
-  }
-
-  .cdc-captured__group img {
-    display: block;
-    width: 18px;
+  /* An analysis board without players (a free board, a study) keeps
+     Lichess's own material difference, above and below the board: the same
+     look, at the board's left edge. It lists the pieces a side is up by, so
+     they're drawn in the other color, as pieces taken. */
+  main.analyse .material {
+    /* Lichess lists the queen first, Chess.com the pawns: reversed, the score
+       still last. */
+    flex-direction: row-reverse !important;
+    gap: 3px;
     height: 18px;
+    padding: 0 !important;
   }
 
-  .cdc-captured__group img + img {
-    margin-left: -11px;
+  main.analyse .material score {
+    order: -1;
   }
 
-  .cdc-captured__score {
-    margin-left: 3px;
+  main.analyse:not(:has(.analyse__clock)) .analyse__player_strip {
+    left: var(--cdc-inset-l, 0px) !important;
+    right: auto !important;
+  }
+
+  main.analyse:has(.analyse__board > .orientation-white) .material-bottom,
+  main.analyse:has(.analyse__board > .orientation-black) .material-top {
+    --cdc-mpiece-pawn: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bp.png');
+    --cdc-mpiece-knight: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bn.png');
+    --cdc-mpiece-bishop: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bb.png');
+    --cdc-mpiece-rook: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/br.png');
+    --cdc-mpiece-queen: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bq.png');
+    --cdc-mpiece-king: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bk.png');
+  }
+
+  main.analyse:has(.analyse__board > .orientation-white) .material-top,
+  main.analyse:has(.analyse__board > .orientation-black) .material-bottom {
+    --cdc-mpiece-pawn: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wp.png');
+    --cdc-mpiece-knight: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wn.png');
+    --cdc-mpiece-bishop: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wb.png');
+    --cdc-mpiece-rook: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wr.png');
+    --cdc-mpiece-queen: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wq.png');
+    --cdc-mpiece-king: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wk.png');
+  }
+
+  main.analyse .material mpiece.pawn { background-image: var(--cdc-mpiece-pawn) !important; }
+  main.analyse .material mpiece.knight { background-image: var(--cdc-mpiece-knight) !important; }
+  main.analyse .material mpiece.bishop { background-image: var(--cdc-mpiece-bishop) !important; }
+  main.analyse .material mpiece.rook { background-image: var(--cdc-mpiece-rook) !important; }
+  main.analyse .material mpiece.queen { background-image: var(--cdc-mpiece-queen) !important; }
+  main.analyse .material mpiece.king { background-image: var(--cdc-mpiece-king) !important; }
+
+  :is(.cdc-captured__group, main.analyse .material > div) {
+    display: flex !important;
+    margin: 0 !important;
+  }
+
+  :is(.cdc-captured__group img, main.analyse .material mpiece) {
+    display: block;
+    width: 18px !important;
+    height: 18px !important;
+    margin: 0 !important;
+    filter: none !important;
+  }
+
+  :is(.cdc-captured__group img, main.analyse .material mpiece) + :is(img, mpiece) {
+    margin-left: -11px !important;
+  }
+
+  :is(.cdc-captured__score, main.analyse .material score) {
+    margin: 0 0 0 3px !important;
     color: var(--cdc-text-dim);
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 700 !important;
   }
 
   /* ------------------------------------------------------------- clock --- */
