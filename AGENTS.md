@@ -305,6 +305,15 @@ coaches' rig is traced by a script that only runs when a portrait changes.
   the window's right edge, their ranks under the sidebar. Cap the board's
   column by what the sidebar leaves (`100vw - var(--cdc-sidebar-w)`, the
   page's margins, the side panel) and give the ranks their gutter.
+- **The board's resize handle.** `cg-resize` sets `---zoom` (0–100) on
+  `body`, which Lichess's CSS turns into `---board-scale` (25% to 100%) and
+  saves as a pref. That pref may date from Lichess's layout (it made boards
+  tiny), so ours ignore it: the board takes all the room it's given until
+  dragged, and `content.js` keeps the dragged size under `cdc-board-zoom`,
+  as `--cdc-zoom`. A layout that sizes its own board multiplies by
+  `var(--cdc-board-scale, 1)` (board.css), or the handle does nothing. And size it
+  with `dvh`, not `vh`: on a Meta Quest or a phone `100vh` is taller than
+  what the browser shows, and the board ran off the bottom.
 - **Pinned titles.** A sticky title widened by negative inline margins, to
   cover the cards' shadows passing under it, runs past the window at 1024px,
   where the page's gutter is only ~10px. Widen it with side box-shadows in

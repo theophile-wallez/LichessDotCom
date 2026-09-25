@@ -761,7 +761,7 @@ main.plan .recent-patrons {
   align-self: start;
   display: none;
   flex-direction: column;
-  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
   margin-top: 16px !important;
   padding: 0 !important;
   overflow: hidden;

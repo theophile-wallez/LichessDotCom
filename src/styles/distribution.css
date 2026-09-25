@@ -67,7 +67,7 @@
 .cdc-dist__plot {
   position: relative;
   min-width: 0;
-  height: clamp(240px, 100vh - 330px, 760px);
+  height: clamp(240px, 100dvh - 330px, 760px);
 }
 
 /* On a big window too (760px left a third of a 1440px-tall one empty), as
@@ -76,7 +76,7 @@
  * rest of the page is 330px tall at 1920px, 370px at 2560px). */
 @media (min-width: 1020px) {
   .cdc-dist__plot {
-    height: clamp(240px, min(100vh - 330px, 50vw), 1060px);
+    height: clamp(240px, min(100dvh - 330px, 50vw), 1060px);
   }
 }
 
