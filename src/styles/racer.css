@@ -60,7 +60,7 @@ main.racer-home > h1.box__top::before {
   color: var(--cdc-text) !important;
   font-size: 13px;
   font-weight: 700;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, color 0.15s !important;
 }
 
 .racer-home__about a::before {
@@ -176,7 +176,7 @@ main.racer-home > h1.box__top::before {
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E") center / 16px no-repeat,
     var(--cdc-btn-green);
   box-shadow: var(--cdc-btn-green-shadow);
-  transition: transform 0.15s;
+  transition: transform 0.15s !important;
 }
 
 html[dir='rtl'] .racer-home .button::after {
@@ -954,7 +954,7 @@ html[dir='rtl'] .racer .racer__race__track::before {
   border: 1px solid var(--cdc-card-border);
   border-radius: 10px;
   background: var(--cdc-bg-panel-dark);
-  transition: border-color 0.15s, transform 0.15s;
+  transition: border-color 0.15s, transform 0.15s !important;
 }
 
 :is(.racer, .storm) .puz-history__round:hover {

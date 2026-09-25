@@ -448,7 +448,7 @@ html:not([data-cdc-fide-skip]) :is(.fide-players-table, .fide-federations .slist
   font-size: 15px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  transition: background 0.15s;
+  transition: background 0.15s !important;
 }
 
 .fide-federations .slist tbody tr.paginated > td:first-child {
@@ -528,7 +528,7 @@ html:not([data-cdc-fide-skip]) :is(.fide-players-table, .fide-federations .slist
   margin: 0 !important;
   border-radius: 50%;
   box-shadow: 0 0 0 2px #ffffff1a, 0 3px 8px #00000066;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 .fide-federations .slist tbody tr:hover td:first-child .flag {
@@ -811,7 +811,7 @@ html:not([data-cdc-fide-skip]) :is(.fide-players-table, .fide-federations .slist
     height: 14px;
     background: linear-gradient(var(--cdc-bg-page), transparent);
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s !important;
     pointer-events: none;
   }
 

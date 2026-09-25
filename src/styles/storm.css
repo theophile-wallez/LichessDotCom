@@ -230,7 +230,7 @@ main:has(> .storm) {
   color: var(--cdc-text) !important;
   font-size: 13px;
   font-weight: 700;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, color 0.15s !important;
 }
 
 .storm-play-scores a:hover {
@@ -309,7 +309,7 @@ body.zenable.zen .storm-dashboard__high__periods {
   background: var(--cdc-bg-raised);
   color: var(--cdc-text) !important;
   font-weight: 700;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, color 0.15s !important;
 }
 
 .storm__about__link a::before {
