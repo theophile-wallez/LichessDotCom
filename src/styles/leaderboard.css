@@ -4,6 +4,17 @@
  * tile that tilts on hover, medals for the top three and a rank for the
  * rest. Online players sit in a side card that stays in view while the
  * leaderboards scroll.
+ *
+ * Tournament winners (/tournament/leaderboard, .tournament-leaderboards)
+ * reuse the same cards, one per kind of tournament, with a cup per winner:
+ * gold, silver and bronze for the yearly, monthly and weekly ones. So do
+ * the tournament shields (/tournament/shields, .tournament-shields), their
+ * tile shaped as a shield, and each shield's history
+ * (/tournament/shields/<perf>, main.tournament-categ-shields) is a cabinet
+ * of gold shields, the current holder's on top.
+ *
+ * The side menu these pages share (with the rating stats, the bots and the
+ * FIDE players) gives each link Chess.com's color icon on a tinted tile.
  */
 
 /* ------------------------------------------------------------ page --- */
@@ -158,29 +169,32 @@
   border-radius: 0 !important;
 }
 
-/* A color per leaderboard, from its icon. */
-.community .leaderboards .user-top {
+/* A color per leaderboard, from its icon, shared with the tournament
+ * winners (Elite and Marathon only exist there). */
+:is(.community .leaderboards .user-top, .tournament-leaderboards__item, .tournament-shields__item) {
   --cdc-lb: #95c85a;
   --cdc-lb-2: #5d9948;
 }
 
-.community .user-top:has(> h2[data-icon='\e032']) { --cdc-lb: #f5a93b; --cdc-lb-2: #d27a1c; }
-.community .user-top:has(> h2[data-icon='\e008']) { --cdc-lb: #fad541; --cdc-lb-2: #e0a21a; }
-.community .user-top:has(> h2[data-icon='\e002']) { --cdc-lb: #95c85a; --cdc-lb-2: #5d9948; }
-.community .user-top:has(> h2[data-icon='\e00a']) { --cdc-lb: #45a3f5; --cdc-lb-2: #2474c9; }
-.community .user-top:has(> h2[data-icon='\e059']) { --cdc-lb: #f06a4a; --cdc-lb-2: #c9412d; }
-.community .user-top:has(> h2[data-icon='\e033']) { --cdc-lb: #a98bf0; --cdc-lb-2: #7458c7; }
-.community .user-top:has(> h2[data-icon='\e045']) { --cdc-lb: #f7c631; --cdc-lb-2: #cf951a; }
-.community .user-top:has(> h2[data-icon='\e066']) { --cdc-lb: #3aa6e0; --cdc-lb-2: #0a78b8; }
-.community .user-top:has(> h2[data-icon='\e006']) { --cdc-lb: #fa8a4c; --cdc-lb-2: #d9601c; }
-.community .user-top:has(> h2[data-icon='\e01e']) { --cdc-lb: #e86bb0; --cdc-lb-2: #b8438a; }
-.community .user-top:has(> h2[data-icon='\e01c']) { --cdc-lb: #f0645a; --cdc-lb-2: #b93a2e; }
-.community .user-top:has(> h2[data-icon='\e00d']) { --cdc-lb: #3fd0b2; --cdc-lb-2: #1f9c83; }
-.community .user-top:has(> h2[data-icon='\e007']) { --cdc-lb: #d4a15f; --cdc-lb-2: #a8743a; }
-.community .user-top:has(> h2[data-icon='\e03d']) { --cdc-lb: #9aa9bd; --cdc-lb-2: #627288; }
-.community .user-top:has(> h2[data-icon='\e065']) { --cdc-lb: #7fb2ff; --cdc-lb-2: #4a7fd6; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e032']) { --cdc-lb: #f5a93b; --cdc-lb-2: #d27a1c; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e008']) { --cdc-lb: #fad541; --cdc-lb-2: #e0a21a; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e002']) { --cdc-lb: #95c85a; --cdc-lb-2: #5d9948; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e00a']) { --cdc-lb: #45a3f5; --cdc-lb-2: #2474c9; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e059']) { --cdc-lb: #f06a4a; --cdc-lb-2: #c9412d; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e033']) { --cdc-lb: #a98bf0; --cdc-lb-2: #7458c7; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e045']) { --cdc-lb: #f7c631; --cdc-lb-2: #cf951a; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e066']) { --cdc-lb: #3aa6e0; --cdc-lb-2: #0a78b8; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e006']) { --cdc-lb: #fa8a4c; --cdc-lb-2: #d9601c; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e01e']) { --cdc-lb: #e86bb0; --cdc-lb-2: #b8438a; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e01c']) { --cdc-lb: #f0645a; --cdc-lb-2: #b93a2e; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e00d']) { --cdc-lb: #3fd0b2; --cdc-lb-2: #1f9c83; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e007']) { --cdc-lb: #d4a15f; --cdc-lb-2: #a8743a; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e03d']) { --cdc-lb: #9aa9bd; --cdc-lb-2: #627288; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e065']) { --cdc-lb: #7fb2ff; --cdc-lb-2: #4a7fd6; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e021']) { --cdc-lb: #c07af5; --cdc-lb-2: #8a45c9; }
+:is(.community .user-top, .tournament-leaderboards__item):has(> h2[data-icon='\e03a']) { --cdc-lb: #6e7cf2; --cdc-lb-2: #4453c9; }
 
-.community .leaderboards .user-top {
+:is(.community .leaderboards .user-top, .tournament-leaderboards__item, .tournament-shields__item) {
   padding-bottom: 8px;
   border: 1px solid var(--cdc-card-border) !important;
   border-radius: 12px;
@@ -190,7 +204,7 @@
   animation-delay: calc(sibling-index() * 35ms);
 }
 
-.community .leaderboards .user-top:hover {
+:is(.community .leaderboards .user-top, .tournament-leaderboards__item, .tournament-shields__item):hover {
   border-color: color-mix(in srgb, var(--cdc-lb) 55%, transparent) !important;
   box-shadow: 0 6px 18px #00000059;
   transform: translateY(-3px);
@@ -204,8 +218,9 @@
 }
 
 /* Header: the icon white on a gradient tile (the h2's ::after), then the
- * name, then a chevron where the name links to the full leaderboard. */
-.community .leaderboards h2 {
+ * name, then a chevron where the name links to the full leaderboard (the
+ * tournament winners' names link nowhere). */
+:is(.community .leaderboards, .tournament-leaderboards, .tournament-shields) h2 {
   position: relative;
   isolation: isolate;
   justify-content: flex-start !important;
@@ -220,7 +235,7 @@
   line-height: 40px !important;
 }
 
-.community .leaderboards h2::after {
+:is(.community .leaderboards, .tournament-leaderboards) h2::after {
   content: '';
   position: absolute;
   z-index: -1;
@@ -234,7 +249,7 @@
   transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.community .leaderboards h2::before {
+:is(.community .leaderboards, .tournament-leaderboards) h2::before {
   --cdc-mode-color: #fff;
   flex: none;
   width: 24px !important;
@@ -249,23 +264,23 @@
 }
 
 /* Chess.com's masks fill their box. */
-.community .leaderboards h2:is([data-icon='\e032'], [data-icon='\e008'], [data-icon='\e002'], [data-icon='\e00a'], [data-icon='\e059'], [data-icon='\e066'], [data-icon='\e006'], [data-icon='\e007'], [data-icon='\e00d'])::before {
+:is(.community .leaderboards, .tournament-leaderboards) h2:is([data-icon='\e032'], [data-icon='\e008'], [data-icon='\e002'], [data-icon='\e00a'], [data-icon='\e059'], [data-icon='\e066'], [data-icon='\e006'], [data-icon='\e007'], [data-icon='\e00d'])::before {
   font-size: 24px !important;
 }
 
 /* Atomic, Antichess and Horde are full-color pictures (theme.css), which
  * whiten into blobs: Lichess's own glyphs read better on the tile. */
-.community .leaderboards h2:is([data-icon='\e01e'], [data-icon='\e01c'], [data-icon='\e03d'])::before {
+:is(.community .leaderboards, .tournament-leaderboards) h2:is([data-icon='\e01e'], [data-icon='\e01c'], [data-icon='\e03d'])::before {
   content: attr(data-icon) !important;
   background: none !important;
 }
 
-.community .leaderboards .user-top:hover h2::after,
-.community .leaderboards .user-top:hover h2::before {
+:is(.community .leaderboards .user-top, .tournament-leaderboards__item, .tournament-shields__item):hover h2::after,
+:is(.community .leaderboards .user-top, .tournament-leaderboards__item, .tournament-shields__item):hover h2::before {
   transform: rotate(-6deg) scale(1.08);
 }
 
-.community .leaderboards h2 a {
+:is(.community .leaderboards, .tournament-shields) h2 a {
   display: flex;
   flex: 1 1 auto !important;
   align-items: center;
@@ -275,7 +290,7 @@
   color: #fff !important;
 }
 
-.community .leaderboards h2 a::after {
+:is(.community .leaderboards, .tournament-shields) h2 a::after {
   content: '';
   flex: none;
   width: 16px;
@@ -286,16 +301,16 @@
   transition: transform 0.15s, background-color 0.15s;
 }
 
-.community .leaderboards h2 a:hover::after {
+:is(.community .leaderboards, .tournament-shields) h2 a:hover::after {
   background: var(--cdc-lb);
   transform: translateX(3px);
 }
 
-html[dir='rtl'] .community .leaderboards h2 a::after {
+html[dir='rtl'] :is(.community .leaderboards, .tournament-shields) h2 a::after {
   transform: scaleX(-1);
 }
 
-html[dir='rtl'] .community .leaderboards h2 a:hover::after {
+html[dir='rtl'] :is(.community .leaderboards, .tournament-shields) h2 a:hover::after {
   transform: scaleX(-1) translateX(3px);
 }
 
@@ -387,22 +402,560 @@ html[dir='rtl'] .community .leaderboards h2 a:hover::after {
   font-weight: 800;
 }
 
+/* ------------------------------------------------ tournament winners --- */
+
+.page-menu__content.box:has(> :is(.tournament-leaderboards, .tournament-shields)) {
+  padding: 16px 0 40px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.page-menu__content > h1.box__top:has(+ :is(.tournament-leaderboards, .tournament-shields)) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 12px;
+  margin: 0 !important;
+  padding: 0 0 10px !important;
+  font-size: 28px !important;
+}
+
+/* Chess.com's trophies icon, as on the players leaderboard. */
+.page-menu__content > h1.box__top:has(+ :is(.tournament-leaderboards, .tournament-shields))::before {
+  content: '';
+  flex: none;
+  width: 36px;
+  height: 36px;
+  background: url('https://assets-ds.chess.com/color-icons/trophies.svg') center / contain no-repeat;
+}
+
+/* Only the cards scroll: the side menu and the title stay in view, the
+ * title on the page's color, casting a soft shadow on the cards only once
+ * it's stuck (as on the blog). Desktop only: below that, Lichess's fixed
+ * top bar would cover them. */
+@media (min-width: 1020px) {
+  main.page-menu:has(.tournament-leaderboards, .tournament-shields) > .subnav,
+  main.tournament-categ-shields > .subnav {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+  }
+
+  /* Lichess's box clips, which would make it the title's scroller, and a
+   * scroller that never scrolls doesn't stick anything. */
+  .page-menu__content.box:has(> :is(.tournament-leaderboards, .tournament-shields)) {
+    overflow: visible !important;
+  }
+
+  .page-menu__content > h1.box__top:has(+ :is(.tournament-leaderboards, .tournament-shields)) {
+    container-type: scroll-state;
+    position: sticky;
+    z-index: 3;
+    top: 0;
+    /* Out into the box's top padding, and a bit wider than the grid, to
+     * cover the shadows of the cards passing under it. */
+    margin: -16px -12px 0 !important;
+    padding: 16px 12px 10px !important;
+    background: var(--cdc-bg-page);
+  }
+
+  .page-menu__content > h1.box__top:has(+ :is(.tournament-leaderboards, .tournament-shields))::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-page), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    .page-menu__content > h1.box__top:has(+ :is(.tournament-leaderboards, .tournament-shields))::after {
+      opacity: 1;
+    }
+  }
+}
+
+:is(.tournament-leaderboards, .tournament-shields) {
+  --cdc-cup: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg opacity='.55'%3E%3Cpath d='M7 3h10v5a5 5 0 0 1-10 0zm4 11h2v4h-2zm-3 4h8v3H8z'/%3E%3Cpath d='M7 5H4.5v1.5a3 3 0 0 0 3 3M17 5h2.5v1.5a3 3 0 0 1-3 3' fill='none' stroke='%23000' stroke-width='1.8'/%3E%3C/g%3E%3C/svg%3E");
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)) !important;
+  gap: 14px;
+  overflow: visible !important;
+  /* Room for a card lifted on hover, which would slide under the title. */
+  padding-top: 8px;
+  border-radius: 0 !important;
+}
+
+:is(.tournament-leaderboards, .tournament-shields) h2 {
+  overflow: hidden;
+  border: 0 !important;
+  box-shadow: none !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  text-overflow: ellipsis;
+}
+
+:is(.tournament-leaderboards ul, .tournament-shields ol) {
+  padding: 0 6px !important;
+}
+
+:is(.tournament-leaderboards, .tournament-shields) li {
+  flex-wrap: nowrap !important;
+  gap: 10px;
+  padding: 6px 10px !important;
+  border-radius: 8px;
+  background: transparent !important;
+}
+
+:is(.tournament-leaderboards, .tournament-shields) li:hover {
+  background: #ffffff0d !important;
+}
+
+/* A cup per winner, engraved in a medal: gold for the yearly one, silver
+ * for the monthly, bronze for the weekly, plain for the daily. Lichess
+ * always lists them in that order, whatever the language. */
+.tournament-leaderboards li::before {
+  content: '';
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--cdc-cup) center no-repeat, #ffffff1a;
+  background-size: 14px, cover;
+  opacity: 0.8;
+}
+
+.tournament-leaderboards li:nth-child(-n + 3)::before {
+  box-shadow: inset 0 1px 0 #ffffff80, inset 0 -2px 0 #0000002e, 0 2px 4px #00000059;
+  opacity: 1;
+}
+
+.tournament-leaderboards li:nth-child(1)::before {
+  background-image: var(--cdc-cup), linear-gradient(145deg, #ffe07a, #e3a51b);
+}
+
+.tournament-leaderboards li:nth-child(2)::before {
+  background-image: var(--cdc-cup), linear-gradient(145deg, #f1f4f8, #a7b0bc);
+}
+
+.tournament-leaderboards li:nth-child(3)::before {
+  background-image: var(--cdc-cup), linear-gradient(145deg, #f4b27a, #bf6a2c);
+}
+
+/* Elite and Marathon winners each won the same event on another day, so
+ * they all get their card's color. */
+.tournament-leaderboards__item:is(:has(> h2[data-icon='\e021']), :has(> h2[data-icon='\e03a'])) li::before {
+  background-image: var(--cdc-cup), linear-gradient(145deg, var(--cdc-lb), var(--cdc-lb-2));
+  box-shadow: inset 0 1px 0 #ffffff59, inset 0 -2px 0 #0000002e, 0 2px 4px #00000059;
+  opacity: 1;
+}
+
+:is(.tournament-leaderboards, .tournament-shields) .user-link {
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+  color: var(--cdc-text) !important;
+  font-size: 14px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:is(.tournament-leaderboards, .tournament-shields) li:hover .user-link {
+  color: #fff !important;
+}
+
+/* The tournament as a pill in the card's color. */
+:is(.tournament-leaderboards, .tournament-shields) li > a:not(.user-link) {
+  flex: none;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cdc-lb) 16%, transparent);
+  color: var(--cdc-lb) !important;
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+:is(.tournament-leaderboards, .tournament-shields) li > a:not(.user-link):hover {
+  background: var(--cdc-lb);
+  color: #1f1e1b !important;
+}
+
+/* ------------------------------------------------------------ shields --- */
+
+/* Shields name their category in the header's link, not with an icon: the
+ * same colors as above, keyed on how that link ends. */
+.tournament-shields .tournament-shields__item:has(> h2 > a[href$='/ultraBullet']) { --cdc-lb: #f06a4a; --cdc-lb-2: #c9412d; }
+.tournament-shields .tournament-shields__item:has(> h2 > a:is([href$='/hyperBullet'], [href$='/bullet'])) { --cdc-lb: #f5a93b; --cdc-lb-2: #d27a1c; }
+.tournament-shields .tournament-shields__item:has(> h2 > a:is([href$='/superBlitz'], [href$='/blitz'])) { --cdc-lb: #fad541; --cdc-lb-2: #e0a21a; }
+.tournament-shields .tournament-shields__item:has(> h2 > a[href$='/rapid']) { --cdc-lb: #95c85a; --cdc-lb-2: #5d9948; }
+.tournament-shields .tournament-shields__item:has(> h2 > a[href$='/classical']) { --cdc-lb: #45a3f5; --cdc-lb-2: #2474c9; }
+.tournament-shields .tournament-shields__item:has(> h2 > a[href$='/crazyhouse']) { --cdc-lb: #3aa6e0; --cdc-lb-2: #0a78b8; }
+.tournament-shields .tournament-shields__item:has(> h2 > a[href$='/chess960']) { --cdc-lb: #fa8a4c; --cdc-lb-2: #d9601c; }
+.tournament-shields .tournament-shields__item:has(> h2 > a[href$='/antichess']) { --cdc-lb: #e86bb0; --cdc-lb-2: #b8438a; }
+.tournament-shields .tournament-shields__item:has(> h2 > a[href$='/atomic']) { --cdc-lb: #f0645a; --cdc-lb-2: #b93a2e; }
+.tournament-shields .tournament-shields__item:has(> h2 > a[href$='/threeCheck']) { --cdc-lb: #3fd0b2; --cdc-lb-2: #1f9c83; }
+.tournament-shields .tournament-shields__item:has(> h2 > a[href$='/kingOfTheHill']) { --cdc-lb: #d4a15f; --cdc-lb-2: #a8743a; }
+.tournament-shields .tournament-shields__item:has(> h2 > a[href$='/horde']) { --cdc-lb: #9aa9bd; --cdc-lb-2: #627288; }
+.tournament-shields .tournament-shields__item:has(> h2 > a[href$='/racingKings']) { --cdc-lb: #7fb2ff; --cdc-lb-2: #4a7fd6; }
+
+.tournament-shields,
+main.tournament-categ-shields {
+  --cdc-shield: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 46'%3E%3Cpath d='M20 1 38 7v14c0 11-7.6 19.6-18 24C9.6 40.6 2 32 2 21V7z'/%3E%3C/svg%3E");
+}
+
+/* Lichess's gold shield picture, with the category's glyph on it, becomes
+ * the header's tile: the card's gradient, cut as a shield. */
+.tournament-shields .shield-trophy {
+  position: static !important;
+  flex: none;
+  width: 40px !important;
+  height: 46px !important;
+  margin-inline-end: 6px;
+  padding-bottom: 4px;
+  background: linear-gradient(145deg, var(--cdc-lb), var(--cdc-lb-2)) !important;
+  -webkit-mask: var(--cdc-shield) center / contain no-repeat;
+  mask: var(--cdc-shield) center / contain no-repeat;
+  filter: none !important;
+  color: #fff !important;
+  font-size: 22px !important;
+  line-height: 42px !important;
+  text-shadow: 0 1px 1px #0000004d !important;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tournament-shields__item:hover .shield-trophy {
+  transform: rotate(-6deg) scale(1.08);
+}
+
+/* The name right after the tile, the chevron at the end. */
+.tournament-shields h2 a::after {
+  margin-inline-start: auto;
+}
+
+/* The five last holders, newest first: the one holding the shield now gets
+ * a gold one, the others a faint one. */
+.tournament-shields li::before {
+  content: '';
+  flex: none;
+  width: 18px;
+  height: 21px;
+  margin-inline: 3px;
+  background: #ffffff26;
+  -webkit-mask: var(--cdc-shield) center / contain no-repeat;
+  mask: var(--cdc-shield) center / contain no-repeat;
+}
+
+.tournament-shields li:first-child::before {
+  background: linear-gradient(145deg, #ffe07a, #e3a51b);
+}
+
+.tournament-shields li:first-child .user-link {
+  color: #fff !important;
+}
+
+/* -------------------------------------------------- a shield's history --- */
+
+main.tournament-categ-shields {
+  --cdc-lb: #f7c631;
+  --cdc-lb-2: #cf951a;
+}
+
+main.tournament-categ-shields .page-menu__content.box {
+  padding: 16px 0 40px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+main.tournament-categ-shields .box__top {
+  margin: 0 !important;
+  padding: 0 0 10px !important;
+}
+
+main.tournament-categ-shields .box__top h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 !important;
+  font-size: 28px !important;
+}
+
+/* The way back to all the shields, as a round button. */
+main.tournament-categ-shields .box__top h1 > a {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--cdc-btn-grey);
+  box-shadow: var(--cdc-btn-grey-shadow);
+  color: var(--cdc-text) !important;
+  font-size: 16px;
+}
+
+main.tournament-categ-shields .box__top h1 > a:hover {
+  background: var(--cdc-btn-grey-hover);
+  color: #fff !important;
+}
+
+main.tournament-categ-shields .box__top h1 > a::before {
+  margin: 0 !important;
+}
+
+/* Every shield won, as a card in a cabinet. */
+main.tournament-categ-shields .box > ol {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+  margin: 0;
+  /* Room for a card lifted on hover, which would slide under the title. */
+  padding: 8px 0 0;
+}
+
+/* The shield, then the name over the date. */
+main.tournament-categ-shields .box > ol > li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 12px;
+  align-items: center;
+  height: auto !important;
+  min-width: 0;
+  padding: 12px 14px !important;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 12px;
+  background: var(--cdc-bg-panel) !important;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s, box-shadow 0.15s;
+  animation: cdc-lb-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation-delay: calc(min(sibling-index(), 24) * 25ms);
+}
+
+main.tournament-categ-shields .box > ol > li:hover {
+  border-color: color-mix(in srgb, var(--cdc-lb) 55%, transparent);
+  box-shadow: 0 6px 18px #00000059;
+  transform: translateY(-3px);
+}
+
+/* A gold shield, its glyph engraved, instead of Lichess's picture. */
+main.tournament-categ-shields .shield-trophy {
+  position: static !important;
+  flex: none;
+  width: 34px !important;
+  height: 39px !important;
+  padding-bottom: 3px;
+  background: linear-gradient(145deg, #ffe07a, #e3a51b) !important;
+  -webkit-mask: var(--cdc-shield) center / contain no-repeat;
+  mask: var(--cdc-shield) center / contain no-repeat;
+  filter: none !important;
+  color: #5c3c00 !important;
+  font-size: 18px !important;
+  line-height: 36px !important;
+  text-shadow: 0 1px 0 #ffffff59 !important;
+  transform: none !important;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+main.tournament-categ-shields .box > ol > li:hover .shield-trophy {
+  transform: rotate(-6deg) scale(1.08) !important;
+}
+
+main.tournament-categ-shields .shield-trophy {
+  grid-row: span 2;
+}
+
+main.tournament-categ-shields .user-link {
+  align-self: end;
+  overflow: hidden;
+  min-width: 0;
+  color: var(--cdc-text) !important;
+  font-size: 15px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+main.tournament-categ-shields li:hover .user-link {
+  color: #fff !important;
+}
+
+main.tournament-categ-shields li > a:not(.user-link) {
+  align-self: start;
+  justify-self: start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cdc-lb) 16%, transparent);
+  color: var(--cdc-lb) !important;
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+main.tournament-categ-shields li > a:not(.user-link):hover {
+  background: var(--cdc-lb);
+  color: #1f1e1b !important;
+}
+
+/* The one holding the shield now: a card across the cabinet, and a bigger
+ * shield. */
+main.tournament-categ-shields .box > ol > li:first-child {
+  grid-column: 1 / -1;
+  gap: 6px 16px;
+  padding: 16px 20px !important;
+  border-color: color-mix(in srgb, var(--cdc-lb) 40%, transparent);
+}
+
+main.tournament-categ-shields li:first-child .shield-trophy {
+  width: 52px !important;
+  height: 60px !important;
+  padding-bottom: 5px;
+  font-size: 28px !important;
+  line-height: 55px !important;
+}
+
+main.tournament-categ-shields li:first-child .user-link {
+  color: #fff !important;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+/* Only the cabinet scrolls: the title stays in view, as on the index. */
+@media (min-width: 1020px) {
+  main.tournament-categ-shields .page-menu__content.box {
+    overflow: visible !important;
+  }
+
+  main.tournament-categ-shields .box__top {
+    container-type: scroll-state;
+    position: sticky;
+    z-index: 3;
+    top: 0;
+    margin: -16px -12px 0 !important;
+    padding: 16px 12px 10px !important;
+    background: var(--cdc-bg-page);
+  }
+
+  main.tournament-categ-shields .box__top::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: 14px;
+    background: linear-gradient(var(--cdc-bg-page), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  @container scroll-state(stuck: top) {
+    main.tournament-categ-shields .box__top::after {
+      opacity: 1;
+    }
+  }
+}
+
+/* ---------------------------------------------------- community menu --- */
+
+/* The side menu shared by these pages, the rating stats, the bots and the
+ * FIDE players: each link gets Chess.com's color icon on a tile tinted in
+ * its own color, which hops on hover. Told apart by how the hrefs end, as
+ * Lichess localizes them. */
+.subnav:has(a[href$='/player/bots']) a {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 14px 7px 8px !important;
+}
+
+.subnav:has(a[href$='/player/bots']) a::before {
+  content: '';
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background:
+    var(--cdc-nav-icon) center / 24px 24px no-repeat,
+    color-mix(in srgb, var(--cdc-nav-color, #fff) 16%, transparent);
+  box-shadow: inset 0 1px #ffffff14;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s;
+}
+
+.subnav:has(a[href$='/player/bots']) a:hover::before {
+  transform: translateY(-2px) rotate(-8deg) scale(1.08);
+}
+
+.subnav:has(a[href$='/player/bots']) a.active::before {
+  background-color: color-mix(in srgb, var(--cdc-nav-color, #fff) 32%, transparent);
+  box-shadow: inset 0 1px #ffffff26, 0 0 0 1px color-mix(in srgb, var(--cdc-nav-color, #fff) 45%, transparent);
+}
+
+.subnav a[href$='/player'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/leaderboard.svg');
+  --cdc-nav-color: #f7c631;
+}
+
+.subnav a[href*='/stat/rating/distribution'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/rating-stats.svg');
+  --cdc-nav-color: #1baaf0;
+}
+
+.subnav a[href$='/tournament/leaderboard'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/trophies.svg');
+  --cdc-nav-color: #fa742c;
+}
+
+.subnav a[href$='/tournament/shields'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/shield.svg');
+  --cdc-nav-color: #81b64c;
+}
+
+.subnav a[href$='/player/bots'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/device-bot.svg');
+  --cdc-nav-color: #8a6fd8;
+}
+
+.subnav:has(a[href$='/player/bots']) a[href*='/fide'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/globe.svg');
+  --cdc-nav-color: #26c2a3;
+}
+
+/* Lichess's separators are blank gaps: a faint rule instead. */
+.subnav:has(a[href$='/player/bots']) .sep {
+  height: 1px;
+  margin: 8px 14px !important;
+  background: var(--cdc-border);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .community__online > h2::before,
-  .community .leaderboards .user-top {
+  :is(.community .leaderboards .user-top, .tournament-leaderboards__item, .tournament-shields__item),
+  main.tournament-categ-shields .box > ol > li {
     animation: none;
   }
 
-  .community .leaderboards .user-top,
-  .community .leaderboards h2::before,
-  .community .leaderboards h2::after {
+  :is(.community .leaderboards .user-top, .tournament-leaderboards__item, .tournament-shields__item),
+  :is(.community .leaderboards, .tournament-leaderboards) h2::before,
+  :is(.community .leaderboards, .tournament-leaderboards) h2::after,
+  .shield-trophy,
+  main.tournament-categ-shields .box > ol > li,
+  .subnav:has(a[href$='/player/bots']) a::before {
     transition: none;
   }
 
-  .community .leaderboards .user-top:hover,
-  .community .leaderboards .user-top:hover h2::before,
-  .community .leaderboards .user-top:hover h2::after {
-    transform: none;
+  :is(.community .leaderboards .user-top, .tournament-leaderboards__item, .tournament-shields__item):hover,
+  :is(.community .leaderboards .user-top, .tournament-leaderboards__item, .tournament-shields__item):hover h2::before,
+  :is(.community .leaderboards .user-top, .tournament-leaderboards__item, .tournament-shields__item):hover h2::after,
+  .tournament-shields__item:hover .shield-trophy,
+  main.tournament-categ-shields .box > ol > li:hover,
+  main.tournament-categ-shields .box > ol > li:hover .shield-trophy {
+    transform: none !important;
   }
 }
 
@@ -421,7 +974,9 @@ html[dir='rtl'] .community .leaderboards h2 a:hover::after {
 
 /* Lichess's mobile layout runs the lists edge to edge. */
 @media (max-width: 799.98px) {
-  .community.page-menu__content.box {
+  .community.page-menu__content.box,
+  .page-menu__content.box:has(> :is(.tournament-leaderboards, .tournament-shields)),
+  main.tournament-categ-shields .page-menu__content.box {
     padding: 12px 12px 32px !important;
   }
 }

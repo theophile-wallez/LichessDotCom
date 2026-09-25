@@ -271,8 +271,11 @@
     display: none;
   }
 
+  /* Lichess makes them blocks with left-aligned text: the glyph sat left. */
   main.analyse .ceval > button {
     flex: none;
+    display: grid !important;
+    place-items: center;
     width: 32px;
     height: 32px;
     padding: 0 !important;

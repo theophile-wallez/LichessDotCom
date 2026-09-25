@@ -47,6 +47,15 @@
   }
   document.documentElement.dataset.cdcCoach = coach;
 
+  // The FIDE players' rank (styles/fide.css) counts the rows on the page, so a
+  // list opened on a later page (/fide?page=3) starts from that page's first
+  // player, at 30 a page, and hands out no medals.
+  const fidePage = location.pathname.endsWith('/fide') && +new URLSearchParams(location.search).get('page');
+  if (fidePage > 1) {
+    document.documentElement.dataset.cdcFideSkip = (fidePage - 1) * 30;
+    document.documentElement.style.setProperty('--cdc-fide-skip', (fidePage - 1) * 30);
+  }
+
   let sounds = null;
 
   const postSounds = () => {
@@ -486,6 +495,58 @@
     cleanRatings(tip);
   };
 
+  // Chess.com-style tooltips on the page's buttons (see styles/theme.css),
+  // instead of the browser's slow, unstyled `title`. On hover the title moves
+  // to `data-cdc-tip`, so the native one never shows. Snabbdom only sets the
+  // title again if it changes, and the next hover moves it again.
+  const tooltip = document.createElement('div');
+  tooltip.className = 'cdc-tooltip';
+  tooltip.setAttribute('aria-hidden', 'true');
+  let tooltipFor = null, tooltipTimer = 0, tooltipHiddenAt = 0;
+  const hideTooltip = () => {
+    clearTimeout(tooltipTimer);
+    if (tooltipFor && tooltip.classList.contains('cdc-tooltip--on')) tooltipHiddenAt = Date.now();
+    tooltipFor = null;
+    tooltip.classList.remove('cdc-tooltip--on');
+  };
+  const showTooltip = el => {
+    const text = el.dataset.cdcTip;
+    const key = text.match(/^(.*\S)\s*\((\S)\)$/);
+    tooltip.textContent = key ? key[1] : text;
+    if (key) tooltip.appendChild(document.createElement('kbd')).textContent = key[2];
+    if (!tooltip.isConnected) document.body.appendChild(tooltip);
+    const a = el.getBoundingClientRect(), t = tooltip.getBoundingClientRect();
+    const below = a.top - 8 - t.height < TIP_MARGIN;
+    const left = Math.max(TIP_MARGIN, Math.min(a.left + a.width / 2 - t.width / 2, innerWidth - TIP_MARGIN - t.width));
+    tooltip.dataset.side = below ? 'below' : 'above';
+    tooltip.style.top = (below ? a.bottom + 8 : a.top - 8 - t.height) + 'px';
+    tooltip.style.left = left + 'px';
+    tooltip.style.setProperty('--cdc-tooltip-arrow', `${a.left + a.width / 2 - left}px`);
+    tooltip.classList.add('cdc-tooltip--on');
+  };
+  document.addEventListener('mouseover', e => {
+    const el = e.target.closest?.('main button:is([title], [data-cdc-tip])');
+    if (el === tooltipFor) return;
+    hideTooltip();
+    if (!el) return;
+    if (el.title) {
+      el.dataset.cdcTip = el.title;
+      if (!el.hasAttribute('aria-label')) el.setAttribute('aria-label', el.title);
+      el.removeAttribute('title');
+    }
+    if (!el.dataset.cdcTip) return;
+    tooltipFor = el;
+    // A short wait before the first one, none when going from button to button.
+    tooltipTimer = setTimeout(() => showTooltip(el), Date.now() - tooltipHiddenAt < 400 ? 0 : 250);
+  }, true);
+  document.addEventListener('mouseout', e => e.relatedTarget || hideTooltip());
+  document.addEventListener('pointerdown', hideTooltip, true);
+  document.addEventListener('scroll', hideTooltip, true);
+  const syncTooltip = () => {
+    // Snabbdom replaced the button under the pointer.
+    if (tooltipFor && !tooltipFor.isConnected) hideTooltip();
+  };
+
   setInterval(() => {
     syncControlsHeight();
     syncPlayers();
@@ -500,6 +561,7 @@
     syncSwissRounds();
     syncForumLabels();
     syncPowertip();
+    syncTooltip();
   }, 250);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncHero);
   else syncHero();

@@ -29,6 +29,7 @@
         "src/styles/powertip.css",
         "src/styles/profile.css",
         "src/styles/ratingchart.css",
+        "src/styles/distribution.css",
         "src/styles/home.css",
         "src/styles/coach.css",
         "src/styles/teams.css",
@@ -44,6 +45,8 @@
         "src/styles/broadcast.css",
         "src/styles/swiss.css",
         "src/styles/leaderboard.css",
+        "src/styles/fide.css",
+        "src/styles/bots.css",
         "src/styles/simul.css",
         "src/styles/forum.css"
       ],
@@ -52,7 +55,7 @@
     },
     {
       "matches": ["https://lichess.org/*"],
-      "js": ["src/page.js", "src/board.js", "src/review.js"],
+      "js": ["src/page.js", "src/board.js", "src/review.js", "src/distribution.js"],
       "run_at": "document_start",
       "world": "MAIN"
     }

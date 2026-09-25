@@ -54,20 +54,33 @@ is "a Chess.com user wouldn't notice they're on Lichess".
   side panel and the title stay put and only the content moves, as in an
   app: never the whole page. Pin them with `position: sticky` (see
   `simul.css`), or make the content its own scrolling area.
+- **Every chart is modern.** Lichess draws its graphs with Chart.js into a
+  `<canvas>`: flat, in its own colors and out of reach of CSS. Any graph we
+  meet gets redrawn in SVG from the page's own data (usually
+  `#page-init-data`), in the look the profile's rating chart set
+  (`ratingchart.js`, `distribution.js`, `dashboard.js`): smooth curves or
+  rounded columns over a gradient in the series' color (the same color for
+  the same rating everywhere), a faint dashed grid, chips as the legend, a
+  frosted tooltip on hover, and an entrance animation (off under
+  `prefers-reduced-motion`). Labels come from Lichess's `i18n.site` and
+  numbers from `Intl`, so the chart speaks the page's language. Hide
+  Lichess's canvas only once ours is in, so a data change falls back to
+  theirs.
 
 ## Layout of the repo
 
 | Path | What it does |
 | --- | --- |
-| `manifest.json` | Content scripts: CSS + `content.js` + `dashboard.js` + `ratingchart.js` (isolated world), `page.js` + `board.js` + `review.js` (page world). |
+| `manifest.json` | Content scripts: CSS + `content.js` + `dashboard.js` + `ratingchart.js` (isolated world), `page.js` + `board.js` + `review.js` + `distribution.js` (page world). |
 | `img/coaches/` | The Game Review coach's faces (`coach-<n>.webp`), web-accessible so `review.css` can load them. |
 | `src/background.js` | Service worker: downloads the Chess.com sounds, caches them as base64. |
-| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, fetches a finished game's move times (and its time control, for the "New 10 min" button), the players' country flags (from their profiles), the analysis board's players (copied from the hidden game info), the home hero, coach title badges, the Swiss list's round progress, the forum index's count labels, the hover card's rating chips and its fit in the window, the eval bar's score, the font remapping, and which coach (`data-cdc-coach` on `<html>`) reads a practice drill's goal. |
+| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, fetches a finished game's move times (and its time control, for the "New 10 min" button), the players' country flags (from their profiles), the analysis board's players (copied from the hidden game info), the home hero, coach title badges, the Swiss list's round progress, the forum index's count labels, the hover card's rating chips and its fit in the window, the eval bar's score, the font remapping, the FIDE list's rank offset on a later page, and which coach (`data-cdc-coach` on `<html>`) reads a practice drill's goal. |
 | `src/dashboard.js` | Isolated world: the puzzle dashboard's theme radar, redrawn as SVG from the page's init JSON (Lichess draws it into a canvas). |
 | `src/ratingchart.js` | Isolated world: the rating history chart (profile, rating stats page), redrawn in SVG from the page's init JSON (Lichess draws it with Chart.js into a canvas): smooth curves over gradients, range pills, one chip per rating, a hover tooltip. |
+| `src/distribution.js` | Page world: the weekly rating distribution (`/stat/rating/distribution/<perf>`), redrawn in SVG from the page's init JSON (Lichess draws it with Chart.js into a canvas): a rounded column per 25 points in the rating's color, the cumulative curve, pills for your rating and the player you came from, a hover tooltip. Page world for Lichess's translated labels (`i18n.site`). |
 | `src/page.js` | Page world: wraps `site.sound` to play the right Chess.com sound per move, plus premove / illegal / game-start, which Lichess has no sound for. |
 | `src/board.js` | Page world: every main board's shapes redrawn Chess.com-style (right-clicked squares filled, arrows), checkmate badge and label. |
-| `src/review.js` | Page world: Game Review (engine, classification, panel, the coach's comment per move: how the evaluation moved plus one fact from the board and the engine, typed out word by word, board overlays, eval bar). On the free analysis board (`/analysis`) the same coach judges each move as it's played, variations included, with the badges on the board and in Lichess's move list. |
+| `src/review.js` | Page world: Game Review (engine, classification, panel, the coach's comment per move: how the evaluation moved plus one fact from the board and the engine, its pieces drawn as Neo pieces and its moves as chips, typed out word by word, board overlays, eval bar). On the free analysis board (`/analysis`) the same coach judges each move as it's played, variations included, with the badges on the board and in Lichess's move list. |
 | `src/styles/theme.css` | Overrides Lichess's `--c-*` color variables, fonts, buttons. |
 | `src/styles/sidebar.css` | Lichess's top header → Chess.com's left sidebar, and the user menu (dasher) as a Chess.com menu. |
 | `src/styles/board.css` | Board, pieces, highlights, move hints, arrows, coordinates, and Lichess's eval bar drawn like the Game Review's. |
@@ -80,6 +93,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/powertip.css` | The profile hover card (`#powerTip`, filled with `/@/<user>/mini`) as a Chess.com player card. |
 | `src/styles/profile.css` | Player profile (`main.page-menu` + `.user-show`) as a Chess.com member page: a hero card (avatar, name, awards, counters, actions), the side ratings as a full-width strip of rating cards, the about card and rating chart, pill tabs, the activity timeline and the game rows. |
 | `src/styles/ratingchart.css` | The SVG rating chart of `ratingchart.js`: chips, range pills, curves and their wipe-in / morph animations, the tooltip. Hides Lichess's chart only once ours is in. |
+| `src/styles/distribution.css` | The rating distribution page (`.rating-stats`) and the SVG chart of `distribution.js`: columns that rise in, the curve drawing itself, marker pills. Reuses the chips, grid and tooltip of `ratingchart.css`. |
 | `src/styles/home.css` | Home page (`main.lobby`) as a 12-column card dashboard, with quick pairing as Chess.com's time-control picker (same-size buttons, three to a row); the hero is added by `content.js`. |
 | `src/styles/coach.css` | Coach directory (`main.coach-list`) as a grid of coach cards; the title badges are split out of the names by `content.js`. |
 | `src/styles/teams.css` | Team lists (`main.team-list`) as a grid of club cards with avatar tiles. |
@@ -94,7 +108,9 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/dashboard.css` | Puzzle dashboard (`.puzzle-dashboard`): stat tiles, per-theme rows, and the panel around `dashboard.js`'s radar. |
 | `src/styles/broadcast.css` | Broadcasts (`.relay-index` lists, calendar, FIDE pages, info pages) as event cards with a LIVE pill. |
 | `src/styles/swiss.css` | Swiss tournaments home (`main.swiss-home`): now playing / starting soon as tournament cards (time-control tile, rounds progress bar, player chip), the explanations as point cards, a comparison card and a grid of FAQ cards. |
-| `src/styles/leaderboard.css` | Players leaderboard (`/player`, `.community`) in the Practice look: a card per leaderboard with its icon white on a tile in its own color, medals for the top three, and the online players in a sticky side card with rating chips. |
+| `src/styles/leaderboard.css` | Players leaderboard (`/player`, `.community`) in the Practice look: a card per leaderboard with its icon white on a tile in its own color, medals for the top three, and the online players in a sticky side card with rating chips. Tournament winners (`/tournament/leaderboard`, `.tournament-leaderboards`) reuse the same cards, with a gold / silver / bronze cup per yearly / monthly / weekly winner, the tournament as a pill, and the side menu and title pinned while the cards scroll. Tournament shields (`/tournament/shields`, `.tournament-shields`) are the same cards with a shield-shaped tile (colored by how the category link ends, as the header has no icon) and a gold mini-shield for the current holder; a shield's history (`/tournament/shields/<perf>`, `main.tournament-categ-shields`) is a grid of gold shield cards, the holder's across the top. The side menu these pages share (leaderboard, rating stats, tournament winners and shields, bots, FIDE players) gives each link Chess.com's color icon on a tile tinted in its own color. |
+| `src/styles/fide.css` | FIDE players (`/fide`, `.fide-players`) as Chess.com's top players: a row card per player with a rank (medals for the top three, only when sorted by a rating; `content.js` offsets it when the list opens on a later `?page=`), a rounded photo (Chess.com's avatar when FIDE has none), title badge, name and flag, the sorted-by rating in white, and the sort links as pills with time-control icons. The side menu, the title with the search and the column pills stay put while the rows scroll. |
+| `src/styles/bots.css` | Online bots (`/player/bots`, `.bots`) as bot cards: a Neo piece white on a gradient tile (gold for the featured bots, otherwise a color and a piece per card), a green dot when online, ratings as chips, a clipped bio and a green Play button. Each section's title stays in view over its own cards. |
 | `src/styles/simul.css` | Simuls home (`main.simul-list`) in the Practice look: a color per section (yours, open, in progress, finished), each simul a card whose tile is a stack of little boards with a Neo piece on it, a dashed "host a simul" card, the title pinned while the list scrolls, and the help as a sticky card with Fischer's photo as a polaroid and the rules as numbered steps. |
 | `src/styles/forum.css` | The forum, every page of it: the index as a card per category (a color and one of Lichess's 3D emoji each, counts as chips, the last post as a footer), a category's topics as rows with the reply count in a speech bubble, a topic's posts as cards with avatars and pill reactions, the reply box, the new topic form's warnings as tip tiles, and the search results. |
 
