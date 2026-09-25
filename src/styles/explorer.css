@@ -190,6 +190,12 @@
   line-height: 1;
 }
 
+/* The analysis board already names the line over its move list (review.js):
+   no need to say it twice. */
+html.cdc-opening-on main.analyse .explorer-box .data > .title:has(> a) {
+  display: none !important;
+}
+
 .explorer-box .data > .title > a {
   min-width: 0;
   overflow: hidden;
