@@ -36,6 +36,7 @@
         "src/styles/teams.css",
         "src/styles/study.css",
         "src/styles/friends.css",
+        "src/styles/friendbox.css",
         "src/styles/puzzle.css",
         "src/styles/blog.css",
         "src/styles/practice.css",

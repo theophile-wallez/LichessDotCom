@@ -940,13 +940,25 @@
     vertical-align: -0.35em;
   }
 
+  /* A chip holds its pieces whole: they're sized to its line, and the
+   * chip's own negative margins keep it from pushing the lines apart. */
   .cdc-mv {
     display: inline-block;
-    padding: 0 0.3em 0 0.1em;
+    margin: -0.05em 0;
+    padding: 0.05em 0.3em 0.05em 0.1em;
     border-radius: 6px;
     background: #ebeae8;
     font-weight: 700;
+    line-height: 1.3;
+    vertical-align: -0.05em;
     white-space: nowrap;
+  }
+
+  .cdc-mv .cdc-pc {
+    width: 1.3em;
+    height: 1.3em;
+    margin: 0 0.05em 0 0;
+    vertical-align: top;
   }
 
   .cdc-sq {

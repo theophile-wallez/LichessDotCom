@@ -295,6 +295,61 @@ html[dir='rtl'] :is(.relay-index, .relay-calendar) .box__top .search input {
   }
 }
 
+/* ------------------------------------------------------------ menu --- */
+
+/* The side menu (the FIDE pages share it): each link's icon and tile color
+ * (the tiles are in pages.css). "My broadcasts" and another user's end with
+ * their name; the private and non-official lists are for admins. */
+.subnav:has(a[href$='/broadcast/calendar']) a[href$='/broadcast'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/today.svg');
+  --cdc-nav-color: #81b64c;
+}
+
+.subnav:has(a[href$='/broadcast/calendar']) a[href*='/broadcast/by/'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/stream.svg');
+  --cdc-nav-color: #8a6fd8;
+}
+
+.subnav:has(a[href$='/broadcast/calendar']) a[href$='/broadcast/subscribed'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/heart-red.svg');
+  --cdc-nav-color: #e25555;
+}
+
+.subnav:has(a[href$='/broadcast/calendar']) a[href$='/broadcast/calendar'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/calendar-dailypuzzle.svg');
+  --cdc-nav-color: #1baaf0;
+}
+
+.subnav:has(a[href$='/broadcast/calendar']) a[href$='/broadcast/help'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/book-open-aqua.svg');
+  --cdc-nav-color: #26c2a3;
+}
+
+.subnav:has(a[href$='/broadcast/calendar']) a[href$='/broadcast/app'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/device-mobile.svg');
+  --cdc-nav-color: #1baaf0;
+}
+
+.subnav:has(a[href$='/broadcast/calendar']) a[href$='/broadcast/all-private'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/lock-closed.svg');
+  --cdc-nav-color: #f7c631;
+}
+
+.subnav:has(a[href$='/broadcast/calendar']) a[href$='/broadcast/non-official'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/binoculars.svg');
+  --cdc-nav-color: #9aa3ad;
+}
+
+.subnav:has(a[href$='/broadcast/calendar']) a[href$='/fide'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/masters.svg');
+  --cdc-nav-color: #f7c631;
+}
+
+.subnav:has(a[href$='/broadcast/calendar']) a[href*='/fide/federation'] {
+  --cdc-nav-icon: url('https://assets-ds.chess.com/color-icons/globe.svg');
+  --cdc-nav-color: #26c2a3;
+}
+
 /* ---------------------------------------------------------- pinned --- */
 
 /* Only the lists scroll: the side menu (the FIDE pages and the broadcast
