@@ -45,6 +45,8 @@
         "src/styles/broadcast.css",
         "src/styles/swiss.css",
         "src/styles/leaderboard.css",
+        "src/styles/fide.css",
+        "src/styles/bots.css",
         "src/styles/simul.css",
         "src/styles/forum.css"
       ],
