@@ -106,6 +106,13 @@
     const { pieces, lastMove } = state;
     const before = lastPieces;
     lastPieces = pieces;
+    // After a legal move only the side to move can be in check, so a king under
+    // attack is enough: no need for the last move, which Lichess doesn't
+    // highlight when "Highlight last move" is off.
+    const inCheck = [...pieces].some(
+      ([key, p]) => p.role === 'king' && isAttacked(pieces, key, p.color === 'white' ? 'black' : 'white'),
+    );
+    if (inCheck) return 'move-check';
     if (!lastMove.length) return fallback;
 
     // Drops only highlight one square.
@@ -120,11 +127,6 @@
     const castle =
       ay === by && Math.abs(ax - bx) >= 2 && (!mover || mover.role === 'king');
 
-    if (mover) {
-      const enemy = mover.color === 'white' ? 'black' : 'white';
-      const enemyKing = [...pieces].find(([, p]) => p.color === enemy && p.role === 'king');
-      if (enemyKing && isAttacked(pieces, enemyKing[0], mover.color)) return 'move-check';
-    }
     if (castle) return 'castle';
     // Auto-queen swaps the pawn before we get to look, so also check what stood
     // on the origin square before the move.
@@ -211,13 +213,7 @@
     };
 
     playCdcSound = playCdc;
-    if (freshGameId) {
-      const key = 'cdc-started:' + freshGameId;
-      if (!sessionStorage.getItem(key)) {
-        sessionStorage.setItem(key, '1');
-        playCdc('game-start');
-      }
-    }
+    playGameStart();
   }
 
   // ------------------------------------------------------------- attempts ---
@@ -291,21 +287,27 @@
 
   // ----------------------------------------------------------- game start ---
   // Lichess has no game start sound. Its round data is inlined in the page as
-  // JSON and removed once read, so grab it while the page parses, and play
-  // "game-start" once per game when a player opens a game that just began.
+  // JSON and removed once read, so hold on to the node while the page parses
+  // (see dashboard.js). Its text is only complete at DOMContentLoaded: it ends
+  // the page, so it can arrive cut at a network chunk, and nothing after it
+  // would have us look again. Play "game-start" once per game when a player
+  // opens a game that just began.
 
   let freshGameId = null;
+  let initData = null;
 
   const initObserver = new MutationObserver(() => {
-    const el = document.getElementById('page-init-data');
-    if (!el) return;
-    let data;
-    try {
-      data = JSON.parse(el.textContent)?.data;
-    } catch {
-      return; // Not fully parsed yet.
-    }
+    initData = document.getElementById('page-init-data');
+    if (initData) initObserver.disconnect();
+  });
+
+  function readFreshGame() {
     initObserver.disconnect();
+    let data = null;
+    try {
+      data = initData ? JSON.parse(initData.textContent)?.data : null;
+    } catch {}
+    initData = null;
     const game = data?.game;
     const status = game?.status?.name;
     if (
@@ -316,10 +318,24 @@
       (game.turns ?? 0) <= 1
     ) {
       freshGameId = game.id;
+      playGameStart();
     }
-  });
-  initObserver.observe(document, { childList: true, subtree: true });
-  document.addEventListener('DOMContentLoaded', () => initObserver.disconnect());
+  }
+
+  // Runs once both the game is read and our sounds are in, whichever is last.
+  function playGameStart() {
+    if (!freshGameId || !playCdcSound) return;
+    const key = 'cdc-started:' + freshGameId;
+    freshGameId = null;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, '1');
+    playCdcSound('game-start');
+  }
+
+  if (document.readyState === 'loading') {
+    initObserver.observe(document, { childList: true, subtree: true });
+    document.addEventListener('DOMContentLoaded', readFreshGame);
+  }
 
   function toBlobUrls(sounds) {
     const blobs = {};
