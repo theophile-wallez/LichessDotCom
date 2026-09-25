@@ -484,6 +484,12 @@ html.cdc-opening-on main.analyse .explorer-box .data > .title:has(> a) {
 
 /* ---------------------------------------------------- empty, messages --- */
 
+/* Nothing to show ("Max depth reached!", "No game found", "Checkmate"): the
+   tabs and the opening say enough, the move list gets the room. */
+.explorer-box .data.empty > :is(.message, .title:not(:has(> a))) {
+  display: none !important;
+}
+
 .explorer-box .message {
   gap: 8px;
   padding: 16px 12px;
@@ -607,8 +613,9 @@ html.cdc-opening-on main.analyse .explorer-box .data > .title:has(> a) {
 
 /* ---------------------------------------------------- analysis panel --- */
 
-/* Open, the explorer takes most of the panel; the move list keeps enough
-   for a few moves. Lichess still shrinks it once the line leaves book. */
+/* The move list keeps most of the panel: the explorer takes what it needs,
+   up to 40% of it, and scrolls past that. Lichess still shrinks it once the
+   line leaves book. */
 @media (min-width: 1020px) {
   main.analyse .analyse__tools:has(> .explorer-box:not(.reduced)) > .analyse__moves {
     flex: 1 1 0 !important;
@@ -616,6 +623,7 @@ html.cdc-opening-on main.analyse .explorer-box .data > .title:has(> a) {
   }
 
   main.analyse .explorer-box:not(.reduced) {
-    flex: 3 1 0 !important;
+    flex: 0 1 auto !important;
+    max-height: 40%;
   }
 }
