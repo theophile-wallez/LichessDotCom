@@ -1,0 +1,585 @@
+/*
+ * Puzzle Storm: a run (/storm, .storm--play), its end (main.storm--end)
+ * and the highscores dashboard (/storm/dashboard, main.storm-dashboard).
+ * The side panel, the clock, the combo and the puzzles played look like a
+ * Puzzle Racer race's (racer.css shares those rules with `.storm`). Lichess's
+ * tornado gives way to the sidebar's Puzzle Rush icon everywhere, its
+ * digital storm font to bold white numbers, and the highscores sit in the
+ * right-hand column under the panel, so the page doesn't scroll.
+ */
+
+.storm,
+.storm-dashboard,
+main:has(> .storm) {
+  --cdc-storm: #fa742c;
+  --cdc-storm-icon: url('https://assets-ds.chess.com/color-icons/puzzle-rush.svg');
+}
+
+/* ------------------------------------------------------------- run --- */
+
+/* One grid for the run and what the page puts under it: the board, and in
+ * the right-hand column the panel, the highscores and the About link, as
+ * Chess.com's Puzzle Rush does. The run's own grid makes way (`display:
+ * contents`; its nodes stay where Lichess put them). Lichess sizes the board
+ * to the whole window's width, sidebar included, which pushed the column
+ * past the window's edge wherever the width, not the height, limits the
+ * board: cap it to what the sidebar leaves (the column's 240px and the gap,
+ * the page margins, a scrollbar, and a gutter for the ranks, which board.css
+ * draws left of the board). */
+@media (min-width: 1020px) {
+  #main-wrap > main:has(> .storm--play) {
+    --cdc-coords-l: 0px;
+
+    display: grid;
+    grid-template-columns:
+      min(
+        var(---col2-uniboard-width),
+        calc(100vw - var(--cdc-sidebar-w, 0px) - 2 * var(---main-margin, 0px) - var(--cdc-coords-l) - 275px)
+      )
+      minmax(240px, 400px);
+    grid-template-rows: 1fr repeat(3, auto);
+    grid-template-areas:
+      'board side'
+      'board scores'
+      'board high'
+      'board about';
+    justify-content: center;
+    gap: 14px var(---block-gap, 16px);
+    margin-left: var(--cdc-coords-l);
+  }
+
+
+  /* The files under the board get the page's padding rather than the
+   * board's margin, so the right-hand column ends with the squares. */
+  body:is(.coords-in, .coords-out) #main-wrap > main:has(> .storm--play) {
+    --cdc-coords-l: calc(0.6 * var(--cdc-coords-size, 13px) + 10px);
+
+    padding-bottom: 12px;
+  }
+
+  body:is(.coords-in, .coords-out) main > .storm--play .puz-board {
+    margin-bottom: 0 !important;
+  }
+
+  main > .storm--play {
+    display: contents !important;
+  }
+
+  main:has(> .storm--play) > .storm-play-scores {
+    grid-area: scores;
+    margin: 4px 0 0 !important;
+  }
+
+  main:has(> .storm--play) > .storm-dashboard__high__periods {
+    grid-area: high;
+  }
+
+  main:has(> .storm--play) > .storm__about__link {
+    grid-area: about;
+    justify-self: start;
+    margin: 0 !important;
+  }
+
+  main > .storm--play .puz-side {
+    min-height: 0;
+  }
+}
+
+/* ---- side panel --- */
+
+/* The sidebar's Puzzle Rush icon on a tile tinted in its color, where
+ * Lichess draws its tornado. */
+.storm .puz-side__top::before {
+  content: '' !important;
+  flex: none;
+  width: 64px !important;
+  height: 64px !important;
+  margin: 0 !important;
+  border-radius: 14px;
+  background:
+    var(--cdc-storm-icon) center / 46px no-repeat,
+    color-mix(in srgb, var(--cdc-storm) 18%, var(--cdc-bg-raised)) !important;
+  box-shadow: inset 0 1px 0 #ffffff1f, 0 0 0 1px color-mix(in srgb, var(--cdc-storm) 35%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The icon gives a jolt with each puzzle solved. */
+  .storm.puz-mod-puzzle .puz-side__top::before {
+    animation: cdc-storm-jolt 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  }
+}
+
+@keyframes cdc-storm-jolt {
+  30% {
+    transform: rotate(-10deg) scale(1.1);
+  }
+
+  60% {
+    transform: rotate(6deg) scale(1.05);
+  }
+}
+
+/* The clock turns green for a bonus, red for a penalty (Lichess's own
+ * colors lose to the white clock's dark digits). */
+.storm.puz-mod-bonus-slow .puz-clock__time {
+  color: #4f8a34 !important;
+}
+
+.storm.puz-mod-malus-slow .puz-clock__time {
+  color: #c0392f !important;
+}
+
+/* The seconds won or lost float up from the clock as bold pills. */
+.storm :is(.puz-clock__bonus, .puz-clock__malus) {
+  margin: 0 !important;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #81b64c2e;
+  color: var(--cdc-green-hover) !important;
+  font-family: var(--cdc-font) !important;
+  font-size: 22px !important;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.storm .puz-clock__malus {
+  background: #e0282833;
+  color: #f0645a !important;
+}
+
+/* "You play the white pieces": a chip with a pawn of that color, under the
+ * clock rather than hanging below the panel. */
+.storm .puz-clock {
+  flex-wrap: wrap;
+}
+
+.storm .puz-clock__pov {
+  position: static !important;
+  display: inline-flex;
+  align-items: center;
+  flex-basis: auto;
+  gap: 8px;
+  margin: 0 !important;
+  padding: 6px 12px 6px 8px;
+  border-radius: 999px;
+  background: var(--cdc-bg-raised);
+  color: var(--cdc-text) !important;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.storm .puz-clock__pov::before {
+  content: '';
+  width: 28px;
+  height: 28px;
+  margin: -4px -2px -4px -4px;
+  background: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/wp.png') center / contain no-repeat;
+}
+
+.storm:has(.cg-wrap.orientation-black) .puz-clock__pov::before {
+  background-image: url('https://images.chesscomfiles.com/chess-themes/pieces/neo/150/bp.png');
+}
+
+/* Flip, new run, end run: grey buttons, the flip green while flipped. */
+.storm .puz-side__control .button {
+  background: var(--cdc-btn-grey) !important;
+  box-shadow: var(--cdc-btn-grey-shadow) !important;
+  color: var(--cdc-text) !important;
+}
+
+.storm .puz-side__control .button:hover {
+  background: var(--cdc-btn-grey-hover) !important;
+  color: #fff !important;
+}
+
+.storm .puz-side__control .button.active {
+  background: var(--cdc-btn-green) !important;
+  box-shadow: var(--cdc-btn-green-shadow) !important;
+  color: #fff !important;
+}
+
+/* ---- highscores --- */
+
+/* "Highscores" with a trophy, and "View best runs" as a pill. */
+.storm-play-scores {
+  align-items: center;
+  gap: 10px;
+  color: #fff !important;
+}
+
+.storm-play-scores span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 17px;
+  font-weight: 800;
+  text-transform: none !important;
+}
+
+.storm-play-scores span::before {
+  content: '';
+  width: 24px;
+  height: 24px;
+  background: url('https://assets-ds.chess.com/color-icons/trophies.svg') center / contain no-repeat;
+}
+
+.storm-play-scores a {
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: var(--cdc-bg-raised);
+  color: var(--cdc-text) !important;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background 0.15s, color 0.15s;
+}
+
+.storm-play-scores a:hover {
+  background: var(--cdc-bg-raised-hover);
+  color: #fff !important;
+}
+
+/* A tile per period: the score big and white, the all-time best in gold.
+ * Four to a row, or two when the column is narrow (never three and one). */
+.storm-dashboard__high__periods {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(calc(50% - 4px), max(72px, (100% - 330px) * -999)), 1fr));
+  gap: 8px !important;
+}
+
+/* Zen mode hides them, and then their rows' gaps. */
+body.zenable.zen .storm-dashboard__high__periods {
+  display: none !important;
+}
+
+@media (min-width: 1020px) {
+  body.zenable.zen #main-wrap > main:has(> .storm--play) {
+    row-gap: 0;
+  }
+}
+
+.storm-dashboard__high__period {
+  display: flex !important;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 12px 6px 10px !important;
+  border: 1px solid var(--cdc-card-border) !important;
+  border-radius: 10px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: none !important;
+  color: var(--cdc-text-dim) !important;
+  font-family: var(--cdc-font) !important;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.storm-dashboard__high__period strong {
+  color: #fff;
+  font-family: var(--cdc-font) !important;
+  font-size: 28px !important;
+  font-weight: 800 !important;
+  font-variant-numeric: tabular-nums;
+  line-height: 1 !important;
+}
+
+.storm-dashboard__high__period:first-child {
+  border-color: #e3aa2466 !important;
+  box-shadow: inset 0 0 0 1px #e3aa2433 !important;
+}
+
+.storm-dashboard__high__period:first-child strong {
+  color: var(--c-brag);
+}
+
+/* "About Puzzle Storm", as a pill (as on the Racer home). */
+.storm__about__link {
+  font-size: 13px !important;
+}
+
+.storm__about__link a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--cdc-bg-raised);
+  color: var(--cdc-text) !important;
+  font-weight: 700;
+  transition: background 0.15s, color 0.15s;
+}
+
+.storm__about__link a::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  background: url('https://assets-ds.chess.com/color-icons/lessons.svg') center / contain no-repeat;
+}
+
+.storm__about__link a:hover {
+  background: var(--cdc-bg-raised-hover);
+  color: #fff !important;
+}
+
+/* ------------------------------------------------------------- end --- */
+
+/* The score on a dark card like the stats beside it, the number in green
+ * under the Puzzle Rush icon. Lichess fills the card with its "good" color,
+ * which is our green: a whole green card next to the green Play again. */
+.storm--end__score {
+  gap: 6px;
+  padding: 28px 24px !important;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 12px !important;
+  background: var(--cdc-bg-panel) !important;
+  color: var(--cdc-text-dim) !important;
+}
+
+.storm--end__score::before {
+  content: '';
+  width: 72px;
+  height: 72px;
+  background: var(--cdc-storm-icon) center / contain no-repeat;
+}
+
+.storm--end__score__number {
+  width: auto !important;
+  min-width: 3ch;
+  color: var(--cdc-green-hover);
+  font-family: var(--cdc-font) !important;
+  font-size: 128px !important;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.storm--end__score p {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+/* The stats: a row each, the label dim and the number bold and white. */
+.storm--end__stats {
+  padding: 16px 24px !important;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 12px !important;
+  background: var(--cdc-bg-panel) !important;
+}
+
+.storm--end__stats table {
+  border-collapse: collapse;
+}
+
+.storm--end__stats :is(tr, th, td) {
+  background: none !important;
+}
+
+.storm--end__stats tr + tr {
+  border-top: 1px solid var(--cdc-border);
+}
+
+.storm--end__stats th {
+  padding: 0 !important;
+  color: var(--cdc-text-dim);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.storm--end__stats td {
+  padding: 10px 0 10px 24px !important;
+  color: var(--cdc-text-dim);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.storm--end__stats td number,
+.storm-dashboard__history number {
+  color: #fff;
+  font-family: var(--cdc-font) !important;
+  font-size: 22px !important;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A new highscore: a dark card, the title in gold between two Puzzle Rush
+ * icons (Lichess fills it with gold, between two tornadoes). */
+.storm--end__high {
+  padding: 22px 24px !important;
+  border: 1px solid #e3aa2466;
+  border-radius: 12px !important;
+  background: var(--cdc-bg-panel) !important;
+  box-shadow: inset 0 0 0 1px #e3aa2426 !important;
+  color: var(--cdc-text-dim) !important;
+}
+
+/* Lichess's shimmer sweeping across it, in gold. */
+.storm--end__high.bar-glider::after {
+  width: 120px;
+  background: linear-gradient(to right, transparent, #e3aa2426, transparent);
+}
+
+.storm--end__high__content {
+  justify-content: center !important;
+  gap: 28px;
+}
+
+.storm--end__high__content::before,
+.storm--end__high__content::after {
+  width: 72px !important;
+  height: 72px !important;
+  margin: 0 !important;
+  background: var(--cdc-storm-icon) center / contain no-repeat !important;
+}
+
+.storm--end__high__content::after {
+  transform: scaleX(-1);
+}
+
+.storm--end__high__text {
+  gap: 6px;
+}
+
+.storm--end__high__text strong {
+  margin: 0 !important;
+  color: var(--c-brag);
+  font-size: 32px !important;
+  font-weight: 800;
+  text-align: center;
+}
+
+.storm--end__high__text span {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* ---- play again --- */
+
+/* A big green button with the Puzzle Rush icon before its name, where
+ * Lichess spreads a tornado at each end. */
+.storm-play-again {
+  justify-content: center !important;
+  gap: 16px;
+  padding: 20px 32px !important;
+  border-radius: 12px !important;
+  font-size: 26px !important;
+}
+
+.storm-play-again::before {
+  width: 52px !important;
+  height: 52px !important;
+  background: var(--cdc-storm-icon) center / contain no-repeat !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 2px 3px #0000004d);
+}
+
+.storm-play-again::after {
+  display: none !important;
+}
+
+/* ------------------------------------------------------- dashboard --- */
+
+.storm-dashboard {
+  display: flex;
+  flex-flow: column;
+  gap: 16px;
+}
+
+.storm-dashboard__high {
+  padding: 20px 24px 24px !important;
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 12px !important;
+  background: var(--cdc-bg-panel) !important;
+}
+
+.storm-dashboard__high .box__top {
+  margin: 0 0 18px !important;
+  padding: 0 !important;
+}
+
+.storm-dashboard__high h1 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0 !important;
+  font-size: 26px !important;
+  font-weight: 800 !important;
+}
+
+.storm-dashboard__high h1::before {
+  content: '';
+  flex: none;
+  width: 40px;
+  height: 40px;
+  background: var(--cdc-storm-icon) center / contain no-repeat;
+}
+
+.storm-dashboard__high .storm-dashboard__high__period {
+  padding: 22px 8px 16px !important;
+  background: var(--cdc-bg-panel-dark) !important;
+  font-size: 14px;
+}
+
+.storm-dashboard__high .storm-dashboard__high__period strong {
+  font-size: 48px !important;
+}
+
+.storm-dashboard .storm-play-again {
+  margin: 0 !important;
+}
+
+/* The best run of each day: a card of rows, the numbers bold and white,
+ * the score in gold. */
+.storm-dashboard__history {
+  border: 1px solid var(--cdc-card-border);
+  border-radius: 12px !important;
+  background: var(--cdc-bg-panel) !important;
+}
+
+.storm-dashboard__history th {
+  color: var(--cdc-text-dim) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+.storm-dashboard__history td {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.storm-dashboard__history number {
+  font-size: 18px !important;
+}
+
+.storm-dashboard__history number.score {
+  color: var(--c-brag);
+}
+
+/* ---------------------------------------------------------- reload --- */
+
+/* "This run was opened in another tab": the Puzzle Rush icon instead of
+ * Lichess's tornado glyph. */
+.storm--reload {
+  align-items: center;
+  gap: 16px;
+  padding: 32px !important;
+  border-radius: 12px !important;
+}
+
+.storm--reload > :first-child {
+  width: 140px;
+  height: 140px;
+  background: var(--cdc-storm-icon) center / contain no-repeat;
+  font-size: 0 !important;
+}
+
+.storm--reload p {
+  margin: 0 !important;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}

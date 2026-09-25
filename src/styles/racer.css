@@ -6,6 +6,9 @@
  * hover. In a race the side panel, the clock, the combo and the track below
  * the board get Chess.com's look: bold white numbers instead of the storm
  * font, pills, a green combo bar, and lanes of asphalt with a finish line.
+ * Puzzle Storm is built from the same pieces (the side panel, the clock,
+ * the combo, the puzzles played), so those rules are shared with `.storm`;
+ * storm.css adds what is its own.
  */
 
 /* ------------------------------------------------------------ home --- */
@@ -317,7 +320,7 @@ html[dir='rtl'] .racer-home .button:hover::after {
 
 /* ---- side panel --- */
 
-.racer .puz-side {
+:is(.racer, .storm) .puz-side {
   justify-content: flex-start !important;
   gap: 20px;
   padding: 20px !important;
@@ -327,7 +330,7 @@ html[dir='rtl'] .racer-home .button:hover::after {
   box-shadow: none !important;
 }
 
-.racer .puz-side__top {
+:is(.racer, .storm) .puz-side__top {
   flex: none !important;
   align-items: center;
   gap: 16px;
@@ -353,17 +356,17 @@ html[dir='rtl'] .racer-home .button:hover::after {
   text-shadow: 0 2px 4px #0000004d;
 }
 
-.racer .puz-side__start {
+:is(.racer, .storm) .puz-side__start {
   margin: 0 !important;
   color: inherit !important;
 }
 
-.racer .puz-side__start__text {
+:is(.racer, .storm) .puz-side__start__text {
   align-items: flex-start;
   gap: 6px;
 }
 
-.racer .puz-side__start__text strong {
+:is(.racer, .storm) .puz-side__start__text strong {
   color: #fff;
   font-size: 26px !important;
   font-weight: 800 !important;
@@ -371,7 +374,7 @@ html[dir='rtl'] .racer-home .button:hover::after {
 }
 
 /* "Waiting to start", "Spectating": a pill with a beating dot. */
-.racer .puz-side__start__text span {
+:is(.racer, .storm) .puz-side__start__text span {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -384,7 +387,7 @@ html[dir='rtl'] .racer-home .button:hover::after {
   letter-spacing: normal !important;
 }
 
-.racer .puz-side__start__text span::before {
+:is(.racer, .storm) .puz-side__start__text span::before {
   content: '';
   width: 8px;
   height: 8px;
@@ -393,11 +396,11 @@ html[dir='rtl'] .racer-home .button:hover::after {
 }
 
 /* The score: a big white number. */
-.racer .puz-side__solved {
+:is(.racer, .storm) .puz-side__solved {
   text-align: start;
 }
 
-.racer .puz-side__solved__text {
+:is(.racer, .storm) .puz-side__solved__text {
   margin: 0 !important;
   color: #fff !important;
   font-family: var(--cdc-font) !important;
@@ -408,12 +411,12 @@ html[dir='rtl'] .racer-home .button:hover::after {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .racer .puz-side__start__text span::before {
+  :is(.racer, .storm) .puz-side__start__text span::before {
     animation: cdc-racer-beat 1.2s ease-in-out infinite;
   }
 
   /* A solved puzzle bumps the score. */
-  .racer.puz-mod-puzzle .puz-side__solved__text {
+  :is(.racer, .storm).puz-mod-puzzle .puz-side__solved__text {
     animation: cdc-racer-bump 0.4s ease-out;
   }
 }
@@ -432,7 +435,7 @@ html[dir='rtl'] .racer-home .button:hover::after {
   }
 }
 
-.racer .puz-side__solved {
+:is(.racer, .storm) .puz-side__solved {
   text-shadow: none !important;
 }
 
@@ -494,14 +497,14 @@ html[dir='rtl'] .racer-home .button:hover::after {
   gap: 16px;
 }
 
-.racer .puz-clock {
+:is(.racer, .storm) .puz-clock {
   align-items: center;
   gap: 12px;
   margin-block: auto;
 }
 
 /* Chess.com's running clock: white, the digits dark and bold. */
-.racer .puz-clock__time {
+:is(.racer, .storm) .puz-clock__time {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -518,7 +521,7 @@ html[dir='rtl'] .racer-home .button:hover::after {
   line-height: 1.1;
 }
 
-.racer .puz-clock__time::before {
+:is(.racer, .storm) .puz-clock__time::before {
   content: '';
   width: 24px;
   height: 24px;
@@ -548,32 +551,32 @@ html[dir='rtl'] .racer-home .button:hover::after {
 
 /* ---- combo --- */
 
-.racer .puz-side__table {
+:is(.racer, .storm) .puz-side__table {
   flex: none !important;
   gap: 8px;
   margin-top: auto;
 }
 
-.racer .puz-side__control {
+:is(.racer, .storm) .puz-side__control {
   height: auto !important;
   margin: 0 !important;
 }
 
-.racer .puz-side__control .button {
+:is(.racer, .storm) .puz-side__control .button {
   padding: 8px 14px !important;
 }
 
-.racer .puz-combo {
+:is(.racer, .storm) .puz-combo {
   align-items: center;
   gap: 14px;
 }
 
-.racer .puz-combo__counter {
+:is(.racer, .storm) .puz-combo__counter {
   align-items: center;
   min-width: 52px;
 }
 
-.racer .puz-combo__counter__value {
+:is(.racer, .storm) .puz-combo__counter__value {
   width: auto !important;
   margin: 0 !important;
   color: #fff;
@@ -584,7 +587,7 @@ html[dir='rtl'] .racer-home .button:hover::after {
   line-height: 1 !important;
 }
 
-.racer .puz-combo__counter__combo {
+:is(.racer, .storm) .puz-combo__counter__combo {
   color: var(--cdc-text-dim) !important;
   font-family: var(--cdc-font) !important;
   font-size: 11px !important;
@@ -593,18 +596,18 @@ html[dir='rtl'] .racer-home .button:hover::after {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .racer.puz-mod-move .puz-combo__counter__value {
+  :is(.racer, .storm).puz-mod-move .puz-combo__counter__value {
     color: var(--cdc-green-hover);
   }
 }
 
-.racer .puz-combo__bars {
+:is(.racer, .storm) .puz-combo__bars {
   gap: 8px;
   margin: 0 !important;
 }
 
 /* The bar: a rounded groove filled with Chess.com's green. */
-.racer .puz-combo__bar {
+:is(.racer, .storm) .puz-combo__bar {
   flex: 0 0 16px !important;
   border: none !important;
   border-radius: 999px !important;
@@ -613,24 +616,24 @@ html[dir='rtl'] .racer-home .button:hover::after {
   overflow: hidden;
 }
 
-.racer .puz-combo__bar__in {
+:is(.racer, .storm) .puz-combo__bar__in {
   border-radius: 999px !important;
   background: var(--cdc-btn-green) !important;
   box-shadow: inset 0 1px 0 #ffffff4d, 0 0 12px #81b64c99 !important;
 }
 
-.racer .puz-combo__bar__in-full {
+:is(.racer, .storm) .puz-combo__bar__in-full {
   border-radius: 999px !important;
   background: var(--cdc-green-hover) !important;
 }
 
 /* The bonus levels: pills instead of skewed tabs. */
-.racer .puz-combo__levels {
+:is(.racer, .storm) .puz-combo__levels {
   gap: 6px;
   margin: 0 !important;
 }
 
-.racer .puz-combo__level {
+:is(.racer, .storm) .puz-combo__level {
   flex: 1 1 0 !important;
   height: 24px !important;
   margin: 0 !important;
@@ -645,11 +648,11 @@ html[dir='rtl'] .racer-home .button:hover::after {
   transform: none !important;
 }
 
-.racer .puz-combo__level span {
+:is(.racer, .storm) .puz-combo__level span {
   transform: none !important;
 }
 
-.racer .puz-combo__level.active {
+:is(.racer, .storm) .puz-combo__level.active {
   background: var(--cdc-btn-green) !important;
   box-shadow: var(--cdc-btn-green-shadow) !important;
   color: #fff !important;
@@ -900,33 +903,33 @@ html[dir='rtl'] .racer .racer__race__track::before {
 
 /* After the race, below the fold: a card per puzzle, its board rounded and
  * its time on a pill in the result's color. */
-.racer .puz-history {
+:is(.racer, .storm) .puz-history {
   padding: 20px !important;
   border: 1px solid var(--cdc-card-border);
   border-radius: 10px !important;
   background: var(--cdc-bg-panel) !important;
 }
 
-.racer .puz-history .box__top {
+:is(.racer, .storm) .puz-history .box__top {
   flex-wrap: wrap;
   gap: 10px 16px;
   margin: 0 0 16px !important;
   padding: 0 !important;
 }
 
-.racer .puz-history .box__top h2 {
+:is(.racer, .storm) .puz-history .box__top h2 {
   margin: 0;
   color: #fff;
   font-size: 22px;
   font-weight: 800;
 }
 
-.racer .puz-history .box__top__actions {
+:is(.racer, .storm) .puz-history .box__top__actions {
   gap: 8px;
 }
 
 /* The filters, as pills: grey, green when on. */
-.racer .puz-history__filter {
+:is(.racer, .storm) .puz-history__filter {
   padding: 7px 14px !important;
   border-radius: 999px !important;
   background: var(--cdc-btn-grey) !important;
@@ -935,18 +938,18 @@ html[dir='rtl'] .racer .racer__race__track::before {
   font-size: 13px !important;
 }
 
-.racer .puz-history__filter.active {
+:is(.racer, .storm) .puz-history__filter.active {
   background: var(--cdc-btn-green) !important;
   box-shadow: var(--cdc-btn-green-shadow) !important;
   color: #fff !important;
 }
 
-.racer .puz-history__rounds {
+:is(.racer, .storm) .puz-history__rounds {
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
   gap: 12px;
 }
 
-.racer .puz-history__round {
+:is(.racer, .storm) .puz-history__round {
   padding: 8px !important;
   border: 1px solid var(--cdc-card-border);
   border-radius: 10px;
@@ -954,24 +957,24 @@ html[dir='rtl'] .racer .racer__race__track::before {
   transition: border-color 0.15s, transform 0.15s;
 }
 
-.racer .puz-history__round:hover {
+:is(.racer, .storm) .puz-history__round:hover {
   border-color: var(--cdc-card-border-hover);
   transform: translateY(-2px);
 }
 
-.racer .puz-history__round cg-container {
+:is(.racer, .storm) .puz-history__round cg-container {
   outline: none !important;
 }
 
-.racer .puz-history__round cg-board {
+:is(.racer, .storm) .puz-history__round cg-board {
   border-radius: 6px;
 }
 
-.racer .puz-history__round__meta {
+:is(.racer, .storm) .puz-history__round__meta {
   padding-top: 8px !important;
 }
 
-.racer .puz-history :is(good, bad, unfinished) {
+:is(.racer, .storm) .puz-history :is(good, bad, unfinished) {
   gap: 4px;
   padding: 2px 9px 2px 6px;
   border-radius: 999px !important;
@@ -979,21 +982,21 @@ html[dir='rtl'] .racer .racer__race__track::before {
   font-weight: 800;
 }
 
-.racer .puz-history good {
+:is(.racer, .storm) .puz-history good {
   background: #81b64c26;
   color: var(--cdc-green-hover) !important;
 }
 
-.racer .puz-history bad {
+:is(.racer, .storm) .puz-history bad {
   background: #e0282826;
   color: #f0645a !important;
 }
 
-.racer .puz-history unfinished {
+:is(.racer, .storm) .puz-history unfinished {
   background: var(--cdc-bg-raised);
 }
 
-.racer .puz-history__round__result rating {
+:is(.racer, .storm) .puz-history__round__result rating {
   color: var(--cdc-text-dim) !important;
   font-size: 12px !important;
   font-weight: 700;

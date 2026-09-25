@@ -1094,35 +1094,12 @@ input.range::-webkit-slider-thumb {
   font-weight: 700;
 }
 
-/* Puzzle Storm (racer.css does a race the same way): Lichess sizes the
- * board to the whole window's width, sidebar included, which pushed the
- * side panel past the window's edge wherever the width, not the height,
- * limits the board. Cap it to what the sidebar leaves: the panel's 240px
- * and the gap, the page margins, a scrollbar, and a gutter for the ranks,
- * which board.css draws left of the board (they fell under the sidebar). */
-@media (min-width: 1020px) {
-  main > .storm--play {
-    --cdc-coords-l: 0px;
-
-    grid-template-columns:
-      min(
-        var(---col2-uniboard-width),
-        calc(100vw - var(--cdc-sidebar-w, 0px) - 2 * var(---main-margin, 0px) - var(--cdc-coords-l) - 275px)
-      )
-      minmax(240px, 400px) !important;
-    margin-left: var(--cdc-coords-l);
-  }
-
-  body:is(.coords-in, .coords-out) main > .storm--play {
-    --cdc-coords-l: calc(0.6 * var(--cdc-coords-size, 13px) + 10px);
-  }
-}
-
-/* The coordinate trainer (/training/coordinate), the same way, in Lichess's
- * two columns (board, then the explanation) and its three (the settings
- * first): from 1020px the explanation and Start button hung past the
- * window's edge by up to 50px. Its board shows coordinates only when asked
- * to ("Show coordinates"): then the ranks get their gutter. */
+/* The coordinate trainer (/training/coordinate), sized as storm.css sizes
+ * Puzzle Storm's board, in Lichess's two columns (board, then the
+ * explanation) and its three (the settings first): from 1020px the
+ * explanation and Start button hung past the window's edge by up to 50px.
+ * Its board shows coordinates only when asked to ("Show coordinates"):
+ * then the ranks get their gutter. */
 @media (min-width: 1020px) {
   main#trainer > .trainer {
     --cdc-coords-l: 0px;
@@ -1164,18 +1141,6 @@ input.range::-webkit-slider-thumb {
  * a narrow panel instead of pushing it out of the card. */
 .racer .copy-me__target {
   min-width: 0;
-}
-
-/* The end of a storm run: the score on a dark card like the stats beside
- * it, the number in green. Lichess fills the card with its "good" color,
- * which is our green: a whole green card next to the green Play again. */
-.storm--end__score {
-  background: var(--cdc-bg-panel) !important;
-  color: var(--cdc-text-dim) !important;
-}
-
-.storm--end__score__number {
-  color: var(--cdc-green-hover);
 }
 
 /* --------------------------------------------------------- board editor --- */
