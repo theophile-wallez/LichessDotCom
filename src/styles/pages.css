@@ -1094,14 +1094,14 @@ input.range::-webkit-slider-thumb {
   font-weight: 700;
 }
 
-/* Puzzle Storm and a Puzzle Racer race: Lichess sizes the board to the
- * whole window's width, sidebar included, which pushed the side panel past
- * the window's edge wherever the width, not the height, limits the board.
- * Cap it to what the sidebar leaves: the panel's 240px and the gap, the page
- * margins, a scrollbar, and a gutter for the ranks, which board.css draws
- * left of the board (they fell under the sidebar). */
+/* Puzzle Storm (racer.css does a race the same way): Lichess sizes the
+ * board to the whole window's width, sidebar included, which pushed the
+ * side panel past the window's edge wherever the width, not the height,
+ * limits the board. Cap it to what the sidebar leaves: the panel's 240px
+ * and the gap, the page margins, a scrollbar, and a gutter for the ranks,
+ * which board.css draws left of the board (they fell under the sidebar). */
 @media (min-width: 1020px) {
-  main > :is(.storm--play, .racer) {
+  main > .storm--play {
     --cdc-coords-l: 0px;
 
     grid-template-columns:
@@ -1113,7 +1113,7 @@ input.range::-webkit-slider-thumb {
     margin-left: var(--cdc-coords-l);
   }
 
-  body:is(.coords-in, .coords-out) main > :is(.storm--play, .racer) {
+  body:is(.coords-in, .coords-out) main > .storm--play {
     --cdc-coords-l: calc(0.6 * var(--cdc-coords-size, 13px) + 10px);
   }
 }
