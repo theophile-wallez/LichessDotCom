@@ -70,8 +70,24 @@
     coach = 1 + Math.floor(Math.random() * COACHES);
     localStorage.setItem('cdc-coach', coach);
   }
-  const coachAvatar = () =>
-    `<button class="cdc-coach__avatar" data-cdc="coach" data-coach="${coach}" title="${esc(T.coach)}" aria-label="${esc(T.coach)}"></button>`;
+  // The coach blinks, and reacts to the verdict (review.css): a mood per
+  // class, played once per move, not again when the same move is re-rendered
+  // (Explain, a new coach). `at` names the move: its ply, or its path.
+  const MOODS = {
+    brilliant: 'delight', great: 'delight', best: 'happy', excellent: 'happy', good: 'calm', book: 'calm',
+    inaccuracy: 'doubt', mistake: 'worry', miss: 'worry', blunder: 'shock',
+  };
+  let reacted = '';
+  const coachAvatar = (cls, at) => {
+    const mood = MOODS[cls] || '';
+    const key = mood && `${at}|${cls}`;
+    const react = key && key !== reacted;
+    reacted = key;
+    // The panel is re-rendered often (every percent of the analysis): start
+    // the idle loops where the clock is, so a render doesn't reset a blink.
+    const style = `--cdc-idle:${(-(performance.now() / 1000) % 7).toFixed(2)}s${mood ? `;--cdc-mood-c:${CLS[cls].color}` : ''}`;
+    return `<button class="cdc-coach__avatar${react ? ' cdc-coach__avatar--react' : ''}" data-cdc="coach" data-coach="${coach}"${mood ? ` data-mood="${mood}"` : ''} style="${style}" title="${esc(T.coach)}" aria-label="${esc(T.coach)}"><span class="cdc-coach__face"><i class="cdc-coach__lid"></i><i class="cdc-coach__lid"></i></span></button>`;
+  };
 
   // key, color, label, sentence ({m} = move), in Chess.com's summary order.
   const CLASSES = [
@@ -1240,7 +1256,7 @@
     const atEnd = ctrl.onMainline && ply >= ctrl.mainline.length - 1;
     const canBest = shown || (move && move.best && !GOOD.has(move.cls));
     dom.panel.innerHTML = `${header(T.review, 'summary')}
-      <div class="cdc-coach">${coachAvatar()}<div class="cdc-bubble">${bubble}</div></div>
+      <div class="cdc-coach">${coachAvatar(!shown && move?.cls, ply)}<div class="cdc-bubble">${bubble}</div></div>
       <div class="cdc-review__nav">
         <button class="cdc-btn${state.explain ? ' cdc-btn--on' : ''}" data-cdc="explain">${svgIcon('bulb')}${esc(T.explain)}</button>
         <button class="cdc-btn${shown ? ' cdc-btn--on' : ''}" data-cdc="best" ${canBest ? '' : 'disabled'}>${svgIcon('star')}${esc(T.best)}</button>
@@ -1288,7 +1304,7 @@
         : !move
           ? `<p class="cdc-bubble__title">${esc(T.thinking)}</p>`
           : verdict(ctrl, move);
-    dom.panel.innerHTML = `<div class="cdc-coach">${coachAvatar()}<div class="cdc-bubble">${bubble}</div></div>`;
+    dom.panel.innerHTML = `<div class="cdc-coach">${coachAvatar(!live.error && move?.cls, ctrl.path)}<div class="cdc-bubble">${bubble}</div></div>`;
   }
 
   // Eval bar, board badge / arrow / square colors, move list badges.
