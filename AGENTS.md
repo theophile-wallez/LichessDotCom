@@ -87,7 +87,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/styles/playerbar.css` | The player bars' look, shared by the game page (`.ruser`, `.rclock`) and the analysis board (`.cdc-player`, `.analyse__clock`): avatar, title, name, flag, rating, captured pieces and the clock. Each page only places them. |
 | `src/styles/game.css` | Game page (`main.round`) grid, where the player bars and clocks sit, moves, chat, and the game-over panel (Game Review button, move times). |
 | `src/styles/analysis.css` | Analysis page (`main.analyse`) grid (with the game page's player bars when there are players or clocks), engine header and lines, move list (glyph badges, comment cards) and controls. |
-| `src/styles/review.css` | Game Review panel, eval bar, board annotations, and the free analysis board's coach over Lichess's panel. |
+| `src/styles/review.css` | Game Review panel, eval bar, board annotations, and the free analysis board's coach over Lichess's panel. The coach is alive: it breathes, blinks (a skin-colored lid over each eye, placed per portrait) and reacts to each verdict with a mood (a hop, a nod, a tilt, a shake, and a mark over the head). |
 | `src/styles/pages.css` | Modern look for every other page (headings, side menus, tabs, tables, forms, dialogs, lobby, editor, tournaments). |
 | `src/styles/dropdowns.css` | Every dropdown as one menu style: Lichess's `.mselect`, native `<select>` (via `appearance: base-select`) and autocomplete lists. |
 | `src/styles/powertip.css` | The profile hover card (`#powerTip`, filled with `/@/<user>/mini`) as a Chess.com player card. |
