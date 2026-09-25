@@ -23,6 +23,7 @@
         "src/styles/playerbar.css",
         "src/styles/game.css",
         "src/styles/analysis.css",
+        "src/styles/explorer.css",
         "src/styles/review.css",
         "src/styles/pages.css",
         "src/styles/dropdowns.css",
