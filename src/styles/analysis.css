@@ -17,11 +17,14 @@
     --cdc-gauge-gap: 10px;
     --cdc-v-room: 56px;
     --cdc-panel-w: clamp(300px, 26vw, 460px);
+    /* Resizable like the game page's board (game.css). */
     --cdc-board: max(
       320px,
-      min(
-        calc(100vh - var(--cdc-v-room) - 2 * var(--cdc-bar) - var(--cdc-coords-off)),
-        calc(100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-panel-w) - var(--cdc-gap) - 72px)
+      calc(
+        min(
+          calc(100dvh - var(--cdc-v-room) - 2 * var(--cdc-bar) - var(--cdc-coords-off)),
+          calc(100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-panel-w) - var(--cdc-gap) - 72px)
+        ) * var(---board-scale, 1)
       )
     );
     --cdc-stage: calc(var(--cdc-board) + 2 * var(--cdc-bar) + var(--cdc-coords-off));
@@ -800,7 +803,7 @@
   }
 
   html:has(main.analyse) body {
-    height: 100vh;
+    height: 100dvh;
     margin: 0 !important;
     padding: 0 !important;
   }

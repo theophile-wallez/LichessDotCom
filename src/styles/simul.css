@@ -396,7 +396,7 @@ main.simul-list .simul-list__help {
   position: sticky;
   top: 16px;
   align-self: start;
-  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
   margin-top: 16px !important;
   overflow-y: auto;
   scrollbar-width: thin;

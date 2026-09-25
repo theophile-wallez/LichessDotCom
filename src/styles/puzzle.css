@@ -69,12 +69,15 @@
     --cdc-side-col: var(--cdc-side-w);
     --cdc-session-h: 38px;
     --cdc-kb-h: 0px;
+    /* Resizable like the game page's board (game.css). */
     --cdc-board: max(
       320px,
-      min(
-        calc(100vh - 28px - var(--cdc-coords-off) - var(--cdc-session-h) - var(--cdc-kb-h)),
-        calc(100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-side-w) - var(--cdc-tools-w)
-          - var(--cdc-gauge-w) - var(--cdc-coords-l) - 3 * var(--cdc-gap) - 48px)
+      calc(
+        min(
+          calc(100dvh - 28px - var(--cdc-coords-off) - var(--cdc-session-h) - var(--cdc-kb-h)),
+          calc(100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-side-w) - var(--cdc-tools-w)
+            - var(--cdc-gauge-w) - var(--cdc-coords-l) - 3 * var(--cdc-gap) - 48px)
+        ) * var(---board-scale, 1)
       )
     );
 
@@ -125,7 +128,7 @@
   }
 
   html:has(main.puzzle) body {
-    height: 100vh;
+    height: 100dvh;
     margin-bottom: 0 !important;
   }
 

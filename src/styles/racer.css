@@ -96,7 +96,7 @@ main.racer-home > h1.box__top::before {
   --cdc-race: #45a3f5;
   --cdc-race-2: #2474c9;
   /* As tall as the window leaves, so the page is filled but never scrolls. */
-  --cdc-scene-h: clamp(190px, calc(100vh - 300px), 420px);
+  --cdc-scene-h: clamp(190px, calc(100dvh - 300px), 420px);
 
   position: relative;
   display: flex !important;
@@ -297,7 +297,7 @@ html[dir='rtl'] .racer-home .button:hover::after {
       min(
         var(---col2-uniboard-width),
         calc(100vw - var(--cdc-sidebar-w, 0px) - 2 * var(---main-margin, 0px) - var(--cdc-coords-l) - 275px),
-        calc(100vh - 80px - var(---block-gap, 16px) - var(--cdc-race-h) - var(--cdc-coords-off, 0px))
+        calc(100dvh - 80px - var(---block-gap, 16px) - var(--cdc-race-h) - var(--cdc-coords-off, 0px))
       )
       minmax(240px, 400px) !important;
     margin-left: var(--cdc-coords-l);

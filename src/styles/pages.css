@@ -1212,7 +1212,7 @@ input.range::-webkit-slider-thumb {
     position: sticky;
     top: 16px;
     align-self: start;
-    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
     overflow-y: auto;
     scrollbar-width: thin;
   }
@@ -1404,7 +1404,7 @@ input.range::-webkit-slider-thumb {
     position: sticky;
     top: 16px;
     align-self: start;
-    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
     overflow-y: auto;
     scrollbar-width: thin;
   }

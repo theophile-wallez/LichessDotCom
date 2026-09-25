@@ -424,7 +424,7 @@
     right: auto !important;
     bottom: 12px !important;
     left: calc(var(--cdc-sidebar-w) + 6px) !important;
-    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
     overflow-y: auto;
     border-radius: 6px;
     background: var(--cdc-bg-panel) !important;
@@ -438,7 +438,7 @@
     bottom: 12px;
     left: calc(var(--cdc-sidebar-w) + 6px);
     width: 280px !important;
-    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
     overflow-y: auto !important;
   }
 
