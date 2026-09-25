@@ -37,6 +37,22 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addFonts);
   else addFonts();
 
+  // Donate as a sidebar item of its own (styles/sidebar.css). Lichess's lone
+  // Donate link after the nav is missing for patrons and on zen pages, but the
+  // flyout's copy is there for everyone except kids: copy its label and link.
+  const addDonate = () => {
+    const nav = document.getElementById('topnav');
+    const patron = nav?.querySelector('a.community-patron');
+    if (!patron || document.getElementById('cdc-donate')) return;
+    const donate = document.createElement('a');
+    donate.id = 'cdc-donate';
+    donate.href = patron.href;
+    donate.textContent = patron.textContent.trim();
+    nav.after(donate);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addDonate);
+  else addDonate();
+
   // The coach's face on a practice drill (styles/practice-run.css): the Game
   // Review's coach, kept by review.js under the same key, or picked at random
   // the first time.

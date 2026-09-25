@@ -3,6 +3,11 @@
  * Below 1020px Lichess switches to its hamburger menu, which we leave alone.
  */
 
+/* Our Donate item (below) belongs to the desktop sidebar only. */
+#cdc-donate {
+  display: none;
+}
+
 @media (min-width: 1020px) {
   :root {
     --cdc-sidebar-w: 176px;
@@ -252,37 +257,33 @@
 
   /* ----------------------------------------------------------- donate --- */
 
-  /* Lichess puts Donate in the Play flyout on mobile and as a lone link after
-     the nav on desktop: make that link a sidebar item of its own, right under
-     Tools, with a heart that beats on hover. */
-  #topnav div a.community-patron {
+  /* Lichess only renders its lone Donate link after the nav for non-patrons,
+     and not on zen pages (a game), while the flyout's copy (Play, or Community
+     for patrons) is always there: content.js builds #cdc-donate from that one,
+     a sidebar item of its own right under Tools, with a heart that beats on
+     hover. */
+  #topnav div a.community-patron,
+  #top .site-title-nav__donate {
     display: none !important;
   }
 
-  #top .site-title-nav__donate {
+  #cdc-donate {
     display: flex !important;
     align-items: center;
-    justify-content: flex-start !important;
     gap: 10px;
-    height: 44px !important;
-    margin: 0 !important;
-    padding: 0 10px 0 12px !important;
+    height: 44px;
+    padding: 0 10px 0 12px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: 1 !important;
-    text-transform: none !important;
-    font-size: 16px !important;
-    font-weight: 700 !important;
+    line-height: 1;
+    font-size: 16px;
+    font-weight: 700;
     color: var(--cdc-text) !important;
-    border: none !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    text-shadow: none !important;
-    opacity: 1 !important;
+    background: transparent;
   }
 
-  #top .site-title-nav__donate::before {
+  #cdc-donate::before {
     content: '';
     flex: none;
     width: 28px;
@@ -290,12 +291,12 @@
     background: url('https://assets-ds.chess.com/color-icons/heart-red.svg') center / contain no-repeat;
   }
 
-  #top .site-title-nav__donate:hover {
-    background: #00000033 !important;
+  #cdc-donate:hover {
+    background: #00000033;
     color: #fff !important;
   }
 
-  #top .site-title-nav__donate:hover::before {
+  #cdc-donate:hover::before {
     animation: cdc-heartbeat 0.9s ease-in-out infinite;
   }
 
@@ -307,7 +308,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    #top .site-title-nav__donate:hover::before {
+    #cdc-donate:hover::before {
       animation: none;
     }
   }
