@@ -41,7 +41,10 @@
   }
 }
 
+/* No longer a card, so nothing to clip: Lichess's overflow: hidden would cut
+ * the coach cards' hover shadow at the box's edges. */
 .coach-list__main.box {
+  overflow: visible !important;
   min-height: 0 !important;
   padding: 0 !important;
   background: transparent !important;

@@ -668,8 +668,10 @@
   /* ------------------------------------------------------------ side --- */
 
   /* A stack of cards (streams, spotlights, about) instead of one card
-     stretched to the feed's height with a hole in the middle. */
+     stretched to the feed's height with a hole in the middle. No longer a
+     card itself, so it mustn't clip the cards' shadows at its edges. */
   main.lobby .lobby__side {
+    overflow: visible !important;
     gap: 20px !important;
     padding: 0 !important;
     background: none !important;

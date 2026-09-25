@@ -15,7 +15,10 @@
 
 /* --------------------------------------------------------- toolbar --- */
 
+/* No longer a card, so nothing to clip: Lichess's overflow: hidden would cut
+ * the study cards' hover shadow and the New study button's at the box's edges. */
 .study-index.box {
+  overflow: visible !important;
   padding: 0 !important;
   background: transparent !important;
 }
@@ -59,6 +62,12 @@
 .study-index .box__top .mselect__label {
   min-width: 170px;
   padding: 0 12px 0 14px !important;
+}
+
+/* The sort menu opens from the end of its picker, toward the page: long
+ * labels (Italian) would otherwise run it past the window's edge. */
+.study-index .box__top .mselect__list {
+  inset-inline: auto 0 !important;
 }
 
 .study-index .box__top form[action*='list-format'] .button,
