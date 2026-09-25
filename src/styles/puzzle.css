@@ -25,21 +25,23 @@
     --cdc-side-w: clamp(250px, 19vw, 340px);
     --cdc-tools-w: clamp(270px, 21vw, 380px);
     --cdc-gauge-w: 26px;
-    --cdc-gauge-col: var(--cdc-gap);
+    --cdc-coords-l: 0px;
+    --cdc-coords-off: 0px;
+    --cdc-gauge-col: calc(var(--cdc-gap) + var(--cdc-coords-l));
     --cdc-session-h: 38px;
     --cdc-board: max(
       320px,
       min(
-        calc(100vh - 28px - var(--cdc-session-h)),
+        calc(100vh - 28px - var(--cdc-coords-off) - var(--cdc-session-h)),
         calc(100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-side-w) - var(--cdc-tools-w)
-          - var(--cdc-gauge-w) - 3 * var(--cdc-gap) - 48px)
+          - var(--cdc-gauge-w) - var(--cdc-coords-l) - 3 * var(--cdc-gap) - 48px)
       )
     );
 
     grid-template-columns:
       var(--cdc-side-w) var(--cdc-gauge-col) var(--cdc-board) var(--cdc-gap)
       var(--cdc-tools-w) !important;
-    grid-template-rows: var(--cdc-board) var(--cdc-session-h) auto !important;
+    grid-template-rows: var(--cdc-board) calc(var(--cdc-coords-off) + var(--cdc-session-h)) auto !important;
     grid-template-areas:
       'side gauge board . tools'
       'side . session . .'
@@ -49,8 +51,15 @@
     align-content: start;
   }
 
+  /* The coordinates stand outside the board (board.css): the ranks get a
+     gutter on its left, the files a strip under it. */
+  body:is(.coords-in, .coords-out) main.puzzle {
+    --cdc-coords-l: calc(0.6 * var(--cdc-coords-size, 13px) + 10px);
+    --cdc-coords-off: calc(1.2 * var(--cdc-coords-size, 13px) + 8px);
+  }
+
   main.puzzle.gauge-on {
-    --cdc-gauge-col: calc(var(--cdc-gap) + var(--cdc-gauge-w) + 8px);
+    --cdc-gauge-col: calc(var(--cdc-gap) + var(--cdc-gauge-w) + 8px + var(--cdc-coords-l));
   }
 
   main.puzzle .puzzle__board {
@@ -62,7 +71,7 @@
   main.puzzle .puzzle__session {
     flex-wrap: nowrap !important;
     gap: 6px;
-    margin: 0 !important;
+    margin: var(--cdc-coords-off) 0 0 !important;
     /* Room for the current chip's ring, which the scroller would clip. */
     padding: 8px 2px 4px;
     overflow-x: auto;

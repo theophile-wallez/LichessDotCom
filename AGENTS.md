@@ -138,6 +138,13 @@ There is no build step and no dependencies: plain JS and CSS, loaded unpacked.
   between Lichess releases (currently `i5d`, `aPp`, `qZM`, `Z7yx`, `bo3`,
   active class `a1t`). `game.css` lists old and new names with `:is()`. If the
   move list loses its styling, find the new names in Lichess's round bundle.
+- **Coordinates.** Lichess swaps `body.coords-out` for `coords-in` while its
+  eval gauge shows (analysis, puzzles: `forceInnerCoords`), so a player who
+  chose "outside" saw them jump inside and back from move to move. On desktop
+  `board.css` draws both classes outside, like Chess.com, sized by
+  `--cdc-coords-size`; a layout leaves them room under
+  `body:is(.coords-in, .coords-out)` (a gutter left of the board for the
+  ranks, `--cdc-coords-off` under it for the files). Only `coords-no` has none.
 - **Board inset.** Chessground shrinks the board to whole pixels per square,
   so `cg-container` sits a few px inside its wrapper. `content.js` measures it
   into `--cdc-inset-{t,r,b,l}`; use those to align anything with the squares.

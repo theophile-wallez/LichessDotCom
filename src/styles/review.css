@@ -1175,7 +1175,7 @@
     display: none;
     position: relative;
     width: 26px;
-    margin-right: 10px;
+    margin-right: var(--cdc-gauge-gap, 10px);
     /* Level with the squares, between the player bars if any. */
     margin-top: calc(var(--cdc-bar, 0px) + var(--cdc-inset-t, 0px));
     margin-bottom: calc(var(--cdc-bar, 0px) + var(--cdc-coords-off, 0px) + var(--cdc-inset-b, 0px));

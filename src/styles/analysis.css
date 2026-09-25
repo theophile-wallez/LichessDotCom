@@ -14,6 +14,7 @@
     --cdc-gap: 24px;
     --cdc-bar: 0px;
     --cdc-coords-off: 0px;
+    --cdc-gauge-gap: 10px;
     --cdc-v-room: 56px;
     --cdc-panel-w: clamp(300px, 26vw, 460px);
     --cdc-board: max(
@@ -55,7 +56,7 @@
   main.analyse .eval-gauge {
     --cdc-gauge-w: 26px;
     grid-area: gauge !important;
-    margin: calc(var(--cdc-bar) + var(--cdc-inset-t, 0px)) 10px
+    margin: calc(var(--cdc-bar) + var(--cdc-inset-t, 0px)) var(--cdc-gauge-gap)
       calc(var(--cdc-bar) + var(--cdc-coords-off) + var(--cdc-inset-b, 0px)) 0 !important;
   }
 
@@ -72,8 +73,14 @@
     margin-top: 0 !important;
   }
 
-  body.coords-out main.analyse:is(:has(> .cdc-player), :has(.analyse__clock)):not(:has(.practice__side)) {
-    --cdc-coords-off: 18px;
+  body:is(.coords-in, .coords-out) main.analyse:is(:has(> .cdc-player), :has(.analyse__clock)):not(:has(.practice__side)) {
+    --cdc-coords-off: calc(1.2 * var(--cdc-coords-size, 13px) + 8px);
+  }
+
+  /* The ranks stand left of the board (board.css): the eval bar leaves them
+     room. */
+  body:is(.coords-in, .coords-out) main.analyse {
+    --cdc-gauge-gap: calc(0.6 * var(--cdc-coords-size, 13px) + 18px);
   }
 
   main.analyse > :is(.cdc-player, .cdc-captured) {

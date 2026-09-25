@@ -61,8 +61,8 @@
     align-content: start !important;
   }
 
-  body.coords-out main.round {
-    --cdc-coords-off: 18px;
+  body:is(.coords-in, .coords-out) main.round {
+    --cdc-coords-off: calc(1.2 * var(--cdc-coords-size, 13px) + 8px);
   }
 
   main.round .round__app,
