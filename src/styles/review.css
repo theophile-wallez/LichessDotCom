@@ -461,14 +461,17 @@
 
   /* The coach: our own portraits, shipped with the extension (the page world
    * can't call chrome.runtime.getURL, but manifest CSS gets the extension id
-   * substituted). A button: clicking it changes coach. */
+   * substituted). A button: clicking it changes coach. It reacts to each
+   * verdict with translate / rotate / scale, which add up with the hover's
+   * transform; the portrait inside breathes on its own. */
   .cdc-coach__avatar {
+    position: relative;
     flex: none;
     width: calc(var(--cdc-coach-h) * 1.09);
     height: var(--cdc-coach-h);
     padding: 0;
     border: none;
-    background: transparent bottom center / contain no-repeat;
+    background: transparent;
     cursor: pointer;
     transform-origin: 50% 100%;
     transition: transform 0.15s;
@@ -478,10 +481,202 @@
     transform: scale(1.04);
   }
 
-  .cdc-coach__avatar[data-coach='1'] { background-image: url('chrome-extension://__MSG_@@extension_id__/img/coaches/coach-1.webp'); }
-  .cdc-coach__avatar[data-coach='2'] { background-image: url('chrome-extension://__MSG_@@extension_id__/img/coaches/coach-2.webp'); }
-  .cdc-coach__avatar[data-coach='3'] { background-image: url('chrome-extension://__MSG_@@extension_id__/img/coaches/coach-3.webp'); }
-  .cdc-coach__avatar[data-coach='4'] { background-image: url('chrome-extension://__MSG_@@extension_id__/img/coaches/coach-4.webp'); }
+  .cdc-coach__face {
+    position: absolute;
+    inset: 0;
+    background: bottom center / contain no-repeat;
+    transform-origin: 50% 100%;
+    animation: cdc-breathe 3.5s var(--cdc-idle, 0s) ease-in-out infinite;
+  }
+
+  /* The portraits are 300×275 and fill the button, so the eyes are placed
+   * in percents of the image. Each lid is the skin above the eye fading into
+   * the skin below, with the lash line on its lower edge: closed, it's the
+   * arc of a shut eye. */
+  .cdc-coach__avatar[data-coach='1'] .cdc-coach__face { --cdc-lid: #f39e6e, #f9b789; background-image: url('chrome-extension://__MSG_@@extension_id__/img/coaches/coach-1.webp'); }
+  .cdc-coach__avatar[data-coach='2'] .cdc-coach__face { --cdc-lid: #fab494, #fcbb95; background-image: url('chrome-extension://__MSG_@@extension_id__/img/coaches/coach-2.webp'); }
+  .cdc-coach__avatar[data-coach='3'] .cdc-coach__face { --cdc-lid: #bd6843, #c97650; background-image: url('chrome-extension://__MSG_@@extension_id__/img/coaches/coach-3.webp'); }
+  .cdc-coach__avatar[data-coach='4'] .cdc-coach__face { --cdc-lid: #f39e77, #fac09b; background-image: url('chrome-extension://__MSG_@@extension_id__/img/coaches/coach-4.webp'); }
+
+  .cdc-coach__avatar[data-coach='1'] .cdc-coach__lid:nth-child(1) { left: 36.33%; top: 34.55%; width: 10%; height: 5.45%; }
+  .cdc-coach__avatar[data-coach='1'] .cdc-coach__lid:nth-child(2) { left: 54%; top: 34.55%; width: 10.33%; height: 5.09%; }
+  .cdc-coach__avatar[data-coach='2'] .cdc-coach__lid:nth-child(1) { left: 36.33%; top: 36.73%; width: 9.33%; height: 4.73%; }
+  .cdc-coach__avatar[data-coach='2'] .cdc-coach__lid:nth-child(2) { left: 54.33%; top: 36.73%; width: 9%; height: 4.73%; }
+  .cdc-coach__avatar[data-coach='3'] .cdc-coach__lid:nth-child(1) { left: 35.33%; top: 38.55%; width: 11%; height: 5.09%; }
+  .cdc-coach__avatar[data-coach='3'] .cdc-coach__lid:nth-child(2) { left: 54.67%; top: 38.18%; width: 12%; height: 5.82%; }
+  .cdc-coach__avatar[data-coach='4'] .cdc-coach__lid:nth-child(1) { left: 36.33%; top: 36.73%; width: 10%; height: 5.09%; }
+  .cdc-coach__avatar[data-coach='4'] .cdc-coach__lid:nth-child(2) { left: 54%; top: 36.73%; width: 10%; height: 5.09%; }
+
+  .cdc-coach__lid {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(var(--cdc-lid));
+    box-shadow: inset 0 -1.5px 0 rgba(40, 22, 16, 0.85);
+    transform: scaleY(0);
+    transform-origin: 50% 0;
+    animation: cdc-blink 7s var(--cdc-idle, 0s) infinite;
+  }
+
+  /* One blink, then a double one, every 7s. */
+  @keyframes cdc-blink {
+    0%, 38%, 41.6%, 85%, 88.2%, 90%, 93.2%, 100% { transform: scaleY(0); animation-timing-function: ease-in; }
+    39.8%, 86.6%, 91.6% { transform: scaleY(1); animation-timing-function: ease-out; }
+  }
+
+  @keyframes cdc-breathe {
+    50% { transform: scaleY(1.012); }
+  }
+
+  /* ---- the coach's reactions --- */
+
+  /* Brilliant, great: a hop, happy eyes, sparkles. */
+  .cdc-coach__avatar--react[data-mood='delight'] { animation: cdc-hop 0.8s ease-out; }
+  .cdc-coach__avatar--react[data-mood='delight'] .cdc-coach__lid { animation: cdc-squint 1.1s ease-in-out, cdc-blink 7s 1.1s infinite; }
+
+  @keyframes cdc-hop {
+    15% { scale: 1.05 0.93; }
+    40% { translate: 0 -8%; scale: 0.96 1.05; }
+    65% { translate: 0 0; scale: 1.04 0.96; }
+    80% { translate: 0 -3%; scale: 1; }
+  }
+
+  @keyframes cdc-squint {
+    25%, 70% { transform: scaleY(0.4); }
+  }
+
+  /* Best, excellent: two nods and a blink. */
+  .cdc-coach__avatar--react[data-mood='happy'] { animation: cdc-nod 0.7s ease-in-out; }
+  .cdc-coach__avatar--react[data-mood='happy'] .cdc-coach__lid { animation: cdc-blink-once 0.4s 0.15s, cdc-blink 7s 0.55s infinite; }
+
+  @keyframes cdc-nod {
+    25%, 75% { translate: 0 3%; }
+    50% { translate: 0 0; }
+  }
+
+  @keyframes cdc-blink-once {
+    50% { transform: scaleY(1); }
+  }
+
+  /* Good, book: one small nod. */
+  .cdc-coach__avatar--react[data-mood='calm'] { animation: cdc-nod-once 0.45s ease-in-out; }
+
+  @keyframes cdc-nod-once {
+    50% { translate: 0 2%; }
+  }
+
+  /* Inaccuracy: a skeptical tilt, one eye narrowed. */
+  .cdc-coach__avatar--react[data-mood='doubt'] { animation: cdc-tilt 1.5s ease-in-out; }
+  .cdc-coach__avatar--react[data-mood='doubt'] .cdc-coach__lid { animation: cdc-skeptic 1.5s ease-in-out, cdc-blink 7s 1.5s infinite; }
+  .cdc-coach__avatar--react[data-mood='doubt'] .cdc-coach__lid:nth-child(2) { --cdc-skeptic: 0.2; }
+
+  @keyframes cdc-tilt {
+    25%, 75% { rotate: -6deg; }
+  }
+
+  @keyframes cdc-skeptic {
+    25%, 75% { transform: scaleY(var(--cdc-skeptic, 0.55)); }
+  }
+
+  /* Mistake, miss: leaning back with a slow blink, and a drop of sweat. */
+  .cdc-coach__avatar--react[data-mood='worry'] { animation: cdc-lean 1.5s ease-in-out; }
+  .cdc-coach__avatar--react[data-mood='worry'] .cdc-coach__lid { animation: cdc-blink-once 0.8s 0.3s ease-in-out, cdc-blink 7s 1.1s infinite; }
+
+  @keyframes cdc-lean {
+    30%, 75% { rotate: 4deg; translate: 3% 0; scale: 0.97; }
+  }
+
+  /* Blunder: a jolt, a head shake, a double take. */
+  .cdc-coach__avatar--react[data-mood='shock'] { animation: cdc-jolt 1s ease-out; }
+  .cdc-coach__avatar--react[data-mood='shock'] .cdc-coach__lid { animation: cdc-blink-once 0.2s 0.35s, cdc-blink-once 0.2s 0.6s, cdc-blink 7s 0.8s infinite; }
+
+  @keyframes cdc-jolt {
+    12% { translate: 0 -6%; scale: 1.05; rotate: 0deg; }
+    30% { translate: 0 0; scale: 1; rotate: 5deg; }
+    45% { rotate: -5deg; }
+    60% { rotate: 3.5deg; }
+    75% { rotate: -2deg; }
+    90% { rotate: 0.5deg; }
+  }
+
+  /* The marks over the head: sparkles, "?", "!" or a drop, in the class's
+   * color, popping up and fading away. */
+  .cdc-coach__avatar::before,
+  .cdc-coach__avatar::after {
+    position: absolute;
+    z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .cdc-coach__avatar--react:is([data-mood='delight'], [data-mood='doubt'], [data-mood='shock'], [data-mood='worry'])::after {
+    content: '';
+    top: 2%;
+    right: 6%;
+    animation: cdc-mark 1.4s ease-out;
+  }
+
+  .cdc-coach__avatar--react[data-mood='delight']::before {
+    content: '';
+    top: 22%;
+    left: 8%;
+    animation: cdc-mark 1.2s 0.15s ease-out;
+  }
+
+  .cdc-coach__avatar--react[data-mood='delight']::before,
+  .cdc-coach__avatar--react[data-mood='delight']::after {
+    width: 18%;
+    aspect-ratio: 1;
+    background: var(--cdc-mood-c);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 0Q11 9 20 10Q11 11 10 20Q9 11 0 10Q9 9 10 0z'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+
+  .cdc-coach__avatar--react[data-mood='delight']::before {
+    width: 12%;
+  }
+
+  .cdc-coach__avatar--react:is([data-mood='doubt'], [data-mood='shock'])::after {
+    color: var(--cdc-mood-c);
+    font: 900 calc(var(--cdc-coach-h) * 0.26) / 1 var(--cdc-font);
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+  }
+
+  .cdc-coach__avatar--react[data-mood='doubt']::after { content: '?'; }
+  .cdc-coach__avatar--react[data-mood='shock']::after { content: '!'; right: 10%; font-size: calc(var(--cdc-coach-h) * 0.3); }
+
+  .cdc-coach__avatar--react[data-mood='worry']::after {
+    top: 24%;
+    right: 20%;
+    width: 7%;
+    aspect-ratio: 3 / 4;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: linear-gradient(#bfe3ff, #6fb6f0);
+    clip-path: polygon(50% 0, 100% 55%, 100% 100%, 0 100%, 0 55%);
+    animation: cdc-drop 1.5s 0.3s ease-in;
+  }
+
+  @keyframes cdc-mark {
+    0% { opacity: 0; scale: 0.3; translate: 0 20%; }
+    20% { opacity: 1; scale: 1.15; }
+    32% { scale: 1; translate: 0 0; }
+    75% { opacity: 1; }
+    100% { opacity: 0; translate: 0 -20%; }
+  }
+
+  @keyframes cdc-drop {
+    0% { opacity: 0; translate: 0 0; }
+    15%, 60% { opacity: 1; }
+    100% { opacity: 0; translate: 0 90%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cdc-coach__avatar,
+    .cdc-coach__avatar::before,
+    .cdc-coach__avatar::after,
+    .cdc-coach__face,
+    .cdc-coach__lid {
+      animation: none !important;
+    }
+  }
 
   .cdc-bubble {
     position: relative;
