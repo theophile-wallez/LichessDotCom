@@ -29,17 +29,16 @@
     --cdc-coords-off: 0px;
     --cdc-gap: 24px;
     --cdc-panel-w: clamp(300px, 26vw, 460px);
-    /* As big as the window allows, times Lichess's `---board-scale`: the
-       board's resize handle sets `---zoom` on body, which Lichess turns into
-       that scale (25% to 100%). `dvh`, not `vh`: on a Meta Quest or a phone,
-       `100vh` is taller than what the browser shows. */
+    /* As big as the window allows, unless resized with the board's handle
+       (`--cdc-board-scale`, board.css). `dvh`, not `vh`: on a Meta Quest or
+       a phone, `100vh` is taller than what the browser shows. */
     --cdc-board: max(
       320px,
       calc(
         min(
           calc(100dvh - 32px - 2 * var(--cdc-bar) - var(--cdc-coords-off)),
           calc(100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-panel-w) - var(--cdc-gap) - 48px)
-        ) * var(---board-scale, 1)
+        ) * var(--cdc-board-scale, 1)
       )
     );
     --cdc-bar-bot: calc(var(--cdc-bar) + var(--cdc-coords-off));
@@ -726,7 +725,7 @@
             (100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-panel-w) - var(--cdc-gap) - var(--cdc-pocket-gap) - 48px) /
               1.09375
           )
-        ) * var(---board-scale, 1)
+        ) * var(--cdc-board-scale, 1)
       )
     );
 

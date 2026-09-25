@@ -11,6 +11,10 @@
   --cdc-hint: rgba(0, 0, 0, 0.14);
   /* Chess.com's premove red covers the square whole, on both colors. */
   --cdc-premove: #f19082;
+  /* How much of the room the layouts give the board it takes: all of it,
+     unless resized by hand (`--cdc-zoom`, 0 to 100, set by content.js), from
+     a quarter up, as Lichess's `---board-scale` does. */
+  --cdc-board-scale: calc(var(--cdc-zoom, 100) / 100 * 0.75 + 0.25);
 }
 
 /* ----------------------------------------------------------------- board --- */

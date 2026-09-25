@@ -73,6 +73,41 @@
     document.documentElement.style.setProperty('--cdc-fide-skip', (fidePage - 1) * 30);
   }
 
+  // The board's size (game.css, analysis.css, puzzle.css): as big as the
+  // window allows, unless resized by hand. Lichess's own zoom pref may date
+  // from its layout, so it's not used: a drag on the board's handle starts
+  // from our size, and its `---zoom` on body is copied to `--cdc-zoom` and
+  // kept under our own key. Dragged back to full, the key goes.
+  const ZOOM_KEY = 'cdc-board-zoom';
+  const setZoom = z => {
+    if (z >= 100) document.documentElement.style.removeProperty('--cdc-zoom');
+    else document.documentElement.style.setProperty('--cdc-zoom', z);
+  };
+  const savedZoom = localStorage.getItem(ZOOM_KEY);
+  if (savedZoom !== null) setZoom(+savedZoom);
+  let zooming = null;
+  const startZoom = e => {
+    if (zooming || !e.target.closest?.('cg-resize')) return;
+    // Capture phase: before Lichess's handler reads the zoom to start from.
+    document.body.style.setProperty('---zoom', getComputedStyle(document.documentElement).getPropertyValue('--cdc-zoom') || 100);
+    zooming = new MutationObserver(() => {
+      const z = parseInt(document.body.style.getPropertyValue('---zoom'));
+      if (!(z >= 0)) return;
+      setZoom(z);
+      if (z >= 100) localStorage.removeItem(ZOOM_KEY);
+      else localStorage.setItem(ZOOM_KEY, z);
+      window.dispatchEvent(new Event('resize'));
+    });
+    zooming.observe(document.body, { attributes: true, attributeFilter: ['style'] });
+    const stop = () => {
+      zooming.disconnect();
+      zooming = null;
+    };
+    document.addEventListener(e.type === 'touchstart' ? 'touchend' : 'mouseup', stop, { once: true });
+  };
+  document.addEventListener('mousedown', startZoom, true);
+  document.addEventListener('touchstart', startZoom, { capture: true, passive: true });
+
   let sounds = null;
 
   const postSounds = () => {

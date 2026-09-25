@@ -77,7 +77,7 @@
           calc(100dvh - 28px - var(--cdc-coords-off) - var(--cdc-session-h) - var(--cdc-kb-h)),
           calc(100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-side-w) - var(--cdc-tools-w)
             - var(--cdc-gauge-w) - var(--cdc-coords-l) - 3 * var(--cdc-gap) - 48px)
-        ) * var(---board-scale, 1)
+        ) * var(--cdc-board-scale, 1)
       )
     );
 
