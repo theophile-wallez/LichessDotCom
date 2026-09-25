@@ -445,6 +445,36 @@
   .cdc-acc--w { background: #fff; color: #312e2b; }
   .cdc-acc--b { background: #403d39; color: #fff; }
 
+  /* The game rating's label explains itself on hover (#cdc-tip). */
+  [data-cdc-tip] {
+    cursor: default;
+  }
+
+  #cdc-tip {
+    position: fixed;
+    z-index: 1000;
+    max-width: 280px;
+    padding: 7px 10px;
+    border-radius: 5px;
+    background: #161512;
+    box-shadow: 0 2px 8px #00000080;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+    pointer-events: none;
+  }
+
+  #cdc-tip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: var(--cdc-tip-x, 50%);
+    margin-left: -6px;
+    border: 6px solid transparent;
+    border-top-color: #161512;
+  }
+
   .cdc-cls-icon {
     display: inline-flex;
     width: 22px;
