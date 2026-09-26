@@ -1749,6 +1749,10 @@
       // click spanning a redraw still lands (the summary's Start button
       // redraws with every step of the analysis).
       const kept = new Map([...dom.panel.querySelectorAll('button[data-cdc]:not([data-cdc="coach"])')].map(b => [b.outerHTML, b]));
+      // So does where a scrolling part of it was scrolled to (the summary's
+      // rows, read while the analysis runs).
+      const scrolled = state.mode !== state.drawnMode ? [] : [...dom.panel.querySelectorAll('*')].filter(e => e.scrollTop).map(e => [e.className, e.scrollTop]);
+      state.drawnMode = state.mode;
       if (state.mode === 'summary') renderSummary(ctrl);
       else if (state.mode === 'moves') renderMoves(ctrl);
       else if (state.mode === 'live') renderLive(ctrl);
@@ -1756,6 +1760,10 @@
       for (const b of dom.panel.querySelectorAll('button[data-cdc]:not([data-cdc="coach"])')) {
         const old = kept.get(b.outerHTML);
         if (old && old !== b) b.replaceWith(old);
+      }
+      for (const [cls, top] of scrolled) {
+        const e = [...dom.panel.querySelectorAll('*')].find(x => x.className === cls);
+        if (e) e.scrollTop = top;
       }
       keepAvatar();
       // The tooltip stays while what it points at does (a kept button).
