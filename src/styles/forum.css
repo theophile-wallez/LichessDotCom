@@ -1268,6 +1268,16 @@ main.forum-topic .markdown-editor .header-tab.active::after {
   display: none;
 }
 
+/* The pill slides from one to the other (see "sliding tabs" in theme.css). */
+main.forum-topic .markdown-editor .header[data-cdc-tabs] {
+  --cdc-tab-radius: 999px;
+  --cdc-tab-shadow: none;
+}
+
+main.forum-topic .markdown-editor .header[data-cdc-tabs] .header-tab.active {
+  background: transparent !important;
+}
+
 main.forum-topic .markdown-editor textarea {
   min-height: 160px;
   padding: 12px 14px !important;

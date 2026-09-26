@@ -56,6 +56,13 @@ is "a Chess.com user wouldn't notice they're on Lichess".
   `translateY(-2px) rotate(-8deg) scale(1.08)` on menu links, both with
   `transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)`. Reuse
   these values rather than inventing new ones.
+- **Tabs slide.** Every tab bar's highlight, the raised pill or the
+  underline, is one piece that slides from the tab left to the tab picked
+  (`0.35s cubic-bezier(0.22, 1, 0.36, 1)`), as the rating chart's range
+  pills do. A new tab bar goes in `TAB_BARS` in `content.js`; its CSS then
+  gives the piece its active tab's look (`--cdc-tab-bg`, `-shadow`,
+  `-radius`, `-line`) and takes that look off the active tab under
+  `[data-cdc-tabs]` (see "sliding tabs" in `theme.css`).
 - **Motion is never reduced.** `prefers-reduced-motion` changes nothing:
   every animation and transition runs, ours and Lichess's. Never write a
   `prefers-reduced-motion` query, in CSS or `matchMedia`. `motion.js`
@@ -90,7 +97,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `tools/coach-rig/extract.py` | Run once when a portrait changes (needs numpy and opencv-python-headless): traces its features into `img/coaches/rig.json` and paints its plate. |
 | `tools/game-rating/` | The Game Review's game rating, calibrated on Lichess's own games (needs python-chess, numpy and scipy): `extract.py` judges every move of a database slice with Stockfish evals as `review.js` does (loss, phase, tactics), `fit.py` fits the odds of each loss band per rating and writes them into `review.js`'s `RATING_MODEL` line. Rerun both if the judging or the phases change. |
 | `src/background.js` | Service worker: downloads the Chess.com sounds, caches them as base64. |
-| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, fetches a finished game's move times (and its time control, for the "New 10 min" button), the players' country flags (from their profiles), the analysis board's players (copied from the hidden game info), the home hero, coach title badges, the Swiss list's and a Swiss tournament's round progress and medal ranks, the forum index's count labels, the hover card's rating chips and its fit in the window, the eval bar's score, the font remapping, the FIDE lists' (players, federations) rank offset on a later page, and which coach (`data-cdc-coach` on `<html>`) reads a practice drill's goal, and the sidebar's Donate item (copied from the flyout's, as Lichess's own lone link is missing for patrons and on game pages). |
+| `src/content.js` | Isolated world: forwards sounds to the page, measures sizes for the grids, builds captured pieces, fetches a finished game's move times (and its time control, for the "New 10 min" button), the players' country flags (from their profiles), the analysis board's players (copied from the hidden game info), the home hero, coach title badges, the Swiss list's and a Swiss tournament's round progress and medal ranks, the forum index's count labels, the hover card's rating chips and its fit in the window, the eval bar's score, the font remapping, the FIDE lists' (players, federations) rank offset on a later page, and which coach (`data-cdc-coach` on `<html>`) reads a practice drill's goal, the sidebar's Donate item (copied from the flyout's, as Lichess's own lone link is missing for patrons and on game pages), and every tab bar's sliding highlight (`TAB_BARS`). |
 | `src/dashboard.js` | Isolated world: the puzzle dashboard's theme radar, redrawn as SVG from the page's init JSON (Lichess draws it into a canvas). |
 | `src/ratingchart.js` | Isolated world: the rating history chart (profile, rating stats page), redrawn in SVG from the page's init JSON, or the stats page's `loadEsm` call (Lichess draws it with Chart.js into a canvas): smooth curves over gradients, range pills, one chip per rating, a hover tooltip. |
 | `src/distribution.js` | Page world: the weekly rating distribution (`/stat/rating/distribution/<perf>`), redrawn in SVG from the page's init JSON (Lichess draws it with Chart.js into a canvas): a rounded column per 25 points in the rating's color, the cumulative curve, pills for your rating and the player you came from, a hover tooltip. Page world for Lichess's translated labels (`i18n.site`). |
@@ -98,7 +105,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/page.js` | Page world: wraps `site.sound` to play the right Chess.com sound per move, plus premove / illegal / game-start, which Lichess has no sound for. |
 | `src/board.js` | Page world: every main board's shapes redrawn Chess.com-style (right-clicked squares filled, arrows), checkmate badge and label. |
 | `src/review.js` | Page world: Game Review (engine, classification, panel, the coach's comment per move: how the evaluation moved plus one fact from the board and the engine, its pieces drawn as Neo pieces and its moves as chips, typed out word by word, board overlays, eval bar), and Chess.com's game rating under the summary's counts: the rating each side played at and a verdict per phase (opening, tactics, strategy, endgame, by Lichess's own divider), from `RATING_MODEL`. A move played off the game shows in the review's move list as a variation (Lichess's comments and computer lines stay hidden) and is judged like the game's, badge, best-move arrow and eval bar included. On the free analysis board (`/analysis`) the same coach judges each move as it's played, variations included, with the badges on the board and in Lichess's move list, and, signed in, the opening's name (from the masters explorer) over the move list. |
-| `src/styles/theme.css` | Overrides Lichess's `--c-*` color variables, fonts, buttons. |
+| `src/styles/theme.css` | Overrides Lichess's `--c-*` color variables, fonts, buttons, tooltips, and the sliding highlight every tab bar shares. |
 | `src/styles/sidebar.css` | Lichess's top header → Chess.com's left sidebar, and the user menu (dasher) as a Chess.com menu. |
 | `src/styles/board.css` | Board, pieces, highlights, move hints, arrows, coordinates, and Lichess's eval bar drawn like the Game Review's. |
 | `src/styles/playerbar.css` | The player bars' look, shared by the game page (`.ruser`, `.rclock`) and the analysis board (`.cdc-player`, `.analyse__clock`): avatar, title, name, flag, rating, captured pieces and the clock. Each page only places them. |
@@ -355,6 +362,13 @@ coaches' rig is traced by a script that only runs when a portrait changes.
 - **A `main.analyse` without a board.** A broadcast's own page (overview,
   boards, players) is `main.analyse.is-relay.has-relay-tour`: the analysis
   layout must leave it alone (`broadcast.css` gives it its two columns back).
+- **Tab bars redrawn on click.** Some bars are replaced whole when a tab is
+  picked: the home lobby's (snabbdom draws it anew) and the profile's games
+  filter (it comes back with the games, after Lichess has kept the page busy
+  ~200ms). `content.js` catches the new bar as it's inserted and slides on
+  from where the old one was last painted. Lichess's jQuery handlers
+  `return false`, which also stops the click reaching `document`: learn the
+  tab picked from its class changing, not from the click.
 - **Picker names.** lila puts a picker's name in its `mselect`'s id
   (`#…__day-select`), not in its class.
 

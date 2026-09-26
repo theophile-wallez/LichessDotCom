@@ -1325,6 +1325,17 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
   color: var(--cdc-text-strong) !important;
 }
 
+/* The raised tab slides from one to the next (see "sliding tabs" in
+ * theme.css). */
+.user-show > .angles[data-cdc-tabs] {
+  --cdc-tab-radius: 8px;
+}
+
+.user-show > .angles[data-cdc-tabs] .nm-item.active {
+  background: transparent !important;
+  box-shadow: none;
+}
+
 .user-show > .angles .unread {
   min-width: 20px;
   margin-inline-start: 8px !important;
@@ -1564,7 +1575,13 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
 .user-show .angle-content > #games .nm-item,
 .user-show .angle-content > #games .nm-item.active {
   flex: 1 1 auto;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   min-width: 78px;
+  /* Lichess pushes each tab down from the track's top edge. */
+  margin: 0 !important;
   padding: 7px 8px !important;
   border: none !important;
   border-radius: 7px !important;
@@ -1601,6 +1618,17 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
 .user-show .angle-content > #games .nm-item.active strong,
 .user-show .angle-content > #games .nm-item:hover strong {
   color: var(--cdc-text-strong);
+}
+
+/* The count and its label stack without the line break between them, and
+ * the advanced search's icon sits over its label the same way. */
+.user-show .angle-content > #games .nm-item br {
+  display: none;
+}
+
+.user-show .angle-content > #games[data-cdc-tabs] .nm-item.active {
+  background: transparent !important;
+  box-shadow: none;
 }
 
 /* A phone fits the five usual filters on one row, instead of four and a

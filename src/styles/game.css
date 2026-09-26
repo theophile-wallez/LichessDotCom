@@ -622,6 +622,11 @@
     box-shadow: inset 0 -2px 0 #fff;
   }
 
+  /* The underline slides (see "sliding tabs" in theme.css). */
+  main.round .mchat__tabs[data-cdc-tabs] .mchat__tab-active {
+    box-shadow: none;
+  }
+
   main.round .mchat__content {
     min-height: 0;
     background: transparent !important;
