@@ -282,8 +282,7 @@
     cursor: pointer;
   }
 
-  .cdc-review__table--loading,
-  .cdc-summary-graph:has(.cdc-summary-pct) {
+  .cdc-review__table--loading {
     cursor: default;
   }
 
@@ -298,6 +297,7 @@
     font-size: 12px;
     font-weight: 800;
     mix-blend-mode: difference;
+    pointer-events: none; /* the graph is clickable while it fills in */
   }
 
   #cdc-review-graph {

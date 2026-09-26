@@ -104,7 +104,7 @@ is "a Chess.com user wouldn't notice they're on Lichess".
 | `src/motion.js` | Page world, first: motion is never reduced. Reduced-motion queries answer as if the user asked for nothing, in `matchMedia` and in Lichess's sheets (each one loaded again with CORS, its rules rewritten, the original switched off). |
 | `src/page.js` | Page world: wraps `site.sound` to play the right Chess.com sound per move, plus premove / illegal / game-start, which Lichess has no sound for. |
 | `src/board.js` | Page world: every main board's shapes redrawn Chess.com-style (right-clicked squares filled, arrows), checkmate badge and label. |
-| `src/review.js` | Page world: Game Review (engine, classification, panel, the coach's comment per move: how the evaluation moved plus one fact from the board and the engine, its pieces drawn as Neo pieces and its moves as chips, typed out word by word, board overlays, eval bar), and Chess.com's game rating under the summary's counts: the rating each side played at and a verdict per phase (opening, tactics, strategy, endgame, by Lichess's own divider), from `RATING_MODEL`. A move played off the game shows in the review's move list as a variation (Lichess's comments and computer lines stay hidden) and is judged like the game's, badge, best-move arrow and eval bar included, with the engine's move from there as a pale blue arrow (Lichess's own engine arrows stay hidden during the review). On the free analysis board (`/analysis`) the same coach judges each move as it's played, variations included, with the badges on the board and in Lichess's move list, and, signed in, the opening's name (from the masters explorer) over the move list. |
+| `src/review.js` | Page world: Game Review (engine, classification, panel, the coach's comment per move: how the evaluation moved plus one fact from the board and the engine, its pieces drawn as Neo pieces and its moves as chips, typed out word by word, board overlays, eval bar), and Chess.com's game rating under the summary's counts. The analysis fills in as it runs: Lichess's cloud for the opening, a quick pass (or the game's server analysis) for the graph within seconds, then the full depth, the move on the board first, so the review can start at once and each move is judged as soon as its positions are in (the game rating waits for the last). One engine serves the game and the moves played off it. The game rating: the rating each side played at and a verdict per phase (opening, tactics, strategy, endgame, by Lichess's own divider), from `RATING_MODEL`. A move played off the game shows in the review's move list as a variation (Lichess's comments and computer lines stay hidden) and is judged like the game's, badge, best-move arrow and eval bar included, with the engine's move from there as a pale blue arrow (Lichess's own engine arrows stay hidden during the review). On the free analysis board (`/analysis`) the same coach judges each move as it's played, variations included, with the badges on the board and in Lichess's move list, and, signed in, the opening's name (from the masters explorer) over the move list. |
 | `src/styles/theme.css` | Overrides Lichess's `--c-*` color variables, fonts, buttons, tooltips, and the sliding highlight every tab bar shares. |
 | `src/styles/sidebar.css` | Lichess's top header → Chess.com's left sidebar, and the user menu (dasher) as a Chess.com menu. |
 | `src/styles/board.css` | Board, pieces, highlights, move hints, arrows, coordinates, and Lichess's eval bar drawn like the Game Review's. |
@@ -251,6 +251,13 @@ coaches' rig is traced by a script that only runs when a portrait changes.
   `npm/stockfish-web/sf_19_smallnet.js`. **Only the analysis page has a
   controller**: a game page exposes none, so anything that must work on both
   reads the board's DOM instead (`board.js` does).
+- **The cloud eval.** `/api/cloud-eval?fen=…&multiPv=2` needs no account
+  and takes one position a request (Lichess asks for one at a time); a
+  position nobody analyzed is a 404, which in a game means it has left the
+  opening. Its scores are from White's view and its castling is king takes
+  rook, unlike our engine's lines. The game export's `evals=true` gives
+  the server analysis, when there is one: one line per position, White's
+  view, no second best.
 - **The free analysis board.** `/analysis` is `main.analyse` with
   `site.analysis.synthetic` set and a game id of `synthetic`: no game to
   export, and a tree that grows as the user plays. Every `move` in its move
@@ -413,6 +420,11 @@ reports a light color scheme too (emulate `dark` as well, see "Lichess's
 light theme"), and Playwright hides the scrollbars in headless mode
 (`ignoreDefaultArgs: ['--hide-scrollbars']` brings them back): a layout that
 only fits without a scrollbar looks fine there, not in a real Chrome.
+
+Comparing two versions of the Game Review? Stockfish on several threads
+isn't deterministic: two runs of the same code on the same game differ on
+about a quarter of the verdicts by one step, and the game rating by a
+hundred points or more. Compare against that spread, not against a single run.
 
 Before committing, syntax-check every JS file (e.g. `new Function(src)` in the
 browser) and parse `manifest.json`. Finally, load the extension unpacked in

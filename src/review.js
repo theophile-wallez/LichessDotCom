@@ -2,6 +2,10 @@
 //
 // - Runs Lichess's own Stockfish 19 build (the one its analysis board uses) on
 //   every mainline position, with MultiPV 2, and caches the results per game.
+//   Lichess's cloud gives the opening's positions for free; a quick pass (or
+//   the game's server analysis) draws the graph within seconds; the move on
+//   the board goes first, so the review can start at once, each move judged
+//   as soon as its positions are in.
 // - Classifies each move like Chess.com (book, brilliant, great, best,
 //   excellent, good, inaccuracy, mistake, miss, blunder) from win-probability
 //   loss, and computes per-player accuracy.
@@ -23,6 +27,8 @@
   if (!GAME.test(location.pathname) && !/^\/analysis(?:\/|$)/.test(location.pathname)) return;
 
   const ENGINE = { root: 'npm/stockfish-web', js: 'sf_19_smallnet.js', depth: 16, movetime: 1500 };
+  // The graph's first draft: enough to show the game's trend, in seconds.
+  const QUICK = { depth: 10, movetime: 250 };
   const CACHE_VERSION = 1;
 
   // ------------------------------------------------------------ i18n ---
@@ -366,7 +372,7 @@
     }
 
     // Resolves to { lines: [{ cp | mate, pv }] } from the side to move's view.
-    analyse(fen) {
+    analyse(fen, { depth, movetime } = ENGINE) {
       const run = () =>
         new Promise(resolve => {
           const lines = [];
@@ -384,7 +390,7 @@
             lines[multipv - 1] = cp ? { cp: +cp[1], pv } : { mate: +mate[1], pv };
           };
           this.mod.uci(`position fen ${fen}`);
-          this.mod.uci(`go depth ${ENGINE.depth} movetime ${ENGINE.movetime}`);
+          this.mod.uci(`go depth ${depth} movetime ${movetime}`);
         });
       return (this.queue = this.queue.then(run));
     }
@@ -445,26 +451,6 @@
       best: a.best, bestSan: uciToSan(prev.fen, a.best), eval: b,
       before: a, node, prev, prevMove,
     };
-  }
-
-  function classify(ctrl, positions, bookPly) {
-    const chess960 = ctrl.data.game.variant?.key === 'chess960';
-    const nodes = ctrl.mainline;
-    const moves = [];
-    for (let i = 1; i < nodes.length; i++) {
-      const move = judge(nodes[i - 1], nodes[i], positions[i - 1], positions[i], moves[i - 2], i <= bookPly, chess960);
-      moves.push({ ...move, ply: i });
-    }
-    const accuracy = color => {
-      const accs = moves.filter(m => m.color === color).map(m => m.accuracy);
-      if (!accs.length) return null;
-      const mean = accs.reduce((s, x) => s + x, 0) / accs.length;
-      const harmonic = accs.length / accs.reduce((s, x) => s + 1 / Math.max(x, 1), 0);
-      return (mean + harmonic) / 2;
-    };
-    const counts = { w: {}, b: {} };
-    for (const m of moves) counts[m.color][m.cls] = (counts[m.color][m.cls] || 0) + 1;
-    return { moves, positions, accuracy: { w: accuracy('w'), b: accuracy('b') }, counts, rating: rateGame(ctrl, moves) };
   }
 
   // ----------------------------------------------------- game rating ---
@@ -1238,7 +1224,7 @@
   // The desktop layout, the only one with room for the review (review.css).
   const wide = matchMedia('(min-width: 1020px)');
   const state = {
-    mode: 'summary', review: null, progress: 0, error: null, lastKey: '',
+    mode: 'summary', review: null, progress: 0, version: 0, error: null, lastKey: '',
     explain: false, playing: null, revealed: new Set(),
     bestOf: null, // { path, move }: the move whose best is shown on the board
     allRows: false, // the summary's chevron is open
@@ -1316,18 +1302,24 @@
     return { w: byColor.white, b: byColor.black };
   }
 
-  // `review.total` (positions in the game) lets a partial analysis fill the
-  // graph from the left while it runs.
+  // `review.total` (positions in the game) spaces the graph for the whole
+  // game while its analysis fills in: a position not known yet leaves a gap.
   function graphSvg(review, ply, width, height) {
     const n = (review.total || review.positions.length) - 1 || 1;
-    const x = i => (i / n) * width;
-    const y = wp => height - (Math.max(0, Math.min(100, wp)) / 100) * height;
-    const pts = review.positions.map((p, i) => `${x(i).toFixed(1)},${y(p.wp).toFixed(1)}`);
-    const end = x(review.positions.length - 1).toFixed(1);
-    const area = pts.length ? `M0,${height} L${pts.join(' L')} L${end},${height} Z` : '';
+    const x = i => ((i / n) * width).toFixed(1);
+    const y = wp => (height - (Math.max(0, Math.min(100, wp)) / 100) * height).toFixed(1);
+    const runs = [];
+    review.positions.forEach((p, i) => {
+      if (!p) return;
+      if (!review.positions[i - 1]) runs.push([]);
+      runs[runs.length - 1].push(i);
+    });
+    const area = runs
+      .map(r => `M${x(r[0])},${height} L${r.map(i => `${x(i)},${y(review.positions[i].wp)}`).join(' L')} L${x(r[r.length - 1])},${height} Z`)
+      .join(' ');
     const dots = review.moves
-      .filter(m => GRAPH_DOTS.has(m.cls))
-      .map(m => `<circle cx="${x(m.ply).toFixed(1)}" cy="${y(review.positions[m.ply].wp).toFixed(1)}" r="3.5" fill="${CLS[m.cls].color}"/>`)
+      .filter(m => m && GRAPH_DOTS.has(m.cls) && review.positions[m.ply])
+      .map(m => `<circle cx="${x(m.ply)}" cy="${y(review.positions[m.ply].wp)}" r="3.5" fill="${CLS[m.cls].color}"/>`)
       .join('');
     const marker = ply > 0 ? `<line x1="${x(ply)}" x2="${x(ply)}" y1="0" y2="${height}" stroke="#81b64c" stroke-width="2"/>` : '';
     return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
@@ -1350,7 +1342,7 @@
       state.revealed.add(kind);
       container.firstElementChild.classList.add('cdc-graph-reveal');
     }
-    const n = review.positions.length - 1;
+    const n = (review.total || review.positions.length) - 1;
     const plyAt = e => {
       const r = container.getBoundingClientRect();
       return Math.max(0, Math.min(n, Math.round(((e.clientX - r.left - padX / 2) / width) * n)));
@@ -1358,7 +1350,9 @@
     const tip = container.lastElementChild;
     container.onmousemove = e => {
       const i = plyAt(e);
-      tip.textContent = formatEval(review.positions[i]) || '0.00';
+      const p = review.positions[i];
+      if (!p) return void (tip.style.display = 'none');
+      tip.textContent = formatEval(p) || '0.00';
       tip.style.display = 'block';
       const x = padX / 2 + (i / (n || 1)) * width;
       tip.style.left = Math.max(padX / 2, Math.min(container.clientWidth - padX / 2 - tip.offsetWidth, x - tip.offsetWidth / 2)) + 'px';
@@ -1375,7 +1369,7 @@
   // it, judged as it comes (see "live"). Null until then.
   function reviewMove(ctrl) {
     if (!state.review || !ctrl.path) return null;
-    return ctrl.onMainline ? state.review.moves[ctrl.node.ply - 1] : judgeAt(ctrl, ctrl.path);
+    return (ctrl.onMainline ? state.review.moves[ctrl.node.ply - 1] : judgeAt(ctrl, ctrl.path)) || null;
   }
 
   // The engine's best move instead of the one played, played on the board
@@ -1434,11 +1428,13 @@
   }
 
   // Like Chess.com, the summary keeps its layout while the game is analyzed:
-  // a quote from the coach, the graph filling in, and the counts at zero.
+  // a quote from the coach, the graph, the accuracy and the counts filling
+  // in. The game rating waits for the last move; the review can start at
+  // once, each move judged as soon as its positions are.
   function renderSummary(ctrl) {
     const p = players(ctrl);
     const r = state.review;
-    const loading = !r && !state.error;
+    const loading = !r?.complete && !state.error;
     const pct = Math.round(state.progress * 100);
     const say = state.error ? esc(state.error) : loading ? esc(QUOTE) : esc(T.intro);
     const acc = c => (r?.accuracy[c] == null ? '&nbsp;' : r.accuracy[c].toFixed(1));
@@ -1455,16 +1451,16 @@
     // Under them, as on Chess.com: the rating each side played at, then a
     // verdict per phase, as the icon of the class it deserves (a phase the
     // game never reached goes once it's analyzed).
-    const elo = c => r?.rating[c]?.elo ?? '&nbsp;';
+    const elo = c => r?.rating?.[c]?.elo ?? '&nbsp;';
     const phase = (c, ph) => {
-      const cls = r?.rating[c]?.phases[ph];
+      const cls = r?.rating?.[c]?.phases[ph];
       return cls ? icon(cls) : '';
     };
     const rating = `<tr class="cdc-t-rating"><td class="cdc-t-label"><span data-cdc-tip="${esc(T.gameRatingTip)}">${esc(T.gameRating)}</span></td>
         <td><span class="cdc-acc cdc-acc--w">${elo('w')}</span></td><td></td>
         <td><span class="cdc-acc cdc-acc--b">${elo('b')}</span></td></tr>
       <tr class="cdc-t-sep"><td colspan="4"></td></tr>
-      ${PHASES.filter(ph => !r || r.rating.w?.phases[ph] || r.rating.b?.phases[ph]).map(ph => `<tr class="cdc-t-phase"><td class="cdc-t-label">${esc(T.phases[ph])}</td><td>${phase('w', ph)}</td><td></td><td>${phase('b', ph)}</td></tr>`).join('')}`;
+      ${PHASES.filter(ph => !r?.rating || r.rating.w?.phases[ph] || r.rating.b?.phases[ph]).map(ph => `<tr class="cdc-t-phase"><td class="cdc-t-label">${esc(T.phases[ph])}</td><td>${phase('w', ph)}</td><td></td><td>${phase('b', ph)}</td></tr>`).join('')}`;
     // Only the classification rows scroll: they're a table of their own, with
     // the same fixed columns as the one above so the two line up.
     const cols = '<colgroup><col class="cdc-t-c-label"><col><col class="cdc-t-c-icon"><col></colgroup>';
@@ -1472,7 +1468,7 @@
       <div class="cdc-coach cdc-coach--summary">${coachAvatar()}
         <div class="cdc-bubble"><p class="cdc-bubble__say">${say}</p></div></div>
       <div class="cdc-review__top">
-        <div class="cdc-review__graph cdc-summary-graph">${loading ? `<span class="cdc-summary-pct">${pct}%</span>` : ''}</div>
+        <div class="cdc-review__graph cdc-summary-graph"></div>
         <table class="cdc-review__table">${cols}
           <tr class="cdc-t-names"><td></td><td title="${esc(playerName(p.w))}">${esc(playerName(p.w))}</td><td></td><td title="${esc(playerName(p.b))}">${esc(playerName(p.b))}</td></tr>
           <tr><td class="cdc-t-label">${esc(T.players)}</td><td><span class="cdc-avatar"></span></td><td></td><td><span class="cdc-avatar"></span></td></tr>
@@ -1485,14 +1481,10 @@
       <div class="cdc-review__body">
         <table class="cdc-review__table${loading ? ' cdc-review__table--loading' : ''}">${cols}${rows}${toggle}${rating}</table>
       </div>
-      <div class="cdc-review__foot"><button class="cdc-btn cdc-btn--green" data-cdc="moves" ${r ? '' : 'disabled'}>${esc(T.start)}</button></div>`;
+      <div class="cdc-review__foot"><button class="cdc-btn cdc-btn--green" data-cdc="moves" ${r && !state.error ? '' : 'disabled'}>${esc(T.start)}</button></div>`;
     const g = dom.panel.querySelector('.cdc-summary-graph');
     if (r) mountGraph(g, r, ctrl.node.ply, ctrl);
-    else if (loading) {
-      const partial = { positions: state.partial || [], moves: [], total: ctrl.mainline.length };
-      const box = g.getBoundingClientRect();
-      g.insertAdjacentHTML('beforeend', graphSvg(partial, 0, Math.max(100, Math.floor(box.width)), Math.max(40, Math.floor(box.height))));
-    }
+    if (loading) g.insertAdjacentHTML('afterbegin', `<span class="cdc-summary-pct">${pct}%</span>`);
   }
 
   // The verdict, with the move's piece as a solid figurine like Chess.com,
@@ -1524,8 +1516,8 @@
           <p class="cdc-bubble__title">${title(CLS.best, ctrl.node.san)}</p>
           ${evalChip(shown.before)}</div>`;
     else if (!move) {
-      // Off the game, a move waits for the engine.
-      const say = ctrl.onMainline ? T.intro : live.error || T.thinking;
+      // A move waits for the engine, the game's included while it runs.
+      const say = !ctrl.path ? T.intro : (ctrl.onMainline ? state.error : live.error) || T.thinking;
       bubble = `<p class="cdc-bubble__title">${esc(say)}</p>`;
     } else {
       const good = GOOD.has(move.cls);
@@ -1552,8 +1544,7 @@
     dom.controls.innerHTML = ['first', 'prev', state.playing ? 'pause' : 'play', 'next', 'last']
       .map(a => `<button class="cdc-btn" data-cdc="${a === 'pause' ? 'play' : a}">${svgIcon(a)}</button>`)
       .join('');
-    if (r) mountGraph(dom.graphBox, r, ply, ctrl);
-    else dom.graphBox.innerHTML = '';
+    movesGraph(ctrl, true);
     // jumpToMain doesn't scroll Lichess's move list; keep the move in view.
     requestAnimationFrame(() => {
       const box = document.querySelector('main.analyse .analyse__moves');
@@ -1571,7 +1562,7 @@
     const color = ctrl.getOrientation()[0];
     const line = state.error
       ? `<span class="cdc-review__progress">${esc(state.error)}</span>`
-      : !r
+      : !r?.complete
         ? `<span class="cdc-review__progress">${esc(T.analysing)} ${Math.round(state.progress * 100)}%</span>`
         : COUNTED.filter(k => r.counts[color][k])
             .map(k => `<span class="cdc-review__count" style="color:${CLS[k].color}">${icon(k)}${esc(countLabel(k, r.counts[color][k]))}</span>`)
@@ -1688,28 +1679,53 @@
 
   const mark = (el, key, on) => (on ? (el.dataset[key] = '') : delete el.dataset[key]);
 
+  // The move-by-move graph, drawn again as the analysis fills it in. Only
+  // the graph: redrawing the panel would restart what's hovered or clicked.
+  function movesGraph(ctrl, force) {
+    const r = state.review;
+    if (!r) return void (dom.graphBox.innerHTML = '');
+    if (!force && dom.graphBox.dataset.v === String(state.version)) return;
+    dom.graphBox.dataset.v = state.version;
+    mountGraph(dom.graphBox, r, ctrl.node.ply, ctrl);
+  }
+
   function render(force) {
     const ctrl = site.analysis;
     if (!ctrl || !ensureAttached(ctrl)) return;
     if (state.mode === 'summary' && ctrl.node.ply !== state.summaryPly) return setMode('moves');
     // Off the game's moves, the review judges them like the free board.
     if (state.mode === 'live' || (state.mode === 'moves' && state.review)) pump(ctrl);
+    // The summary and the closed panel show the analysis's progress, in
+    // steps (a graph position known, the next percent of the full depth);
+    // the review only the move on the board.
+    const r = state.review;
+    const known = r ? r.positions.filter(Boolean).length : 0;
+    const progress = state.mode === 'moves' ? '' : [Math.round(state.progress * 100), Math.round((known / ctrl.mainline.length) * 20), !!r?.complete];
     const key =
       state.mode === 'live'
         ? ['live', ctrl.path, liveDigest(judgeAt(ctrl, ctrl.path)), live.error].join('|')
-        : [state.mode, ctrl.path, ctrl.onMainline, ctrl.getOrientation(), !!state.review, Math.round(state.progress * 100), state.error, state.explain, !!state.playing,
-            ctrl.onMainline ? '' : liveDigest(reviewMove(ctrl)), live.error].join('|');
+        : [state.mode, ctrl.path, ctrl.onMainline, ctrl.getOrientation(), !!r, progress, state.error, state.explain, !!state.playing,
+            liveDigest(reviewMove(ctrl)), live.error].join('|');
     if (force || key !== state.lastKey) {
       state.lastKey = key;
       hideTip();
+      // A button the render leaves as it was stays the same element, so a
+      // click spanning a redraw still lands (the summary's Start button
+      // redraws with every step of the analysis).
+      const kept = new Map([...dom.panel.querySelectorAll('button[data-cdc]:not([data-cdc="coach"])')].map(b => [b.outerHTML, b]));
       if (state.mode === 'summary') renderSummary(ctrl);
       else if (state.mode === 'moves') renderMoves(ctrl);
       else if (state.mode === 'live') renderLive(ctrl);
       else renderNormal(ctrl);
+      for (const b of dom.panel.querySelectorAll('button[data-cdc]:not([data-cdc="coach"])')) {
+        const old = kept.get(b.outerHTML);
+        if (old && old !== b) b.replaceWith(old);
+      }
       keepAvatar();
       startStream();
       fitBubble();
     }
+    if (state.mode === 'moves') movesGraph(ctrl);
     renderBoard(ctrl);
   }
 
@@ -1795,7 +1811,7 @@
     evals: new Map(), // fen -> engine record
     books: new Map(), // fen -> { book, name } from Lichess's masters database
     judged: new Map(), // path -> { node, move }
-    engine: null, busy: false, bookBusy: false, noBook: false, error: null,
+    engine: null, booting: null, busy: false, bookBusy: false, noBook: false, error: null,
   };
 
   function changed() {
@@ -1876,7 +1892,9 @@
 
   function pump(ctrl) {
     if (!live.busy && !live.error) {
-      const node = wanted(ctrl).find(n => !live.evals.has(n.fen));
+      // A game's own positions are its analysis's to run (analyseGame).
+      const game = ctrl.synthetic ? null : new Set(work.nodes.map(n => n.fen));
+      const node = wanted(ctrl).find(n => !live.evals.has(n.fen) && !game?.has(n.fen));
       if (node) analyseLive(ctrl, node.fen);
     }
     if (!live.bookBusy && !live.noBook) {
@@ -1893,13 +1911,8 @@
   async function analyseLive(ctrl, fen) {
     live.busy = true;
     try {
-      if (!live.engine) {
-        const engine = new Engine();
-        engine.chess960 = ctrl.data.game.variant?.key === 'chess960';
-        await engine.boot();
-        live.engine = engine;
-      }
-      live.evals.set(fen, toRecord(fen, await live.engine.analyse(fen)));
+      const engine = await engineFor(ctrl);
+      live.evals.set(fen, toRecord(fen, await engine.analyse(fen)));
     } catch (err) {
       console.error('[LichessDotCom] engine failed', err);
       live.error = T.engineError;
@@ -1972,60 +1985,200 @@
 
   // ------------------------------------------------------------ main ---
 
+  // The game's analysis, filled in as it comes. `deep` is what verdicts are
+  // made from: the engine at full depth, or Lichess's cloud. `rough` only
+  // stands in on the graph and the eval bar until then: the quick pass, or
+  // the game's own server analysis. A deep record is never replaced, so a
+  // move, once judged, stays as it is.
+  const work = { nodes: [], deep: [], rough: [], moves: [], bookPly: 0, cloudAt: Infinity };
+
   async function analyseGame(ctrl) {
     const game = ctrl.data.game;
-    const nodes = ctrl.mainline;
+    const nodes = (work.nodes = ctrl.mainline);
     const cacheKey = `cdc-review:${game.id}:${nodes.length}:v${CACHE_VERSION}`;
 
-    let bookPly = 0;
     try {
-      const res = await fetch(`/game/export/${game.id}?opening=true&moves=false&clocks=false&evals=false`, {
+      const res = await fetch(`/game/export/${game.id}?opening=true&moves=false&clocks=false&evals=true`, {
         headers: { Accept: 'application/json' },
       });
       const info = await res.json();
-      bookPly = info.opening?.ply || 0;
+      work.bookPly = info.opening?.ply || 0;
       state.openingName = info.opening?.name || '';
+      // Lichess's server analysis, when someone asked for it: every position
+      // after a move, from White's view, one line only (no second best to
+      // tell a great move by, the best move only after a mistake). Enough
+      // for the graph at once, not for the verdicts.
+      (info.analysis || []).forEach((e, i) => {
+        if (i + 1 >= nodes.length) return;
+        if (e.mate !== undefined) work.rough[i + 1] = { mate: e.mate, wp: e.mate > 0 ? 100 : 0 };
+        else if (e.eval !== undefined) work.rough[i + 1] = { cp: e.eval, wp: winPct(e.eval) };
+      });
     } catch {}
+    seedBooks(ctrl);
 
-    let positions = null;
+    let cached = null;
     try {
-      positions = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+      cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
     } catch {}
+    if (cached?.length === nodes.length) cached.forEach((p, i) => setDeep(i, p));
+    refresh(ctrl);
+    if (state.review.complete) return;
 
-    if (!positions || positions.length !== nodes.length) {
-      const engine = new Engine();
-      engine.chess960 = game.variant?.key === 'chess960';
-      try {
-        await engine.boot();
-      } catch (err) {
-        console.error('[LichessDotCom] engine boot failed', err);
-        state.error = T.engineError;
-        render(true);
-        return;
-      }
-      positions = [];
-      for (let i = 0; i < nodes.length; i++) {
-        positions.push(toRecord(nodes[i].fen, await engine.analyse(nodes[i].fen)));
-        state.partial = positions;
-        state.progress = (i + 1) / nodes.length;
-        render();
-      }
-      engine.destroy();
-      state.revealed.add('summary'); // it already filled in while loading
-      try {
-        localStorage.setItem(cacheKey, JSON.stringify(positions));
-      } catch {}
+    if (game.variant?.key !== 'chess960') lookUpCloud(ctrl);
+    let engine;
+    try {
+      engine = await engineFor(ctrl);
+    } catch (err) {
+      console.error('[LichessDotCom] engine boot failed', err);
+      state.error = T.engineError;
+      render(true);
+      return;
     }
-    state.review = classify(ctrl, positions, bookPly);
-    seedLive(ctrl, positions, bookPly);
-    render(true);
+    for (;;) {
+      const job = nextJob(ctrl);
+      if (!job) {
+        if (state.review.complete) break;
+        await new Promise(resolve => setTimeout(resolve, 100)); // the cloud has the rest in hand
+        continue;
+      }
+      const [i, deep] = job;
+      const rec = toRecord(nodes[i].fen, await engine.analyse(nodes[i].fen, deep ? ENGINE : QUICK));
+      if (deep) setDeep(i, rec);
+      else work.rough[i] = rec;
+      refresh(ctrl);
+    }
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify(work.deep));
+    } catch {}
   }
 
-  // The moves played off the game are judged like the free board's: the
-  // game's positions are already analyzed, and its book moves known.
-  function seedLive(ctrl, positions, bookPly) {
-    const nodes = ctrl.mainline;
-    nodes.forEach((n, i) => live.evals.set(n.fen, positions[i]));
+  // The next position for the engine, as [index, deep]. First the ones the
+  // move on the board is judged from (its position, the one before, the one
+  // before that for a miss) and the next move's; then a quick pass over the
+  // whole game for the graph; then the rest at full depth, from the start.
+  // The cloud goes ahead through the opening: the engine leaves it the few
+  // positions it's about to look up.
+  function nextJob(ctrl) {
+    const { nodes, deep, rough, cloudAt } = work;
+    const missing = i => i >= 0 && i < nodes.length && !deep[i];
+    if (state.mode === 'moves') {
+      const main = ctrl.nodeList.slice(-3).filter(n => nodes[n.ply] === n).map(n => n.ply).reverse();
+      if (ctrl.onMainline) main.push(ctrl.node.ply + 1);
+      const i = main.find(missing);
+      if (i !== undefined) return [i, true];
+    }
+    const cloudSoon = i => i >= cloudAt && i <= cloudAt + 3;
+    for (let i = 0; i < nodes.length; i++) if (!deep[i] && !rough[i] && !cloudSoon(i)) return [i, false];
+    for (let i = 0; i < nodes.length; i++) if (!deep[i] && !cloudSoon(i)) return [i, true];
+    return null;
+  }
+
+  function setDeep(i, rec) {
+    if (work.deep[i]) return;
+    work.deep[i] = rec;
+    live.evals.set(work.nodes[i].fen, rec);
+    live.judged.clear();
+  }
+
+  // Judges every move whose positions are in, and rebuilds the review from
+  // what's known. A move needs the position before it and its own, plus the
+  // one before that for the opponent's last move (a miss fails to punish
+  // it; that move's own verdict can wait, as a miss counts like the
+  // mistake or blunder it is).
+  function refresh(ctrl) {
+    const { nodes, deep, rough, moves, bookPly } = work;
+    const chess960 = ctrl.data.game.variant?.key === 'chess960';
+    const at = (i, prevMove) => ({ ...judge(nodes[i - 1], nodes[i], deep[i - 1], deep[i], prevMove, i <= bookPly, chess960), ply: i });
+    for (let i = 1; i < nodes.length; i++) {
+      if (moves[i - 1] || !deep[i - 1] || !deep[i] || (i >= 2 && !deep[i - 2])) continue;
+      moves[i - 1] = at(i, i >= 2 ? moves[i - 2] || at(i - 1) : undefined);
+    }
+    moves.forEach((m, k) => m && moves[k - 1] && (m.prevMove = moves[k - 1]));
+    const judged = moves.filter(Boolean);
+    const accuracy = color => {
+      const accs = judged.filter(m => m.color === color).map(m => m.accuracy);
+      if (!accs.length) return null;
+      const mean = accs.reduce((s, x) => s + x, 0) / accs.length;
+      const harmonic = accs.length / accs.reduce((s, x) => s + 1 / Math.max(x, 1), 0);
+      return (mean + harmonic) / 2;
+    };
+    const counts = { w: {}, b: {} };
+    for (const m of judged) counts[m.color][m.cls] = (counts[m.color][m.cls] || 0) + 1;
+    const complete = judged.length === nodes.length - 1;
+    state.review = {
+      moves, total: nodes.length, complete,
+      positions: nodes.map((_, i) => deep[i] || rough[i] || null),
+      accuracy: { w: accuracy('w'), b: accuracy('b') }, counts,
+      rating: complete ? state.review?.rating || rateGame(ctrl, moves) : null,
+    };
+    state.progress = deep.filter(Boolean).length / nodes.length;
+    state.version++;
+    if (complete) state.revealed.add('summary');
+  }
+
+  // Lichess's cloud: evaluations someone has already run deep, which for a
+  // game means its opening, until it leaves the known lines. The API takes
+  // one position a request, and Lichess asks for one request at a time; a
+  // few misses in a row and the game has left them. A refusal (too many
+  // requests) ends it too.
+  async function lookUpCloud(ctrl) {
+    const { nodes } = work;
+    let misses = 0;
+    for (let i = 0; i < nodes.length && misses < 3; i++) {
+      work.cloudAt = i;
+      if (work.deep[i]) continue;
+      const fen = nodes[i].fen;
+      try {
+        const res = await fetch(`/api/cloud-eval?fen=${encodeURIComponent(fen)}&multiPv=2`, {
+          headers: { Accept: 'application/json' },
+          signal: AbortSignal.timeout(5000),
+        });
+        if (res.status === 404) {
+          misses++;
+          continue;
+        }
+        if (!res.ok) break;
+        const d = await res.json();
+        if (!d.pvs?.length) {
+          misses++;
+          continue;
+        }
+        misses = 0;
+        setDeep(i, toRecord(fen, fromCloud(fen, d)));
+        refresh(ctrl);
+      } catch {
+        break;
+      }
+    }
+    work.cloudAt = Infinity;
+  }
+
+  // The cloud's lines are from White's view, castling as king takes rook.
+  function fromCloud(fen, d) {
+    const sign = fen.split(' ')[1] === 'w' ? 1 : -1;
+    return {
+      lines: d.pvs.map(p => {
+        const pv = p.moves.split(' ').map(u => normUci(u, false));
+        return p.mate !== undefined ? { mate: p.mate * sign, pv } : { cp: p.cp * sign, pv };
+      }),
+    };
+  }
+
+  // One engine for the page, booted once: the game's analysis and the
+  // moves played off it share it, one position at a time.
+  function engineFor(ctrl) {
+    return (live.booting ||= (async () => {
+      const engine = new Engine();
+      engine.chess960 = ctrl.data.game.variant?.key === 'chess960';
+      await engine.boot();
+      return (live.engine = engine);
+    })());
+  }
+
+  // The moves played off the game are judged like the free board's: its
+  // book moves are known, and its positions as they're analyzed.
+  function seedBooks(ctrl) {
+    const nodes = ctrl.mainline, bookPly = work.bookPly;
     for (let i = 1; i <= bookPly && i < nodes.length; i++)
       live.books.set(nodes[i].fen, { book: true, name: i === bookPly ? state.openingName : '', eco: '' });
     if (nodes[bookPly + 1]) live.books.set(nodes[bookPly + 1].fen, { book: false, name: '', eco: '' });
