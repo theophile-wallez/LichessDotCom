@@ -37,6 +37,18 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addFonts);
   else addFonts();
 
+  // Lichess TV (styles/tv.css): its channels slide in when TV is opened, not
+  // each time it loads again, from a channel link (the referrer is TV) or
+  // for the next game (Lichess reloads the page). `cdc-tv-still` stops it.
+  if (/\/tv(\/|$)/.test(location.pathname)) {
+    const nav = performance.getEntriesByType('navigation')[0];
+    let fromTv = false;
+    try {
+      fromTv = new URL(document.referrer).origin === location.origin && /\/tv(\/|$)/.test(new URL(document.referrer).pathname);
+    } catch {}
+    if (fromTv || nav?.type === 'reload') document.documentElement.classList.add('cdc-tv-still');
+  }
+
   // Donate as a sidebar item of its own (styles/sidebar.css). Lichess's lone
   // Donate link after the nav is missing for patrons and on zen pages, but the
   // flyout's copy is there for everyone except kids: copy its label and link.

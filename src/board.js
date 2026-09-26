@@ -13,7 +13,8 @@
 // units with the orientation applied, and it's the only source a game page has
 // (unlike the analysis page, it exposes no controller, so no `state.drawable`).
 // The Game Review adds its own arrows by square through `window.cdcReviewArrows`
-// ([{ orig, dest, brush }]), and checkmate needs `site.analysis`.
+// ([{ orig, dest, brush }], brush 'best' or 'engine'), and checkmate needs
+// `site.analysis`.
 
 (() => {
   const fr = (document.documentElement.lang || '').startsWith('fr');
@@ -38,6 +39,7 @@
   // the default brush takes the red, and Lichess's red brush the freed orange.
   const MARK_COLORS = { ...ARROW_COLORS, '#15781B': '235,97,80', '#882020': '255,170,0' };
   const REVIEW_COLOR = '159,207,63'; // the review's best move, Chess.com's green
+  const ENGINE_COLOR = ARROW_COLORS['#003088']; // its engine's move, as Lichess's pale blue
   // Chessground fades the pale brushes it draws the engine's own arrows with to
   // 0.4, and the shape being dragged to 0.9; only the former should look faint.
   const alpha = el => (+(el.getAttribute('opacity') ?? 1) < 0.7 ? 0.5 : 0.8);
@@ -53,10 +55,6 @@
   const center = (key, white) => {
     const f = FILES.indexOf(key[0]), r = +key[1] - 1;
     return white ? [f + 0.5, 7.5 - r] : [7.5 - f, r + 0.5];
-  };
-  const keyAt = ([x, y], white) => {
-    const f = Math.floor(x), r = Math.floor(y);
-    return white ? FILES[f] + (8 - r) : FILES[7 - f] + (r + 1);
   };
 
   // Polygon for an arrow along points [from, (corner,) tip], so overlapping
@@ -140,12 +138,12 @@
 
     const white = !container.closest('.cg-wrap')?.classList.contains('orientation-black');
     const ctrl = window.site?.analysis;
-    // During the Game Review, only its best move: no engine arrows. They sit in
-    // the same svg as the hand-drawn ones, so they're matched by their squares.
+    // During the Game Review, only its own arrows, not Lichess's engine's. They
+    // sit in the same svg as the hand-drawn ones, in a pale brush. (Matched by
+    // their squares against `autoShapes`, they flashed on every move: the svg
+    // still holds the last position's for a frame.)
     const reviewing = html.classList.contains('cdc-review-moves') || html.classList.contains('cdc-review-summary');
-    const auto = new Set(
-      reviewing ? (ctrl?.chessground.state.drawable.autoShapes || []).map(s => s.orig + (s.dest || '')) : [],
-    );
+    const auto = el => reviewing && alpha(el) < 0.8;
 
     // Chessground's shapes are in square units from the viewBox's own corner,
     // and an arrow's ends are pulled in from the centers: round back to them.
@@ -155,20 +153,22 @@
 
     const fills = [];
     for (const c of svg.querySelectorAll('circle')) {
+      if (auto(c)) continue;
       const [x, y] = square(c, 'cx', 'cy');
-      if (auto.has(keyAt([x, y], white))) continue;
       const color = MARK_COLORS[c.getAttribute('stroke')] || MARK_COLORS['#15781B'];
       fills.push(`<rect x="${x - 0.5}" y="${y - 0.5}" width="1" height="1" fill="rgba(${color},${alpha(c)})"/>`);
     }
     const arrows = [];
     for (const l of svg.querySelectorAll('line')) {
       if (dragged(l)) continue; // not until the button is released
+      if (auto(l)) continue;
       const a = square(l, 'x1', 'y1'), b = square(l, 'x2', 'y2');
-      if (auto.has(keyAt(a, white) + keyAt(b, white))) continue;
       arrows.push([a, b, ARROW_COLORS[l.getAttribute('stroke')] || ARROW_COLORS['#15781B'], alpha(l)]);
     }
-    for (const s of window.cdcReviewArrows || [])
-      arrows.push([center(s.orig, white), center(s.dest, white), REVIEW_COLOR, 0.8]);
+    for (const s of window.cdcReviewArrows || []) {
+      const engine = s.brush === 'engine';
+      arrows.push([center(s.orig, white), center(s.dest, white), engine ? ENGINE_COLOR : REVIEW_COLOR, engine ? 0.5 : 0.8]);
+    }
 
     const king = matedKing(ctrl?.node);
     if (king && ctrl.node !== mateNode) (mateNode = ctrl.node), (mateAt = Date.now());

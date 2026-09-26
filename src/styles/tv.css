@@ -137,6 +137,12 @@
     animation-delay: calc(min(sibling-index(), 16) * 25ms);
   }
 
+  /* Only when TV is opened, not on a channel change or TV's reload for the
+     next game (content.js). */
+  html.cdc-tv-still main.round.tv-single .subnav .tv-channel {
+    animation: none !important;
+  }
+
   @keyframes cdc-tv-in {
     from {
       opacity: 0;
