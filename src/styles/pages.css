@@ -107,89 +107,139 @@ h3 {
 /* The account settings' menu has no Chess.com icon to borrow (a bell, a
  * key, a lock…): Lichess's own 3D emoji instead. */
 
-.subnav:has(a[href$='/account/kid']) a[href$='/account/profile'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/account/profile'],
+main.account:has(.subnav a.active[href$='/account/profile']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.memo.webp');
   --cdc-nav-color: #1baaf0;
 }
 
-.subnav:has(a[href$='/account/kid']) a[href$='/preferences/display'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/display'],
+main.account:has(.subnav a.active[href$='/preferences/display']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/activity.artist-palette.webp');
   --cdc-nav-color: #fa742c;
 }
 
-.subnav:has(a[href$='/account/kid']) a[href$='/preferences/chess-clock'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/chess-clock'],
+main.account:has(.subnav a.active[href$='/preferences/chess-clock']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.stopwatch.webp');
   --cdc-nav-color: #f7c631;
 }
 
-.subnav:has(a[href$='/account/kid']) a[href$='/preferences/game-behavior'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/game-behavior'],
+main.account:has(.subnav a.active[href$='/preferences/game-behavior']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/activity.joystick.webp');
   --cdc-nav-color: #8a6fd8;
 }
 
-.subnav:has(a[href$='/account/kid']) a[href$='/preferences/privacy'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/privacy'],
+main.account:has(.subnav a.active[href$='/preferences/privacy']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/smileys.see-no-evil-monkey.webp');
   --cdc-nav-color: #c8915b;
 }
 
-.subnav:has(a[href$='/account/kid']) a[href$='/preferences/notification'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/notification'],
+main.account:has(.subnav a.active[href$='/preferences/notification']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.bell.webp');
   --cdc-nav-color: #f7c631;
 }
 
-.subnav:has(a[href$='/account/kid']) a[href$='/account/kid'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/account/kid'],
+main.account:has(.subnav a.active[href$='/account/kid']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.teddy-bear.webp');
   --cdc-nav-color: #e27ba8;
 }
 
-.subnav:has(a[href$='/account/kid']) a[href$='/account/username'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/account/username'],
+main.account:has(.subnav a.active[href$='/account/username']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/symbols.name-badge.webp');
   --cdc-nav-color: #e25555;
 }
 
-.subnav:has(a[href$='/account/kid']) a[href$='/coach/edit'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/coach/edit'],
+main.account:has(.subnav a.active[href$='/coach/edit']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/people.teacher.webp');
   --cdc-nav-color: #26c2a3;
 }
 
-.subnav:has(a[href$='/account/kid']) a[href$='/account/passwd'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/account/passwd'],
+main.account:has(.subnav a.active[href$='/account/passwd']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.key.webp');
   --cdc-nav-color: #f7c631;
 }
 
-.subnav:has(a[href$='/account/kid']) a[href$='/account/email'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/account/email'],
+main.account:has(.subnav a.active[href$='/account/email']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.incoming-envelope.webp');
   --cdc-nav-color: #1baaf0;
 }
 
-.subnav:has(a[href$='/account/kid']) a[href$='/account/twofactor'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/account/twofactor'],
+main.account:has(.subnav a.active[href$='/account/twofactor']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.mobile-phone-with-arrow.webp');
   --cdc-nav-color: #26c2a3;
 }
 
-.subnav:has(a[href$='/account/kid']) a[href$='/account/oauth/token'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/account/oauth/token'],
+main.account:has(.subnav a.active[href$='/account/oauth/token']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/activity.admission-tickets.webp');
   --cdc-nav-color: #8a6fd8;
 }
 
-.subnav:has(a[href$='/account/kid']) a[href$='/account/security'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/account/security'],
+main.account:has(.subnav a.active[href$='/account/security']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.shield.webp');
   --cdc-nav-color: #81b64c;
 }
 
-.subnav:has(a[href$='/account/kid']) a[href$='/preferences/network'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/preferences/network'],
+main.account:has(.subnav a.active[href$='/preferences/network']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.satellite-antenna.webp');
   --cdc-nav-color: #1baaf0;
 }
 
-.subnav:has(a[href$='/account/kid']) a[href$='/dgt'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/dgt'],
+main.account:has(.subnav a.active[href$='/dgt']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/activity.chess.webp');
   --cdc-nav-color: #9aa3ad;
 }
 
-.subnav:has(a[href$='/account/kid']) a[href$='/account/close'] {
+.subnav:has(a[href$='/account/kid']) a[href$='/account/close'],
+main.account:has(.subnav a.active[href$='/account/close']) .page-menu__content {
   --cdc-nav-icon: url('https://lichess1.org/assets/flair/img/objects.door.webp');
   --cdc-nav-color: #e25555;
+}
+
+/* A settings page's title: white (Lichess paints it in its accent green),
+ * after the same icon tile as its link in the menu (the rules above set
+ * its variables on the page too). */
+main.account .page-menu__content h1 {
+  color: #fff !important;
+}
+
+main.account:has(.subnav a.active) .page-menu__content h1:is(.box__top, .box__top > h1) {
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center;
+  gap: 16px;
+}
+
+main.account:has(.subnav a.active) .page-menu__content h1:is(.box__top, .box__top > h1)::before {
+  content: '' !important;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  margin: 0 !important;
+  border-radius: 13px;
+  background:
+    var(--cdc-nav-icon, none) center / 36px 36px no-repeat,
+    color-mix(in srgb, var(--cdc-nav-color, #fff) 24%, transparent);
+  box-shadow: inset 0 1px #ffffff26, 0 0 0 1px color-mix(in srgb, var(--cdc-nav-color, #fff) 40%, transparent);
+}
+
+/* Two-factor's "enabled" title carries its own green check: the tile
+ * replaces it. */
+main.account .page-menu__content .twofactor h1 > .is-green {
+  display: none !important;
 }
 
 /* Lichess's separators are blank gaps: a faint rule instead. */
