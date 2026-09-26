@@ -1478,9 +1478,13 @@
       overlay = `<div class="cdc-badge" style="left:${(dx + 1) * 12.5}%;top:${dy * 12.5}%">${c.svg}</div>`;
     }
     if (dom.overlay.innerHTML !== overlay) dom.overlay.innerHTML = overlay;
-    // The best move, drawn by board.js with the other arrows.
+    // The best move, drawn by board.js with the other arrows. Off the game's
+    // moves, the engine's move from here too, as the free board has Lichess's.
     const showBest = move && move.best && !GOOD.has(move.cls);
-    window.cdcReviewArrows = showBest ? [{ orig: move.best.slice(0, 2), dest: move.best.slice(2, 4), brush: 'best' }] : [];
+    const arrows = showBest ? [{ orig: move.best.slice(0, 2), dest: move.best.slice(2, 4), brush: 'best' }] : [];
+    const next = wide.matches && reviewing && r && !onMain ? live.evals.get(ctrl.node.fen)?.best : null;
+    if (next) arrows.push({ orig: next.slice(0, 2), dest: next.slice(2, 4), brush: 'engine' });
+    window.cdcReviewArrows = arrows;
 
     // Move list badges.
     if (isLive) {
