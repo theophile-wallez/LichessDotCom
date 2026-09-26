@@ -363,12 +363,13 @@ coaches' rig is traced by a script that only runs when a portrait changes.
   boards, players) is `main.analyse.is-relay.has-relay-tour`: the analysis
   layout must leave it alone (`broadcast.css` gives it its two columns back).
 - **Tab bars redrawn on click.** Some bars are replaced whole when a tab is
-  picked: the home lobby's (snabbdom draws it anew) and the profile's games
-  filter (it comes back with the games, after Lichess has kept the page busy
-  ~200ms). `content.js` catches the new bar as it's inserted and slides on
-  from where the old one was last painted. Lichess's jQuery handlers
-  `return false`, which also stops the click reaching `document`: learn the
-  tab picked from its class changing, not from the click.
+  picked, so there's no piece left to slide: the profile's games filter
+  (it comes back with the games), the home lobby's tabs (their parent's
+  class names the tab, so snabbdom draws it all anew) and the explorer's
+  databases (drawn inside a different box per state). Carrying the slide
+  over to the new bar was tried and still jumped: those bars don't slide,
+  and stay out of `TAB_BARS`. Before adding a snabbdom bar, check in lila
+  that neither it nor a parent changes its selector with the tab.
 - **Picker names.** lila puts a picker's name in its `mselect`'s id
   (`#…__day-select`), not in its class.
 

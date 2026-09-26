@@ -1626,11 +1626,6 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
   display: none;
 }
 
-.user-show .angle-content > #games[data-cdc-tabs] .nm-item.active {
-  background: transparent !important;
-  box-shadow: none;
-}
-
 /* A phone fits the five usual filters on one row, instead of four and a
  * lone one under them. */
 @media (max-width: 599.98px) {

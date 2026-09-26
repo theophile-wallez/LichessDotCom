@@ -722,15 +722,15 @@
   // the bar's ::before, placed here in `--cdc-tab-{x,y,w,h}`; the bar is only
   // marked once it's placed, so until then (and with no active tab) the tab
   // keeps its own highlight. [bar, tab, active tab, look]: the first match
-  // wins, and the tabs are the bar's children.
+  // wins, and the tabs are the bar's children. A bar Lichess draws anew on a
+  // click has nothing to slide: the profile's games filter (it comes back
+  // with the games), the home lobby's tabs and the explorer's databases.
   const TAB_BARS = [
     ['.user-show > .angles', '.nm-item', '.active', 'pill'],
-    ['.user-show .angle-content > #games', '.nm-item', '.active', 'pill'],
     ['.game-setup .time-control-tabs .tabs-horiz', 'button', '.active', 'pill'],
     ['.ublog-index .btn-rack', '.btn-rack__btn', '.active', 'pill'],
     ['main.forum-topic .markdown-editor .header', '.header-tab', '.active', 'pill'],
-    ['.explorer-box .explorer-title', ':is(button.button-link, .active)', '.active', 'pill'],
-    ['.tabs-horiz', '*', '.active', 'line'],
+    ['.tabs-horiz:not(.lobby__app > .tabs-horiz)', '*', '.active', 'line'],
     ['.mchat__tabs', '.mchat__tab', '.mchat__tab-active', 'line'],
     ['.auth .auth-tabs', 'a', '.active', 'line'],
     ['.relay-tour__tabs', 'button', '.active', 'pill'],
@@ -747,9 +747,7 @@
     const tabs = [...el.children].filter(c => c.matches(tab));
     for (const t of tabs) bar.sizes.observe(t);
     // A link that leaves the page is shown picked while the next one loads.
-    // Several active at once: the one picked last.
-    const actives = tabs.filter(t => t.matches(active));
-    const item = bar.leaving?.isConnected ? bar.leaving : actives.includes(bar.picked) ? bar.picked : actives[0];
+    const item = bar.leaving?.isConnected ? bar.leaving : tabs.find(t => t.matches(active));
     if (!item) {
       delete el.dataset.cdcTabs;
       bar.item = null;
@@ -759,109 +757,43 @@
     const b = el.getBoundingClientRect(), r = item.getBoundingClientRect();
     const at = [r.left - b.left - el.clientLeft + el.scrollLeft, r.top - b.top - el.clientTop + el.scrollTop, r.width, r.height];
     if (item === bar.item && `${at}` === `${bar.at}`) return;
-    const slide = !!bar.item && item !== bar.item;
-    if (slide) {
-      delete el.dataset.cdcTabsStill;
-      watchTabHandoff(bar, at);
-    } else el.dataset.cdcTabsStill = '';
-    setTabVars(el, at);
-    el.dataset.cdcTabs = bar.look;
-    bar.item = item;
-    bar.at = at;
-  };
-  const setTabVars = (el, [x, y, w, h]) => {
+    if (bar.item && item !== bar.item) delete el.dataset.cdcTabsStill;
+    else el.dataset.cdcTabsStill = '';
+    const [x, y, w, h] = at;
     el.style.setProperty('--cdc-tab-x', `${x}px`);
     el.style.setProperty('--cdc-tab-y', `${y}px`);
     el.style.setProperty('--cdc-tab-w', `${w}px`);
     el.style.setProperty('--cdc-tab-h', `${h}px`);
-  };
-  // How far a bar's piece has got from `from` to `to`, read off the style
-  // it's drawn with: its four values move together, so the one that moves
-  // most tells.
-  const tabProgress = (el, from, to) => {
-    const style = getComputedStyle(el, '::before'), m = new DOMMatrix(style.transform);
-    const now = [m.e, m.f, parseFloat(style.width)];
-    let i = 0;
-    for (const j of [1, 2]) if (Math.abs(to[j] - from[j]) > Math.abs(to[i] - from[i])) i = j;
-    if (Math.abs(to[i] - from[i]) < 0.5) return 1;
-    return Math.max(0, Math.min(1, (now[i] - from[i]) / (to[i] - from[i])));
-  };
-  // Lichess may swap the whole bar for a new one on a click: the home
-  // lobby's tabs are drawn anew for each tab, and the profile's games filter
-  // comes back with the games, a few frames after the click. The new bar is
-  // caught as it's inserted, before it's painted, and its piece slides on
-  // from where the old one was last painted. Lichess keeps the page busy as
-  // it puts the games in, so that's often where it started.
-  const TAB_SLIDE_MS = 350;
-  const watchTabHandoff = (bar, to = bar.at) => {
-    bar.handoff?.disconnect();
-    const from = bar.at, t0 = performance.now();
-    let shown = 0; // How far the piece was in the last frame painted.
-    const watch = (bar.handoff = new MutationObserver(() => {
-      if (bar.el.isConnected) return;
-      watch.disconnect();
-      const next = [...document.querySelectorAll(bar.sel)].find(el => !tabBars.has(el));
-      if (!next) return;
-      const nb = addTabBar(next, bar);
-      next.dataset.cdcTabsStill = '';
-      setTabVars(next, from.map((v, i) => v + (to[i] - v) * shown));
-      next.dataset.cdcTabs = nb.look;
-      // Styled there first, so the slide starts from there.
-      getComputedStyle(next, '::before').transform;
-      nb.item = bar.item;
-      nb.at = from;
-      placeTabs(nb);
-    }));
-    watch.observe(document.documentElement, { childList: true, subtree: true });
-    setTimeout(() => watch.disconnect(), 1500);
-    const tick = () => {
-      if (bar.handoff !== watch || !bar.el.isConnected) return;
-      shown = tabProgress(bar.el, from, to);
-      if (shown < 1 && performance.now() - t0 < TAB_SLIDE_MS + 100) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
+    el.dataset.cdcTabs = bar.look;
+    bar.item = item;
+    bar.at = at;
   };
   const queueTabs = bar => {
     if (bar.queued) return;
     bar.queued = true;
     requestAnimationFrame(() => placeTabs(bar));
   };
-  const addTabBar = (el, { sel, tab, active, look }) => {
-    const bar = { el, sel, tab, active, look, item: null, at: null, picked: null, leaving: null, queued: false };
-    bar.sizes = new ResizeObserver(() => queueTabs(bar));
-    bar.sizes.observe(el);
-    // The tab that just turned active is the one picked, when the old one
-    // hasn't been turned off yet (the profile's games filter).
-    bar.changes = new MutationObserver(records => {
-      for (const r of records) if (r.type === 'attributes' && r.target.parentElement === el && r.target.matches(active)) bar.picked = r.target;
-      queueTabs(bar);
-    });
-    bar.changes.observe(el, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
-    tabBars.set(el, bar);
-    return bar;
-  };
   const syncTabs = () => {
     for (const [sel, tab, active, look] of TAB_BARS)
-      for (const el of document.querySelectorAll(sel)) if (!tabBars.has(el)) addTabBar(el, { sel, tab, active, look });
+      for (const el of document.querySelectorAll(sel)) {
+        if (tabBars.has(el)) continue;
+        const bar = { el, tab, active, look, item: null, at: null, leaving: null, queued: false };
+        bar.sizes = new ResizeObserver(() => queueTabs(bar));
+        bar.sizes.observe(el);
+        bar.changes = new MutationObserver(() => queueTabs(bar));
+        bar.changes.observe(el, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+        tabBars.set(el, bar);
+      }
     // Catches what moves a tab without resizing it or the bar.
     for (const bar of tabBars.values()) placeTabs(bar);
   };
-  const clickedTab = e => {
-    let t = e.target instanceof Element ? e.target : null;
-    while (t && !tabBars.has(t.parentElement)) t = t.parentElement;
-    const bar = t && tabBars.get(t.parentElement);
-    return bar && t.matches(bar.tab) ? [bar, t] : [];
-  };
-  // Before Lichess's own handlers, which may replace the bar.
-  document.addEventListener('click', e => {
-    const [bar] = clickedTab(e);
-    if (bar?.at) watchTabHandoff(bar);
-  }, true);
   // Bubbling to the document, after Lichess's own handlers: a click that
   // got here, uncancelled, on a link is a page about to load.
   document.addEventListener('click', e => {
-    const [bar, t] = clickedTab(e);
-    if (!bar) return;
+    let t = e.target instanceof Element ? e.target : null;
+    while (t && !tabBars.has(t.parentElement)) t = t.parentElement;
+    const bar = t && tabBars.get(t.parentElement);
+    if (!bar || !t.matches(bar.tab)) return;
     const leaves =
       t.matches('a[href]') && !e.defaultPrevented && !e.button && !(e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) &&
       t.target !== '_blank';

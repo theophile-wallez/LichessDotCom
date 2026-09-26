@@ -108,19 +108,6 @@
   margin-right: 6px !important;
 }
 
-/* The raised tab slides to the database picked (see "sliding tabs" in
-   theme.css). */
-.explorer-box .explorer-title[data-cdc-tabs] {
-  --cdc-tab-radius: 5px;
-  --cdc-tab-bg: var(--cdc-btn-grey);
-  --cdc-tab-shadow: var(--cdc-btn-grey-shadow);
-}
-
-.explorer-box .explorer-title[data-cdc-tabs] > .active {
-  background: transparent !important;
-  box-shadow: none;
-}
-
 .explorer-box .explorer-title > .active strong {
   margin: 0 !important;
   overflow: hidden;
