@@ -13,6 +13,11 @@
     --cdc-sidebar-w: 176px;
   }
 
+  /* Chess.com's hover: a faint light wash on a row inset from the edges. */
+  #top {
+    --cdc-sb-hover: #ffffff0d;
+  }
+
   body {
     ---site-header-height: 44px !important;
     ---site-header-margin: 0px !important;
@@ -57,15 +62,22 @@
 
   /* ------------------------------------------------------------- logo --- */
 
+  /* A rounded box inset 8px, like every row below, which lights up on hover. */
   #top .site-title {
     display: flex !important;
     align-items: center;
     gap: 6px;
-    margin: 0 !important;
-    padding: 14px 12px 12px !important;
+    margin: 8px 8px 0 !important;
+    padding: 10px 8px !important;
+    border-radius: 5px;
     transform: none !important;
     font-size: 0 !important;
     color: #fff !important;
+    transition: background-color 0.15s !important;
+  }
+
+  #top .site-title:hover {
+    background: var(--cdc-sb-hover);
   }
 
   #top .site-title > * {
@@ -134,17 +146,20 @@
     white-space: nowrap;
     overflow: hidden;
     align-items: center;
-    gap: 10px;
-    height: 44px !important;
-    padding: 0 10px 0 12px !important;
+    gap: 12px;
+    height: 40px !important;
+    margin: 0 8px !important;
+    padding: 0 8px !important;
     line-height: 1 !important;
     text-transform: none !important;
-    font-size: 16px !important;
-    font-weight: 700 !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
     color: var(--cdc-text) !important;
     border: none !important;
+    border-radius: 5px !important;
     background: transparent !important;
     text-shadow: none !important;
+    transition: background-color 0.15s !important;
   }
 
   #topnav section > a .home {
@@ -160,43 +175,49 @@
   #topnav section > a::before {
     content: '';
     flex: none;
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     background: var(--cdc-nav-icon) center / contain no-repeat;
   }
 
   #topnav.hover section:hover > a,
   #topnav section.active > a {
-    background: #00000033 !important;
+    background: var(--cdc-sb-hover) !important;
     color: #fff !important;
   }
 
-  /* Flyout menus open to the right of the sidebar, like Chess.com. */
+  /* Flyout menus open to the right of the sidebar, like Chess.com: the
+     section spans the sidebar's full width (only its link is inset), so the
+     pointer never leaves it on the way over. 8px up, so the first link lines
+     up with the item. */
   #topnav section > div {
     position: absolute !important;
-    top: 0 !important;
+    top: -8px !important;
     left: 100% !important;
     right: auto !important;
     min-width: 240px;
-    padding: 6px 0 !important;
+    padding: 8px !important;
     border: none !important;
-    border-radius: 0 6px 6px 0 !important;
+    border-radius: 0 5px 5px 0 !important;
     background: var(--cdc-bg-panel-dark) !important;
     box-shadow: 4px 4px 12px #0006 !important;
     z-index: 110;
   }
 
   #topnav section > div a {
-    padding: 10px 16px !important;
+    height: 40px;
+    box-sizing: border-box;
+    padding: 0 8px !important;
     white-space: nowrap;
-    font-size: 15px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 600;
     color: var(--cdc-text) !important;
-    border-radius: 0 !important;
+    border-radius: 5px !important;
+    transition: background-color 0.15s !important;
   }
 
   #topnav section > div a:hover {
-    background: #ffffff14 !important;
+    background: var(--cdc-sb-hover) !important;
     color: #fff !important;
   }
 
@@ -219,8 +240,8 @@
   #topnav section > div a::before {
     content: '';
     flex: none;
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
     background: var(--cdc-sub-icon, none) center / contain no-repeat;
   }
 
@@ -270,29 +291,32 @@
   #cdc-donate {
     display: flex !important;
     align-items: center;
-    gap: 10px;
-    height: 44px;
-    padding: 0 10px 0 12px;
+    gap: 12px;
+    height: 40px;
+    margin: 0 8px;
+    padding: 0 8px;
+    border-radius: 5px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1;
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 600;
     color: var(--cdc-text) !important;
     background: transparent;
+    transition: background-color 0.15s !important;
   }
 
   #cdc-donate::before {
     content: '';
     flex: none;
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     background: url('https://lichess1.org/assets/flair/img/objects.money-bag.webp') center / contain no-repeat;
   }
 
   #cdc-donate:hover {
-    background: #00000033;
+    background: var(--cdc-sb-hover);
     color: #fff !important;
   }
 
@@ -357,7 +381,7 @@
 
   #top #clinput:hover,
   #top #clinput:focus-within {
-    background: #00000033;
+    background: var(--cdc-sb-hover);
   }
 
   #top .signin-or-signup {
@@ -413,7 +437,7 @@
 
   #top #user_tag:hover,
   #top .dasher.shown #user_tag {
-    background: #00000033 !important;
+    background: var(--cdc-sb-hover) !important;
     color: #fff !important;
   }
 
