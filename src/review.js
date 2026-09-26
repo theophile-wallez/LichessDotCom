@@ -1745,7 +1745,6 @@
             liveDigest(reviewMove(ctrl)), live.error].join('|');
     if (force || key !== state.lastKey) {
       state.lastKey = key;
-      hideTip();
       // A button the render leaves as it was stays the same element, so a
       // click spanning a redraw still lands (the summary's Start button
       // redraws with every step of the analysis).
@@ -1759,6 +1758,8 @@
         if (old && old !== b) b.replaceWith(old);
       }
       keepAvatar();
+      // The tooltip stays while what it points at does (a kept button).
+      if (!tipFor?.isConnected) hideTip();
       startStream();
       fitBubble();
     }
@@ -1816,10 +1817,15 @@
   // Chess.com's tooltip: dark, over what it explains, its tail pointing at
   // it. On <body>, as the panel's rows scroll and would clip it.
   const tip = el('div', { id: 'cdc-tip', role: 'tooltip' });
-  const hideTip = () => tip.remove();
+  let tipFor = null;
+  const hideTip = () => {
+    tip.remove();
+    tipFor = null;
+  };
   dom.panel.addEventListener('pointerover', e => {
     const t = e.target.closest('[data-cdc-tip]');
     if (!t) return;
+    tipFor = t;
     tip.textContent = t.dataset.cdcTip;
     document.body.appendChild(tip);
     const a = t.getBoundingClientRect();
