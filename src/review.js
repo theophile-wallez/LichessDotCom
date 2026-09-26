@@ -1354,7 +1354,7 @@
     const area = runs
       .map(r => `M${x(r[0])},${height} L${r.map(i => `${x(i)},${y(review.positions[i].wp)}`).join(' L')} L${x(r[r.length - 1])},${height} Z`)
       .join(' ');
-    const dots = review.moves
+    const dots = (review.draft || review.moves)
       .filter(m => m && GRAPH_DOTS.has(m.cls) && review.positions[m.ply])
       .map(m => `<circle cx="${x(m.ply)}" cy="${y(review.positions[m.ply].wp)}" r="3.5" fill="${CLS[m.cls].color}"/>`)
       .join('');
@@ -1466,8 +1466,8 @@
 
   // Like Chess.com, the summary keeps its layout while the game is analyzed:
   // a quote from the coach, the graph, the accuracy and the counts filling
-  // in. The game rating waits for the last move; the review can start at
-  // once, each move judged as soon as its positions are.
+  // in, first from the quick pass's draft, then at full depth. The game
+  // rating waits for the last move; the review can start at once.
   function renderSummary(ctrl) {
     const p = players(ctrl);
     const r = state.review;
@@ -1686,13 +1686,13 @@
       const tree = document.querySelector('main.analyse .tview2');
       const mainMoves = tree ? [...tree.querySelectorAll(':scope > move:not(.empty)')] : [];
       mainMoves.forEach((m, i) => {
-        const mv = r.moves[i];
+        const mv = r.draft[i];
         if (!mv || m.dataset.cdcCls === mv.cls) return;
         const c = CLS[mv.cls];
         m.dataset.cdcCls = mv.cls;
         m.style.setProperty('--c', c.color);
         m.style.setProperty('--i', c.img);
-        const badge = LIST_BADGES.has(mv.cls) && !(mv.cls === 'book' && r.moves[i + 1]?.cls === 'book');
+        const badge = LIST_BADGES.has(mv.cls) && !(mv.cls === 'book' && r.draft[i + 1]?.cls === 'book');
         if (badge) m.dataset.cdcBadge = '';
         else delete m.dataset.cdcBadge;
       });
@@ -2047,8 +2047,8 @@
       // for the graph at once, not for the verdicts.
       (info.analysis || []).forEach((e, i) => {
         if (i + 1 >= nodes.length) return;
-        if (e.mate !== undefined) work.rough[i + 1] = { mate: e.mate, wp: e.mate > 0 ? 100 : 0 };
-        else if (e.eval !== undefined) work.rough[i + 1] = { cp: e.eval, wp: winPct(e.eval) };
+        if (e.mate !== undefined) work.rough[i + 1] = { mate: e.mate, wp: e.mate > 0 ? 100 : 0, wp2: null, best: null };
+        else if (e.eval !== undefined) work.rough[i + 1] = { cp: e.eval, wp: winPct(e.eval), wp2: null, best: null };
       });
     } catch {}
     seedBooks(ctrl);
@@ -2131,7 +2131,21 @@
       moves[i - 1] = at(i, i >= 2 ? moves[i - 2] || at(i - 1) : undefined);
     }
     moves.forEach((m, k) => m && moves[k - 1] && (m.prevMove = moves[k - 1]));
-    const judged = moves.filter(Boolean);
+    // Until then, a draft from the quick pass (or the server analysis):
+    // the graph's dots, the move list's badges, the counts and the accuracy
+    // show it at once, and each of its moves gives way to the full depth's.
+    // The coach, the board and the game rating wait for the full depth.
+    const rec = i => deep[i] || rough[i];
+    const draft = [];
+    for (let i = 1; i < nodes.length; i++) {
+      if (moves[i - 1] || !rec(i - 1) || !rec(i)) {
+        draft[i - 1] = moves[i - 1];
+        continue;
+      }
+      const m = judge(nodes[i - 1], nodes[i], rec(i - 1), rec(i), draft[i - 2], i <= bookPly, chess960);
+      draft[i - 1] = { ...m, ply: i, draft: true };
+    }
+    const judged = draft.filter(Boolean);
     const accuracy = color => {
       const accs = judged.filter(m => m.color === color).map(m => m.accuracy);
       if (!accs.length) return null;
@@ -2141,9 +2155,9 @@
     };
     const counts = { w: {}, b: {} };
     for (const m of judged) counts[m.color][m.cls] = (counts[m.color][m.cls] || 0) + 1;
-    const complete = judged.length === nodes.length - 1;
+    const complete = moves.filter(Boolean).length === nodes.length - 1;
     state.review = {
-      moves, total: nodes.length, complete,
+      moves, draft, total: nodes.length, complete,
       positions: nodes.map((_, i) => deep[i] || rough[i] || null),
       accuracy: { w: accuracy('w'), b: accuracy('b') }, counts,
       rating: complete ? state.review?.rating || rateGame(ctrl, moves) : null,
