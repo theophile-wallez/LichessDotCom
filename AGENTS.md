@@ -258,6 +258,13 @@ coaches' rig is traced by a script that only runs when a portrait changes.
   rook, unlike our engine's lines. The game export's `evals=true` gives
   the server analysis, when there is one: one line per position, White's
   view, no second best.
+- **Mate distances.** Win probability can't grade a move between two
+  mates (100% or 0% either way), so the review reads their distance, and
+  our engine only gets short ones right: at depth 16 a mate in 5 or fewer
+  comes out exact, a longer one long (a mate in 8 as a mate in 12, and a
+  deeper search barely helps: only ~5 s a position gets it exact). Trust a
+  move's short side only (`SURE_MATE` in `review.js`), and don't print a
+  long defense's length.
 - **The free analysis board.** `/analysis` is `main.analyse` with
   `site.analysis.synthetic` set and a game id of `synthetic`: no game to
   export, and a tree that grows as the user plays. Every `move` in its move

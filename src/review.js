@@ -28,7 +28,7 @@
 
   const ENGINE = { root: 'npm/stockfish-web', js: 'sf_19_smallnet.js', depth: 16, movetime: 1500 };
   // The graph's first draft: enough to show the game's trend, in seconds.
-  const QUICK = { depth: 10, movetime: 250 };
+  const QUICK = { depth: 12, movetime: 500 };
   const CACHE_VERSION = 1;
 
   // ------------------------------------------------------------ i18n ---
@@ -424,6 +424,32 @@
 
   // -------------------------------------------------------- classify ---
 
+  const RANK = ['brilliant', 'great', 'best', 'excellent', 'good', 'inaccuracy', 'mistake', 'miss', 'blunder'];
+
+  // A mate of five moves or fewer comes out exact at our depth; a longer one
+  // comes out long (a mate in 8 as a mate in 12), so only a move's short
+  // side is trusted.
+  const SURE_MATE = 5;
+
+  // The verdict a move deserves from mate distances, or null. The win
+  // probability can't see them: a slower mate is 100% all the same, a mate
+  // let in sooner 0%, and such moves came out best. With a sure mate, the
+  // winner is judged by the moves given away (losing the mate altogether
+  // counts as many); the loser, when it lets a sure mate in though it held
+  // out clearly longer, by how soon. Never worse than an inaccuracy: the
+  // game is won or lost all the same.
+  function mateVerdict(a, b, color) {
+    if (!a.mate || b.mate === 0) return null;
+    const s = color === 'w' ? 1 : -1, before = a.mate * s;
+    const after = b.mate === undefined ? (before > 0 ? Infinity : 0) : b.mate * s;
+    if (before > 0 && before <= SURE_MATE && after > 0) {
+      const lost = after - (before - 1);
+      return lost <= 0 ? null : lost <= 2 ? 'excellent' : lost <= 5 ? 'good' : 'inaccuracy';
+    }
+    if (before < 0 && after < 0 && -after <= SURE_MATE && after - before >= 3) return -after <= 2 ? 'inaccuracy' : 'good';
+    return null;
+  }
+
   // One move, from `prev` to `node`: `a` and `b` are the engine's records of
   // the two positions, `prevMove` the opponent's move just before (a miss
   // fails to punish it). The nodes and records ride along for the coach.
@@ -445,8 +471,12 @@
     else if (loss < 20) cls = 'mistake';
     else cls = 'blunder';
     if ((cls === 'mistake' || cls === 'blunder') && prevMove && prevMove.loss >= 10 && before >= 60) cls = 'miss';
+    // A mate missed or let in: `slower` when that's what the verdict says.
+    const mated = isBest || book ? null : mateVerdict(a, b, color);
+    if (mated && RANK.indexOf(cls) < RANK.indexOf(mated)) cls = mated;
+    const slower = !!mated && cls === mated;
     return {
-      ply: node.ply, san: node.san, uci: node.uci, color, cls, loss,
+      ply: node.ply, san: node.san, uci: node.uci, color, cls, loss, slower,
       accuracy: cls === 'book' ? 100 : moveAccuracy(loss),
       best: a.best, bestSan: uciToSan(prev.fen, a.best), eval: b,
       before: a, node, prev, prevMove,
@@ -1052,6 +1082,13 @@
       return fr
         ? `Échec et mat : le roi ${them === 'w' ? 'blanc' : 'noir'} n’a plus aucune case.`
         : `Checkmate: the ${them === 'w' ? 'white' : 'black'} king has nowhere to go.`;
+
+    // A sure mate missed, or one let in (judge's `slower`). The defense's
+    // length goes unsaid: long mates come out longer than they are.
+    if (move.slower && best)
+      return mates(eb, sign)
+        ? fr ? `${best} matait en ${eb.mate * sign}.` : `${best} mated in ${eb.mate * sign}.`
+        : fr ? `${best} tenait plus longtemps.` : `${best} held out longer.`;
 
     if (!GOOD.has(move.cls) && move.cls !== 'excellent' && move.cls !== 'good') {
       if (mates(ea, -sign) && !mates(eb, -sign) && replySan)
