@@ -775,17 +775,16 @@
     el.style.setProperty('--cdc-tab-w', `${w}px`);
     el.style.setProperty('--cdc-tab-h', `${h}px`);
   };
-  // The slide's easing, cubic-bezier(0.22, 1, 0.36, 1), at a time from 0 to 1.
-  const TAB_SLIDE_MS = 350;
-  const tabEase = t => {
-    const bez = (s, a, b) => 3 * a * s * (1 - s) ** 2 + 3 * b * s * s * (1 - s) + s ** 3;
-    let lo = 0, hi = 1;
-    for (let i = 0; i < 20; i++) {
-      const s = (lo + hi) / 2;
-      if (bez(s, 0.22, 0.36) < t) lo = s;
-      else hi = s;
-    }
-    return bez((lo + hi) / 2, 1, 1);
+  // How far a bar's piece has got from `from` to `to`, read off the style
+  // it's drawn with: its four values move together, so the one that moves
+  // most tells.
+  const tabProgress = (el, from, to) => {
+    const style = getComputedStyle(el, '::before'), m = new DOMMatrix(style.transform);
+    const now = [m.e, m.f, parseFloat(style.width)];
+    let i = 0;
+    for (const j of [1, 2]) if (Math.abs(to[j] - from[j]) > Math.abs(to[i] - from[i])) i = j;
+    if (Math.abs(to[i] - from[i]) < 0.5) return 1;
+    return Math.max(0, Math.min(1, (now[i] - from[i]) / (to[i] - from[i])));
   };
   // Lichess may swap the whole bar for a new one on a click: the home
   // lobby's tabs are drawn anew for each tab, and the profile's games filter
@@ -793,19 +792,19 @@
   // caught as it's inserted, before it's painted, and its piece slides on
   // from where the old one was last painted. Lichess keeps the page busy as
   // it puts the games in, so that's often where it started.
+  const TAB_SLIDE_MS = 350;
   const watchTabHandoff = (bar, to = bar.at) => {
     bar.handoff?.disconnect();
     const from = bar.at, t0 = performance.now();
-    let shown = 0;
+    let shown = 0; // How far the piece was in the last frame painted.
     const watch = (bar.handoff = new MutationObserver(() => {
       if (bar.el.isConnected) return;
       watch.disconnect();
       const next = [...document.querySelectorAll(bar.sel)].find(el => !tabBars.has(el));
       if (!next) return;
-      const p = tabEase(shown);
       const nb = addTabBar(next, bar);
       next.dataset.cdcTabsStill = '';
-      setTabVars(next, from.map((v, i) => v + (to[i] - v) * p));
+      setTabVars(next, from.map((v, i) => v + (to[i] - v) * shown));
       next.dataset.cdcTabs = nb.look;
       // Styled there first, so the slide starts from there.
       getComputedStyle(next, '::before').transform;
@@ -815,11 +814,10 @@
     }));
     watch.observe(document.documentElement, { childList: true, subtree: true });
     setTimeout(() => watch.disconnect(), 1500);
-    // How far the slide got in the last frame painted.
     const tick = () => {
-      if (bar.handoff !== watch) return;
-      shown = Math.min(1, (performance.now() - t0) / TAB_SLIDE_MS);
-      if (shown < 1) requestAnimationFrame(tick);
+      if (bar.handoff !== watch || !bar.el.isConnected) return;
+      shown = tabProgress(bar.el, from, to);
+      if (shown < 1 && performance.now() - t0 < TAB_SLIDE_MS + 100) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
   };
