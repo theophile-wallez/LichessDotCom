@@ -692,7 +692,7 @@
     tooltip.classList.add('cdc-tooltip--on');
   };
   document.addEventListener('mouseover', e => {
-    let el = e.target.closest?.('main :is(button:is([title], [data-cdc-tip]), a.tv-channel[data-cdc-tip])');
+    let el = e.target.closest?.('main :is(button:is([title], [data-cdc-tip]), a.tv-channel[data-cdc-tip]):not(#cdc-review *)');
     // TV's channels only need theirs while their names are hidden (tv.css).
     if (el?.matches('a') && !matchMedia('(max-width: 1259.98px)').matches) el = null;
     if (el === tooltipFor) return;

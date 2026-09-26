@@ -100,7 +100,7 @@
     const key = mood && `${at}|${cls}`;
     const react = key && key !== reacted;
     reacted = key;
-    return `<button class="cdc-coach__avatar${react ? ' cdc-coach__avatar--react' : ''}" data-cdc="coach" data-coach="${coach}" data-mood="${mood || 'neutral'}"${mood ? ` style="--cdc-mood-c:${CLS[cls].color}"` : ''} title="${esc(T.coach)}" aria-label="${esc(T.coach)}"><span class="cdc-coach__face"></span></button>`;
+    return `<button class="cdc-coach__avatar${react ? ' cdc-coach__avatar--react' : ''}" data-cdc="coach" data-coach="${coach}" data-mood="${mood || 'neutral'}"${mood ? ` style="--cdc-mood-c:${CLS[cls].color}"` : ''} data-cdc-tip="${esc(T.coach)}" aria-label="${esc(T.coach)}"><span class="cdc-coach__face"></span></button>`;
   };
   // The panel is re-rendered on every change (every percent of the analysis
   // even), but the coach is one element, kept: a new render only hands it
@@ -1458,9 +1458,9 @@
 
   function header(title, back) {
     return `<div class="cdc-review__head">
-      ${back ? `<button class="cdc-review__back" data-cdc="${back}" title="${esc(T.back)}" aria-label="${esc(T.back)}">${BACK_ICON}</button>` : '<span></span>'}
+      ${back ? `<button class="cdc-review__back" data-cdc="${back}" data-cdc-tip="${esc(T.back)}" aria-label="${esc(T.back)}">${BACK_ICON}</button>` : '<span></span>'}
       <div class="cdc-review__title"><span class="cdc-review__star">★</span>${esc(title)}</div>
-      <button class="cdc-review__close" data-cdc="normal" title="${esc(T.close)}" aria-label="${esc(T.close)}">${CLOSE_ICON}</button>
+      <button class="cdc-review__close" data-cdc="normal" data-cdc-tip="${esc(T.close)}" aria-label="${esc(T.close)}">${CLOSE_ICON}</button>
     </div>`;
   }
 
@@ -1483,7 +1483,7 @@
         <td class="cdc-t-num" style="color:${c.color}">${r?.counts.b[c.key] || 0}</td></tr>`,
     ).join('');
     const more = state.allRows ? T.less : T.more;
-    const toggle = `<tr class="cdc-t-more"><td colspan="4"><button class="cdc-review__more${state.allRows ? ' cdc-review__more--open' : ''}" data-cdc="rows" title="${esc(more)}" aria-label="${esc(more)}" aria-expanded="${state.allRows}">${headIcon('M6 9l6 6 6-6')}</button></td></tr>
+    const toggle = `<tr class="cdc-t-more"><td colspan="4"><button class="cdc-review__more${state.allRows ? ' cdc-review__more--open' : ''}" data-cdc="rows" data-cdc-tip="${esc(more)}" aria-label="${esc(more)}" aria-expanded="${state.allRows}">${headIcon('M6 9l6 6 6-6')}</button></td></tr>
       <tr class="cdc-t-sep"><td colspan="4"></td></tr>`;
     // Under them, as on Chess.com: the rating each side played at, then a
     // verdict per phase, as the icon of the class it deserves (a phase the

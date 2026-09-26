@@ -446,7 +446,7 @@
   .cdc-acc--b { background: #403d39; color: #fff; }
 
   /* The game rating's label explains itself on hover (#cdc-tip). */
-  [data-cdc-tip] {
+  :not(button)[data-cdc-tip] {
     cursor: default;
   }
 
