@@ -16,17 +16,26 @@
  * its display is left alone.
  */
 
+/* Closed, only as wide as its title, tucked in the corner; open, wide
+ * enough for the rows. Frosted, so the page shows through. */
 #friend_box {
-  inset-inline-end: 16px !important;
-  width: 240px;
+  inset-inline-end: 6px !important;
+  width: max-content;
+  min-width: 0 !important;
   border: 1px solid var(--cdc-menu-border) !important;
   border-bottom: none !important;
-  border-radius: 10px 10px 0 0 !important;
-  background: var(--cdc-menu-bg) !important;
-  box-shadow: 0 -4px 24px #00000066, 0 -1px 4px #00000040;
+  border-radius: 8px 8px 0 0 !important;
+  background: #3c3a378c !important;
+  backdrop-filter: blur(14px) saturate(1.4);
+  box-shadow: 0 -2px 14px #0000004d;
   color: var(--cdc-text);
   font-family: var(--cdc-font);
-  font-size: 14px !important;
+  font-size: 13px !important;
+}
+
+#friend_box:has(.content_wrap:not(.none)) {
+  width: 240px;
+  background: #3c3a37cc !important;
 }
 
 /* ------------------------------------------------------------ title --- */
@@ -35,7 +44,7 @@
  * would push apart. */
 #friend_box .friend_box_title {
   position: relative;
-  padding: 10px 38px 10px 14px !important;
+  padding: 6px 28px 6px 10px !important;
   border: none !important;
   background: none !important;
   box-shadow: none !important;
@@ -67,10 +76,10 @@
 #friend_box .friend_box_title::before {
   content: '';
   display: inline-block;
-  margin-inline-end: 10px;
+  margin-inline-end: 8px;
   vertical-align: 1px;
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--cdc-font-dimmer);
 }
@@ -85,10 +94,10 @@
   content: '';
   position: absolute;
   top: 50%;
-  inset-inline-end: 16px;
-  width: 7px;
-  height: 7px;
-  margin-top: -4px;
+  inset-inline-end: 11px;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
   border: solid var(--cdc-text-dim);
   border-width: 2px 2px 0 0;
   transform: translateY(2px) rotate(-45deg);

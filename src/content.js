@@ -37,6 +37,18 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addFonts);
   else addFonts();
 
+  // Lichess TV (styles/tv.css): its channels slide in when TV is opened, not
+  // each time it loads again, from a channel link (the referrer is TV) or
+  // for the next game (Lichess reloads the page). `cdc-tv-still` stops it.
+  if (/\/tv(\/|$)/.test(location.pathname)) {
+    const nav = performance.getEntriesByType('navigation')[0];
+    let fromTv = false;
+    try {
+      fromTv = new URL(document.referrer).origin === location.origin && /\/tv(\/|$)/.test(new URL(document.referrer).pathname);
+    } catch {}
+    if (fromTv || nav?.type === 'reload') document.documentElement.classList.add('cdc-tv-still');
+  }
+
   // Donate as a sidebar item of its own (styles/sidebar.css). Lichess's lone
   // Donate link after the nav is missing for patrons and on zen pages, but the
   // flyout's copy is there for everyone except kids: copy its label and link.
@@ -566,6 +578,23 @@
     }
   };
 
+  // Lichess TV (see styles/tv.css): the channels' column scrolls on its
+  // own, so the channel on air is scrolled into view, once it has a height.
+  // Below 1260px it shows the tiles alone: each one's name and champion go
+  // in its tooltip. Server-rendered, and TV reloads for its next game.
+  const syncTvChannels = () => {
+    const list = document.querySelector('main.tv-single .subnav__inner:not([data-cdc-tv])');
+    if (!list?.clientHeight) return;
+    list.dataset.cdcTv = '';
+    for (const a of list.querySelectorAll('a.tv-channel')) {
+      const name = a.querySelector('strong')?.textContent.trim();
+      const champion = a.querySelector('.champion')?.textContent.replace(/\s+/g, ' ').trim();
+      if (name) a.dataset.cdcTip = champion ? `${name} · ${champion}` : name;
+    }
+    const active = list.querySelector('a.tv-channel.active');
+    if (active) list.scrollTop = active.offsetTop - (list.clientHeight - active.offsetHeight) / 2;
+  };
+
   // Forum index (see styles/forum.css): the categories become cards and
   // their table header goes, so each count gets its column's name ("Topics",
   // "Posts", translated) to show as a label. Server-rendered, so it's safe.
@@ -663,7 +692,9 @@
     tooltip.classList.add('cdc-tooltip--on');
   };
   document.addEventListener('mouseover', e => {
-    const el = e.target.closest?.('main button:is([title], [data-cdc-tip])');
+    let el = e.target.closest?.('main :is(button:is([title], [data-cdc-tip]), a.tv-channel[data-cdc-tip])');
+    // TV's channels only need theirs while their names are hidden (tv.css).
+    if (el?.matches('a') && !matchMedia('(max-width: 1259.98px)').matches) el = null;
     if (el === tooltipFor) return;
     hideTooltip();
     if (!el) return;
@@ -700,6 +731,7 @@
     syncSwissMedals();
     syncSwissFocus();
     syncForumLabels();
+    syncTvChannels();
     syncPowertip();
     syncTooltip();
   }, 250);

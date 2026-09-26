@@ -1429,6 +1429,22 @@ html[dir='rtl'] .user-show > .user-show__header .trophies .trophy.patron {
   line-height: 1 !important;
 }
 
+/* The puzzle modes wear the sidebar's Chess.com pictures here too, as on
+ * the rating cards above, matched on Lichess's glyph (archery target, storm,
+ * flag, arrow through an apple). */
+.user-show .activity .entry > icon:is([data-icon='\e00c'], [data-icon='\e05a'], [data-icon='\e00b'], [data-icon='\e06f'])::before {
+  content: '' !important;
+  display: block;
+  width: 24px;
+  height: 24px;
+  background: var(--cdc-puzzle-icon) center / contain no-repeat;
+}
+
+.user-show .activity .entry > icon[data-icon='\e00c'] { --cdc-puzzle-icon: url('https://assets-ds.chess.com/color-icons/puzzle-piece.svg'); }
+.user-show .activity .entry > icon[data-icon='\e05a'] { --cdc-puzzle-icon: url('https://assets-ds.chess.com/color-icons/puzzle-rush.svg'); }
+.user-show .activity .entry > icon[data-icon='\e00b'] { --cdc-puzzle-icon: url('https://assets-ds.chess.com/color-icons/battle.svg'); }
+.user-show .activity .entry > icon[data-icon='\e06f'] { --cdc-puzzle-icon: url('https://assets-ds.chess.com/color-icons/calendar-dailypuzzle.svg'); }
+
 /* The text takes the rest of the row, however long: sized to its own width
  * first, a long line (a tournament's name, a forum post) wrapped the whole
  * text under its icon. */

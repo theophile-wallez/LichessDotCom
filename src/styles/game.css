@@ -31,13 +31,15 @@
     --cdc-panel-w: clamp(300px, 26vw, 460px);
     /* As big as the window allows, unless resized with the board's handle
        (`--cdc-board-scale`, board.css). `dvh`, not `vh`: on a Meta Quest or
-       a phone, `100vh` is taller than what the browser shows. */
+       a phone, `100vh` is taller than what the browser shows. A page with a
+       column left of the board (TV's channels, tv.css) sets
+       `--cdc-lead-w` to its width and gap. */
     --cdc-board: max(
       320px,
       calc(
         min(
           calc(100dvh - 32px - 2 * var(--cdc-bar) - var(--cdc-coords-off)),
-          calc(100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-panel-w) - var(--cdc-gap) - 48px)
+          calc(100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-lead-w, 0px) - var(--cdc-panel-w) - var(--cdc-gap) - 48px)
         ) * var(--cdc-board-scale, 1)
       )
     );
@@ -667,8 +669,8 @@
   /* ---------------------------------------------------- no scrolling --- */
 
   /* Like Chess.com, the page never scrolls: everything fits the viewport, and
-     what used to sit below the board (crosstable, game info, TV channels) is
-     dropped. The keyboard-move input goes on top of the chat. */
+     what used to sit below the board (crosstable, game info) is dropped. TV's
+     channels come back left of the board (tv.css). The keyboard-move input goes on top of the chat. */
   html:has(main.round),
   html:has(main.round) body {
     overflow: hidden !important;
@@ -722,7 +724,8 @@
         min(
           calc(100dvh - 32px - 2 * var(--cdc-bar) - var(--cdc-coords-off)),
           calc(
-            (100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-panel-w) - var(--cdc-gap) - var(--cdc-pocket-gap) - 48px) /
+            (100vw - var(--cdc-sidebar-w, 0px) - var(--cdc-lead-w, 0px) - var(--cdc-panel-w) - var(--cdc-gap) - var(--cdc-pocket-gap) -
+              48px) /
               1.09375
           )
         ) * var(--cdc-board-scale, 1)

@@ -22,6 +22,7 @@
         "src/styles/board.css",
         "src/styles/playerbar.css",
         "src/styles/game.css",
+        "src/styles/tv.css",
         "src/styles/analysis.css",
         "src/styles/explorer.css",
         "src/styles/review.css",

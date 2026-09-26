@@ -37,6 +37,8 @@
         engineError: "Le moteur n'a pas pu démarrer.",
         liveIntro: 'Joue un coup, je te dirai ce que j’en pense.', thinking: 'Voyons ce coup…',
         startPosition: 'Position de départ', more: 'Voir tous les coups', less: 'Voir moins',
+        gameRating: 'Classement de la partie', gameRatingTip: 'Donne une estimation du classement d’un joueur d’après une seule partie.',
+        phases: { o: 'Ouverture', t: 'Exercices tactiques', s: 'Stratégie', e: 'Finale' },
       }
     : {
         review: 'Game Review', start: 'Start Review', next: 'Next', explain: 'Explain', best: 'Best',
@@ -46,6 +48,8 @@
         engineError: 'The engine failed to start.',
         liveIntro: 'Play a move and I’ll tell you what I think.', thinking: 'Let me look at this move…',
         startPosition: 'Starting position', more: 'Show all moves', less: 'Show less',
+        gameRating: 'Game Rating', gameRatingTip: 'An estimate of a player’s rating based on a single game.',
+        phases: { o: 'Opening', t: 'Tactics', s: 'Strategy', e: 'Endgame' },
       };
 
   // What the coach says while the game is analyzed, like Chess.com.
@@ -460,7 +464,153 @@
     };
     const counts = { w: {}, b: {} };
     for (const m of moves) counts[m.color][m.cls] = (counts[m.color][m.cls] || 0) + 1;
-    return { moves, positions, accuracy: { w: accuracy('w'), b: accuracy('b') }, counts };
+    return { moves, positions, accuracy: { w: accuracy('w'), b: accuracy('b') }, counts, rating: rateGame(ctrl, moves) };
+  }
+
+  // ----------------------------------------------------- game rating ---
+
+  // Chess.com's "Game Rating": the rating a player played at in this one
+  // game, and a verdict on each phase of it, compared with what's expected
+  // at their rating. The odds come from Lichess's own games, fitted by
+  // tools/game-rating: per speed, how often a move at a given rating falls
+  // in each loss band (best … blunder), by phase and by whether the mover
+  // was lost, level or winning. A game's moves make a likelihood over the
+  // level it was played at, a level drawn around the player's rating (`tau`
+  // wide, also fitted), and the estimate is the posterior's mean. Without a
+  // rating (an anonymous player, the AI) the population is the prior.
+  // The phases and the tactics must stay in step with extract.py.
+  const RATING_MODEL = {"pop":{"bullet":[1782,449],"blitz":[1643,438],"rapid":[1493,387],"classical":[1641,306]},"tau":{"bullet":775,"blitz":550,"rapid":450,"classical":350},"cuts":{"o":[357,182,-69,-284,-500],"t":[203,96,-38,-186,-346],"s":[225,80,-66,-204,-344],"e":[237,63,-78,-224,-402]},"theta":{"bullet":[[[-0.445,-0.107,0.012],[-0.732,-0.241,-0.001],[-1.511,-0.292,-0.018],[-3.115,-0.406,0.015],[-7.075,-0.027,-1.73]],[[-0.248,-0.002,-0.009],[-0.312,-0.099,-0.023],[-0.814,-0.237,-0.017],[-1.432,-0.389,-0.007],[-2.023,-0.615,0.018]],[[-0.785,0.006,-0.016],[-1.311,-0.073,-0.014],[-1.885,-0.062,-0.044],[-2.107,-0.052,-0.041],[-1.308,-0.141,-0.032]],[[-1.038,0.0,-0.016],[-1.294,-0.03,-0.014],[-1.859,0.043,-0.051],[-2.954,0.125,-0.057],[-8.163,-0.052,-2.036]],[[-0.791,0.009,-0.004],[-1.218,-0.019,-0.02],[-1.203,-0.061,-0.03],[-0.959,-0.158,-0.011],[-0.849,-0.326,0.01]],[[-1.192,0.026,-0.006],[-1.853,-0.084,0.013],[-2.239,-0.05,-0.024],[-2.339,0.011,-0.047],[-1.458,-0.095,-0.032]],[[-0.224,0.0,-0.019],[-0.53,0.044,-0.033],[-1.395,0.111,-0.047],[-2.887,0.211,-0.082],[-7.883,0.001,-1.987]],[[-0.29,-0.03,-0.0],[-0.116,-0.086,-0.01],[-0.254,-0.161,-0.011],[-0.654,-0.217,-0.014],[-1.248,-0.352,0.007]],[[-0.621,-0.022,-0.015],[-1.129,-0.023,-0.03],[-1.899,-0.018,-0.026],[-2.64,0.036,-0.043],[-2.483,-0.078,-0.037]],[[-0.958,0.053,-0.056],[-1.387,0.088,-0.047],[-2.313,0.123,-0.033],[-3.695,0.181,-0.014],[-8.557,-1.124,-3.982]],[[-0.671,-0.032,-0.031],[-0.822,-0.097,-0.03],[-1.02,-0.131,-0.037],[-1.089,-0.225,-0.016],[-1.091,-0.275,0.015]],[[-1.115,0.028,-0.012],[-1.936,-0.002,-0.014],[-2.767,0.027,-0.032],[-3.43,0.029,-0.038],[-2.462,-0.041,-0.004]]],"blitz":[[[-0.626,-0.131,0.013],[-0.834,-0.185,0.034],[-1.521,-0.217,0.026],[-3.117,-0.155,0.132],[-6.842,0.268,-1.58]],[[-0.28,-0.012,-0.028],[-0.407,-0.16,-0.062],[-0.985,-0.381,-0.064],[-1.692,-0.613,-0.052],[-2.532,-0.944,-0.021]],[[-0.858,-0.054,-0.013],[-1.421,-0.14,-0.007],[-1.898,-0.202,-0.022],[-1.924,-0.133,-0.036],[-1.341,-0.25,-0.01]],[[-1.096,-0.017,-0.013],[-1.302,-0.024,-0.012],[-1.833,-0.016,-0.031],[-2.922,0.007,-0.04],[-8.28,-0.052,-2.963]],[[-0.826,-0.018,-0.005],[-1.297,-0.09,-0.012],[-1.34,-0.167,-0.023],[-1.145,-0.278,-0.023],[-1.172,-0.52,-0.011]],[[-1.119,0.067,0.002],[-1.902,-0.031,0.023],[-2.282,-0.069,0.003],[-2.343,-0.023,-0.019],[-1.572,-0.163,-0.028]],[[-0.276,-0.053,-0.016],[-0.469,-0.001,-0.008],[-1.206,0.04,-0.007],[-2.596,0.103,-0.036],[-8.005,0.015,-1.756]],[[-0.375,-0.035,-0.012],[-0.258,-0.128,-0.027],[-0.433,-0.243,-0.029],[-0.843,-0.363,-0.036],[-1.519,-0.569,-0.031]],[[-0.672,0.007,-0.014],[-1.155,-0.057,-0.031],[-1.828,-0.031,-0.005],[-2.47,0.032,-0.043],[-2.403,-0.169,-0.022]],[[-1.015,0.088,-0.063],[-1.366,0.131,-0.055],[-2.234,0.165,-0.043],[-3.471,0.154,-0.06],[-9.043,-0.249,-3.385]],[[-0.935,-0.075,-0.005],[-1.185,-0.135,-0.025],[-1.427,-0.22,-0.029],[-1.54,-0.315,-0.015],[-1.535,-0.452,-0.004]],[[-1.072,0.158,-0.04],[-1.991,0.117,-0.027],[-2.789,0.089,-0.026],[-3.434,0.127,-0.035],[-2.595,-0.005,-0.017]]],"rapid":[[[-0.64,-0.108,0.029],[-0.801,-0.164,0.035],[-1.484,-0.216,0.024],[-2.981,-0.174,0.11],[-6.842,0.535,-1.547]],[[-0.297,-0.011,-0.033],[-0.424,-0.187,-0.056],[-0.98,-0.461,-0.046],[-1.615,-0.714,-0.046],[-2.398,-1.087,-0.03]],[[-0.909,-0.042,0.031],[-1.516,-0.185,0.012],[-1.924,-0.169,0.003],[-1.958,-0.173,-0.07],[-1.498,-0.301,0.019]],[[-1.066,-0.024,-0.031],[-1.329,-0.034,0.019],[-1.904,-0.037,0.003],[-3.049,-0.057,0.014],[-8.444,0.072,-1.827]],[[-0.821,-0.027,-0.017],[-1.294,-0.112,-0.028],[-1.341,-0.22,-0.031],[-1.164,-0.388,-0.021],[-1.188,-0.68,0.021]],[[-1.144,0.077,0.005],[-1.97,-0.12,0.053],[-2.403,-0.138,0.017],[-2.484,-0.084,-0.011],[-1.75,-0.261,-0.018]],[[-0.267,-0.072,-0.065],[-0.489,-0.011,-0.022],[-1.254,0.021,-0.039],[-2.725,0.072,-0.028],[-7.918,0.024,-1.796]],[[-0.383,-0.044,-0.012],[-0.262,-0.17,-0.048],[-0.421,-0.321,-0.047],[-0.829,-0.475,-0.044],[-1.477,-0.75,-0.026]],[[-0.695,-0.008,-0.025],[-1.219,-0.085,-0.032],[-1.937,-0.088,-0.036],[-2.576,-0.02,-0.068],[-2.517,-0.227,-0.028]],[[-1.065,0.128,-0.084],[-1.418,0.164,-0.078],[-2.328,0.176,-0.05],[-3.553,0.181,-0.084],[-9.159,0.075,-2.739]],[[-0.975,-0.089,-0.02],[-1.25,-0.158,-0.049],[-1.489,-0.266,-0.048],[-1.586,-0.386,-0.047],[-1.603,-0.602,0.016]],[[-1.105,0.218,-0.076],[-2.076,0.116,-0.053],[-2.942,0.086,-0.026],[-3.581,0.137,-0.091],[-2.781,-0.097,-0.015]]],"classical":[[[-0.588,-0.2,0.028],[-0.648,-0.359,0.076],[-1.459,-0.043,0.066],[-2.776,0.064,0.139],[-5.019,0.145,-0.971]],[[-0.316,-0.049,-0.03],[-0.366,-0.28,-0.146],[-0.848,-0.651,-0.169],[-1.392,-0.949,-0.183],[-2.074,-1.377,-0.246]],[[-0.831,-0.106,-0.017],[-1.383,-0.213,-0.06],[-1.981,-0.128,0.108],[-2.027,-0.188,0.038],[-1.341,-0.617,-0.276]],[[-1.014,0.022,-0.074],[-1.301,-0.099,-0.044],[-2.029,0.059,0.016],[-3.166,-0.169,-0.212],[-6.39,-0.125,-1.295]],[[-0.826,0.038,-0.09],[-1.288,-0.196,0.014],[-1.344,-0.409,0.013],[-1.075,-0.502,-0.091],[-1.07,-0.983,-0.061]],[[-1.125,0.104,-0.039],[-1.945,-0.122,-0.012],[-2.452,-0.119,-0.027],[-2.64,0.007,-0.123],[-1.87,-0.24,-0.126]],[[-0.25,0.015,-0.078],[-0.547,0.01,-0.101],[-1.338,0.107,-0.137],[-2.775,0.105,-0.106],[-5.912,-0.156,-1.188]],[[-0.43,0.031,-0.066],[-0.255,-0.097,-0.14],[-0.39,-0.401,-0.117],[-0.753,-0.623,-0.122],[-1.416,-0.913,-0.1]],[[-0.787,0.069,-0.018],[-1.305,-0.126,-0.027],[-2.059,0.092,-0.141],[-2.78,0.059,-0.02],[-2.618,-0.211,-0.052]],[[-1.126,0.22,-0.158],[-1.541,0.294,-0.083],[-2.51,0.273,-0.106],[-3.743,0.096,-0.072],[-7.203,-0.318,-1.37]],[[-0.956,0.004,-0.154],[-1.183,-0.044,-0.285],[-1.398,-0.3,-0.227],[-1.51,-0.428,-0.29],[-1.497,-0.668,-0.323]],[[-1.235,0.309,-0.066],[-2.288,0.198,0.015],[-3.125,0.103,-0.152],[-3.835,-0.011,0.013],[-2.936,-0.113,-0.231]]]}};
+  const RATING_BANDS = [0.5, 2, 5, 10, 20];
+  const PHASES = ['o', 't', 's', 'e']; // opening, tactics, strategy, endgame
+  const RATING_GRID = Array.from({ length: 311 }, (_, i) => 100 + 10 * i);
+  const RATING_SPEED = { ultraBullet: 'bullet', bullet: 'bullet', blitz: 'blitz', rapid: 'rapid', classical: 'classical', correspondence: 'classical' };
+
+  // Lichess's own phases (scalachess's Divider): the middlegame starts once
+  // pieces are traded or developed, or the two camps mix; the endgame once
+  // six pieces or fewer are left, kings and pawns aside.
+  function divide(fens) {
+    const count = (board, keep) => Object.entries(board).filter(([s, p]) => keep(s, p)).length;
+    const minors = b => count(b, (s, p) => p.type !== 'k' && p.type !== 'p');
+    const sparse = b => count(b, (s, p) => p.color === 'w' && s[1] === '1') < 4 || count(b, (s, p) => p.color === 'b' && s[1] === '8') < 4;
+    const score = (y, w, k) =>
+      w === 0 ? [0, 1 + y, y < 6 ? 2 + (6 - y) : 0, y < 7 ? 3 + (7 - y) : 0, y < 7 ? 3 + (7 - y) : 0][k] || 0
+      : w === 1 ? [1 + (8 - y), 5 + Math.abs(4 - y), 4 + (7 - y), 5 + (7 - y)][k] || 0
+      : w === 2 ? [y > 2 ? 2 + (y - 2) : 0, 4 + (y - 1), 7][k] || 0
+      : w === 3 ? [y > 1 ? 3 + (y - 1) : 0, 5 + (y - 1)][k] || 0
+      : w === 4 && k === 0 && y > 1 ? 3 + (y - 1) : 0;
+    const mixedness = b => {
+      let acc = 0;
+      for (let y = 0; y < 7; y++)
+        for (let x = 0; x < 7; x++) {
+          const n = { w: 0, b: 0 };
+          for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) {
+            const p = b[sq(x + dx, y + dy)];
+            if (p) n[p.color]++;
+          }
+          acc += score(y + 1, n.w, n.b);
+        }
+      return acc;
+    };
+    const boards = fens.map(f => parseFen(f).board);
+    let middle = boards.findIndex(b => minors(b) <= 10 || sparse(b) || mixedness(b) > 150);
+    const end = middle < 0 ? -1 : boards.findIndex(b => minors(b) <= 6);
+    if (middle >= 0 && end >= 0 && middle >= end) middle = -1;
+    return { middle, end };
+  }
+
+  // A position with a tactic in it: the side to move is in check, the last
+  // move threw away 10% or more (a chance to punish it), or a piece hangs
+  // (a knight, bishop, rook or queen attacked, and either undefended or
+  // attacked by something cheaper). Pins aside, as `attackers` has them.
+  function tactical(fen, prevLoss) {
+    const { board, turn } = parseFen(fen);
+    const enemy = c => (c === 'w' ? 'b' : 'w');
+    const king = Object.keys(board).find(s => board[s].type === 'k' && board[s].color === turn);
+    if (prevLoss >= 10 || (king && attackers(board, king, enemy(turn)).length)) return true;
+    return Object.entries(board).some(([s, p]) => {
+      if (p.type === 'p' || p.type === 'k') return false;
+      const hits = attackers(board, s, enemy(p.color));
+      return hits.length > 0 && (Math.min(...hits) < VALUES[p.type] || !attackers(board, s, p.color).length);
+    });
+  }
+
+  // log p(loss band | rating) per context (phase × lost / level / winning)
+  // over RATING_GRID, per speed, computed the first time it's needed.
+  const ratingOdds = {};
+  function oddsFor(speed) {
+    if (ratingOdds[speed]) return ratingOdds[speed];
+    const [lo, hi] = [-1.6, 2.2]; // the fit is quadratic in there, linear beyond
+    const q = x => (x < lo ? lo * lo + 2 * lo * (x - lo) : x > hi ? hi * hi + 2 * hi * (x - hi) : x * x);
+    return (ratingOdds[speed] = RATING_MODEL.theta[speed].map(ctx =>
+      RATING_GRID.map(r => {
+        const x = (r - 1500) / 500;
+        const logits = [0, ...ctx.map(([a, b, c]) => a + b * x + c * q(x))];
+        const max = Math.max(...logits);
+        const sum = Math.log(logits.reduce((s, l) => s + Math.exp(l - max), 0)) + max;
+        return logits.map(l => l - sum);
+      }),
+    ));
+  }
+
+  const posteriorMean = (ll, mu, sd) => {
+    const post = ll.map((l, i) => l - 0.5 * ((RATING_GRID[i] - mu) / sd) ** 2);
+    const max = Math.max(...post);
+    let w = 0, s = 0;
+    post.forEach((p, i) => {
+      const e = Math.exp(p - max);
+      w += e;
+      s += e * RATING_GRID[i];
+    });
+    return s / w;
+  };
+
+  // { w, b }: each player's { elo, phases: { o, t, s, e } }, a phase's verdict
+  // being a class key (best … blunder, or book for a book-only opening), or
+  // null when the player made no move in that phase.
+  function rateGame(ctrl, moves) {
+    const speed = RATING_SPEED[ctrl.data.game.speed] || 'blitz';
+    const odds = oddsFor(speed);
+    const tau = RATING_MODEL.tau[speed];
+    const [popMu, popSd] = RATING_MODEL.pop[speed];
+    const { middle, end } = divide(ctrl.mainline.map(n => n.fen));
+    const scored = moves.map((m, i) => {
+      if (m.cls === 'book') return { color: m.color, phase: 'k' };
+      const pos = m.ply - 1; // the phase of the position it was played from
+      const prev = moves[i - 1];
+      const phase =
+        end >= 0 && pos >= end ? 'e'
+        : middle < 0 || pos < middle ? 'o'
+        : tactical(m.prev.fen, prev && prev.cls !== 'book' ? prev.loss : 0) ? 't' : 's';
+      const before = pov(m.before.wp, m.color);
+      const ctx = PHASES.indexOf(phase) * 3 + (before < 20 ? 0 : before > 80 ? 2 : 1);
+      const band = RATING_BANDS.findIndex(t => m.loss < t);
+      return { color: m.color, phase, ctx, band: band < 0 ? RATING_BANDS.length : band };
+    });
+    const likelihood = list => RATING_GRID.map((_, g) => list.reduce((s, m) => s + odds[m.ctx][g][m.band], 0));
+    const p = players(ctrl);
+    const rate = color => {
+      const own = scored.filter(m => m.color === color);
+      const played = own.filter(m => m.phase !== 'k');
+      if (!played.length) return null;
+      const rating = p[color]?.rating;
+      const est = rating ? posteriorMean(likelihood(played), rating, tau) : posteriorMean(likelihood(played), popMu, Math.hypot(popSd, tau));
+      // Each phase against what's expected at the player's rating (or, for
+      // an unrated one, at the level of their whole game).
+      const anchor = rating || est;
+      const phases = {};
+      for (const ph of PHASES) {
+        const inPhase = played.filter(m => m.phase === ph);
+        if (!inPhase.length) {
+          phases[ph] = ph === 'o' && own.some(m => m.phase === 'k') ? 'book' : null;
+          continue;
+        }
+        const diff = posteriorMean(likelihood(inPhase), anchor, tau) - anchor;
+        const cut = RATING_MODEL.cuts[ph].findIndex(c => diff >= c);
+        phases[ph] = ['best', 'excellent', 'good', 'inaccuracy', 'mistake'][cut] || 'blunder';
+      }
+      return { elo: Math.round(est / 50) * 50, phases };
+    };
+    return { w: rate('w'), b: rate('b') };
   }
 
   // --------------------------------------------------- coach remarks ---
@@ -1302,6 +1452,19 @@
     const more = state.allRows ? T.less : T.more;
     const toggle = `<tr class="cdc-t-more"><td colspan="4"><button class="cdc-review__more${state.allRows ? ' cdc-review__more--open' : ''}" data-cdc="rows" title="${esc(more)}" aria-label="${esc(more)}" aria-expanded="${state.allRows}">${headIcon('M6 9l6 6 6-6')}</button></td></tr>
       <tr class="cdc-t-sep"><td colspan="4"></td></tr>`;
+    // Under them, as on Chess.com: the rating each side played at, then a
+    // verdict per phase, as the icon of the class it deserves (a phase the
+    // game never reached goes once it's analyzed).
+    const elo = c => r?.rating[c]?.elo ?? '&nbsp;';
+    const phase = (c, ph) => {
+      const cls = r?.rating[c]?.phases[ph];
+      return cls ? icon(cls) : '';
+    };
+    const rating = `<tr class="cdc-t-rating"><td class="cdc-t-label"><span data-cdc-tip="${esc(T.gameRatingTip)}">${esc(T.gameRating)}</span></td>
+        <td><span class="cdc-acc cdc-acc--w">${elo('w')}</span></td><td></td>
+        <td><span class="cdc-acc cdc-acc--b">${elo('b')}</span></td></tr>
+      <tr class="cdc-t-sep"><td colspan="4"></td></tr>
+      ${PHASES.filter(ph => !r || r.rating.w?.phases[ph] || r.rating.b?.phases[ph]).map(ph => `<tr class="cdc-t-phase"><td class="cdc-t-label">${esc(T.phases[ph])}</td><td>${phase('w', ph)}</td><td></td><td>${phase('b', ph)}</td></tr>`).join('')}`;
     // Only the classification rows scroll: they're a table of their own, with
     // the same fixed columns as the one above so the two line up.
     const cols = '<colgroup><col class="cdc-t-c-label"><col><col class="cdc-t-c-icon"><col></colgroup>';
@@ -1320,7 +1483,7 @@
         </table>
       </div>
       <div class="cdc-review__body">
-        <table class="cdc-review__table${loading ? ' cdc-review__table--loading' : ''}">${cols}${rows}${toggle}</table>
+        <table class="cdc-review__table${loading ? ' cdc-review__table--loading' : ''}">${cols}${rows}${toggle}${rating}</table>
       </div>
       <div class="cdc-review__foot"><button class="cdc-btn cdc-btn--green" data-cdc="moves" ${r ? '' : 'disabled'}>${esc(T.start)}</button></div>`;
     const g = dom.panel.querySelector('.cdc-summary-graph');
@@ -1538,6 +1701,7 @@
             ctrl.onMainline ? '' : liveDigest(reviewMove(ctrl)), live.error].join('|');
     if (force || key !== state.lastKey) {
       state.lastKey = key;
+      hideTip();
       if (state.mode === 'summary') renderSummary(ctrl);
       else if (state.mode === 'moves') renderMoves(ctrl);
       else if (state.mode === 'live') renderLive(ctrl);
@@ -1595,6 +1759,28 @@
   };
   dom.panel.addEventListener('click', onClick);
   dom.controls.addEventListener('click', onClick);
+
+  // Chess.com's tooltip: dark, over what it explains, its tail pointing at
+  // it. On <body>, as the panel's rows scroll and would clip it.
+  const tip = el('div', { id: 'cdc-tip', role: 'tooltip' });
+  const hideTip = () => tip.remove();
+  dom.panel.addEventListener('pointerover', e => {
+    const t = e.target.closest('[data-cdc-tip]');
+    if (!t) return;
+    tip.textContent = t.dataset.cdcTip;
+    document.body.appendChild(tip);
+    const a = t.getBoundingClientRect();
+    const w = tip.offsetWidth;
+    const left = Math.max(8, Math.min(window.innerWidth - w - 8, a.left + a.width / 2 - w / 2));
+    tip.style.left = `${left}px`;
+    tip.style.top = `${a.top - tip.offsetHeight - 10}px`;
+    tip.style.setProperty('--cdc-tip-x', `${a.left + a.width / 2 - left}px`);
+  });
+  dom.panel.addEventListener('pointerout', e => {
+    const t = e.target.closest('[data-cdc-tip]');
+    if (t && !t.contains(e.relatedTarget)) hideTip();
+  });
+  dom.panel.addEventListener('scroll', hideTip, true);
 
 
   // ------------------------------------------------------------ live ---
