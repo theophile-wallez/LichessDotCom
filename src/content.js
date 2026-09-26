@@ -716,6 +716,100 @@
     if (tooltipFor && !tooltipFor.isConnected) hideTooltip();
   };
 
+  // Tab bars (see "sliding tabs" in styles/theme.css): the active tab's
+  // highlight, a raised pill or an underline, is one piece that slides from
+  // the tab left to the tab picked, as the rating chart's range pills do. It's
+  // the bar's ::before, placed here in `--cdc-tab-{x,y,w,h}`; the bar is only
+  // marked once it's placed, so until then (and with no active tab) the tab
+  // keeps its own highlight. [bar, tab, active tab, look]: the first match
+  // wins, and the tabs are the bar's children. A bar Lichess draws anew on a
+  // click has nothing to slide: the profile's games filter (it comes back
+  // with the games), the home lobby's tabs and the explorer's databases.
+  const TAB_BARS = [
+    ['.user-show > .angles', '.nm-item', '.active', 'pill'],
+    ['.game-setup .time-control-tabs .tabs-horiz', 'button', '.active', 'pill'],
+    ['.ublog-index .btn-rack', '.btn-rack__btn', '.active', 'pill'],
+    ['main.forum-topic .markdown-editor .header', '.header-tab', '.active', 'pill'],
+    ['.tabs-horiz:not(.lobby__app > .tabs-horiz)', '*', '.active', 'line'],
+    ['.mchat__tabs', '.mchat__tab', '.mchat__tab-active', 'line'],
+    ['.auth .auth-tabs', 'a', '.active', 'line'],
+    ['.relay-tour__tabs', 'button', '.active', 'pill'],
+  ];
+  const tabBars = new Map();
+  const placeTabs = bar => {
+    const { el, tab, active } = bar;
+    bar.queued = false;
+    if (!el.isConnected) {
+      bar.sizes.disconnect();
+      bar.changes.disconnect();
+      return tabBars.delete(el);
+    }
+    const tabs = [...el.children].filter(c => c.matches(tab));
+    for (const t of tabs) bar.sizes.observe(t);
+    // A link that leaves the page is shown picked while the next one loads.
+    const item = bar.leaving?.isConnected ? bar.leaving : tabs.find(t => t.matches(active));
+    if (!item) {
+      delete el.dataset.cdcTabs;
+      bar.item = null;
+      return;
+    }
+    if (!item.offsetWidth) return; // Hidden: placed once it shows.
+    const b = el.getBoundingClientRect(), r = item.getBoundingClientRect();
+    const at = [r.left - b.left - el.clientLeft + el.scrollLeft, r.top - b.top - el.clientTop + el.scrollTop, r.width, r.height];
+    if (item === bar.item && `${at}` === `${bar.at}`) return;
+    if (bar.item && item !== bar.item) delete el.dataset.cdcTabsStill;
+    else el.dataset.cdcTabsStill = '';
+    const [x, y, w, h] = at;
+    el.style.setProperty('--cdc-tab-x', `${x}px`);
+    el.style.setProperty('--cdc-tab-y', `${y}px`);
+    el.style.setProperty('--cdc-tab-w', `${w}px`);
+    el.style.setProperty('--cdc-tab-h', `${h}px`);
+    el.dataset.cdcTabs = bar.look;
+    bar.item = item;
+    bar.at = at;
+  };
+  const queueTabs = bar => {
+    if (bar.queued) return;
+    bar.queued = true;
+    requestAnimationFrame(() => placeTabs(bar));
+  };
+  const syncTabs = () => {
+    for (const [sel, tab, active, look] of TAB_BARS)
+      for (const el of document.querySelectorAll(sel)) {
+        if (tabBars.has(el)) continue;
+        const bar = { el, tab, active, look, item: null, at: null, leaving: null, queued: false };
+        bar.sizes = new ResizeObserver(() => queueTabs(bar));
+        bar.sizes.observe(el);
+        bar.changes = new MutationObserver(() => queueTabs(bar));
+        bar.changes.observe(el, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+        tabBars.set(el, bar);
+      }
+    // Catches what moves a tab without resizing it or the bar.
+    for (const bar of tabBars.values()) placeTabs(bar);
+  };
+  // Bubbling to the document, after Lichess's own handlers: a click that
+  // got here, uncancelled, on a link is a page about to load.
+  document.addEventListener('click', e => {
+    let t = e.target instanceof Element ? e.target : null;
+    while (t && !tabBars.has(t.parentElement)) t = t.parentElement;
+    const bar = t && tabBars.get(t.parentElement);
+    if (!bar || !t.matches(bar.tab)) return;
+    const leaves =
+      t.matches('a[href]') && !e.defaultPrevented && !e.button && !(e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) &&
+      t.target !== '_blank';
+    if (!leaves) return;
+    bar.leaving = t;
+    queueTabs(bar);
+  });
+  // Back to this page from the history cache: the link didn't stay picked.
+  window.addEventListener('pageshow', e => {
+    if (!e.persisted) return;
+    for (const bar of tabBars.values()) {
+      bar.leaving = null;
+      queueTabs(bar);
+    }
+  });
+
   setInterval(() => {
     syncControlsHeight();
     syncPlayers();
@@ -734,6 +828,7 @@
     syncTvChannels();
     syncPowertip();
     syncTooltip();
+    syncTabs();
   }, 250);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncHero);
   else syncHero();

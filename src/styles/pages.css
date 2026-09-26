@@ -224,6 +224,11 @@ h3 {
   border-color: #fff !important;
 }
 
+/* Their underline slides from tab to tab (see "sliding tabs" in theme.css). */
+.tabs-horiz[data-cdc-tabs='line'] > .active {
+  border-bottom-color: transparent !important;
+}
+
 /* --------------------------------------------------------------- tables --- */
 
 .slist thead {
@@ -721,6 +726,11 @@ dialog .help th p {
   color: #fff !important;
 }
 
+.game-setup .time-control-tabs .tabs-horiz[data-cdc-tabs] button.active {
+  background: transparent !important;
+  box-shadow: none;
+}
+
 .game-setup .time-control-tabs .time-panel {
   gap: 16px !important;
 }
@@ -1071,6 +1081,10 @@ input.range::-webkit-slider-thumb {
 .auth .auth-tabs a.active {
   color: #fff !important;
   border-bottom-color: #fff !important;
+}
+
+.auth .auth-tabs[data-cdc-tabs] a.active {
+  border-bottom-color: transparent !important;
 }
 
 /* ------------------------------------------------------- puzzle modes --- */

@@ -438,6 +438,18 @@
   color: #fff !important;
 }
 
+/* The green one slides (see "sliding tabs" in theme.css). */
+.ublog-index .btn-rack[data-cdc-tabs] {
+  --cdc-tab-radius: 6px;
+  --cdc-tab-bg: var(--cdc-btn-green);
+  --cdc-tab-shadow: var(--cdc-btn-green-shadow);
+}
+
+.ublog-index .btn-rack[data-cdc-tabs] .btn-rack__btn.active {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
 /* By month: previous / next month as quiet icon buttons around the pickers. */
 .ublog-index .calendar-mselect > a {
   width: 40px;

@@ -427,3 +427,55 @@ select {
   font: inherit !important;
   font-size: 11px !important;
 }
+
+/* ---------------------------------------------------------- sliding tabs --- */
+
+/* A tab bar's highlight, a raised pill or an underline, is one piece that
+ * slides from the tab left to the tab picked, as the rating chart's range
+ * pills do. content.js marks the bar (`data-cdc-tabs`: pill or line) once it
+ * has placed the piece, in `--cdc-tab-{x,y,w,h}`, and `data-cdc-tabs-still`
+ * when it moved without a new tab picked (the first time, a reflow). Each
+ * bar's CSS gives the piece its active tab's look (`--cdc-tab-bg`,
+ * `-shadow`, `-radius`, and `-line` for an underline's thickness) and takes
+ * that look off the tab. */
+[data-cdc-tabs] {
+  position: relative;
+}
+
+[data-cdc-tabs='pill'] {
+  isolation: isolate;
+}
+
+[data-cdc-tabs]::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  box-sizing: border-box;
+  width: var(--cdc-tab-w);
+  height: var(--cdc-tab-h);
+  border-radius: var(--cdc-tab-radius, 7px);
+  background: var(--cdc-tab-bg, var(--cdc-bg-raised));
+  box-shadow: var(--cdc-tab-shadow, 0 1px 3px #00000080);
+  transform: translate(var(--cdc-tab-x), var(--cdc-tab-y));
+  pointer-events: none;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.35s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+/* An underline runs along the tab's bottom edge, over the tabs. */
+[data-cdc-tabs='line']::before {
+  z-index: 1;
+  height: var(--cdc-tab-line, 2px);
+  border-radius: var(--cdc-tab-radius, 0);
+  background: var(--cdc-tab-bg, #fff);
+  box-shadow: none;
+  transform: translate(var(--cdc-tab-x), calc(var(--cdc-tab-y) + var(--cdc-tab-h) - var(--cdc-tab-line, 2px)));
+}
+
+[data-cdc-tabs-still]::before {
+  transition: none !important;
+}

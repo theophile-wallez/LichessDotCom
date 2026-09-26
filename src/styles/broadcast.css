@@ -431,3 +431,20 @@ main.analyse.has-relay-tour .relay-tour__side .relay-game:hover {
 main.analyse.has-relay-tour .relay-tour__side .relay-game--current {
   background: #ffffff14 !important;
 }
+
+/* The tour's tabs (overview, boards, players…): Lichess's gold outline
+ * slides to the tab picked (see "sliding tabs" in theme.css), drawn over
+ * the tabs' own grey outlines. */
+.relay-tour__tabs[data-cdc-tabs] {
+  --cdc-tab-radius: var(---ui-roundness, 7px);
+  --cdc-tab-bg: transparent;
+  --cdc-tab-shadow: inset 0 0 0 1px var(--c-brag);
+}
+
+.relay-tour__tabs[data-cdc-tabs]::before {
+  z-index: 1;
+}
+
+.relay-tour__tabs[data-cdc-tabs] button.active {
+  border-color: var(--c-border) !important;
+}
