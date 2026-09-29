@@ -109,21 +109,23 @@ html:not([data-cdc-pieces='lichess']) .is2d .king.black {
 
 /* ---- Highlights --- */
 
+/* Chessground puts all of a square's classes on one element: highlights paint its color
+   and move hints its image, so a hint on the last move's square draws over the highlight. */
 cg-board square.last-move,
 body[data-board] .is2d cg-board square.last-move {
-  background: var(--cdc-highlight) !important;
+  background-color: var(--cdc-highlight) !important;
 }
 
 cg-board square.selected {
-  background: var(--cdc-highlight) !important;
+  background-color: var(--cdc-highlight) !important;
 }
 
-cg-board square.move-dest {
-  background: radial-gradient(var(--cdc-hint) 22%, transparent 23%) !important;
+cg-board square:is(.move-dest, .premove-dest) {
+  background-image: radial-gradient(var(--cdc-hint) 22%, transparent 23%) !important;
 }
 
-cg-board square.oc.move-dest {
-  background: radial-gradient(
+cg-board square.oc:is(.move-dest, .premove-dest) {
+  background-image: radial-gradient(
     transparent 0 57%,
     var(--cdc-hint) 58% 70%,
     transparent 71%
@@ -135,23 +137,10 @@ cg-board square.move-dest.hover {
   box-shadow: inset 0 0 0 max(3px, 0.35vmin) rgba(255, 255, 255, 0.65);
 }
 
-/* Premove hints look like normal move hints, not a warning color. */
-cg-board square.premove-dest {
-  background: radial-gradient(var(--cdc-hint) 22%, transparent 23%) !important;
-}
-
-cg-board square.oc.premove-dest {
-  background: radial-gradient(
-    transparent 0 57%,
-    var(--cdc-hint) 58% 70%,
-    transparent 71%
-  ) !important;
-}
-
 /* A set premove: both squares, opaque (chessground already shows the piece on the new one). */
 cg-board square.current-premove,
 body[data-board] .is2d cg-board square.current-premove {
-  background: var(--cdc-premove) !important;
+  background-color: var(--cdc-premove) !important;
 }
 
 cg-board square.check {

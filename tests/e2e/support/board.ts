@@ -31,12 +31,15 @@ export async function orientationOf(page: Page): Promise<Orientation> {
   return classes.includes('orientation-black') ? 'black' : 'white';
 }
 
+/** Clicks a square of the main board: picks the piece on it, or moves the picked one there. */
+export async function clickSquare(page: Page, square: string): Promise<void> {
+  const board = await boxOf(page.locator('main .main-board cg-board').first());
+  const { x, y } = squareCenter(board, square, await orientationOf(page));
+  await page.mouse.click(x, y);
+}
+
 /** Plays a move by clicking its two squares, as a user can instead of dragging. */
 export async function clickMove(page: Page, from: string, to: string): Promise<void> {
-  const board = await boxOf(page.locator('main .main-board cg-board').first());
-  const orientation = await orientationOf(page);
-  for (const square of [from, to]) {
-    const { x, y } = squareCenter(board, square, orientation);
-    await page.mouse.click(x, y);
-  }
+  await clickSquare(page, from);
+  await clickSquare(page, to);
 }

@@ -92,61 +92,61 @@ html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='brilliant']
   main.analyse
   cg-board
   square.last-move {
-  background: rgba(38, 194, 163, 0.5) !important;
+  background-color: rgba(38, 194, 163, 0.5) !important;
 }
 html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='great']
   main.analyse
   cg-board
   square.last-move {
-  background: rgba(116, 155, 191, 0.5) !important;
+  background-color: rgba(116, 155, 191, 0.5) !important;
 }
 html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='best']
   main.analyse
   cg-board
   square.last-move {
-  background: rgba(129, 182, 76, 0.5) !important;
+  background-color: rgba(129, 182, 76, 0.5) !important;
 }
 html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='excellent']
   main.analyse
   cg-board
   square.last-move {
-  background: rgba(129, 182, 76, 0.5) !important;
+  background-color: rgba(129, 182, 76, 0.5) !important;
 }
 html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='good']
   main.analyse
   cg-board
   square.last-move {
-  background: rgba(149, 183, 118, 0.5) !important;
+  background-color: rgba(149, 183, 118, 0.5) !important;
 }
 html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='book']
   main.analyse
   cg-board
   square.last-move {
-  background: rgba(168, 136, 101, 0.5) !important;
+  background-color: rgba(168, 136, 101, 0.5) !important;
 }
 html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='inaccuracy']
   main.analyse
   cg-board
   square.last-move {
-  background: rgba(247, 198, 49, 0.5) !important;
+  background-color: rgba(247, 198, 49, 0.5) !important;
 }
 html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='mistake']
   main.analyse
   cg-board
   square.last-move {
-  background: rgba(255, 164, 89, 0.5) !important;
+  background-color: rgba(255, 164, 89, 0.5) !important;
 }
 html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='miss']
   main.analyse
   cg-board
   square.last-move {
-  background: rgba(255, 119, 105, 0.5) !important;
+  background-color: rgba(255, 119, 105, 0.5) !important;
 }
 html:is(.cdc-review-moves, .cdc-review-live)[data-cdc-cls='blunder']
   main.analyse
   cg-board
   square.last-move {
-  background: rgba(250, 65, 45, 0.5) !important;
+  background-color: rgba(250, 65, 45, 0.5) !important;
 }
 
 /* ---- Mobile --- */
