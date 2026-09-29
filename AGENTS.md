@@ -94,7 +94,9 @@ back. `pnpm check` enforces much of what follows; the rest is on you.
 - `fixtures/legacy*.json` are outputs recorded from the original code. They
   are the reference for behavior: never regenerate them from the new code.
   If a change must alter one, it's a deliberate behavior change: say so in
-  the commit.
+  the commit. Compare their fractions through `nearly`
+  (`#shared/testing/numbers.ts`): `Math.exp` and `Math.log` differ in the
+  last bit between macOS and Linux.
 - No fixed real-time sleeps in tests: wait for the thing you need.
 
 **Docs**

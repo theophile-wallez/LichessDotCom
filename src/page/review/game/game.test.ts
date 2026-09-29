@@ -4,6 +4,7 @@ import { StoredRecordCodec } from '#page/review/evaluation/stored.ts';
 import { UNIT_CASES } from '#page/review/fixtures/unit-cases.ts';
 import { builtSession, fakeGame, newSession } from '#page/review/fixtures/unit-review.ts';
 import type { JudgedMove } from '#page/review/session.ts';
+import { nearly } from '#shared/testing/numbers.ts';
 import { nextJob } from './analyse-game.ts';
 import { cacheRecords, readCachedRecords } from './cache.ts';
 import { lookUpCloud } from './cloud-lookup.ts';
@@ -74,7 +75,7 @@ describe('refresh', () => {
         revealed: [...revealed],
       };
       // Holes and undefined as JSON has them, as the recording does.
-      expect(JSON.parse(JSON.stringify(port))).toEqual(expected);
+      expect(JSON.parse(JSON.stringify(port))).toEqual(nearly(expected));
     },
   );
 });

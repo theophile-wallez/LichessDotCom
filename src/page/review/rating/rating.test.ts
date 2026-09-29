@@ -1,6 +1,7 @@
 import { z } from 'zod/mini';
 import { describe, expect, it } from 'vitest';
 import { fixtureGames, replay } from '#page/review/fixtures/replay.ts';
+import { nearly } from '#shared/testing/numbers.ts';
 import { ratingModel, type Speed } from './model.ts';
 import { bandOdds, posteriorMean, RATING_GRID } from './odds.ts';
 import { divide } from './phases.ts';
@@ -52,7 +53,7 @@ describe('the odds', () => {
     for (const speed of speeds) {
       const odds = bandOdds(speed);
       for (const [context, grid, band, value] of legacy.odds[speed]) {
-        expect(odds[Number(context)]?.[Number(grid)]?.[Number(band)]).toBe(value);
+        expect(odds[Number(context)]?.[Number(grid)]?.[Number(band)]).toEqual(nearly(value));
       }
     }
   });
@@ -62,7 +63,7 @@ describe('the odds', () => {
       const likelihood = RATING_GRID.map(
         (_, i) => -0.00001 * (i - 150) ** 2 * (Number(mean) / 1000) - (i % 7) * 0.01,
       );
-      expect(posteriorMean(likelihood, Number(mean), Number(deviation))).toBe(expected);
+      expect(posteriorMean(likelihood, Number(mean), Number(deviation))).toEqual(nearly(expected));
     }
   });
 

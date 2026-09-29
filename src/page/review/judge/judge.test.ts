@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fixtureGames, legacyColor, replay } from '#page/review/fixtures/replay.ts';
 import type { PositionRecord } from '#page/review/evaluation/score.ts';
+import { nearlyObject } from '#shared/testing/numbers.ts';
 import { mateVerdict, SURE_MATE } from './mate.ts';
 import { judge } from './judge.ts';
 import { classCounts, playerAccuracy } from './summary.ts';
@@ -31,11 +32,9 @@ describe('judge', () => {
       expect(moves).toHaveLength(expected.length);
       for (const [i, move] of moves.entries()) {
         const { color, cls, ...rest } = expected[i] ?? { color: '', cls: '' };
-        expect({ ...move, color: legacyColor(move.color) }).toMatchObject({
-          ...rest,
-          moveClass: cls,
-          color,
-        });
+        expect({ ...move, color: legacyColor(move.color) }).toMatchObject(
+          nearlyObject({ ...rest, moveClass: cls, color }),
+        );
       }
     }
   });
