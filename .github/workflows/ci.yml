@@ -89,6 +89,11 @@ jobs:
           path: packages
       - run: mkdir -p dist && unzip -q packages/LichessDotCom-v*[0-9].zip -d dist/chrome
       - run: pnpm test:e2e
+      # The dev reload ships in dev builds only: its spec runs on one too.
+      - run: node scripts/build.ts --out dist/dev
+      - run: pnpm exec playwright test tests/e2e/background.spec.ts
+        env:
+          CDC_EXTENSION_DIR: dist/dev
 
       - uses: actions/upload-artifact@v7
         if: failure()

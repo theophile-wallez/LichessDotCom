@@ -1,5 +1,7 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { ManifestSchema } from '#manifest';
+import { DEV_CHECK_TYPE } from '#shared/dev-check.ts';
 import { chromium, type BrowserContext, type BrowserContextOptions } from '@playwright/test';
 
 // Where the build under test is, and how Chromium must be launched to load it.
@@ -13,6 +15,25 @@ export const EXTENSION_DIR = path.resolve(
   process.env['CDC_EXTENSION_DIR'] ??
     path.join(import.meta.dirname, '..', '..', '..', 'dist', 'chrome'),
 );
+
+const readIn = (file: string): string | null => {
+  const at = path.join(EXTENSION_DIR, file);
+  return existsSync(at) ? readFileSync(at, 'utf8') : null;
+};
+
+/**
+ * Whether this build runs the dev reload, as its worker decides: the dev
+ * reload's code in the bundle (a release build drops it) and the storage
+ * permission (src/background/index.ts). False for a build not there yet,
+ * which `assertBuilt` reports.
+ */
+export function runsDevReload(): boolean {
+  const worker = readIn('background.js');
+  const manifest = readIn('manifest.json');
+  if (worker === null || manifest === null) return false;
+  const { permissions = [] } = ManifestSchema.parse(JSON.parse(manifest));
+  return worker.includes(DEV_CHECK_TYPE) && permissions.includes('storage');
+}
 
 /** Fails early, rather than with every test timing out on an unstyled page. */
 export function assertBuilt(): void {
